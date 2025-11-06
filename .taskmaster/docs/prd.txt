@@ -1,1270 +1,1303 @@
-# WildOut! - Indonesia's Premier Nightlife & Creative Community Platform
-## Product Requirements Document (RPG Method)
+<rpg-method>
+# Repository Planning Graph (RPG) Method - PRD Template
+
+This template teaches you (AI or human) how to create structured, dependency-aware PRDs using the RPG methodology from Microsoft Research. The key insight: separate WHAT (functional) from HOW (structural), then connect them with explicit dependencies.
+
+## Core Principles
+
+1. **Dual-Semantics**: Think functional (capabilities) AND structural (code organization) separately, then map them
+2. **Explicit Dependencies**: Never assume - always state what depends on what
+3. **Topological Order**: Build foundation first, then layers on top
+4. **Progressive Refinement**: Start broad, refine iteratively
+
+## How to Use This Template
+
+- Follow the instructions in each `<instruction>` block
+- Look at `<example>` blocks to see good vs bad patterns
+- Fill in the content sections with your project details
+- The AI reading this will learn the RPG method by following along
+- Task Master will parse the resulting PRD into dependency-aware tasks
+
+## Recommended Tools for Creating PRDs
+
+When using this template to **create** a PRD (not parse it), use **code-context-aware AI assistants** for best results:
+
+**Why?** The AI needs to understand your existing codebase to make good architectural decisions about modules, dependencies, and integration points.
+
+**Recommended tools:**
+- **Claude Code** (claude-code CLI) - Best for structured reasoning and large contexts
+- **Cursor/Windsurf** - IDE integration with full codebase context
+- **Gemini CLI** (gemini-cli) - Massive context window for large codebases
+- **Codex/Grok CLI** - Strong code generation with context awareness
+
+**Note:** Once your PRD is created, `task-master parse-prd` works with any configured AI model - it just needs to read the PRD text itself, not your codebase.
+</rpg-method>
 
 ---
+
+<overview>
 
 ## Problem Statement
 
-Jakarta's vibrant nightlife and creative communities lack a centralized digital platform to discover events, connect with artists, and manage large-scale event production. Event organizers currently rely on fragmented social media, manual spreadsheets, and inefficient communication channels. Artists struggle to find performance opportunities, and brands lack dedicated venues for partnerships and sponsorships.
-
-**Core Problem**: No unified ecosystem exists that simultaneously serves event discovery (for attendees), event management (for organizers), artist networking (for creatives), and brand partnerships (for corporates).
+WildOut! is a media platform for Indonesia's creative community that currently has a React/TypeScript landing page and admin dashboard. The platform needs structured development with clear separation of concerns, dependency mapping, and phased implementation of features. The core challenge is managing complex content relationships (events, team, partners, gallery, settings) while maintaining code quality, performance, and maintainability as the platform scales from initial launch to supporting 500+ events, 50K+ members, and 100+ partners.
 
 ## Target Users
 
-### User Personas
+**Primary:**
+- **Event Organizers**: Need to create, manage, and promote events (festivals, club nights, exhibitions, live music)
+- **Platform Administrators**: Manage content, team members, partners, gallery, and site settings
+- **Creative Community Members**: Browse events, discover artists, connect with venues and other creatives
 
-1. **Event Attendees** (18-35, nightlife enthusiasts)
-   - Pain: Finding events across multiple platforms
-   - Goal: Discover new experiences, connect with community
-   - Motivation: FOMO, social status, cultural participation
-
-2. **Event Organizers** (DJs, promoters, venue managers)
-   - Pain: Manual event management, scattered communications
-   - Goal: Sell tickets, manage logistics, reach audience
-   - Motivation: Revenue, audience growth, operational efficiency
-
-3. **Artists/Creatives** (Musicians, visual artists, performers)
-   - Pain: Limited gig opportunities, unclear event pipelines
-   - Goal: Find performances, build portfolio, network
-   - Motivation: Income, exposure, artistic collaboration
-
-4. **Brand Partners** (Corporate sponsors, beverage companies)
-   - Pain: Limited co-branding opportunities, unclear ROI tracking
-   - Goal: Brand visibility, community engagement
-   - Motivation: Market reach, brand loyalty, community alignment
+**Secondary:**
+- **Venue Owners**: List their venues and managed events
+- **Artists/DJs**: Showcase their profiles and upcoming performances
+- **Partners/Sponsors**: Brand visibility and partnership opportunities
 
 ## Success Metrics
 
-- **User Acquisition**: 10K+ registered users within 6 months
-- **Event Coverage**: 100+ events on platform within 3 months
-- **Engagement**: 80%+ monthly active users viewing events
-- **Platform Activity**: 50+ artists, 20+ brand partners actively engaged
-- **Content**: 500+ event images in gallery within 6 months
-- **Dashboard Adoption**: 80% of organizers using admin dashboard for CRUD operations
-- **Real-time Sync**: Zero-latency between dashboard changes and landing page updates
+- **Launch**: Fully functional landing page + admin dashboard deployed (v0.1.0)
+- **Content Scale**: Support 500+ events, 50K+ members, 100+ partners without performance degradation
+- **Admin Efficiency**: Content management operations completed in < 5 seconds per action
+- **Developer Velocity**: New features implemented in phased sprints with minimal blockers
+- **Code Quality**: 80%+ test coverage for critical paths, < 2 bugs per release
+- **Platform Availability**: 99%+ uptime for user-facing pages
+
+</overview>
 
 ---
+
+<functional-decomposition>
 
 ## Capability Tree
 
-### Capability: Landing Page & Discovery
+### Capability: Event Management
+Core capability for creating, updating, viewing, and managing event lifecycle across the platform.
 
-Public-facing interface for event discovery, artist exploration, and brand showcase.
+#### Feature: Event CRUD Operations
+- **Description**: Create, read, update, and delete event records with full metadata
+- **Inputs**: Event form data (title, description, date, time, venue, capacity, price, artists, images)
+- **Outputs**: Event record with unique ID, timestamps, and validation status
+- **Behavior**: Validate input, persist to Supabase, trigger side effects (cache invalidation, notifications)
 
-#### Feature: Event Showcase & Filtering
-- **Description**: Display upcoming events with category filtering and sorting
-- **Inputs**: Event list from ContentContext, user filter selections
-- **Outputs**: Rendered event grid with details, event detail modal
-- **Behavior**: Fetch events, apply category/date filters, display in responsive grid, open modal on selection
+#### Feature: Event Status Lifecycle
+- **Description**: Manage event progression through states: draft → upcoming → ongoing → completed → archived
+- **Inputs**: Event ID, new status, transition reason
+- **Outputs**: Updated event with audit trail
+- **Behavior**: Enforce valid state transitions, prevent invalid operations (e.g., complete past events)
 
-#### Feature: Artist Directory
-- **Description**: Showcase team members and artists with bios, photos, and social links
-- **Inputs**: Artist/team member list from ContentContext
-- **Outputs**: Rendered artist cards, profile details, social links
-- **Behavior**: Display artist grid, link to social profiles, clickable for detailed bios
+#### Feature: Event Gallery & Media
+- **Description**: Manage featured images, gallery photos, and media assets for events
+- **Inputs**: Event ID, image files, captions, metadata
+- **Outputs**: Stored media with URLs, thumbnails, and metadata
+- **Behavior**: Upload to Supabase Storage, generate thumbnails, validate file types
 
-#### Feature: Gallery Showcase
-- **Description**: Display event photographs and creative content
-- **Inputs**: Gallery images from ContentContext, optional event associations
-- **Outputs**: Rendered gallery grid, lightbox/modal for viewing
-- **Behavior**: Load images, display in responsive grid, enable full-screen viewing
+#### Feature: Event Lineup & Artists
+- **Description**: Manage artists performing at events with roles and metadata
+- **Inputs**: Event ID, artist profiles, roles (Headliner, Supporting, Opening)
+- **Outputs**: Artist lineup with ordering and role assignments
+- **Behavior**: Link artist profiles, validate role assignments, handle artist availability
 
-#### Feature: Brand Partners Display
-- **Description**: Showcase corporate partners and sponsors
-- **Inputs**: Partner list from ContentContext
-- **Outputs**: Rendered partner logos grid
-- **Behavior**: Display partner logos with links to websites, categorize by type
+### Capability: Content Management System (CMS)
+Admin-facing content management for site configuration, static content, and metadata.
 
-#### Feature: Hero Section & Statistics
-- **Description**: Landing page hero with dynamic company statistics and messaging
-- **Inputs**: Hero content (title, subtitle, stats) from ContentContext
-- **Outputs**: Rendered hero banner with animated stats
-- **Behavior**: Display headline, animation on stat counters, call-to-action buttons
+#### Feature: Team Management
+- **Description**: Create and maintain team member profiles with photos, bios, contact info, and roles
+- **Inputs**: Team member form (name, bio, role, photo, social links)
+- **Outputs**: Team member record with profile image and metadata
+- **Behavior**: Validate data, upload photos, create/update team roster
 
-#### Feature: About & Company Story
-- **Description**: Communicate WildOut! mission, history, and values
-- **Inputs**: About content (story, features, founding year) from ContentContext
-- **Outputs**: Rendered about section with timeline/cards
-- **Behavior**: Display story paragraphs, feature cards, visual hierarchy
+#### Feature: Partner/Sponsor Management
+- **Description**: Manage brand partners and sponsors with categories and branding
+- **Inputs**: Partner name, category, logo, links, metadata
+- **Outputs**: Partner record with branding assets
+- **Behavior**: Validate categories, organize by sponsorship tier
 
-#### Feature: Navigation & Site Footer
-- **Description**: Global navigation dock and footer with social/contact info
-- **Inputs**: Site settings (contact info, social media) from ContentContext
-- **Outputs**: Rendered navigation, footer with links
-- **Behavior**: Sticky navigation dock, footer with email/phone/address, social media links
+#### Feature: Gallery Management (Site-wide)
+- **Description**: Manage shared photo gallery for past events and promotional content
+- **Inputs**: Photo files, captions, event associations, metadata
+- **Outputs**: Gallery item with URLs and metadata
+- **Behavior**: Store photos, organize by events/collections, generate thumbnails
 
-#### Feature: 3D Background Effects
-- **Description**: Animated 3D background for visual appeal
-- **Inputs**: Canvas dimensions, animation parameters
-- **Outputs**: Rendered 3D animated background
-- **Behavior**: Initialize 3D scene, apply animations, optimize performance
+#### Feature: Hero & Landing Content
+- **Description**: Manage landing page hero section with stats, imagery, and featured content
+- **Inputs**: Hero title, subtitle, featured event, background image, statistics
+- **Outputs**: Hero configuration with media assets
+- **Behavior**: Update hero display, manage featured event rotation
 
----
+#### Feature: About Section Management
+- **Description**: Manage company/platform about section and history
+- **Inputs**: About text, founding year, features list, images
+- **Outputs**: About configuration for landing page
+- **Behavior**: Store and render about information
 
-### Capability: Admin Dashboard & Content Management
+#### Feature: Site Settings & Configuration
+- **Description**: Global site settings like contact info, social media links, branding
+- **Inputs**: Site config (email, phone, social links, metadata)
+- **Outputs**: Site configuration document
+- **Behavior**: Update settings, provide read access to all consumers
 
-Protected interface for organizers to manage all platform content with real-time sync.
+### Capability: Public Content Presentation
+User-facing presentation of events, community content, and discovery features.
 
-#### Feature: Dashboard Layout & Authentication
-- **Description**: Sidebar navigation, responsive dashboard shell, basic auth placeholder
-- **Inputs**: User authentication state, current route
-- **Outputs**: Rendered dashboard layout with sidebar
-- **Behavior**: Show/hide admin routes based on auth, handle redirect on failed auth
+#### Feature: Landing Page Rendering
+- **Description**: Render complete landing page with hero, featured events, partners, team, about
+- **Inputs**: Landing page configuration, current content from CMS
+- **Outputs**: Fully rendered HTML/React components
+- **Behavior**: Compose hero, events list, team section, partners, about, footer
 
-#### Feature: Event Management (CRUD)
-- **Description**: Create, read, update, delete events with full details
-- **Inputs**: Event form submission or event selection
-- **Outputs**: Updated event list in ContentContext
-- **Behavior**: Form validation, create/edit/delete operations, real-time refresh
+#### Feature: Event Browsing & Filtering
+- **Description**: Display all events with filtering, sorting, and search capabilities
+- **Inputs**: Query parameters (date range, category, venue, artist, etc.)
+- **Outputs**: Filtered event list with pagination
+- **Behavior**: Query events by criteria, implement pagination, real-time search
 
-#### Feature: Event Creation Assistant
-- **Description**: Dedicated form for creating new events with all required fields
-- **Inputs**: Event form data (title, date, venue, artists, etc.)
-- **Outputs**: New event created and added to ContentContext
-- **Behavior**: Multi-step form validation, artist selection, gallery upload integration
+#### Feature: Event Detail View
+- **Description**: Detailed view of single event with full information and related content
+- **Inputs**: Event ID
+- **Outputs**: Complete event page with media gallery, lineup, venue details
+- **Behavior**: Load event data, resolve related entities (artists, venue), lazy-load gallery
 
-#### Feature: Partner Management
-- **Description**: Add, edit, delete brand partners and sponsors
-- **Inputs**: Partner form data (name, category, website, status)
-- **Outputs**: Updated partner list in ContentContext
-- **Behavior**: CRUD operations, category classification, status toggling
+#### Feature: Community Discovery
+- **Description**: Discover artists, venues, and creative community members
+- **Inputs**: Search query, filter criteria
+- **Outputs**: Community member profiles or listings
+- **Behavior**: Search across artists and venues, display profiles
 
-#### Feature: Gallery Management
-- **Description**: Upload, tag, and organize event photographs
-- **Inputs**: Image files, captions, event associations
-- **Outputs**: Updated gallery list in ContentContext
-- **Behavior**: Image upload handling, association with events, caption editing
+### Capability: Data Persistence & Synchronization
+Database operations, caching, and real-time data synchronization.
 
-#### Feature: Team Member Management
-- **Description**: Manage team member profiles, roles, and contact information
-- **Inputs**: Team member form data (name, role, email, bio, photo)
-- **Outputs**: Updated team list in ContentContext
-- **Behavior**: CRUD operations, role categorization, profile photo upload
+#### Feature: Supabase Integration
+- **Description**: All database operations through Supabase client with proper error handling
+- **Inputs**: Database queries, mutations, subscriptions
+- **Outputs**: Data from PostgreSQL database
+- **Behavior**: Execute queries, handle auth, manage connections, retry logic
 
-#### Feature: Site Settings Configuration
-- **Description**: Edit hero content, about section, and site-wide settings
-- **Inputs**: Settings form data (site name, tagline, social media, contact info)
-- **Outputs**: Updated site settings in ContentContext
-- **Behavior**: Form submission, settings update, real-time reflection on landing page
+#### Feature: Real-time Data Subscription
+- **Description**: Subscribe to real-time updates for collaborative editing and live content
+- **Inputs**: Subscription filters (event changes, new uploads)
+- **Outputs**: Live updates pushed to clients
+- **Behavior**: Use Supabase realtime subscriptions, trigger UI updates
 
-#### Feature: Hero & About Section Editors
-- **Description**: Edit hero statistics and company story
-- **Inputs**: Hero/About form data (title, stats, story blocks, features)
-- **Outputs**: Updated HeroContent/AboutContent in ContentContext
-- **Behavior**: Rich text editing, dynamic stat updates, feature card management
+#### Feature: Caching & Performance Optimization
+- **Description**: Client-side caching to reduce API calls and improve performance
+- **Inputs**: Data fetches, cache invalidation signals
+- **Outputs**: Cached data served from local state
+- **Behavior**: Implement React Context caching, invalidate on mutations
 
-#### Feature: Real-time Dashboard Preview
-- **Description**: Live preview showing how dashboard changes affect landing page
-- **Inputs**: ContentContext state
-- **Outputs**: Split-view or preview panel
-- **Behavior**: Subscribe to context changes, update preview in real-time
+#### Feature: Error Recovery & Resilience
+- **Description**: Handle failures, retries, and partial data scenarios gracefully
+- **Inputs**: Failed operations, network errors, timeout scenarios
+- **Outputs**: User-friendly error messages, retry mechanisms
+- **Behavior**: Implement exponential backoff, fallback UI states, user notifications
 
----
+### Capability: User Interface & Experience
+Frontend components and interactions for both public and admin interfaces.
 
-### Capability: State Management & Data Layer
+#### Feature: Responsive Component Library
+- **Description**: Reusable, accessible, responsive UI components
+- **Inputs**: Component configuration, content, state
+- **Outputs**: Rendered React components with Tailwind styling
+- **Behavior**: Use Radix UI primitives, implement shadcn/ui patterns, support dark mode
 
-Centralized state management for real-time synchronization between dashboard and landing page.
+#### Feature: Form Management & Validation
+- **Description**: Complex form handling with validation, error states, and submission
+- **Inputs**: Form schema, user input, validation rules
+- **Outputs**: Validated data ready for persistence
+- **Behavior**: Use React Hook Form, show real-time validation, handle async validation
 
-#### Feature: ContentContext System
-- **Description**: Global React Context providing all platform content
-- **Inputs**: Initial data seed, update functions
-- **Outputs**: Typed context object with state and update functions
-- **Behavior**: Wrap app with ContentProvider, expose useContent hook
+#### Feature: Data Visualization
+- **Description**: Charts and analytics for dashboard (event stats, attendance, partner metrics)
+- **Inputs**: Event data, attendance records, analytics
+- **Outputs**: Visual charts and reports
+- **Behavior**: Use Recharts for data visualization, aggregate metrics
 
-#### Feature: Data Models & TypeScript Interfaces
-- **Description**: Strongly-typed interfaces for all domain objects
-- **Inputs**: Domain requirements, business logic
-- **Outputs**: TypeScript interfaces exported for app-wide use
-- **Behavior**: Define interfaces (Event, Partner, TeamMember, etc.), enforce type safety
+#### Feature: Modal & Dialog Management
+- **Description**: Modals for confirmations, forms, detail views
+- **Inputs**: Modal type, content, actions
+- **Outputs**: Rendered modal with proper focus management
+- **Behavior**: Use Radix Dialog, manage z-stacking, handle dismissals
 
-#### Feature: Initial Data & Mock Content
-- **Description**: Seed data with realistic event and content examples
-- **Inputs**: Domain knowledge, event/partner/artist data
-- **Outputs**: INITIAL_* constants in ContentContext
-- **Behavior**: Create realistic sample data, populate context on app load
+#### Feature: Navigation & Routing
+- **Description**: Client-side routing between landing page, all-events page, and admin dashboard
+- **Inputs**: Route path, router state
+- **Outputs**: Correct page component rendered
+- **Behavior**: Custom router implementation using React Context and History API
 
-#### Feature: State Update Functions
-- **Description**: Mutation functions for updating content
-- **Inputs**: Updated data arrays/objects
-- **Outputs**: Updated state
-- **Behavior**: Provide updateEvents, updatePartners, updateGallery, etc. functions
+#### Feature: Toast Notifications
+- **Description**: Non-blocking notifications for success, error, and info messages
+- **Inputs**: Toast message, type, duration
+- **Outputs**: Toast displayed in UI
+- **Behavior**: Use Sonner library, auto-dismiss, stackable
 
----
+### Capability: Authentication & Authorization
+User access control and admin privileges management.
 
-### Capability: Styling & Design System
+#### Feature: Admin Authentication
+- **Description**: Authentication for admin dashboard access
+- **Inputs**: Credentials
+- **Outputs**: Auth token, user session
+- **Behavior**: Validate credentials, maintain session, handle logout
 
-Consistent visual language with Tailwind CSS and shadcn/ui components.
+#### Feature: Role-Based Access Control (RBAC)
+- **Description**: Different permission levels for different user roles
+- **Inputs**: User role, resource being accessed
+- **Outputs**: Authorization decision (allowed/denied)
+- **Behavior**: Check user role, enforce access policies
 
-#### Feature: Dark Theme Implementation
-- **Description**: Default dark mode (near-black background, light text)
-- **Inputs**: Tailwind configuration
-- **Outputs**: Styled pages with dark theme
-- **Behavior**: Apply dark backgrounds, light text contrast, adjust colors throughout
+### Capability: Performance & Analytics
+Monitoring, optimization, and user behavior tracking.
 
-#### Feature: Glass Morphism & Visual Effects
-- **Description**: Transparent backgrounds with backdrop blur for modern aesthetic
-- **Inputs**: Component markup, Tailwind classes
-- **Outputs**: Rendered components with glass effect
-- **Behavior**: Apply `backdrop-blur` utilities, transparent backgrounds, subtle borders
+#### Feature: Performance Monitoring
+- **Description**: Track page load times, component render performance, API response times
+- **Inputs**: Performance metrics
+- **Outputs**: Performance reports and alerts
+- **Behavior**: Collect metrics, analyze trends, identify bottlenecks
 
-#### Feature: Responsive Layout System
-- **Description**: Mobile-first responsive design using Tailwind grid/flex
-- **Inputs**: Component structure, responsive breakpoints
-- **Outputs**: Pages that adapt to mobile/tablet/desktop
-- **Behavior**: Use Tailwind breakpoints (sm, md, lg), stack on mobile, grid on desktop
+#### Feature: Event Analytics
+- **Description**: Track event views, clicks, attendance, and engagement metrics
+- **Inputs**: User interactions, event data
+- **Outputs**: Analytics dashboard
+- **Behavior**: Aggregate event metrics, generate reports
 
-#### Feature: Animation & Transitions
-- **Description**: Smooth animations using Framer Motion/Motion
-- **Inputs**: Component state, animation triggers
-- **Outputs**: Animated components
-- **Behavior**: Apply page transitions, hover effects, stat counter animations
-
-#### Feature: Icon System (Lucide React)
-- **Description**: Consistent iconography throughout UI
-- **Inputs**: Icon names, sizes, colors
-- **Outputs**: Rendered icons
-- **Behavior**: Use Lucide React for consistent, performant icons
-
-#### Feature: shadcn/ui Component Integration
-- **Description**: Pre-built accessible components (buttons, dialogs, forms, etc.)
-- **Inputs**: Component type requirements
-- **Outputs**: Rendered shadcn/ui components
-- **Behavior**: Import and compose shadcn/ui components with Tailwind customization
-
----
-
-### Capability: Routing & Navigation
-
-Client-side routing for SPA with public and protected routes.
-
-#### Feature: Landing Page Route
-- **Description**: Public route displaying full landing page (all sections)
-- **Inputs**: ContentContext data
-- **Outputs**: Rendered landing page
-- **Behavior**: Route `/` serves LandingPage component
-
-#### Feature: All Events View
-- **Description**: Dedicated page showing all events with filtering/pagination
-- **Inputs**: Full event list, user filters
-- **Outputs**: Paginated event list view
-- **Behavior**: Route `/events` or section within landing, supports filtering
-
-#### Feature: Admin Dashboard Route
-- **Description**: Protected route for admin dashboard
-- **Inputs**: Authentication state
-- **Outputs**: Rendered dashboard or redirect to home
-- **Behavior**: Route `/admin` checks auth, serves DashboardLayout if authenticated
-
-#### Feature: Route Protection
-- **Description**: Placeholder authentication check for admin routes
-- **Inputs**: User auth state (currently placeholder boolean)
-- **Outputs**: Route access or redirect
-- **Behavior**: Basic boolean check, redirect to home on failure
+</functional-decomposition>
 
 ---
+
+<structural-decomposition>
 
 ## Repository Structure
 
 ```
-WildOut!/
+project-root/
 ├── src/
-│   ├── App.tsx                             # Root component with routing
-│   ├── main.tsx                            # Entry point
-│   ├── index.css                           # App-level styles
-│   │
-│   ├── components/
-│   │   ├── ui/                             # shadcn/ui components (40+ prebuilt)
-│   │   │   ├── button.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── form.tsx
-│   │   │   └── ... (25+ more)
-│   │   │
-│   │   ├── dashboard/                      # Admin dashboard components
-│   │   │   ├── DashboardLayout.tsx         # Main shell with sidebar
-│   │   │   ├── DashboardHome.tsx           # Overview/stats
-│   │   │   ├── DashboardEvents.tsx         # Event CRUD list
-│   │   │   ├── DashboardEventsNew.tsx      # Event creation form
-│   │   │   ├── DashboardGallery.tsx        # Gallery management
-│   │   │   ├── DashboardPartners.tsx       # Partner management
-│   │   │   ├── DashboardTeam.tsx           # Team management
-│   │   │   ├── DashboardHero.tsx           # Hero editor
-│   │   │   ├── DashboardAbout.tsx          # About editor
-│   │   │   └── DashboardSettings.tsx       # Site settings
-│   │   │
-│   │   ├── Landing page sections
-│   │   │   ├── LandingPage.tsx             # Main container
-│   │   │   ├── HeroSection.tsx             # Hero with stats
-│   │   │   ├── EventsSection.tsx           # Event showcase
-│   │   │   ├── EventDetailModal.tsx        # Event detail popup
-│   │   │   ├── AboutSection.tsx            # Company story
-│   │   │   ├── TeamSection.tsx             # Artist directory
-│   │   │   ├── GallerySection.tsx          # Photo gallery
-│   │   │   ├── PartnersSection.tsx         # Brand partners
-│   │   │   ├── FloatingDock.tsx            # Navigation dock
-│   │   │   ├── Footer.tsx                  # Footer
-│   │   │   ├── Navigation.tsx              # Nav component
-│   │   │   ├── Background3D.tsx            # 3D effects
-│   │   │   └── AllEventsPage.tsx           # All events view
-│   │   │
-│   │   ├── Routing
-│   │   │   ├── Router.tsx                  # React Router setup
-│   │   │   ├── Dashboard.tsx               # Dashboard entry
-│   │   │   └── ...
-│   │   │
-│   │   └── Other
-│   │       ├── figma/
-│   │       │   └── ImageWithFallback.tsx   # Image component
-│   │       └── ...
-│   │
-│   ├── contexts/
-│   │   └── ContentContext.tsx              # Global state (events, partners, etc.)
-│   │
-│   ├── hooks/                              # Custom React hooks (future)
-│   │
-│   ├── utils/
-│   │   └── supabase/
-│   │       ├── info.tsx                    # Supabase utilities
-│   │       └── ...
-│   │
-│   ├── supabase/                           # Edge functions (future)
-│   │   └── functions/
-│   │       └── server/
-│   │           ├── index.tsx               # Server entry
-│   │           └── kv_store.tsx            # KV store
-│   │
-│   ├── styles/
-│   │   └── globals.css                     # Tailwind imports, global styles
-│   │
-│   ├── assets/
-│   │   ├── *.png                           # Images, logos
-│   │   └── ...
-│   │
-│   ├── guidelines/
-│   │   └── Guidelines.md                   # Dev guidelines template
-│   │
-│   └── Attributions.md                     # Attribution credits
-│
-├── public/
-│   └── index.html
-│
-├── Configuration files
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   ├── eslint.config.js
-│   ├── package.json
-│   └── package-lock.json
-│
-├── .taskmaster/
-│   └── docs/
-│       └── prd.txt                         # This file
-│
-└── openspec/
-    └── project.md                          # Project conventions & context
-
+│   ├── components/           # UI Components
+│   │   ├── dashboard/        # Dashboard-specific components
+│   │   │   ├── DashboardLayout.tsx
+│   │   │   ├── DashboardHome.tsx
+│   │   │   ├── DashboardEvents.tsx
+│   │   │   ├── DashboardEventsNew.tsx
+│   │   │   ├── DashboardAbout.tsx
+│   │   │   ├── DashboardGallery.tsx
+│   │   │   ├── DashboardHero.tsx
+│   │   │   ├── DashboardPartners.tsx
+│   │   │   ├── DashboardSettings.tsx
+│   │   │   ├── DashboardTeam.tsx
+│   │   │   └── index.ts
+│   │   ├── ui/               # Reusable UI primitives (shadcn/ui style)
+│   │   ├── figma/            # Figma asset components
+│   │   ├── LandingPage.tsx
+│   │   ├── AllEventsPage.tsx
+│   │   ├── Dashboard.tsx
+│   │   ├── Router.tsx
+│   │   └── index.ts
+│   ├── contexts/             # React Context providers
+│   │   ├── ContentContext.tsx
+│   │   └── index.ts
+│   ├── hooks/                # Custom React hooks
+│   │   ├── useEvents.ts
+│   │   ├── useRouter.ts
+│   │   └── index.ts
+│   ├── utils/                # Utility functions
+│   │   ├── formatting.ts
+│   │   ├── validation.ts
+│   │   ├── api.ts
+│   │   └── index.ts
+│   ├── supabase/             # Supabase configuration
+│   │   ├── client.ts
+│   │   ├── functions/
+│   │   │   └── server/
+│   │   └── types.ts
+│   ├── types/                # Global TypeScript types
+│   │   ├── events.ts
+│   │   ├── content.ts
+│   │   └── index.ts
+│   ├── styles/               # Global styles
+│   │   ├── globals.css
+│   │   └── index.css
+│   ├── App.tsx               # Root app component
+│   ├── main.tsx              # React DOM entry point
+│   └── index.css
+├── .taskmaster/              # Task Master configuration
+│   ├── docs/
+│   │   └── prd.txt
+│   ├── config.json
+│   └── state.json
+├── .kilo/                    # Kilo configuration
+│   └── mcp.json
+├── .cursor/                  # Cursor configuration
+│   ├── mcp.json
+│   └── rules/
+├── public/                   # Static assets
+├── vite.config.ts            # Vite configuration
+├── tailwind.config.js        # Tailwind CSS configuration
+├── package.json              # NPM dependencies
+├── tsconfig.json             # TypeScript configuration
+├── index.html                # HTML entry point
+└── README.md                 # Project documentation
 ```
 
 ## Module Definitions
 
-### Module: UI Components (`src/components/ui/`)
-- **Maps to capability**: Styling & Design System
-- **Responsibility**: Provide pre-built, accessible React components from shadcn/ui
-- **Exports**: 40+ components (Button, Dialog, Form, Card, etc.)
-- **Details**: Each component is a wrapped shadcn/ui component with Tailwind customization
-
-### Module: Landing Page Components (`src/components/`)
-- **Maps to capability**: Landing Page & Discovery
-- **Responsibility**: Render public-facing landing page sections
-- **Key components**: HeroSection, EventsSection, TeamSection, GallerySection, PartnersSection, Footer
-- **Exports**: Fully rendered sections to be composed into LandingPage
-
-### Module: Dashboard Components (`src/components/dashboard/`)
-- **Maps to capability**: Admin Dashboard & Content Management
-- **Responsibility**: Provide admin interface for content CRUD
-- **Key components**: DashboardLayout, DashboardEvents, DashboardGallery, DashboardTeam, DashboardSettings, etc.
-- **Exports**: Dashboard sections and managers
-
-### Module: ContentContext (`src/contexts/ContentContext.tsx`)
-- **Maps to capability**: State Management & Data Layer
-- **Responsibility**: Central state management for all platform content
+### Module: ContentContext (Maps to: Data Persistence & Synchronization + State Management)
+- **Responsibility**: Global state management for all content entities (events, team, partners, gallery, hero, about, settings)
+- **File structure**:
+  ```
+  contexts/
+  ├── ContentContext.tsx      # Context provider and types
+  └── index.ts                # Public exports
+  ```
 - **Exports**:
-  - `ContentProvider` component
-  - `useContent()` custom hook
-  - TypeScript interfaces: Event, Partner, TeamMember, GalleryImage, HeroContent, AboutContent, SiteSettings
+  - `ContentProvider` - Context provider component
+  - `useContent()` - Hook to access content context
+  - Types: Event, Team, Partner, GalleryItem, etc.
 
-### Module: Routing (`src/components/Router.tsx`)
-- **Maps to capability**: Routing & Navigation
-- **Responsibility**: Setup React Router with public and protected routes
-- **Exports**: Configured router component with route definitions
+### Module: Router (Maps to: Navigation & Routing)
+- **Responsibility**: Client-side routing without external router library
+- **File structure**:
+  ```
+  components/
+  ├── Router.tsx              # Router context and provider
+  └── [other components using routes]
+  ```
+- **Exports**:
+  - `RouterProvider` - Router context provider
+  - `useRouter()` - Hook to access current page and navigation
+  - Route definitions: landing, admin, all-events
+
+### Module: Dashboard Components (Maps to: Content Management System + User Interface)
+- **Responsibility**: Admin dashboard UI and content management operations
+- **File structure**:
+  ```
+  components/dashboard/
+  ├── DashboardLayout.tsx     # Main dashboard layout
+  ├── DashboardHome.tsx       # Dashboard overview
+  ├── DashboardEvents.tsx     # Event listing and management
+  ├── DashboardEventsNew.tsx  # Event creation form
+  ├── DashboardTeam.tsx       # Team member management
+  ├── DashboardPartners.tsx   # Partner/sponsor management
+  ├── DashboardGallery.tsx    # Gallery management
+  ├── DashboardHero.tsx       # Hero section management
+  ├── DashboardAbout.tsx      # About section management
+  ├── DashboardSettings.tsx   # Site settings management
+  └── index.ts                # Public exports
+  ```
+- **Exports**:
+  - `Dashboard` - Root dashboard component
+  - Individual dashboard page components
+
+### Module: UI Components (Maps to: User Interface & Experience)
+- **Responsibility**: Reusable, accessible UI primitives
+- **File structure**:
+  ```
+  components/ui/
+  ├── button.tsx
+  ├── input.tsx
+  ├── dialog.tsx
+  ├── form.tsx
+  ├── select.tsx
+  ├── accordion.tsx
+  ├── alert.tsx
+  ├── avatar.tsx
+  ├── badge.tsx
+  ├── card.tsx
+  ├── checkbox.tsx
+  ├── dropdown-menu.tsx
+  ├── popover.tsx
+  ├── toast.tsx
+  ├── sonner.tsx
+  └── [other UI primitives]
+  ```
+- **Exports**: Individual UI component exports
+
+### Module: LandingPage (Maps to: Public Content Presentation)
+- **Responsibility**: Render complete landing page with all sections
+- **File structure**:
+  ```
+  components/
+  ├── LandingPage.tsx         # Main landing page component
+  └── [hero, footer, sections as needed]
+  ```
+- **Exports**:
+  - `LandingPage` - Root landing page component
+
+### Module: AllEventsPage (Maps to: Public Content Presentation)
+- **Responsibility**: Event browsing, filtering, and discovery
+- **File structure**:
+  ```
+  components/
+  ├── AllEventsPage.tsx       # Main events page
+  └── [event filters, event cards, pagination]
+  ```
+- **Exports**:
+  - `AllEventsPage` - Events listing component
+
+### Module: Supabase (Maps to: Data Persistence & Synchronization)
+- **Responsibility**: Supabase client configuration and integration
+- **File structure**:
+  ```
+  supabase/
+  ├── client.ts               # Supabase client initialization
+  ├── types.ts                # Database types
+  └── functions/              # Edge Functions
+      └── server/             # Hono-based server functions
+  ```
+- **Exports**:
+  - `supabaseClient` - Configured Supabase client
+  - Database types and schemas
+
+### Module: Hooks (Maps to: User Interface & Experience)
+- **Responsibility**: Custom React hooks for business logic
+- **File structure**:
+  ```
+  hooks/
+  ├── useEvents.ts            # Event-related operations
+  ├── useRouter.ts            # Navigation hook
+  ├── useForm.ts              # Form management helpers
+  └── index.ts                # Public exports
+  ```
+- **Exports**: Custom hook functions
+
+### Module: Utils (Maps to: Data Persistence & Synchronization + UI)
+- **Responsibility**: Utility functions for formatting, validation, API calls
+- **File structure**:
+  ```
+  utils/
+  ├── formatting.ts           # Date, string formatting utilities
+  ├── validation.ts           # Input validation rules
+  ├── api.ts                  # API helper functions
+  └── index.ts                # Public exports
+  ```
+- **Exports**: Utility functions
+
+### Module: Types (Maps to: Foundation)
+- **Responsibility**: Global TypeScript type definitions
+- **File structure**:
+  ```
+  types/
+  ├── events.ts               # Event-related types
+  ├── content.ts              # Content entity types
+  └── index.ts                # Public exports
+  ```
+- **Exports**: Type definitions for entire application
+
+</structural-decomposition>
 
 ---
+
+<dependency-graph>
 
 ## Dependency Chain
 
-### Foundation Layer (Phase 0 - Setup)
-No dependencies - built first.
+### Foundation Layer (Phase 0)
+No dependencies - these are built first.
 
-- **TypeScript Configuration**: Type system foundation (tsconfig.json)
-- **Tailwind CSS Setup**: Style system foundation (tailwind config in vite.config.ts)
-- **Build Tools**: Vite + SWC for compilation (vite.config.ts)
-- **ESLint Configuration**: Code quality foundation (eslint.config.js)
+- **Types**: Global TypeScript type definitions (events, content, API responses)
+- **Styles**: Global CSS and Tailwind configuration
+- **Utils**: Basic utility functions (formatting, validation, common helpers)
 
-**Delivers**: Development environment ready for feature development
+### UI Layer (Phase 1)
+- **UI Components**: Depends on [Types, Styles]
+  - Reusable Radix UI wrapped components, shadcn/ui patterns
+  - Button, input, dialog, forms, etc.
 
----
+### Configuration & Integration (Phase 2)
+- **Supabase Client**: Depends on [Types]
+  - Supabase JavaScript client configuration
+  - Database type definitions and schemas
+  
+- **React Hooks**: Depends on [Types, Utils, Supabase Client]
+  - Custom hooks for state management and effects
 
-### Data & State Layer (Phase 1 - Core State)
-Depends on: [Foundation Layer]
+### State Management (Phase 3)
+- **ContentContext**: Depends on [Types, Supabase Client, Hooks]
+  - Global React Context for content management
+  - Manages events, team, partners, gallery, hero, about, settings
 
-- **ContentContext System**: Global state container with interfaces
-  - Depends on: TypeScript Configuration
-  - Provides: Central state management point
+- **Router**: Depends on [React]
+  - Client-side routing context and navigation
 
-- **Data Models & Interfaces**: TypeScript definitions for all domain objects
-  - Depends on: TypeScript Configuration
-  - Provides: Type safety for all components
+### Component Layer (Phase 4)
+- **UI Components (App-specific)**: Depends on [UI Components, ContentContext, Router]
+  - LandingPage components (hero, footer, sections)
+  - AllEventsPage components (filters, event cards)
+  - Dashboard components (all subpages)
 
-- **Initial Data & Mock Content**: Seed data for demo
-  - Depends on: Data Models & Interfaces
-  - Provides: Realistic sample data for development
+### Page Components (Phase 5)
+- **LandingPage**: Depends on [UI Components (app-specific), ContentContext, Router]
+  - Main landing page assembly
+  
+- **AllEventsPage**: Depends on [UI Components (app-specific), ContentContext, Router]
+  - Events browsing and filtering
+  
+- **Dashboard**: Depends on [Dashboard Components, ContentContext, Router, UI Components]
+  - Admin interface assembly
 
-**Delivers**: Strongly-typed state system with seed data
+### Root Application (Phase 6)
+- **App**: Depends on [LandingPage, AllEventsPage, Dashboard, Router, ContentContext, ContentProvider]
+  - Root application component that orchestrates all pages
 
----
-
-### UI Components Layer (Phase 2 - Component Foundation)
-Depends on: [Foundation Layer, Data & State Layer]
-
-- **shadcn/ui Components**: Pre-built accessible components
-  - Depends on: Tailwind CSS Setup, ESLint Configuration
-  - Provides: 40+ reusable components
-
-- **Design System Implementation**: Dark theme, glass morphism, animations
-  - Depends on: Tailwind CSS Setup, shadcn/ui Components
-  - Provides: Consistent visual language throughout app
-
-**Delivers**: Complete component library and design system
-
----
-
-### Landing Page Layer (Phase 3 - Public Interfaces)
-Depends on: [UI Components Layer, Data & State Layer]
-
-- **Hero Section Component**: Landing hero with stats
-  - Depends on: UI Components Layer, ContentContext System
-  - Provides: Visual hero banner with dynamic stats
-
-- **Event Showcase & Filtering**: Event discovery component
-  - Depends on: UI Components Layer, ContentContext System
-  - Provides: Event grid with filters and modal
-
-- **Artist Directory Component**: Team member profiles
-  - Depends on: UI Components Layer, ContentContext System
-  - Provides: Rendered artist grid and detail
-
-- **Gallery Showcase Component**: Photo gallery
-  - Depends on: UI Components Layer, ContentContext System
-  - Provides: Image grid with lightbox viewing
-
-- **Brand Partners Display**: Partner logos
-  - Depends on: UI Components Layer, ContentContext System
-  - Provides: Partner logo grid
-
-- **About Section Component**: Company story
-  - Depends on: UI Components Layer, ContentContext System
-  - Provides: About content with features
-
-- **Navigation & Footer Components**: Global navigation
-  - Depends on: UI Components Layer, ContentContext System
-  - Provides: Sticky nav dock, footer with links
-
-- **3D Background Effects**: Animated 3D background
-  - Depends on: UI Components Layer
-  - Provides: Visual depth to landing page
-
-- **Landing Page Container**: Compose all sections
-  - Depends on: All Landing Page components
-  - Provides: Full landing page experience
-
-**Delivers**: Complete, discoverable landing page with real-time content sync
+</dependency-graph>
 
 ---
 
-### Routing Layer (Phase 4 - Navigation Structure)
-Depends on: [Landing Page Layer, Data & State Layer]
-
-- **React Router Setup**: Route definitions
-  - Depends on: Landing Page Container, ContentContext System
-  - Provides: SPA navigation structure
-
-- **Route Protection**: Auth placeholder
-  - Depends on: React Router Setup
-  - Provides: Protected route mechanism
-
-- **Landing Page Route**: Public route
-  - Depends on: Route Protection, Landing Page Container
-  - Provides: Accessible landing page at `/`
-
-- **All Events View Route**: Events listing route
-  - Depends on: Route Protection, Event Showcase Component
-  - Provides: Dedicated events page
-
-**Delivers**: Fully routed single-page application
-
----
-
-### Admin Dashboard Layer (Phase 5 - Content Management)
-Depends on: [UI Components Layer, Data & State Layer, Routing Layer]
-
-- **Dashboard Layout Shell**: Sidebar navigation, responsive shell
-  - Depends on: UI Components Layer, Routing Layer
-  - Provides: Dashboard container structure
-
-- **Event Management (CRUD)**: Event list and editing
-  - Depends on: Dashboard Layout, UI Components Layer, ContentContext System
-  - Provides: Event management interface
-
-- **Event Creation Assistant**: New event form
-  - Depends on: Dashboard Layout, UI Components Layer, ContentContext System
-  - Provides: Event creation interface
-
-- **Partner Management**: Partner CRUD
-  - Depends on: Dashboard Layout, UI Components Layer, ContentContext System
-  - Provides: Partner management interface
-
-- **Gallery Management**: Image upload and tagging
-  - Depends on: Dashboard Layout, UI Components Layer, ContentContext System
-  - Provides: Gallery management interface
-
-- **Team Member Management**: Team CRUD
-  - Depends on: Dashboard Layout, UI Components Layer, ContentContext System
-  - Provides: Team management interface
-
-- **Hero & About Editors**: Content editors
-  - Depends on: Dashboard Layout, UI Components Layer, ContentContext System
-  - Provides: Hero/About content management
-
-- **Site Settings Configuration**: Settings form
-  - Depends on: Dashboard Layout, UI Components Layer, ContentContext System
-  - Provides: Site-wide configuration interface
-
-- **Real-time Dashboard Preview**: Live preview
-  - Depends on: All Dashboard components, ContentContext System
-  - Provides: Split-view preview of changes
-
-**Delivers**: Fully functional admin dashboard with real-time sync to landing page
-
----
-
-### Polish & Optimization Layer (Phase 6 - Refinement)
-Depends on: [All previous layers]
-
-- **Performance Optimization**: Bundle size, lazy loading, code splitting
-  - Depends on: All components
-  - Provides: Optimized performance metrics
-
-- **Error Handling & Edge Cases**: Error boundaries, validation
-  - Depends on: All components
-  - Provides: Robust error handling
-
-- **Accessibility Audit**: ARIA, semantic HTML
-  - Depends on: All components
-  - Provides: WCAG compliance
-
-- **Cross-browser Testing**: Browser compatibility
-  - Depends on: All components
-  - Provides: Verified browser support
-
-**Delivers**: Production-ready, optimized application
-
----
+<implementation-roadmap>
 
 ## Development Phases
 
-### Phase 0: Foundation & Setup
-**Goal**: Establish development environment with build tools, type system, and design system foundation
+### Phase 0: Foundation & Configuration
+**Goal**: Establish project foundation with types, styles, utilities, and configuration.
 
-**Entry Criteria**: Clean repository
+**Entry Criteria**: Clean repository with package.json and build config
 
 **Tasks**:
+- [ ] Setup TypeScript types for all domain entities (Event, Team, Partner, Gallery, HeroContent, About, Settings)
+  - Acceptance criteria: All types defined, no `any` types, comprehensive interfaces
+  - Test strategy: Type compilation without errors, IntelliSense verification
 
-- [ ] Setup Vite configuration and build process
-  - Acceptance criteria: `npm run dev` starts dev server at port 3000 without errors
-  - Test strategy: Manual verification of dev server functionality
+- [ ] Configure Tailwind CSS and global styles
+  - Acceptance criteria: Tailwind working in vite, custom theme configured, globals.css present
+  - Test strategy: Manual check of styling in browser
 
-- [ ] Configure TypeScript with strict mode and compiler options
-  - Acceptance criteria: TypeScript strict mode enabled, unused vars caught
-  - Test strategy: Create test TypeScript files with violations
+- [ ] Create utility functions (formatting, validation, common helpers)
+  - Acceptance criteria: Utility functions for date formatting, input validation, API helpers
+  - Test strategy: Unit tests for all utility functions
 
-- [ ] Configure ESLint with React, TypeScript, and Prettier plugins
-  - Acceptance criteria: ESLint config passes validation, linting works on sample files
-  - Test strategy: Run ESLint on codebase, verify rules apply
+- [ ] Initialize Supabase client configuration
+  - Acceptance criteria: Supabase client properly configured with project ID, environment variables
+  - Test strategy: Client can connect to Supabase without errors
 
-- [ ] Setup Tailwind CSS with dark theme configuration
-  - Acceptance criteria: Tailwind utilities work, dark theme applied to sample component
-  - Test strategy: Create styled test component, verify dark theme application
+**Exit Criteria**: TypeScript compiler passes, all utilities have tests, Supabase client ready for use
 
-- [ ] Import and configure shadcn/ui components
-  - Acceptance criteria: 5+ shadcn/ui components properly imported and working
-  - Test strategy: Render sample components in test page
-
-**Exit Criteria**: Development environment ready; `npm run dev` works, `npm run build` succeeds, TypeScript/ESLint/Tailwind all configured
-
-**Delivers**:
-- Working development environment
-- Type-safe code foundation
-- Design system ready for component development
+**Delivers**: Foundation layer ready for Phase 1, no TypeScript errors throughout project
 
 ---
 
-### Phase 1: State Management & Data Models
-**Goal**: Establish central state management with fully-typed data models
+### Phase 1: UI Component Library
+**Goal**: Build reusable, accessible UI component library using Radix UI and Tailwind.
 
 **Entry Criteria**: Phase 0 complete
 
 **Tasks**:
+- [ ] Implement core UI components (Button, Input, Dialog, Form, Select, Tabs)
+  - Depends on: [Types, Styles]
+  - Acceptance criteria: All components render, accessible, Tailwind styled, support dark mode
+  - Test strategy: Component storybook or manual testing
 
-- [ ] Create TypeScript interfaces for all domain objects (Event, Partner, TeamMember, etc.)
-  - Acceptance criteria: All interfaces properly typed with required/optional fields
-  - Test strategy: Verify interface definitions against project.md specifications
+- [ ] Implement data display components (Card, Badge, Avatar, Alert, Accordion)
+  - Depends on: [Core UI components]
+  - Acceptance criteria: Components display data correctly, responsive
+  - Test strategy: Manual testing on different screen sizes
 
-- [ ] Implement ContentContext with all state and update functions
-  - Acceptance criteria: ContentProvider wraps app, useContent hook provides state, update functions work
-  - Test strategy: Create test component using useContent, update state via functions
+- [ ] Implement form components (FormField, Checkbox, RadioGroup, DatePicker)
+  - Depends on: [Core UI components]
+  - Acceptance criteria: Form components integrate with React Hook Form, validation visible
+  - Test strategy: Manual form submission testing
 
-- [ ] Create initial seed data with realistic examples (events, partners, team, gallery)
-  - Acceptance criteria: INITIAL_* constants defined with realistic data
-  - Test strategy: Manual inspection of seed data quality and variety
+- [ ] Implement layout components (SideNav, Header, Footer, Grid layouts)
+  - Depends on: [Core UI components]
+  - Acceptance criteria: Responsive layouts work on mobile and desktop
+  - Test strategy: Mobile and desktop viewport testing
 
-- [ ] Setup Context Provider in App.tsx
-  - Acceptance criteria: App wraps with ContentProvider, no context errors
-  - Test strategy: App starts without console errors related to context
+**Exit Criteria**: 30+ UI components implemented and tested, component library ready for app development
 
-**Exit Criteria**: Global state system ready for consumption by components; state updates reflect in real-time
-
-**Delivers**:
-- Centralized state management with React Context
-- Type-safe data models for entire application
-- Realistic seed data for development
+**Delivers**: Complete UI component library for application pages
 
 ---
 
-### Phase 2: UI Component Library
-**Goal**: Establish complete design system with shadcn/ui and Tailwind styling
+### Phase 2: State Management & Configuration
+**Goal**: Setup global state management and application configuration.
 
 **Entry Criteria**: Phase 1 complete
 
 **Tasks**:
+- [ ] Implement ContentContext for global state (events, team, partners, gallery, hero, about, settings)
+  - Depends on: [Types, Supabase Client]
+  - Acceptance criteria: Context provides access to all content entities, loading states, error handling
+  - Test strategy: Unit tests for context operations, verify state updates correctly
 
-- [ ] Import all necessary shadcn/ui components (Button, Card, Dialog, Form, etc.)
-  - Acceptance criteria: 40+ components properly imported and type-checked
-  - Test strategy: Render sample page with multiple component types
+- [ ] Implement Router context for navigation between pages
+  - Depends on: [React]
+  - Acceptance criteria: Router supports landing, admin, all-events pages, History API integration
+  - Test strategy: Navigation between pages works, URL updates correctly
 
-- [ ] Implement dark theme styling throughout application
-  - Acceptance criteria: All pages use dark background (#0a0a0a) and light text
-  - Test strategy: Visual inspection of all pages for dark theme consistency
+- [ ] Create custom React hooks (useEvents, useRouter, useForm helpers)
+  - Depends on: [ContentContext, Types]
+  - Acceptance criteria: Hooks simplify component logic, proper dependency arrays, no memory leaks
+  - Test strategy: Hook unit tests, verify effect cleanup
 
-- [ ] Implement glass morphism effects (backdrop blur, transparency)
-  - Acceptance criteria: Sample components show glass morphism effect
-  - Test strategy: Visual inspection of backdrop blur on test components
+**Exit Criteria**: Global state management fully functional, routing works, hooks tested
 
-- [ ] Setup animation system with Framer Motion
-  - Acceptance criteria: Sample animations run smoothly (page transitions, stat counters)
-  - Test strategy: Visual inspection of animation smoothness
-
-- [ ] Create responsive layout utilities and breakpoint system
-  - Acceptance criteria: Components properly stack on mobile, grid on desktop
-  - Test strategy: Browser resize tests at multiple breakpoints
-
-- [ ] Implement icon system with Lucide React
-  - Acceptance criteria: Icons render correctly and are performant
-  - Test strategy: Sample page with 20+ icons loads quickly
-
-**Exit Criteria**: Complete design system ready for page composition; consistent visual language across all components
-
-**Delivers**:
-- Production-ready component library
-- Consistent design system (dark theme, glass morphism, animations)
-- Responsive layout foundation
+**Delivers**: State management layer ready for UI development
 
 ---
 
-### Phase 3: Landing Page - Section Components
-**Goal**: Build all landing page sections with real-time content sync
+### Phase 3: Dashboard - Core Infrastructure
+**Goal**: Build dashboard layout and core management interface structure.
 
 **Entry Criteria**: Phase 2 complete
 
 **Tasks**:
+- [ ] Implement DashboardLayout with navigation, sidebar, and main content area
+  - Depends on: [UI Components, Router]
+  - Acceptance criteria: Layout renders correctly, navigation works, responsive on all screen sizes
+  - Test strategy: Manual testing of layout on desktop and tablet
 
-- [ ] Build Hero Section (title, subtitle, dynamic stats)
-  - Acceptance criteria: Hero displays with animated stat counters
-  - Test strategy: Verify stats from ContentContext render correctly
+- [ ] Implement DashboardHome with overview and statistics
+  - Depends on: [DashboardLayout, ContentContext]
+  - Acceptance criteria: Dashboard home displays key metrics from ContentContext
+  - Test strategy: Verify correct data displayed from context
 
-- [ ] Build Event Showcase component with filtering and modals
-  - Acceptance criteria: Events display in grid, filters work, modal opens on click
-  - Test strategy: Test filtering by category, modal interactions
+- [ ] Create form component wrappers for dashboard (FormField, FormInput, FormSelect with defaults)
+  - Depends on: [UI Components, React Hook Form]
+  - Acceptance criteria: Dashboard forms consistent, validation working
+  - Test strategy: Form validation testing
 
-- [ ] Build Event Detail Modal (full event information)
-  - Acceptance criteria: Modal displays event details (artists, highlights, gallery)
-  - Test strategy: Verify all event fields render in modal
+**Exit Criteria**: Dashboard layout complete and responsive, form infrastructure ready
 
-- [ ] Build Artist Directory component (Team Section)
-  - Acceptance criteria: Team members display with photos, roles, social links
-  - Test strategy: Click social links, verify layout responsiveness
-
-- [ ] Build Gallery component with lightbox viewing
-  - Acceptance criteria: Images display in grid, lightbox opens and navigates between images
-  - Test strategy: Test image loading, lightbox transitions
-
-- [ ] Build Brand Partners display component
-  - Acceptance criteria: Partner logos display with links to websites
-  - Test strategy: Verify logos load, links work
-
-- [ ] Build About Section with company story
-  - Acceptance criteria: Story text and feature cards display
-  - Test strategy: Verify text content and feature card layout
-
-- [ ] Build Navigation Dock (floating/sticky navigation)
-  - Acceptance criteria: Navigation scrolls with page, provides section links
-  - Test strategy: Test scroll behavior and link navigation
-
-- [ ] Build Footer with contact info and social links
-  - Acceptance criteria: Footer displays contact details and social media links
-  - Test strategy: Verify all links are functional
-
-- [ ] Build 3D animated background
-  - Acceptance criteria: 3D background renders without breaking layout
-  - Test strategy: Test on multiple browsers, verify performance
-
-**Exit Criteria**: All landing page sections complete and displaying real data from ContentContext with proper styling
-
-**Delivers**:
-- Complete landing page with all discovery features
-- Event filtering and detail viewing
-- Real-time content sync (changes to ContentContext immediately visible)
+**Delivers**: Dashboard UI framework for content management pages
 
 ---
 
-### Phase 4: Landing Page - Container & Routing
-**Goal**: Compose landing page sections into complete page and setup routing
+### Phase 4: Event Management
+**Goal**: Implement complete event CRUD operations and event-related features.
 
 **Entry Criteria**: Phase 3 complete
 
 **Tasks**:
+- [ ] Implement DashboardEvents listing page with event table/grid
+  - Depends on: [DashboardLayout, ContentContext, UI Components]
+  - Acceptance criteria: Events list displays all events, sortable/filterable, pagination
+  - Test strategy: Verify correct events displayed, filtering works
 
-- [ ] Create LandingPage component composing all sections
-  - Acceptance criteria: LandingPage component renders all sections in correct order
-  - Test strategy: Verify layout and scroll flow
+- [ ] Implement DashboardEventsNew form for creating and editing events
+  - Depends on: [DashboardLayout, ContentContext, Forms]
+  - Acceptance criteria: Event form includes all fields (title, description, date, venue, artists, etc.), saves to database
+  - Test strategy: Create event, verify it appears in list, verify data in Supabase
 
-- [ ] Setup React Router with route definitions
-  - Acceptance criteria: Router configured with all routes
-  - Test strategy: Navigation between routes works
+- [ ] Implement event gallery & media management
+  - Depends on: [Event CRUD, Supabase Storage]
+  - Acceptance criteria: Upload images, display thumbnails, link to events
+  - Test strategy: Upload image, verify in Supabase Storage and displayed
 
-- [ ] Implement landing page route (/)
-  - Acceptance criteria: Landing page accessible at `/`
-  - Test strategy: Navigate to `/` and verify page loads
+- [ ] Implement event status lifecycle management
+  - Depends on: [Event CRUD]
+  - Acceptance criteria: Change event status, enforce valid transitions, audit trail
+  - Test strategy: Verify status changes, invalid transitions rejected
 
-- [ ] Create AllEventsPage for dedicated events listing
-  - Acceptance criteria: Dedicated page shows all events with filtering/pagination
-  - Test strategy: Verify filtering and pagination work
+**Exit Criteria**: Complete event CRUD working end-to-end, images uploadable, events persistent in database
 
-- [ ] Implement basic route protection placeholder
-  - Acceptance criteria: Auth check function exists (for future implementation)
-  - Test strategy: Verify placeholder auth check works
-
-**Exit Criteria**: Single-page application fully routed with public landing page
-
-**Delivers**:
-- Functional SPA with complete landing page
-- Route-based navigation
-- Foundation for admin route protection
+**Delivers**: Fully functional event management system
 
 ---
 
-### Phase 5: Admin Dashboard - Core Infrastructure
-**Goal**: Build admin dashboard shell and basic CRUD operations
+### Phase 5: Content Management (Team, Partners, Gallery, Settings)
+**Goal**: Implement management interfaces for team, partners, gallery, and site settings.
 
 **Entry Criteria**: Phase 4 complete
 
 **Tasks**:
+- [ ] Implement DashboardTeam for team member management
+  - Depends on: [DashboardLayout, ContentContext, Event CRUD patterns]
+  - Acceptance criteria: Add/edit/delete team members, upload photos, CRUD operations
+  - Test strategy: Create team member, verify in list and Supabase
 
-- [ ] Build DashboardLayout with sidebar navigation
-  - Acceptance criteria: Sidebar displays navigation items, main content area responsive
-  - Test strategy: Test sidebar collapse on mobile, navigation functionality
+- [ ] Implement DashboardPartners for sponsor/partner management
+  - Depends on: [DashboardLayout, ContentContext, Event CRUD patterns]
+  - Acceptance criteria: Manage partners, categories, logos, sponsorship info
+  - Test strategy: Create partner, verify in list
 
-- [ ] Build DashboardHome with overview stats and dashboard widgets
-  - Acceptance criteria: Dashboard overview shows key statistics
-  - Test strategy: Verify stats pull from ContentContext correctly
+- [ ] Implement DashboardGallery for site-wide gallery management
+  - Depends on: [DashboardLayout, ContentContext, Media handling]
+  - Acceptance criteria: Upload photos, organize by events, add metadata
+  - Test strategy: Upload photos, verify display
 
-- [ ] Implement basic auth check for /admin route
-  - Acceptance criteria: Route redirects to home if not authenticated
-  - Test strategy: Test redirect behavior
+- [ ] Implement DashboardHero and DashboardAbout for landing page content
+  - Depends on: [DashboardLayout, ContentContext]
+  - Acceptance criteria: Edit hero section (title, subtitle, featured event), edit about section
+  - Test strategy: Verify changes appear on landing page
 
-- [ ] Build Event Management list view
-  - Acceptance criteria: Events display in table/list with edit/delete options
-  - Test strategy: Verify all events from ContentContext display
+- [ ] Implement DashboardSettings for site configuration
+  - Depends on: [DashboardLayout, ContentContext]
+  - Acceptance criteria: Edit contact info, social media links, site metadata
+  - Test strategy: Update settings, verify in context
 
-- [ ] Build Event Creation form with validation
-  - Acceptance criteria: Form validates inputs, creates new event, updates ContentContext
-  - Test strategy: Test form validation and event creation
+**Exit Criteria**: All content management features working, all entities manageable through dashboard
 
-- [ ] Build Partner Management interface
-  - Acceptance criteria: Full CRUD for partners (create, list, edit, delete)
-  - Test strategy: Test all CRUD operations
-
-- [ ] Build Gallery Management interface
-  - Acceptance criteria: Image upload/listing/deletion functionality
-  - Test strategy: Test image upload and deletion
-
-- [ ] Build Team Member Management interface
-  - Acceptance criteria: Full CRUD for team members
-  - Test strategy: Test all CRUD operations
-
-**Exit Criteria**: Admin dashboard with full CRUD for all content types, real-time sync to landing page
-
-**Delivers**:
-- Complete content management system
-- All content types manageable via dashboard
-- Real-time landing page updates
+**Delivers**: Complete admin dashboard for content management
 
 ---
 
-### Phase 6: Admin Dashboard - Editors & Settings
-**Goal**: Complete admin dashboard with specialized editors and settings management
+### Phase 6: Public Pages - Landing & Events Display
+**Goal**: Build public-facing landing page and events browsing experience.
 
 **Entry Criteria**: Phase 5 complete
 
 **Tasks**:
+- [ ] Implement LandingPage with hero, featured events, team, partners sections
+  - Depends on: [UI Components, ContentContext, LandingPage components]
+  - Acceptance criteria: Landing page displays all sections, uses CMS content, responsive
+  - Test strategy: Verify all sections render, data from context displays
 
-- [ ] Build Hero Section Editor
-  - Acceptance criteria: Edit hero title, subtitle, stats; changes reflect immediately on landing page
-  - Test strategy: Edit hero content, verify updates appear on landing page
+- [ ] Implement AllEventsPage with filtering, search, and pagination
+  - Depends on: [UI Components, ContentContext]
+  - Acceptance criteria: Browse all events, filter by date/category/venue, search, pagination works
+  - Test strategy: Filter events, search works, pagination navigates correctly
 
-- [ ] Build About Section Editor
-  - Acceptance criteria: Edit company story, features; changes reflect immediately
-  - Test strategy: Edit about content, verify real-time sync
+- [ ] Implement EventDetail modal/view with full event information
+  - Depends on: [AllEventsPage, ContentContext]
+  - Acceptance criteria: Show complete event details, lineup, gallery, venue info
+  - Test strategy: Click event, detail view loads with correct data
 
-- [ ] Build Site Settings form
-  - Acceptance criteria: Edit site name, email, phone, address, social media links
-  - Test strategy: Update settings, verify footer and contact info update
+- [ ] Implement responsive design and mobile optimization
+  - Depends on: [LandingPage, AllEventsPage, EventDetail]
+  - Acceptance criteria: Pages responsive on mobile/tablet/desktop, touch-friendly
+  - Test strategy: Mobile device/emulator testing
 
-- [ ] Build Real-time Dashboard Preview component
-  - Acceptance criteria: Preview panel shows how dashboard changes appear on landing page
-  - Test strategy: Make changes to content, observe preview updates
+**Exit Criteria**: Public pages fully functional and responsive, content displays from CMS
 
-- [ ] Implement status toggles for events/partners/team (active/inactive)
-  - Acceptance criteria: Toggle status updates ContentContext
-  - Test strategy: Test toggle functionality and immediate updates
-
-**Exit Criteria**: Complete admin dashboard with all content management features and real-time preview
-
-**Delivers**:
-- Full-featured content management dashboard
-- Ability to manage all platform content without code changes
-- Real-time preview of changes
+**Delivers**: Complete public-facing user experience
 
 ---
 
-### Phase 7: Polish & Optimization
-**Goal**: Performance optimization, error handling, and production readiness
+### Phase 7: Performance, Testing & Polish
+**Goal**: Optimize performance, add comprehensive tests, and refine user experience.
 
 **Entry Criteria**: Phase 6 complete
 
 **Tasks**:
+- [ ] Implement caching strategy and performance optimization
+  - Depends on: [All prior phases]
+  - Acceptance criteria: Page load time < 3s, cached data reduces API calls, images optimized
+  - Test strategy: Lighthouse audit, network monitoring
 
-- [ ] Optimize bundle size with lazy loading
-  - Acceptance criteria: Dashboard routes lazy-loaded, bundle size < 500KB gzipped
-  - Test strategy: Run `npm run build`, check bundle size report
+- [ ] Add comprehensive test suite (unit, integration, E2E)
+  - Depends on: [All prior phases]
+  - Acceptance criteria: 80%+ coverage of critical paths, all CRUD operations tested
+  - Test strategy: Run test suite, verify coverage reports
 
-- [ ] Implement error boundaries and error handling
-  - Acceptance criteria: Errors caught gracefully, user-friendly error messages shown
-  - Test strategy: Test with broken data, verify error handling
+- [ ] Implement error handling and user feedback (toasts, error boundaries)
+  - Depends on: [All prior phases]
+  - Acceptance criteria: Graceful error handling, user sees clear error messages
+  - Test strategy: Trigger errors, verify proper handling
 
-- [ ] Optimize image loading with ImageWithFallback component
-  - Acceptance criteria: Images load efficiently with fallback states
-  - Test strategy: Test slow network conditions, verify fallbacks work
+- [ ] Polish UI/UX, add animations, finalize branding
+  - Depends on: [All prior phases]
+  - Acceptance criteria: Smooth transitions, professional appearance, brand consistency
+  - Test strategy: Manual QA
 
-- [ ] Implement responsive design refinements
-  - Acceptance criteria: All pages responsive across mobile/tablet/desktop
-  - Test strategy: Test on multiple devices and screen sizes
+**Exit Criteria**: v0.1.0 production-ready, all tests passing, performance optimized
 
-- [ ] Audit and improve accessibility (ARIA, semantic HTML)
-  - Acceptance criteria: Page meets WCAG guidelines, screen reader tested
-  - Test strategy: Use accessibility auditor, screen reader testing
-
-- [ ] Setup production build and preview
-  - Acceptance criteria: `npm run build` produces optimized build, preview works
-  - Test strategy: Build for production, test preview server
-
-- [ ] Performance profiling and optimization
-  - Acceptance criteria: Page load time < 2 seconds, smooth 60fps animations
-  - Test strategy: Lighthouse audit, performance profiling
-
-**Exit Criteria**: Production-ready application with optimizations and error handling
-
-**Delivers**:
-- Optimized, production-ready application
-- Full error handling and edge case management
-- Responsive and accessible across all devices
+**Delivers**: Polished, tested, optimized production release
 
 ---
 
-## Test Strategy
+### Phase 8: Deployment & Monitoring (Post-MVP)
+**Goal**: Deploy to production and setup monitoring.
 
-### Test Pyramid
+**Entry Criteria**: Phase 7 complete
+
+**Tasks**:
+- [ ] Setup CI/CD pipeline for automated testing and deployment
+  - Depends on: [Test suite]
+  - Acceptance criteria: Automated tests run on commit, deployment to hosting on main branch
+  - Test strategy: Trigger CI/CD, verify deployment
+
+- [ ] Deploy to production hosting
+  - Depends on: [CI/CD setup]
+  - Acceptance criteria: Application running in production, SSL certificate, domain pointing
+  - Test strategy: Access production URL, verify functionality
+
+- [ ] Setup monitoring and error tracking (Sentry, analytics)
+  - Depends on: [Production deployment]
+  - Acceptance criteria: Error tracking active, performance metrics collected
+  - Test strategy: Trigger error, verify in monitoring system
+
+**Exit Criteria**: v0.1.0 live in production, monitoring active
+
+**Delivers**: Production-ready application with monitoring
+
+</implementation-roadmap>
+
+---
+
+<test-strategy>
+
+## Test Pyramid
+
 ```
         /\
-       /E2E\       ← 10% (End-to-end, critical user journeys)
+       /E2E\       ← 10% (End-to-end, slow, comprehensive)
       /------\
-     /Integration\ ← 25% (Component interactions, state updates)
+     /Integration\ ← 30% (Module interactions, data flow)
     /------------\
-   /  Unit Tests  \ ← 65% (Isolated component/function tests)
+   /  Unit Tests  \ ← 60% (Fast, isolated, deterministic)
   /----------------\
 ```
 
-### Coverage Requirements
+## Coverage Requirements
+
 - Line coverage: 80% minimum
 - Branch coverage: 75% minimum
-- Function coverage: 80% minimum
-- Critical paths: 100%
+- Function coverage: 85% minimum
+- Statement coverage: 80% minimum
 
-### Critical Test Scenarios
+## Critical Test Scenarios
 
-#### Event Management
+### Event CRUD Operations
 **Happy path**:
-- Create event with all fields (title, date, venue, artists, etc.)
-- Expected: Event appears in list and on landing page immediately
+- Create event with all required fields → Event saved and appears in list
+- Edit event → Changes persist and display updates
+- Delete event → Event removed from list and database
+- Expected: Events CRUD operations work end-to-end
 
 **Edge cases**:
-- Create event with minimum fields
-- Create multiple events with same date
-- Expected: All events created and displayed correctly
+- Create event with minimum fields → Event saved with defaults
+- Edit event with missing optional fields → Fields preserved or cleared as expected
+- Upload multiple images for event → All images stored and thumbnails generated
+- Expected: Edge cases handled gracefully
 
 **Error cases**:
-- Submit form with missing required fields
-- Expected: Validation errors shown, event not created
+- Create event with invalid date (past date) → Error shown, event not created
+- Upload oversized image → Error shown, upload cancelled
+- Network error during event creation → Retry available, no duplicate creation
+- Expected: Errors handled gracefully, user informed
 
-**Integration**:
-- Update event from dashboard, verify landing page reflects changes immediately
-- Expected: Real-time sync between dashboard and landing page
+**Integration points**:
+- Create event → Appears in AllEventsPage with correct data
+- Update event hero content → Landing page updates
+- Delete event → Removed from all lists and collections
 
-#### ContentContext State
+### Content Management (Team, Partners, Gallery, Settings)
 **Happy path**:
-- Call updateEvents with new array
-- Expected: State updates, all consumers notified
+- Create team member with photo → Appears on landing page
+- Update partner info → Changes reflect in partnership section
+- Add gallery photo → Appears in gallery and event association
+- Update site settings → Changes used throughout application
+- Expected: Content changes propagate to all pages
 
 **Error cases**:
-- Pass invalid data to update function
-- Expected: TypeScript catches errors at compile time
+- Upload invalid image format → Error message, upload rejected
+- Save settings with invalid email → Validation error shown
+- Expected: Input validation prevents bad data
 
-**Integration**:
-- Multiple components consuming same context state
-- Expected: All components update when state changes
-
-#### Responsive Design
+### Landing Page & Public Content
 **Happy path**:
-- View landing page on mobile, tablet, desktop
-- Expected: Layout adapts appropriately to each screen size
+- Load landing page → Hero, featured events, team, partners display
+- Filter events by date → Only matching events shown
+- Search for event → Correct results appear
+- Expected: Public pages render correctly with CMS data
 
 **Edge cases**:
-- Test at exact breakpoints (320px, 640px, 1024px, 1280px)
-- Expected: Components reflow without breaking
+- Landing page with no featured event → Graceful fallback
+- Events list with pagination → Navigation works correctly
+- Event with no images → Placeholder used
+- Expected: Graceful degradation for missing data
 
-#### Real-time Sync
+**Integration points**:
+- Admin changes hero content → Landing page reflects changes
+- Admin adds event → Event appears in all-events list
+- Admin updates site settings → Footer contact info updates
+
+### Form Management & Validation
 **Happy path**:
-- Make changes in dashboard, observe landing page update immediately
-- Expected: Zero-latency sync between dashboard and landing page
+- Submit valid event form → Event created, success toast shown
+- Submit form with validation errors → Form doesn't submit, errors highlighted
+- Expected: Form validation working as expected
 
-**Edge cases**:
-- Rapid sequential changes
-- Expected: State updates applied in order without race conditions
+**Error cases**:
+- Server error during submission → Error toast shown, allow retry
+- Network timeout → Appropriate error handling
+- Expected: Graceful error recovery
 
-### Test Generation Guidelines
-- Focus on user workflows (create event → see on landing page)
-- Test ContentContext integration extensively (it's the heart of the system)
-- Test responsive breakpoints for all layouts
-- Verify real-time sync behavior under various conditions
-- Keep tests focused on business logic, not implementation details
-- Use React Testing Library for component tests (prefer user interactions over implementation details)
+## Test Generation Guidelines
 
----
+**For Unit Tests:**
+- Focus on utility functions (formatting, validation, API helpers)
+- Test edge cases: empty strings, null values, boundary conditions
+- Aim for pure functions with clear inputs/outputs
+- Mock dependencies (API calls, database)
+- Avoid testing React internals; focus on business logic
 
-## Architecture Decisions
+**For Integration Tests:**
+- Test hooks with Supabase context
+- Test ContentContext operations and state updates
+- Test form submission end-to-end (from user input to state update)
+- Test data flow between components
+- Use actual Supabase test database or mock
 
-### Architecture: React Context for Global State
-**Decision**: Use React Context API for managing global content state instead of external state management library (Redux, Zustand, etc.)
+**For E2E Tests (critical paths only):**
+- Landing page loads and displays correct CMS data
+- Admin can create an event and see it on landing page
+- Admin can edit hero content and changes appear immediately
+- User can filter and find events
 
-**Rationale**:
-- Simple requirements (flat data model, infrequent updates)
-- Minimal bundle size impact (Context is built-in)
-- Tight integration with React patterns
-- Easy for newcomers to understand
-- Sufficient for current scale (few hundred items)
+**Testing Conventions:**
+- Use descriptive test names: `should create event with all fields and display in list`
+- Group related tests in describe blocks by feature
+- Use setup/teardown for test isolation
+- Test both success and error paths
+- Avoid testing implementation details; test behavior
 
-**Trade-offs**:
-- Not optimized for deeply nested renders (but our components are well-structured)
-- No time-travel debugging (Redux DevTools not available)
-- No middleware system (not currently needed)
-
-**Alternatives considered**:
-- Redux: Overkill complexity for current needs, larger bundle
-- Zustand: Good middle ground, but Context sufficient for current requirements
-- MobX: Steeper learning curve, not necessary
-- Local component state: Insufficient for cross-component sync
-
-### Architecture: Tailwind CSS for Styling
-**Decision**: Use Tailwind CSS utility-first approach instead of CSS modules, Styled Components, or traditional CSS
-
-**Rationale**:
-- Rapid development with utility classes
-- Consistency through predefined tokens
-- Excellent responsive design support
-- Small bundle size with PurgeCSS
-- Large ecosystem and community support
-- Works well with shadcn/ui components
-
-**Trade-offs**:
-- Utility classes in JSX can be verbose
-- Need to learn Tailwind utility naming
-- Requires PostCSS tooling
-
-**Alternatives considered**:
-- CSS Modules: More verbose, harder to maintain consistency
-- Styled Components: Larger bundle, overkill for our needs
-- Traditional CSS: Lack of consistency, maintenance nightmare
-
-### Architecture: shadcn/ui for Component Library
-**Decision**: Use shadcn/ui components instead of building all components from scratch
-
-**Rationale**:
-- 40+ pre-built, accessible components
-- Built on Radix UI (excellent accessibility)
-- Headless design allows full customization with Tailwind
-- Copy-paste model gives full control
-- Large community and active maintenance
-- Integrates seamlessly with Tailwind
-
-**Trade-offs**:
-- Takes up disk space (components copied into repo)
-- Less control than fully custom components
-- Opinionated design patterns
-
-**Alternatives considered**:
-- Material-UI: Too heavy, different aesthetic
-- Chakra UI: Good but less customizable
-- Building from scratch: Too time-consuming, less accessible
-
-### Architecture: Vite + SWC for Build
-**Decision**: Use Vite with SWC for extremely fast development experience
-
-**Rationale**:
-- SWC is 20x faster than Babel
-- Vite's esbuild is extremely efficient
-- Fast refresh (HMR) for React development
-- Smaller bundle sizes than Webpack
-- Modern ES2020 support
-- ESM-native approach
-
-**Trade-offs**:
-- Younger ecosystem than Webpack
-- Smaller community (though growing rapidly)
-- Some edge cases with older plugins
-
-**Alternatives considered**:
-- Webpack: Mature but slower builds
-- Parcel: Good but less control
-- esbuild: Too bare-bones for React development
+</test-strategy>
 
 ---
 
-## Risk Analysis
+<architecture>
 
-### Technical Risks
+## System Components
 
-**Risk**: Real-time sync performance with large dataset
-- **Impact**: High (core feature of product)
-- **Likelihood**: Medium (unlikely at current scale, but could occur)
-- **Mitigation**:
-  - Optimize ContentContext with useMemo to prevent unnecessary re-renders
-  - Implement selective subscriptions for large lists
-  - Monitor performance metrics with React DevTools Profiler
-- **Fallback**:
-  - Move to Redux with reselect for fine-grained optimization
-  - Implement manual subscription system
+**Frontend Application (React + TypeScript)**
+- Browser-based single-page application
+- Uses React Context for state management
+- Custom client-side router for navigation
+- Component-based architecture with separation of concerns
 
-**Risk**: TypeScript strict mode catches insufficient errors
-- **Impact**: Low (just means catching bugs)
-- **Likelihood**: Low
-- **Mitigation**:
-  - Enable all strict compiler options
-  - Use no-unknown-any ESLint rule
-  - Regular code reviews
-- **Fallback**: None needed (extra type safety is beneficial)
+**UI Layer**
+- Built on Radix UI primitives for accessibility
+- Styled with Tailwind CSS for utility-first styling
+- darkMode support via next-themes
+- Responsive design for mobile, tablet, desktop
 
-**Risk**: Responsive design breaks at unusual screen sizes
-- **Impact**: Medium (affects mobile users)
-- **Likelihood**: Medium (CSS frameworks sometimes have edge cases)
-- **Mitigation**:
-  - Test at multiple breakpoints during development
-  - Use real devices for testing, not just browser tools
-  - Monitor for responsive issues in production
-- **Fallback**: Manual media query overrides for edge cases
+**Backend Services (Supabase)**
+- PostgreSQL database for persistent storage
+- Edge Functions (Hono) for serverless operations
+- File storage for images and media
+- Real-time subscriptions for collaborative features (future)
 
-**Risk**: Image loading performance impact from Unsplash
-- **Impact**: Medium (affects page load time)
-- **Likelihood**: Medium (depends on image optimization)
-- **Mitigation**:
-  - Use Unsplash URL parameters for width/quality optimization
-  - Implement lazy loading with Intersection Observer
-  - Use ImageWithFallback component with loading states
-  - Monitor image load metrics
-- **Fallback**: Switch to self-hosted images or different CDN
+**Data Flow**
+- User interactions → React Components → Hooks → ContentContext → Supabase Client → Database
+- Admin edits → ContentContext → Supabase → Real-time → Landing page re-render
 
-### Dependency Risks
+## Data Models
 
-**Risk**: React version compatibility in future
-- **Impact**: High (core dependency)
-- **Likelihood**: Low (React is mature)
-- **Mitigation**:
-  - Keep React updated to latest stable
-  - Monitor deprecation warnings
-  - Plan upgrade cycles
-- **Fallback**: React has excellent backwards compatibility
+**Event**
+```typescript
+{
+  id: string (UUID)
+  title: string
+  description: string
+  date: Date
+  time: string
+  venue: string
+  venue_address: string
+  capacity: number
+  price_min: number
+  price_max: number
+  category: 'festival' | 'art' | 'live_music' | 'club'
+  status: 'draft' | 'upcoming' | 'ongoing' | 'completed' | 'archived'
+  featured_image: string (URL)
+  gallery_images: string[] (URLs)
+  artists: Artist[]
+  highlights: string[]
+  created_at: timestamp
+  updated_at: timestamp
+}
+```
 
-**Risk**: Vite ecosystem stability
-- **Impact**: Medium (build tool)
-- **Likelihood**: Low (Vite widely adopted now)
-- **Mitigation**:
-  - Keep Vite and plugins updated
-  - Monitor Vite release notes
-  - Have Webpack fallback plan if needed
-- **Fallback**: Migrate to Webpack if necessary (lower priority)
+**Team Member**
+```typescript
+{
+  id: string (UUID)
+  name: string
+  role: string
+  bio: string
+  photo: string (URL)
+  social_links: { platform: string, url: string }[]
+  created_at: timestamp
+  updated_at: timestamp
+}
+```
 
-**Risk**: Supabase integration when implementing database
-- **Impact**: High (database is critical for production)
-- **Likelihood**: Medium (Supabase still evolving)
-- **Mitigation**:
-  - Abstraction layer between app and Supabase
-  - Thorough testing of Supabase queries
-  - Regular backups and monitoring
-- **Fallback**: Migration to traditional PostgreSQL + API layer
+**Partner**
+```typescript
+{
+  id: string (UUID)
+  name: string
+  category: 'music' | 'energy' | 'beverage' | 'lifestyle' | 'technology'
+  logo: string (URL)
+  website_url: string
+  sponsorship_level: 'platinum' | 'gold' | 'silver' | 'bronze'
+  created_at: timestamp
+  updated_at: timestamp
+}
+```
 
-### Scope Risks
+**Gallery Item**
+```typescript
+{
+  id: string (UUID)
+  image_url: string
+  caption: string
+  event_id: string (FK)
+  uploaded_at: timestamp
+}
+```
 
-**Risk**: Feature creep adding unrealistic scope
-- **Impact**: High (delays launch)
-- **Likelihood**: Medium (common in projects)
-- **Mitigation**:
-  - Strict phase gates - only move to next phase after current complete
-  - MVP mentality - get to working product first, enhance later
-  - Regular scope reviews with stakeholders
-- **Fallback**: Cut features or extend timeline
+**Hero Content**
+```typescript
+{
+  title: string
+  subtitle: string
+  featured_event_id: string (FK)
+  background_image: string (URL)
+  stats: { label: string, value: string }[]
+}
+```
 
-**Risk**: Real-time sync becomes more complex than anticipated
-- **Impact**: High (core feature)
-- **Likelihood**: Low (we've kept it simple with Context)
-- **Mitigation**:
-  - Start with simple in-memory state
-  - Optimize only if performance metrics show issues
-  - Use React DevTools Profiler to identify bottlenecks
-- **Fallback**: Implement manual UI update patterns
+**Site Settings**
+```typescript
+{
+  contact_email: string
+  contact_phone: string
+  social_links: { platform: string, url: string }[]
+  site_metadata: { key: string, value: string }[]
+}
+```
 
-**Risk**: Timeline underestimation
-- **Impact**: High (project delays)
-- **Likelihood**: Medium (common in development)
-- **Mitigation**:
-  - Buffer time in each phase (20% overhead)
-  - Break down tasks into smaller, more estimable pieces
-  - Track actual time vs estimated time per phase
-- **Fallback**: Prioritize features ruthlessly, cut lower-priority items
+## Technology Stack
+
+**Core Framework**
+- **React 19.2.0** - UI library for component-based interfaces
+- **TypeScript** - Type-safe JavaScript for better tooling and error prevention
+- **Vite 7.2.1** - Fast build tool and dev server
+
+**UI & Styling**
+- **Tailwind CSS v4.1.3** - Utility-first CSS framework
+- **Radix UI** - Unstyled, accessible component primitives
+- **shadcn/ui** - Pre-built component patterns
+- **Lucide React** - Icon library
+- **Motion** - Animation library
+- **next-themes** - Theme management (light/dark mode)
+
+**State & Routing**
+- **React Context API** - Global state management (no external libraries)
+- **Custom Router** - Client-side routing with History API
+
+**Backend & Database**
+- **Supabase** - Backend-as-a-Service (PostgreSQL database, Edge Functions, Storage)
+- **Hono** - Web framework for Edge Functions
+
+**Forms & Input**
+- **React Hook Form** - Form state management and validation
+- **React Day Picker** - Date selection
+
+**Notifications & UI Feedback**
+- **Sonner** - Toast notifications library
+
+**Data & Analytics**
+- **Recharts** - Data visualization library
+
+**Utilities**
+- **CMDK** - Command menu component
+- **Embla Carousel** - Carousel/slider component
+- **Clsx** - Conditional CSS class names
+- **Tailwind Merge** - Merge Tailwind classes
+
+**Build & Configuration**
+- **@vitejs/plugin-react-swc** - Fast React transformation with SWC
+- **path aliases** - Use `@/` to reference `src/` directory
+
+## Technology Decisions
+
+**Decision: React + TypeScript over Vue/Svelte**
+- **Rationale**: React ecosystem maturity, TypeScript first-class support, larger community resources
+- **Trade-offs**: Larger bundle size than Vue, more verbose than Svelte
+- **Alternatives considered**: Vue.js, Svelte
+
+**Decision: Context API instead of Redux/Zustand**
+- **Rationale**: Simpler setup for medium-complexity state, sufficient for current scope (5 main entities)
+- **Trade-offs**: Manual memoization needed to prevent unnecessary renders
+- **Alternatives considered**: Redux, Zustand, Recoil
+
+**Decision: Custom Router instead of React Router**
+- **Rationale**: Reduced dependencies, simple routing needs (3 main routes), control over implementation
+- **Trade-offs**: No built-in features like nested routes, code splitting
+- **Alternatives considered**: React Router, TanStack Router, TinyRouter
+
+**Decision: Supabase for Backend**
+- **Rationale**: PostgreSQL database, real-time capabilities, built-in auth, low operational overhead
+- **Trade-offs**: Vendor lock-in, limited scalability options compared to self-hosted
+- **Alternatives considered**: Firebase, self-hosted PostgreSQL, MongoDB
+
+**Decision: Tailwind CSS + Radix UI**
+- **Rationale**: Accessibility built-in (Radix), utility-first styling (Tailwind) reduces custom CSS, consistent design system
+- **Trade-offs**: Large CSS file (mitigated by Vite purging), learning curve for utility-first
+- **Alternatives considered**: Material UI, Ant Design, custom CSS
+
+**Decision: React Hook Form over Formik**
+- **Rationale**: Smaller bundle size, performance optimized, minimal re-renders
+- **Trade-offs**: Less out-of-the-box validation compared to Formik
+- **Alternatives considered**: Formik, Final Form
+
+</architecture>
 
 ---
+
+<risks>
+
+## Technical Risks
+
+**Risk**: Supabase Real-time subscriptions not scaling beyond 50K members
+- **Impact**: High - Platform can't handle live updates as community grows
+- **Likelihood**: Medium - Known limitation of real-time services
+- **Mitigation**: Implement smart subscription management (only subscribe to events user is interested in), use polling fallback
+- **Fallback**: Migrate to self-hosted PostgreSQL with custom WebSocket layer
+
+**Risk**: React Context re-renders on every content change, performance degrades
+- **Impact**: Medium - UI becomes sluggish as data grows
+- **Likelihood**: Medium - Context doesn't have built-in memoization
+- **Mitigation**: Implement useMemo/useCallback in context, consider split contexts per entity, add performance monitoring
+- **Fallback**: Migrate to Zustand or Redux for fine-grained reactivity
+
+**Risk**: Image uploads to Supabase Storage overwhelm performance or costs
+- **Impact**: Medium - Platform degrades under high upload volume
+- **Likelihood**: Low - Supabase Storage is production-grade
+- **Mitigation**: Implement image compression before upload, add CDN for image delivery, set storage quotas
+- **Fallback**: Use alternative storage (AWS S3, Cloudinary)
+
+**Risk**: TypeScript type definitions become unmaintainable as schema evolves
+- **Impact**: Low-Medium - Bugs due to type mismatch
+- **Likelihood**: Medium - Schema changes without type updates
+- **Mitigation**: Use Supabase type generation tools, automate schema → types pipeline, enforce type-only imports
+- **Fallback**: Accept runtime validation, add zod/runtime type checking
+
+## Dependency Risks
+
+**Risk**: Radix UI or Tailwind CSS breaking changes in major version bumps
+- **Impact**: Medium - May require component rewrites
+- **Likelihood**: Low - Mature libraries with stable APIs
+- **Mitigation**: Pin versions in package.json, test major version upgrades in staging first
+- **Fallback**: Fork and patch libraries if critical issues arise
+
+**Risk**: Supabase service outage affects admin dashboard availability
+- **Impact**: High - Admins can't manage content during outage
+- **Likelihood**: Low - SLA usually 99.5%+
+- **Mitigation**: Implement offline mode with local storage backup, cache admin data client-side
+- **Fallback**: Accept downtime, set up monitoring/alerts
+
+**Risk**: Node/npm ecosystem breaking changes (Vite, TypeScript, etc.)
+- **Impact**: Medium - Build may fail, compatibility issues
+- **Likelihood**: Low - Conservative upgrade strategy
+- **Mitigation**: Regular dependency updates in isolation, test in CI, use lockfile (package-lock.json)
+- **Fallback**: Rollback to known-good versions
+
+## Scope Risks
+
+**Risk**: Event schema requirements evolve faster than implementation
+- **Impact**: Medium - Mid-development schema changes, rework required
+- **Likelihood**: High - Evolving requirements typical in startups
+- **Mitigation**: Build flexible schema with JSONB fields, design for extension, frequent stakeholder reviews
+- **Fallback**: Prioritize core MVP, defer non-essential fields to Phase 2
+
+**Risk**: UI/UX requirements expand beyond initial scope (animations, complex interactions)
+- **Impact**: Low-Medium - Timeline slips, scope creep
+- **Likelihood**: Medium - Designer may add polish iteratively
+- **Mitigation**: Lock scope before Phase 3, use design system to standardize, time-box polish work
+- **Fallback**: Release v0.1.0 with basic UX, refine in v0.2.0
+
+**Risk**: Team capacity lower than estimated (1-2 developers instead of 3)
+- **Impact**: High - Timeline extends significantly
+- **Likelihood**: Medium - Startup resource constraints
+- **Mitigation**: Prioritize MVP features (Phases 0-5), defer nice-to-have (Phase 7-8)
+- **Fallback**: Cut less critical features (analytics, monitoring), extend timeline
+
+**Risk**: Unclear requirements for admin workflows
+- **Impact**: Medium - Built features don't match admin needs
+- **Likelihood**: Medium - First-time admin tool
+- **Mitigation**: Conduct admin interviews, build mock screens, iterate on DashboardLayout before full implementation
+- **Fallback**: Be ready to redesign admin UI in Phase 4 before full implementation
+
+</risks>
+
+---
+
+<appendix>
+
+## References
+
+- **Supabase Documentation**: https://supabase.com/docs
+- **React Documentation**: https://react.dev
+- **TypeScript Handbook**: https://www.typescriptlang.org/docs/
+- **Tailwind CSS**: https://tailwindcss.com/docs
+- **Radix UI**: https://www.radix-ui.com/primitives/docs/overview/introduction
+- **Vite Documentation**: https://vitejs.dev/guide/
+- **RPG Methodology**: https://www.microsoft.com/en-us/research/publication/the-repository-planning-graph-rpg-method/ (reference)
+- **WildOut! Figma Design**: https://www.figma.com/design/gdU03sBHxmwEdKKZb5eJHW/WildOut--Landing-Page-and-Dashboard
 
 ## Glossary
 
-**ContentContext**: Global React Context providing all platform content (events, partners, gallery, team, etc.)
-
-**Real-time Sync**: Immediate reflection of dashboard changes on landing page via React Context updates
-
-**Landing Page**: Public-facing website showcasing events, artists, gallery, partners, and company information
-
-**Admin Dashboard**: Protected interface for organizers to manage all platform content
-
-**CRUD**: Create, Read, Update, Delete operations for managing content
-
-**Event Showcase**: Feature displaying upcoming events with filtering and detail modal
-
-**GlassMorphism**: Visual effect using transparent background with backdrop blur
-
-**SPA (Single-Page Application)**: Application that dynamically updates single HTML page instead of loading new pages
-
-**Type Safety**: Using TypeScript to catch errors at compile time rather than runtime
-
-**Responsive Design**: Layout that adapts to different screen sizes and devices
-
----
+- **CMS**: Content Management System - admin interface for managing events, team, partners, gallery, and settings
+- **CRUD**: Create, Read, Update, Delete - basic operations on data entities
+- **Context API**: React's built-in state management mechanism
+- **Hook**: Reusable function in React for state and effects
+- **Supabase**: Backend-as-a-Service combining PostgreSQL, authentication, storage, and edge functions
+- **Edge Function**: Serverless function running on Supabase infrastructure
+- **Radix UI**: Low-level component library providing accessibility and unstyled primitives
+- **Tailwind CSS**: Utility-first CSS framework
+- **Entity**: A domain object (Event, Team, Partner, etc.)
+- **Payload**: Data sent to or received from an API
+- **Topological Order**: Ordering dependencies such that all dependencies of an item come before the item
 
 ## Open Questions
 
-1. **Authentication**: Current placeholder boolean check - what auth system will be implemented? (Supabase Auth, custom OAuth, JWT?)
+1. **Admin Authentication**: How should admin users authenticate? (OAuth, email/password, SAML?)
+2. **Event Artist Data Model**: Should artists be standalone entities or always linked to events?
+3. **Community Profiles**: Should artists/venues have public profiles with their own pages?
+4. **Analytics Requirements**: What specific metrics should dashboard show? (views, clicks, conversions?)
+5. **Multi-language Support**: Should platform support Indonesian + English from start?
+6. **Payment Integration**: Is there an event ticketing/payment flow needed?
+7. **Image Storage Strategy**: CDN requirement? Image optimization preferences?
+8. **Real-time Requirements**: Do admins need to see real-time collaborative editing or is eventual consistency OK?
+9. **Mobile Admin App**: Is mobile admin dashboard needed or web-only?
+10. **Version History**: Should content have revision history/rollback capabilities?
 
-2. **Image Storage**: Currently using Unsplash URLs - when moving to production, will images be self-hosted or use cloud storage (AWS S3, Cloudinary, Supabase Storage)?
-
-3. **Database Backend**: ContentContext currently uses in-memory state - when will Supabase PostgreSQL integration begin? What's the migration strategy from in-memory to persistent storage?
-
-4. **Payment Processing**: No ticketing/payment system currently. Will this be integrated? Which payment processor (Midtrans, Stripe, local Indonesian provider)?
-
-5. **Scaling**: Current design assumes reasonable data sizes. At what user/event count should we revisit architecture (Context optimization, database queries, caching)?
-
-6. **Localization**: Project mentions Indonesian market. Will UI be localized (Bahasa Indonesia translations)? When?
-
-7. **Notifications**: No notification system currently. Will email/SMS notifications be added? When?
-
-8. **Analytics**: No tracking currently. Will Google Analytics 4 or custom event tracking be implemented?
-
-9. **Social Integration**: No Instagram/Twitter API integration yet. Is this planned for phase after launch?
-
-10. **Real-time Features**: Currently no websocket-based real-time features. Are live updates (attendee count, live chat) planned?
+</appendix>
 
 ---
 
-## Appendix
+<task-master-integration>
 
-### Key Resources
-- **Figma Design**: https://www.figma.com/design/gdU03sBHxmwEdKKZb5eJHW/WildOut--Landing-Page-and-Dashboard
-- **Project Conventions**: `openspec/project.md`
-- **React Documentation**: https://react.dev
-- **Tailwind CSS**: https://tailwindcss.com
-- **shadcn/ui**: https://shadcn-ui.com
-- **Vite Documentation**: https://vitejs.dev
-- **TypeScript Handbook**: https://www.typescriptlang.org/docs
+# How Task Master Uses This PRD
 
-### Technology Stack Summary
-- **Runtime**: Node.js 18+
-- **Language**: TypeScript 5.9.3 (strict mode)
-- **Framework**: React 19.2.0
-- **Build Tool**: Vite 7.2.1 + SWC
-- **Styling**: Tailwind CSS 3
-- **Components**: shadcn/ui (40+)
-- **Icons**: Lucide React
-- **Animations**: Framer Motion
-- **Forms**: React Hook Form
-- **Linting**: ESLint 9 + Prettier
-- **State**: React Context API
-- **Routing**: React Router
-- **Future Backend**: Supabase (PostgreSQL + Auth)
+When you run `task-master parse-prd <file>.txt`, the parser:
 
-### Development Environment
-- **Package Manager**: npm
-- **Node Version**: 18+
-- **IDE Recommended**: VS Code with ESLint + TypeScript extensions
-- **Browser Support**: Modern browsers (ES2020+)
-- **Development Port**: 3000
-- **Build Output**: `build/` directory (ESNext target)
+1. **Extracts capabilities** → Main tasks
+   - Each `### Capability:` becomes a top-level task
 
----
+2. **Extracts features** → Subtasks
+   - Each `#### Feature:` becomes a subtask under its capability
 
-**Document Version**: 1.0
-**Last Updated**: 2025-11-06
-**Status**: Ready for Phase 0 Kickoff
+3. **Parses dependencies** → Task dependencies
+   - `Depends on: [X, Y]` sets task.dependencies = ["X", "Y"]
 
+4. **Orders by phases** → Task priorities
+   - Phase 0 tasks = highest priority
+   - Phase N tasks = lower priority, properly sequenced
 
+5. **Uses test strategy** → Test generation context
+   - Feeds test scenarios to Surgical Test Generator during implementation
+
+**Result**: A dependency-aware task graph that can be executed in topological order.
+
+## Why RPG Structure Matters
+
+Traditional flat PRDs lead to:
+- ❌ Unclear task dependencies
+- ❌ Arbitrary task ordering
+- ❌ Circular dependencies discovered late
+- ❌ Poorly scoped tasks
+
+RPG-structured PRDs provide:
+- ✅ Explicit dependency chains
+- ✅ Topological execution order
+- ✅ Clear module boundaries
+- ✅ Validated task graph before implementation
+
+## Tips for Best Results
+
+1. **Spend time on dependency graph** - This is the most valuable section for Task Master
+2. **Keep features atomic** - Each feature should be independently testable
+3. **Progressive refinement** - Start broad, use `task-master expand` to break down complex tasks
+4. **Use research mode** - `task-master parse-prd --research` leverages AI for better task generation
+
+</task-master-integration>
