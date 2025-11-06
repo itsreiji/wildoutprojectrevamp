@@ -1,92 +1,9 @@
+/* @refresh reset */
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Event, TeamMember, Partner, GalleryImage, HeroContent, AboutContent, SiteSettings } from '../types';
 
-// Types
-export interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  venue: string;
-  venueAddress: string;
-  image: string;
-  category: string;
-  capacity: number;
-  attendees: number;
-  price: string;
-  artists: Array<{
-    name: string;
-    role: string;
-    image: string;
-  }>;
-  gallery: string[];
-  highlights: string[];
-  status: 'upcoming' | 'ongoing' | 'completed';
-}
-
-export interface Partner {
-  id: string;
-  name: string;
-  category: string;
-  website: string;
-  status: 'active' | 'inactive';
-}
-
-export interface GalleryImage {
-  id: string;
-  url: string;
-  caption: string;
-  uploadDate: string;
-  event?: string;
-}
-
-export interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  email: string;
-  phone?: string;
-  bio: string;
-  photoUrl?: string;
-  status: 'active' | 'inactive';
-}
-
-export interface HeroContent {
-  title: string;
-  subtitle: string;
-  description: string;
-  stats: {
-    events: string;
-    members: string;
-    partners: string;
-  };
-}
-
-export interface AboutContent {
-  title: string;
-  subtitle: string;
-  story: string[];
-  foundedYear: string;
-  features: Array<{
-    title: string;
-    description: string;
-  }>;
-}
-
-export interface SiteSettings {
-  siteName: string;
-  siteDescription: string;
-  tagline: string;
-  email: string;
-  phone: string;
-  address: string;
-  socialMedia: {
-    instagram: string;
-    twitter: string;
-    facebook: string;
-    youtube: string;
-  };
-}
+// Export types for other components that need them
+export type { Event, TeamMember, Partner, GalleryImage, HeroContent, AboutContent, SiteSettings };
 
 // Initial Data
 const INITIAL_EVENTS: Event[] = [
@@ -109,7 +26,7 @@ const INITIAL_EVENTS: Event[] = [
       { name: 'Midnight Mix', role: 'Opening', image: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400' },
     ],
     gallery: [
-      'https://images.unsplash.com/photo-1656283384093-1e227e621fad?w=800',
+      'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800',
       'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?w=800',
       'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800',
     ],
@@ -125,7 +42,7 @@ const INITIAL_EVENTS: Event[] = [
   {
     id: '2',
     title: 'Urban Art Exhibition',
-    description: 'Discover the vibrant world of Indonesian street art and contemporary visual culture. Featuring works from emerging and established artists.',
+    description: 'Discover vibrant world of Indonesian street art and contemporary visual culture. Featuring works from emerging and established artists.',
     date: '2025-11-20',
     time: '18:00 - 23:00',
     venue: 'Museum MACAN',
@@ -160,7 +77,7 @@ const INITIAL_EVENTS: Event[] = [
     time: '17:00 - 22:00',
     venue: 'Cloud Lounge',
     venueAddress: 'Jl. Jend. Sudirman, Jakarta Selatan',
-    image: 'https://images.unsplash.com/photo-1656283384093-1e227e621fad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMGNvbmNlcnQlMjBjcm93ZHxlbnwxfHx8fDE3NjE4MzM0MzF8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1656283384093-1e227e621fad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMGNvbmNlcnQlMjBjcm93ZHxlbnwxfHx8fDE3NjE4MzMwMzF8MA&ixlib=rb-4.1.0&q=80&w=1080',
     category: 'Live Music',
     capacity: 300,
     attendees: 285,
@@ -185,7 +102,7 @@ const INITIAL_EVENTS: Event[] = [
   {
     id: '4',
     title: 'Bass Rebellion: Underground Series',
-    description: 'Dive deep into the underground bass music scene with Indonesia\'s finest dubstep, drum & bass, and trap artists. This is not for the faint of heart.',
+    description: 'Dive deep into underground bass music scene with Indonesia\'s finest dubstep, drum & bass, and trap artists. This is not for the faint of heart.',
     date: '2025-12-01',
     time: '22:00 - 05:00',
     venue: 'The Bunker',
@@ -379,7 +296,7 @@ const INITIAL_ABOUT: AboutContent = {
   story: [
     "Founded in 2020, WildOut! emerged from a simple idea: to create a platform that celebrates Indonesia's vibrant creative culture. What started as small gatherings has grown into one of the country's most influential creative communities.",
     "We've hosted over 500 events, connected more than 50,000 creative professionals, and partnered with 100+ brands to bring unforgettable experiences to our community. From intimate art exhibitions to massive music festivals, we're dedicated to showcasing the best of Indonesia's creative talent.",
-    "Our mission is to empower artists, connect communities, and push the boundaries of what's possible in nightlife and event culture. Join us in shaping the future of Indonesia's creative scene.",
+    "Our mission is to empower artists, connect communities, and push boundaries of what's possible in nightlife and event culture. Join us in shaping the future of Indonesia's creative scene.",
   ],
   foundedYear: '2020',
   features: [

@@ -4,65 +4,94 @@
       {
         "id": 1,
         "title": "Foundation: Setup TypeScript Types and Utility Functions",
-        "description": "Establish the foundational TypeScript types for all data models (Event, Team Member, Partner, etc.) and create a library of shared utility functions for formatting, validation, and API helpers.",
-        "details": "Create type definition files under `src/types/` as specified in the PRD (e.g., `events.ts`, `content.ts`). Use the data models from the architecture section to define interfaces for `Event`, `TeamMember`, `Partner`, etc. In `src/utils/`, create `formatting.ts` for date/string manipulation, `validation.ts` for input validation rules (e.g., for emails, URLs), and `api.ts` for wrapping Supabase calls. \n\n```typescript\n// src/types/events.ts\nexport interface Event {\n  id: string; // UUID\n  title: string;\n  description: string;\n  date: Date;\n  // ... other fields from PRD\n}\n\n// src/utils/formatting.ts\nexport const formatDate = (date: Date): string => {\n  return new Intl.DateTimeFormat('en-US').format(date);\n};\n```",
-        "testStrategy": "Verify all types compile without errors using `tsc --noEmit`. Write unit tests for all utility functions in `src/utils/` using a testing framework like Vitest, ensuring edge cases (nulls, empty strings, invalid formats) are covered.",
-        "priority": "high",
+        "description": "Successfully established the foundational TypeScript types for all data models (Event, TeamMember, Partner, etc.) and created a library of shared utility functions. This work, guided by the `foundation-types-utils` OpenSpec, provides a strongly-typed foundation for the application's data layer.",
+        "status": "done",
         "dependencies": [],
-        "status": "pending",
+        "priority": "high",
+        "details": "## OpenSpec Proposal\n- **Proposal ID**: `foundation-types-utils`\n- **Status**: approved\n- **Location**: `openspec/changes/foundation-types-utils/`\n\nThe implementation followed the specifications in this proposal, and the checklist in `tasks.md` is now complete.\n\n---\n\n### Implementation Summary\n\nAll type definitions and utility functions have been implemented as specified:\n\n- **Type Definitions**: All data model interfaces are defined in `src/types/`, including `events.ts`, `team.ts`, `partners.ts`, `content.ts`, and `settings.ts`.\n\n- **Utility Functions**: Helper functions for formatting (`src/utils/formatting.ts`), validation (`src/utils/validation.ts`), and API interactions with Supabase (`src/utils/api.ts`) have been created.\n\n- **Integration**: The `ContentContext` in `src/contexts/ContentContext.tsx` has been successfully updated to import and use these new types, ensuring type-safe state management across the application.",
+        "testStrategy": "All types were confirmed to compile without errors using `tsc --noEmit`. Unit tests were written for all utility functions in `src/utils/` using Vitest, covering all specified edge cases. All tests are passing, validating the implementation against the criteria in `openspec/changes/foundation-types-utils/tasks.md`.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Create Directory Structure and Core Event Type Definition",
-            "description": "Establish the foundational directory structure by creating `src/types` and `src/utils`. Then, create the first and most critical data model, the `Event` type, in its own file.",
+            "title": "Review and Finalize OpenSpec Proposal",
+            "description": "Review the draft OpenSpec proposal to ensure it aligns with project goals and technical requirements before starting implementation. This step is crucial to formalize the plan.",
             "dependencies": [],
-            "details": "Create a new directory `src/types`. Inside this directory, create a file named `events.ts`. Define and export the TypeScript interface `Event` with all required fields such as `id`, `title`, `description`, `date`, `location`, `featured_image`, and `gallery_images`. Also, create the empty `src/utils` directory for upcoming utility functions.",
-            "status": "pending",
-            "testStrategy": "Run `tsc --noEmit` to ensure the new type file compiles correctly without errors. No runtime tests are needed for this structure and type definition task."
+            "details": "Locate the proposal in `openspec/changes/foundation-types-utils/`. Review the type definitions, utility function signatures, and the implementation checklist in `tasks.md`. Provide feedback and get approval to move the proposal from `draft` to `approved` status.",
+            "status": "done",
+            "testStrategy": "Confirmation of review and approval from the project lead. The spec's status should be updated to 'approved' before subsequent tasks begin."
           },
           {
             "id": 2,
-            "title": "Define Team Member and Partner TypeScript Interfaces",
-            "description": "Expand the application's data models by defining the TypeScript interfaces for `TeamMember` and `Partner`. These will be used for the 'About Us' and partner sections of the site.",
+            "title": "Create Directory Structure and Core Event Type Definition",
+            "description": "Establish the foundational directory structure and implement the `Event` type, which is central to the application, according to the approved specification.",
             "dependencies": [
               1
             ],
-            "details": "In the `src/types` directory, create a new file `team.ts` and define the `TeamMember` interface, including fields like `id`, `name`, `role`, `bio`, and `avatar_url`. Similarly, create `partners.ts` and define the `Partner` interface with fields such as `id`, `name`, `logo_url`, and `website_url`.",
-            "status": "pending",
-            "testStrategy": "Verify type correctness by running `tsc --noEmit`. Ensure all defined interfaces are exported correctly from their respective modules."
+            "details": "Create the `src/types` and `src/utils` directories if they don't already exist. Then, create the file `src/types/events.ts` and implement the `Event` TypeScript interface precisely as specified in the `foundation-types-utils` OpenSpec.",
+            "status": "done",
+            "testStrategy": "Run `tsc --noEmit` to ensure the new type file compiles correctly without errors. No runtime tests are needed for this structure and type definition task."
           },
           {
             "id": 3,
-            "title": "Define Interfaces for General Page Content and Settings",
-            "description": "Create TypeScript types for various singleton content pieces, including the hero section, about page text, gallery images, and global application settings.",
+            "title": "Define Team Member and Partner TypeScript Interfaces",
+            "description": "Expand the application's data models by defining the TypeScript interfaces for `TeamMember` and `Partner` based on the approved OpenSpec.",
             "dependencies": [
-              1
+              2
             ],
-            "details": "Create a new file `src/types/content.ts`. Inside, define and export interfaces for `HeroContent`, `AboutContent`, and `GalleryImage`. The `GalleryImage` type should include at least `id`, `image_url`, and `alt_text`. Also, create `src/types/settings.ts` to define a `Settings` interface for site-wide configuration data.",
-            "status": "pending",
-            "testStrategy": "Compile the project using `tsc --noEmit` to check for any syntax or type-related errors in the newly created definition files."
+            "details": "In the `src/types` directory, create `team.ts` and `partners.ts`. Implement the `TeamMember` and `Partner` interfaces exactly as defined in the `foundation-types-utils` OpenSpec to ensure consistency with the data schema.",
+            "status": "done",
+            "testStrategy": "Verify type correctness by running `tsc --noEmit`. Ensure all defined interfaces are exported correctly from their respective modules as per the spec."
           },
           {
             "id": 4,
-            "title": "Implement Formatting and Validation Utility Functions",
-            "description": "Create a set of reusable utility functions for common data manipulation tasks like date formatting and input validation to ensure consistency across the application.",
-            "dependencies": [],
-            "details": "In the `src/utils` directory, create `formatting.ts`. Add functions like `formatDate(date: Date)` using `Intl.DateTimeFormat`. Create `validation.ts` and add functions or constants for validation, such as an email regex `EMAIL_REGEX` or a function `isValidUrl(url: string)`. Consider adding a library like `zod` for more complex schema validation later.",
-            "status": "pending",
-            "testStrategy": "Write unit tests for each utility function using a framework like Vitest. Test `formatDate` with various date objects and edge cases. For validation functions, test with both valid and invalid inputs to ensure correctness."
+            "title": "Define Interfaces for General Page Content and Settings",
+            "description": "Create TypeScript types for singleton content pieces and global settings, following the data models specified in the OpenSpec.",
+            "dependencies": [
+              2
+            ],
+            "details": "Create `src/types/content.ts` and `src/types/settings.ts`. Implement the `HeroContent`, `AboutContent`, `GalleryImage`, and `Settings` interfaces as detailed in the approved `foundation-types-utils` OpenSpec.",
+            "status": "done",
+            "testStrategy": "Compile the project using `tsc --noEmit` to check for any syntax or type-related errors in the newly created definition files."
           },
           {
             "id": 5,
+            "title": "Implement Formatting and Validation Utility Functions",
+            "description": "Create a set of reusable utility functions for common data manipulation tasks, as specified in the OpenSpec, to ensure consistency across the application.",
+            "dependencies": [
+              1
+            ],
+            "details": "In `src/utils`, create `formatting.ts` and `validation.ts`. Implement the utility functions (`formatDate`, `isValidUrl`, etc.) according to the specification in the `foundation-types-utils` OpenSpec. The spec may recommend libraries like `zod` for more complex schema validation.",
+            "status": "done",
+            "testStrategy": "Write unit tests for each utility function using Vitest. Test `formatDate` with various date objects and edge cases. For validation functions, test with both valid and invalid inputs to ensure correctness, following the checklist in `tasks.md`."
+          },
+          {
+            "id": 6,
             "title": "Create Initial API Helper Functions for Supabase",
-            "description": "Establish a centralized API layer by creating an `api.ts` file that will contain all functions for interacting with the Supabase backend. This abstracts data-fetching logic from the UI components.",
+            "description": "Establish a centralized API layer by creating an `api.ts` file containing typed functions for interacting with the Supabase backend, as laid out in the OpenSpec.",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Create `src/utils/api.ts`. Following the OpenSpec, import the newly created data model types and define async helper functions (`getEvents`, `getTeamMembers`, etc.) that will wrap Supabase calls. Ensure function signatures match the spec.",
+            "status": "done",
+            "testStrategy": "Since the Supabase client may not yet be implemented, this task can be tested by ensuring the file compiles without errors (`tsc --noEmit`) and that the function signatures correctly use the TypeScript types defined in previous tasks."
+          },
+          {
+            "id": 7,
+            "title": "Conduct Final Code Review and Merge",
+            "description": "Review the completed implementation of all types and utilities to ensure it meets code quality standards and correctly follows the OpenSpec proposal before merging.",
             "dependencies": [
               1,
               2,
-              3
+              3,
+              4,
+              5,
+              6
             ],
-            "details": "Create the file `src/utils/api.ts`. Import the data model types (e.g., `Event`, `TeamMember`) from the `src/types` directory. Define and export async functions that will wrap Supabase calls, such as `getEvents(): Promise<Event[]>` and `getTeamMembers(): Promise<TeamMember[]>`. The function bodies can be placeholders until the Supabase client is initialized.",
-            "status": "pending",
-            "testStrategy": "Since the Supabase client is not yet implemented, this task can be tested by ensuring the file compiles without errors (`tsc --noEmit`) and that the function signatures correctly use the TypeScript types defined in previous tasks."
+            "details": "Perform a thorough code review of the changes in the relevant feature branch. Check for adherence to the coding style, correctness of the TypeScript types, and the implementation of utility functions. Verify that the integration with `ContentContext.tsx` is correct. Once approved, merge the branch into main.",
+            "status": "done",
+            "testStrategy": "Approval from at least one other project lead. Successful merge of the feature branch into the main development branch without conflicts."
           }
         ]
       },
@@ -264,69 +293,69 @@
         ]
       },
       {
-        "id": 5,
+        "id": "5",
         "title": "Navigation: Implement Custom Client-Side Router",
-        "description": "Develop a custom, lightweight client-side router using the React Context API and the browser's History API to manage navigation between the landing page, all-events page, and the admin dashboard.",
-        "details": "Create `src/components/Router.tsx`. The `RouterProvider` will use a state to track the current path and a `useEffect` hook to listen to `popstate` events. It will provide a `navigate` function to push new states to the History API. The `useRouter` hook will return the current path and the `navigate` function. A `Router` component will conditionally render page components based on the current path.\n\n```tsx\n// src/components/Router.tsx\n// ... imports\nconst RouterContext = createContext<{ path: string; navigate: (to: string) => void; } | null>(null);\n\nexport const RouterProvider = ({ children }) => {\n  const [path, setPath] = useState(window.location.pathname);\n  // ... useEffect for popstate and logic for navigate function\n};\n\nexport const Router = ({ routes }) => {\n  const { path } = useRouter();\n  const Page = routes[path] || routes['/404'];\n  return <Page />;\n};\n```",
-        "testStrategy": "Manually test navigation by clicking links and using browser back/forward buttons. Verify that the correct page component renders and the URL in the address bar updates accordingly. Write integration tests to check that calling `navigate` updates the context and simulates a URL change.",
-        "priority": "high",
-        "dependencies": [],
+        "description": "Develop a custom, lightweight client-side router as specified in the `refactor-router-system` OpenSpec proposal. This involves using the React Context API and the browser's History API to manage navigation, refactoring the existing implementation to use a path-based routes object pattern.",
         "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "details": "## OpenSpec Proposal\n- **Proposal ID**: `refactor-router-system`\n- **Status**: draft\n- **Location**: `openspec/changes/refactor-router-system/`\n\nThis proposal details the refactor from a page-based to a path-based routing system and is ready for review before implementation.\n\n## Implementation Details\nThe current proof-of-concept router in `src/components/Router.tsx` uses a Page type union. This will be refactored to use a path-based routing system with a routes object, as specified in the OpenSpec. The new implementation will be structured within `src/components/router/`.\n\nThe `RouterProvider` will manage the current path and provide a `navigate` function. The `Router` component will render pages based on a `routes` object prop.\n\n```tsx\n// src/components/router/index.tsx\n// ... imports\nconst RouterContext = createContext<{ path: string; navigate: (to: string) => void; } | null>(null);\n\nexport const RouterProvider = ({ children }) => {\n  const [path, setPath] = useState(window.location.pathname);\n  // ... useEffect for popstate and logic for navigate function\n};\n\nexport const Router = ({ routes }) => {\n  const { path } = useRouter();\n  const Page = routes[path] || routes['/404'];\n  return <Page />;\n};\n```",
+        "testStrategy": "Manually test navigation by clicking links and using browser back/forward buttons. Verify that the correct page component renders and the URL updates. Write integration tests to check that `navigate` updates the context. Ensure the final implementation passes all criteria in the implementation checklist found in `openspec/changes/refactor-router-system/tasks.md`.",
         "subtasks": [
           {
             "id": 1,
             "title": "Create RouterContext and Initial RouterProvider Structure",
-            "description": "Create the file `src/components/router/index.tsx` and define the `RouterContext` using `createContext`. Implement the basic `RouterProvider` component that holds the current path in a state initialized from `window.location.pathname` and exposes a placeholder navigate function.",
+            "description": "Create the file `src/components/router/index.tsx` and define the `RouterContext` and a basic `RouterProvider` component, which will serve as the foundation for the routing system.",
             "dependencies": [],
-            "details": "In a new file at `src/components/router/index.tsx`, define the context type as `{ path: string; navigate: (to: string) => void; } | null`. The `RouterProvider` component will accept `children` and wrap them with the `RouterContext.Provider`, passing the current path state and a temporary empty function for `navigate`.",
+            "details": "As specified in `openspec/changes/refactor-router-system/`, create the file `src/components/router/index.tsx`. Define the context type as `{ path: string; navigate: (to: string) => void; } | null`. The `RouterProvider` component will accept `children` and wrap them with the `RouterContext.Provider`, passing the current path state (initialized from `window.location.pathname`) and a temporary empty function for `navigate`.",
             "status": "pending",
             "testStrategy": "Verify that the `RouterProvider` renders its children without crashing. Use React DevTools to inspect the context provider and confirm it holds the initial path value correctly."
           },
           {
             "id": 2,
             "title": "Integrate Browser History API into RouterProvider",
-            "description": "Enhance the `RouterProvider` to handle browser navigation events. Implement the `navigate` function to push new entries to the browser's history and add an effect to listen for `popstate` events.",
+            "description": "Enhance `RouterProvider` to handle browser navigation. Implement the `navigate` function to use `pushState` and add a `popstate` event listener to handle back/forward actions.",
             "dependencies": [
               1
             ],
-            "details": "In `RouterProvider`, implement the `navigate` function to call `window.history.pushState({}, '', to)` and update the component's `path` state. Add a `useEffect` hook that registers a `popstate` event listener on mount. This listener will update the path state when the user uses browser back/forward buttons. Ensure the effect returns a cleanup function to remove the listener on unmount.",
+            "details": "In `RouterProvider`, implement the `navigate` function to call `window.history.pushState({}, '', to)` and update the component's `path` state, following the OpenSpec specification. Add a `useEffect` hook to register a `popstate` event listener on mount, which updates the path state. The effect must return a cleanup function to remove the listener on unmount.",
             "status": "pending",
-            "testStrategy": "Manually test by calling the `navigate` function from the console and verifying the URL updates and the component re-renders. Test the browser's back and forward buttons to ensure the `popstate` listener correctly updates the path state."
+            "testStrategy": "Manually call the `navigate` function from the console and verify the URL updates and the component re-renders. Test the browser's back and forward buttons to ensure the `popstate` listener correctly updates the path state."
           },
           {
             "id": 3,
             "title": "Build `useRouter` Hook and Page-Rendering `Router` Component",
-            "description": "Create a `useRouter` custom hook to provide easy access to the router context. Then, build the `Router` component that consumes this hook to conditionally render the correct page component based on the current path.",
+            "description": "Create a `useRouter` hook for context access and a `Router` component that uses a routes object to render the correct page based on the current path.",
             "dependencies": [
               1,
               2
             ],
-            "details": "The `useRouter` hook should call `useContext(RouterContext)` and throw an error if used outside the provider. The `Router` component will accept a `routes` prop (an object mapping string paths to React components), call `useRouter()` to get the current path, and render `routes[path]` or a fallback `routes['/404']` component if the path is not found.",
+            "details": "Implement the `useRouter` hook to call `useContext(RouterContext)` and throw an error if used outside the provider. The `Router` component will implement the 'routes object pattern' from the OpenSpec, accepting a `routes` prop (an object mapping string paths to components) and rendering `routes[path]` or a fallback `routes['/404']` component.",
             "status": "pending",
-            "testStrategy": "Create a test page with the `RouterProvider` and `Router`. Pass a mock `routes` object and verify that changing the path (via DevTools or a test button) renders the correct component."
+            "testStrategy": "Create a test page with `RouterProvider` and `Router`. Pass a mock `routes` object and verify that changing the path (via DevTools or a test button) renders the correct component."
           },
           {
             "id": 4,
             "title": "Develop a Reusable `Link` Component for Navigation",
-            "description": "Create a `Link` component that acts as a wrapper around an `<a>` tag for internal application navigation, utilizing the router's `navigate` function to prevent full page reloads.",
+            "description": "Create a `Link` component for declarative, internal navigation that uses the router's `navigate` function to prevent full page reloads.",
             "dependencies": [
               3
             ],
-            "details": "Create a new `Link.tsx` file inside `src/components/router/`. The component will accept `to`, `className`, and `children` props. It should use the `useRouter` hook to access the `navigate` function. Its `onClick` handler must call `event.preventDefault()` and then `navigate(to)`. The underlying `<a>` tag's `href` attribute should be set to the `to` prop for accessibility and standard browser behavior like 'open in new tab'.",
+            "details": "Create a `Link.tsx` component in `src/components/router/` that matches the specification in the OpenSpec proposal. It will accept `to`, `className`, and `children` props. Its `onClick` handler must call `event.preventDefault()` and then the `navigate(to)` function obtained from the `useRouter` hook. The underlying `<a>` tag's `href` should be set to the `to` prop.",
             "status": "pending",
-            "testStrategy": "In a test environment, render several `Link` components. Click on each one and assert that the URL changes without a page refresh and the correct component is displayed by the `Router`."
+            "testStrategy": "Render several `Link` components in a test environment. Click each one and assert that the URL changes without a page refresh and the correct component is displayed by the `Router`."
           },
           {
             "id": 5,
             "title": "Integrate RouterProvider and Router into the Main App",
-            "description": "Wire up the new router system in the main application component. Wrap the application layout with `RouterProvider` and use the `Router` and `Link` components to define the application's routes and navigation.",
+            "description": "Wire up the new router system in `src/App.tsx`. Wrap the application with `RouterProvider` and use `Router` and `Link` components to define routes and navigation.",
             "dependencies": [
               3,
               4
             ],
-            "details": "In `src/App.tsx`, import `RouterProvider`, `Router`, and `Link`. Create placeholder page components for the landing page, all-events page, and admin dashboard. Wrap the main application structure with `<RouterProvider>`. Inside, define a `routes` object and pass it to `<Router routes={...} />`. Add a basic navigation menu using the new `Link` component to switch between the pages.",
+            "details": "In `src/App.tsx`, integrate the router system as defined in the final steps of the OpenSpec checklist. Create placeholder page components, wrap the main app structure with `<RouterProvider>`, define a `routes` object, and pass it to `<Router routes={...} />`. Implement a basic navigation menu using the new `Link` component.",
             "status": "pending",
-            "testStrategy": "Run the application and manually navigate between all defined routes using the new `Link` components. Verify that the URL updates correctly, the correct page component renders, and the browser's back/forward buttons work as expected across the entire application."
+            "testStrategy": "Run the application and manually navigate between all defined routes using the `Link` components. Verify that the URL updates, the correct page renders, and browser back/forward buttons work as expected."
           }
         ]
       },
@@ -678,7 +707,7 @@
     ],
     "metadata": {
       "created": "2025-11-06T21:58:25.323Z",
-      "updated": "2025-01-27T00:00:00.000Z",
+      "updated": "2025-11-06T23:00:17.449Z",
       "description": "Tasks for master context"
     }
   }

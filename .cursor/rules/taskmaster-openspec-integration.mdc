@@ -29,6 +29,38 @@ alwaysApply: true
    - Create or update the parent task's openspec proposal
    - Include subtask breakdown in proposal's implementation plan
 
+### Subtask Handling
+
+**Default Approach**: Subtasks are **covered within the parent task's proposal** as part of the implementation checklist. The parent task's proposal should include:
+- **Implementation checklist** derived from all subtasks (in `tasks.md`)
+- **Subtask breakdown** in the technical specifications
+- **Dependencies** between subtasks documented in the proposal
+
+**When Subtasks Need Separate Proposals**:
+A subtask should have its **own proposal** if it meets any of these criteria:
+- **Architectural significance**: Introduces new patterns, frameworks, or architectural decisions
+- **Breaking changes**: Modifies APIs, schemas, or contracts that affect other systems
+- **Independent scope**: Can be implemented and deployed independently from parent task
+- **Complexity threshold**: Requires detailed design decisions, trade-offs, or research beyond what fits in parent proposal
+- **Cross-cutting concerns**: Affects multiple capabilities or systems beyond the parent task's scope
+
+**Subtask Proposal Workflow**:
+1. When a subtask requires its own proposal:
+   - Create proposal with ID: `YYYYMMDD-parent-task-id-subtask-id-description`
+   - Link the subtask proposal in the subtask's `details` field
+   - Reference the parent task proposal in the subtask proposal metadata
+   - Update parent task proposal to reference the subtask proposal
+2. Subtask proposals follow the same format and requirements as parent task proposals
+3. Subtask proposal status should sync with subtask status (see Status Synchronization)
+
+**Example Structure**:
+```
+Parent Task (ID: 5) → Proposal: `20250115-user-authentication`
+├── Subtask 5.1 → Covered in parent proposal's tasks.md
+├── Subtask 5.2 → Covered in parent proposal's tasks.md
+└── Subtask 5.3 (Complex: New auth framework) → Separate proposal: `20250115-user-auth-5-3-oauth-integration`
+```
+
 ### Task Details Format
 
 Every task's `details` field must include:
@@ -114,9 +146,27 @@ task-master expand --id=5 --research
 # Step 2: Agent updates/creates proposal
 # - Update existing proposal with subtask breakdown
 # - Add implementation checklist from subtasks
+# - Identify if any subtask needs separate proposal
 # - Include research findings in technical specs
 
 # Step 3: Review updated proposal
+```
+
+### Example 4: Subtask Requiring Separate Proposal
+
+```bash
+# Step 1: Expand task creates subtasks
+task-master expand --id=5 --research
+
+# Step 2: Agent identifies complex subtask (e.g., 5.3 introduces new auth framework)
+# - Create separate proposal: openspec/changes/20250115-user-auth-5-3-oauth-integration/
+# - Link subtask proposal in subtask 5.3 details
+# - Reference parent proposal in subtask proposal metadata
+# - Update parent proposal to reference subtask proposal
+
+# Step 3: Review both proposals
+# - Parent proposal covers overall authentication system
+# - Subtask proposal covers OAuth integration specifics
 ```
 
 ## Status Synchronization
@@ -129,6 +179,11 @@ task-master expand --id=5 --research
 | `blocked` | `review` | Resolve blockers in proposal |
 | `deferred` | `draft` | Document reason in proposal |
 
+**For Subtasks**:
+- Subtask status should sync with its proposal status (if separate proposal exists)
+- If subtask is covered in parent proposal, track completion in parent proposal's `tasks.md` checklist
+- When all subtasks are complete, parent task proposal can move to `implemented` status
+
 ## Validation Checklist
 
 Before marking any task as `in-progress`, verify:
@@ -140,6 +195,17 @@ Before marking any task as `in-progress`, verify:
 - [ ] All dependencies documented in both task and proposal
 - [ ] Test strategy matches between task and proposal
 
+**For Tasks with Subtasks**:
+- [ ] All subtasks are included in parent task proposal's `tasks.md` checklist
+- [ ] Complex subtasks (if any) have their own proposals with proper linking
+- [ ] Subtask dependencies are documented in the proposal
+- [ ] Implementation order is clear in the proposal's checklist
+
+**For Subtasks**:
+- [ ] Subtask is covered in parent task proposal's implementation checklist, OR
+- [ ] Subtask has its own proposal (if it meets complexity criteria) with proper linking to parent
+- [ ] Subtask proposal status syncs with subtask status
+
 ## Integration Points
 
 ### Task-Master Commands That Trigger Proposal Actions
@@ -148,11 +214,12 @@ Before marking any task as `in-progress`, verify:
 |---------|----------------|
 | `parse_prd` | Create proposals for all generated tasks |
 | `add_task` | Create proposal for new task |
-| `expand_task` | Update proposal with subtask details |
+| `expand_task` | Update parent task proposal with subtask breakdown; create separate proposals for complex subtasks if needed |
+| `add_subtask` | Update parent task proposal's implementation checklist; create separate proposal if subtask meets complexity criteria |
 | `update_task` | Update proposal with changes |
-| `update_subtask` | Append findings to proposal |
-| `set_task_status` | Sync proposal status |
-| `research` | Include findings in proposal |
+| `update_subtask` | Append findings to parent task proposal (or subtask proposal if separate) |
+| `set_task_status` | Sync proposal status (parent or subtask proposal as applicable) |
+| `research` | Include findings in relevant proposal(s) |
 
 ### Openspec Commands Integration
 
