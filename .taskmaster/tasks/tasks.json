@@ -1,0 +1,634 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Initialize Project Foundation and Tooling",
+        "description": "Verify, document, and finalize the project's foundational development environment. The initial setup of the build system (Vite), TypeScript, linting (ESLint), and styling (Tailwind CSS v4) is complete. This task focuses on ensuring the toolchain is robust, well-documented, and ready for team-wide development.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "The initial tooling configuration is already in place. This task involves formal verification and documentation based on the OpenSpec proposal at `openspec/changes/initialize-project-foundation/`. The work includes: 1. Verifying that `vite.config.ts` (using SWC), `tsconfig.json` (with strict mode), `eslint.config.js`, and `tailwind.config.js` (for Tailwind CSS v4) are correctly configured and work in concert. 2. Documenting the setup for future maintenance and developer onboarding. 3. Confirming the dark theme (background #0a0a0a) is applied correctly. 4. Validating that `npm run dev`, `npm run build`, and `npm run lint` scripts in `package.json` function as expected.",
+        "testStrategy": "Execute a formal test plan to validate the existing toolchain. 1. Confirm the Vite dev server starts and HMR functions correctly for both `.tsx` and CSS files. 2. Deliberately introduce a type error to confirm `tsc` fails the build. 3. Deliberately introduce a linting error and run the lint script to ensure it's caught. 4. Verify the `npm run build` command produces an optimized, runnable build in the `dist/` directory. 5. Review all new documentation for clarity and accuracy.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initial Vite and TypeScript Configuration",
+            "description": "Initialize the project with Vite and configure TypeScript for strict type checking. This establishes the core build and compilation pipeline for the application.",
+            "dependencies": [],
+            "details": "Use the Vite CLI to scaffold a new React+TypeScript project. Configure `vite.config.ts` to use SWC for faster builds. Initialize a `tsconfig.json` file and enable `strict: true` along with other recommended settings.",
+            "status": "done",
+            "testStrategy": "Verify that `npm run dev` starts the Vite development server without any errors. Confirm that the default `App.tsx` component renders correctly in the browser.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Initial ESLint and Prettier Setup",
+            "description": "Integrate ESLint and Prettier to enforce consistent code style, catch common errors, and automate formatting across the entire codebase.",
+            "dependencies": [
+              1
+            ],
+            "details": "Install ESLint, Prettier, and plugins for React, TypeScript, and Prettier compatibility. Create `eslint.config.js` to extend recommended rule sets and integrate Prettier rules. Add a `.prettierrc` file for formatting options.",
+            "status": "done",
+            "testStrategy": "Create a temporary file with deliberate formatting and style issues. Run the lint and format commands to ensure errors are reported and the file is automatically corrected.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Initial Tailwind CSS v4 Configuration",
+            "description": "Set up Tailwind CSS as the primary styling framework. This includes configuring the base theme, specifically establishing the dark mode background and importing base styles.",
+            "dependencies": [
+              1
+            ],
+            "details": "Follow the official Tailwind CSS v4 guide for Vite to install and configure it. In `tailwind.config.js`, define the content paths. In `src/index.css`, set the body background color to `#0a0a0a`.",
+            "status": "done",
+            "testStrategy": "Create a simple component and apply several Tailwind utility classes (e.g., `p-4`, `text-red-500`). Verify in the browser that the styles are applied and the page background is the correct dark color.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Initial Validation of Toolchain and Build Scripts",
+            "description": "Ensure that all configured tools (Vite, TypeScript, ESLint, Tailwind CSS) work together seamlessly and validate that the primary npm scripts for development and production builds are functioning correctly.",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Review and confirm the `dev`, `build`, and `lint` scripts in `package.json`. Run `npm run dev` to test the development server with HMR. Run `npm run build` to ensure a successful production build is generated without errors.",
+            "status": "done",
+            "testStrategy": "Execute `npm run dev`, make a style change, and verify hot-reloading works. Execute `npm run build` and confirm a `dist` directory is created. Finally, run `npm run lint` to ensure no configuration conflicts exist.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Formal Verification of Integrated Toolchain",
+            "description": "Perform a comprehensive, end-to-end verification of the integrated toolchain to confirm all parts work together as expected, based on the completed setup.",
+            "dependencies": [
+              4
+            ],
+            "details": "Execute a test plan on the existing setup: 1. Dev Server: Verify HMR for React components (.tsx) and Tailwind styles. 2. TypeScript: Introduce deliberate type errors in `src/App.tsx` and confirm the build fails. 3. ESLint/Prettier: Introduce style/lint errors and confirm `npm run lint` reports them. 4. Build: Run `npm run build` and verify the output in the `dist/` directory.",
+            "status": "done",
+            "testStrategy": "All verification steps must pass. The build must be successful, and all checks must report errors correctly. A summary report of the verification should be attached to the task.",
+            "updatedAt": "2025-11-06T20:10:09.999Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "Document Tooling and Project Onboarding",
+            "description": "Create clear documentation for the project's tooling and development workflow to facilitate developer onboarding and long-term maintenance.",
+            "dependencies": [
+              4
+            ],
+            "details": "Update the `README.md` to include: 1. A 'Getting Started' section with prerequisites and installation steps. 2. An 'Available Scripts' section explaining `npm run dev`, `npm run build`, and `npm run lint`. 3. A brief overview of the technology stack (Vite, TS, Tailwind v4).",
+            "status": "done",
+            "testStrategy": "Have a team member follow the `README.md` documentation to set up the project in a clean environment. The setup process should be successful without requiring additional verbal instruction.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-06T20:10:18.940Z"
+          }
+        ],
+        "complexity": 4,
+        "recommendedSubtasks": 4,
+        "expansionPrompt": "Break this task into subtasks for: 1. Vite + TypeScript setup and configuration. 2. ESLint + Prettier configuration for code quality. 3. Tailwind CSS installation and base theme configuration. 4. Validating that all build, development, and lint commands work together correctly.",
+        "updatedAt": "2025-11-06T20:10:18.940Z"
+      },
+      {
+        "id": "2",
+        "title": "Implement Data Models and ContentContext State Management",
+        "description": "Establish the central state management system using React Context. This includes defining all TypeScript interfaces for the application's data models and seeding the context with initial mock data.",
+        "details": "In `src/contexts/ContentContext.tsx`, define and export TypeScript interfaces: `Event`, `Partner`, `TeamMember`, `GalleryImage`, `HeroContent`, `AboutContent`, and `SiteSettings`. Implement the `ContentProvider` and a `useContent` hook. Populate the initial state with realistic mock data (`INITIAL_EVENTS`, `INITIAL_PARTNERS`, etc.). Create state update functions (`updateEvents`, `updatePartners`) that use `useState` to manage the content. Wrap the root component in `App.tsx` with `<ContentProvider>`.",
+        "testStrategy": "Create a test component that consumes the `useContent` hook to display initial data and uses an update function to modify it. Verify that the component re-renders with the new state. Unit tests should be written for each update function to ensure state immutability and correctness. Type safety will be validated by the TypeScript compiler.",
+        "priority": "high",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define TypeScript Interfaces for All Application Data Models",
+            "description": "Create and export all necessary TypeScript interfaces for the application's data models within a dedicated types file or the context file to ensure type safety across the application.",
+            "dependencies": [],
+            "details": "In a new file like `src/types/models.ts`, define and export the following interfaces: `Event`, `Partner`, `TeamMember`, `GalleryImage`, `HeroContent`, `AboutContent`, and `SiteSettings`. Each interface must accurately reflect the required data structure and types for its corresponding entity.",
+            "status": "pending",
+            "testStrategy": "Code review to ensure all required fields are present and correctly typed. The TypeScript compiler will serve as the primary validation for type correctness.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create Mock Data for Initial State Seeding",
+            "description": "Develop realistic mock data for each data model defined in the previous subtask. This data will be used to seed the initial state of the ContentContext, facilitating UI development and testing without a backend.",
+            "dependencies": [
+              1
+            ],
+            "details": "In a new file, `src/data/mockData.ts`, import the newly created interfaces. Create and export constant variables for each data model (e.g., `INITIAL_EVENTS`, `INITIAL_PARTNERS`) populated with realistic sample data that conforms to the TypeScript interfaces.",
+            "status": "pending",
+            "testStrategy": "Verify that the mock data objects correctly conform to their respective TypeScript interfaces without any compiler errors. Manually inspect the data for realism and completeness.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement ContentProvider, useContent Hook, and State Update Functions",
+            "description": "Build the core React Context for state management, including the provider component, the consumer hook, and the functions to manage and update the application's state, and wrap the application with the provider.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "In `src/contexts/ContentContext.tsx`, implement the `ContentProvider`. Use `useState` to manage state for all data models, initializing it with the mock data. Create the `useContent` hook. Implement state update functions (`updateEvents`, `updatePartners`, etc.). Finally, wrap the root component in `App.tsx` with `<ContentProvider>`.",
+            "status": "pending",
+            "testStrategy": "Create a test component that consumes the `useContent` hook to display initial data and uses an update function to modify it. Verify that the component re-renders with the new state, confirming the context is working correctly.",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Break this task into subtasks for: 1. Defining all TypeScript interfaces for data models (Event, Partner, etc.). 2. Creating mock data files for initial state seeding. 3. Implementing the ContentProvider, useContent hook, and state update functions."
+      },
+      {
+        "id": "3",
+        "title": "Integrate shadcn/ui and Establish Global Design System",
+        "description": "Integrate the shadcn/ui component library and establish the application-wide design system, including glass morphism effects, animations with Framer Motion, and the Lucide React icon system.",
+        "details": "Use the shadcn/ui CLI to add essential components like `Button`, `Card`, `Dialog`, `Form`, `Input`, and `Sheet` into the `src/components/ui` directory. In `tailwind.config.js`, configure the `backdrop-blur` utility for glass morphism effects. Create a wrapper or utility for Framer Motion animations to be reused for page transitions and micro-interactions. Integrate `lucide-react` and create a convention for its usage throughout the application.",
+        "testStrategy": "Create a storybook or a dedicated test page (`/dev/components`) to render all imported shadcn/ui components and custom styled elements. Verify that the dark theme is applied correctly. Test glass morphism effects on a sample component. Confirm that Framer Motion animations are smooth and Lucide icons render correctly. Check for visual consistency across all components.",
+        "priority": "high",
+        "dependencies": [
+          "1"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install Core shadcn/ui Components via CLI",
+            "description": "Use the shadcn/ui command-line interface to add the foundational UI components required for the application's design system, such as Button, Card, and Input.",
+            "dependencies": [],
+            "details": "Execute the shadcn/ui CLI command: `npx shadcn-ui@latest add button card dialog form input sheet`. This will populate the `src/components/ui` directory with the necessary component files.",
+            "status": "pending",
+            "testStrategy": "Create a Storybook story or a dedicated test page (e.g., `/dev/components`) to render each of the newly added components. Verify they appear with the default base styling without any console errors.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Configure Tailwind CSS for Glass Morphism and Custom Theme",
+            "description": "Extend the `tailwind.config.js` file to support the application's unique design language, focusing on configuring the `backdrop-blur` utility for glass morphism effects.",
+            "dependencies": [
+              1
+            ],
+            "details": "In `tailwind.config.js`, modify the `theme.extend` object to include configurations for `backdrop-blur`. Also, define any custom colors, animations, or keyframes needed for the global design system.",
+            "status": "pending",
+            "testStrategy": "Apply the custom `backdrop-blur` class to a component placed over a background image or gradient to visually confirm the glass effect. Use any new custom theme utilities (e.g., colors) on an element to verify they are compiled and applied correctly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Integrate Framer Motion and Lucide React Icons",
+            "description": "Install and configure `framer-motion` for animations and `lucide-react` for the icon system. Establish reusable patterns and conventions for their usage throughout the application.",
+            "dependencies": [],
+            "details": "Install `framer-motion` and `lucide-react`. Create a reusable animation wrapper or a set of utility variants in `src/lib/animations.ts` for common effects like page transitions. Create a convention for icon usage, possibly through a centralized `Icon` component.",
+            "status": "pending",
+            "testStrategy": "Implement a simple component that uses a reusable animation from the new utility to test a fade-in or slide-in effect. Render several `lucide-react` icons on a test page to confirm they display correctly and can be styled (e.g., size, color).",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 3,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Break this task into subtasks for: 1. Using the shadcn/ui CLI to install required base components (Button, Card, Dialog, etc.). 2. Configuring Tailwind CSS for glass morphism and other custom theme properties. 3. Integrating lucide-react and creating a reusable animation utility with Framer Motion."
+      },
+      {
+        "id": "4",
+        "title": "Build Core Landing Page Layout, Navigation, and Routing",
+        "description": "Develop the main shell for the public-facing application, including the main router, the primary landing page route, the floating navigation dock, and the site footer.",
+        "details": "Set up `react-router-dom` in `src/components/Router.tsx`. Define the public route for `/` that renders the `LandingPage.tsx` component. Create the `FloatingDock.tsx` component, which will contain links to different sections of the landing page and have a `position: 'sticky'` style. Implement the `Footer.tsx` component to display contact information and social media links fetched from the `ContentContext`. The `LandingPage.tsx` will serve as the container for all other landing page section components.",
+        "testStrategy": "Verify that navigating to the root URL `/` correctly renders the `LandingPage` container with the floating dock and footer. Test that the navigation links in the dock scroll to the correct sections (once they are built). Ensure the footer displays the correct data from the context. The layout should be responsive, with the navigation dock potentially transforming into a mobile menu on smaller screens.",
+        "priority": "high",
+        "dependencies": [
+          "2",
+          "3"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up React Router and Define Root Layout Route",
+            "description": "Install and configure `react-router-dom` to handle application routing. Define the primary root route `/` that will render the main landing page layout.",
+            "dependencies": [],
+            "details": "Create the `src/components/Router.tsx` component. Use `createBrowserRouter` to define a public route for the path `/` that renders the `LandingPage.tsx` component as its element.",
+            "status": "pending",
+            "testStrategy": "Run the application and navigate to the root URL (`/`). Verify that the component designated for the root route (initially a placeholder `LandingPage`) is rendered correctly without any routing errors.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Build the Responsive Floating Navigation Dock",
+            "description": "Create the `FloatingDock.tsx` component, which will contain navigation links to different sections of the landing page and remain visible during scroll.",
+            "dependencies": [],
+            "details": "Develop the `FloatingDock.tsx` component. Implement its styling using CSS to achieve a `position: 'sticky'` effect. Ensure the component is responsive and adapts its layout for mobile, tablet, and desktop screens. Initially, use placeholder hash links.",
+            "status": "pending",
+            "testStrategy": "Render the component in Storybook or on a test page with sufficient content to enable scrolling. Verify that the dock sticks to its designated position. Test responsiveness by resizing the browser window.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build the Site Footer and Connect to ContentContext",
+            "description": "Implement the `Footer.tsx` component to display contact information and social media links. This data will be consumed from the `ContentContext`.",
+            "dependencies": [],
+            "details": "Create the `Footer.tsx` component file. Inside the component, call the `useContent()` hook to get data from `ContentContext`. Map over the social media links to render them dynamically. Style the footer appropriately.",
+            "status": "pending",
+            "testStrategy": "Wrap the `Footer` component with a `ContentProvider` supplying mock data in a test environment. Assert that the contact information and social media links are rendered correctly based on the mock context data.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Create the Main LandingPage Container Component",
+            "description": "Develop the `LandingPage.tsx` component, which will serve as the top-level container for the landing page, composing the floating dock, the footer, and all future content sections.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create the file `src/pages/LandingPage.tsx`. This component will be rendered by the root route. It should implement the main layout structure, importing and placing the `FloatingDock.tsx`, `Footer.tsx`, and providing a main content area for other sections.",
+            "status": "pending",
+            "testStrategy": "Once subtasks 2 and 3 are complete, verify that navigating to the `/` route renders the `LandingPage` which in turn correctly displays the `FloatingDock` and `Footer` components in their intended positions.",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 4,
+        "expansionPrompt": "Break this task into subtasks for: 1. Setting up react-router-dom and defining the root layout route. 2. Building the responsive FloatingDock navigation component. 3. Building the Footer component and connecting it to the ContentContext. 4. Creating the main LandingPage container component to compose all sections."
+      },
+      {
+        "id": "5",
+        "title": "Develop Event Showcase and Detail Modal",
+        "description": "Create the `EventsSection` to display a filterable grid of upcoming events and the `EventDetailModal` to show comprehensive information when an event is selected. This is a core discovery feature for attendees.",
+        "details": "In `src/components/EventsSection.tsx`, fetch the events list from `useContent()`. Implement filtering logic (e.g., by category, date) using local state. Render events in a responsive grid of `Card` components. On clicking a card, use a `Dialog` component from shadcn/ui to display the `EventDetailModal.tsx`. This modal will receive an event object as a prop and render all its details, such as venue, artists, description, and associated gallery images.",
+        "testStrategy": "Test that all events from the `ContentContext` are displayed. Verify that the filtering controls work as expected and update the displayed grid in real-time. Click on an event card to ensure the modal opens with the correct event data. Test the modal's close functionality. Ensure the grid layout is responsive across different screen sizes.",
+        "priority": "high",
+        "dependencies": [
+          "4"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Build EventsSection and Fetch Data from Context",
+            "description": "Create the initial `EventsSection.tsx` component. Fetch the list of events from the `useContent()` hook and render them in a basic responsive grid using `Card` components.",
+            "dependencies": [],
+            "details": "In `src/components/EventsSection.tsx`, import `useContent` from the context provider. Call `const { events } = useContent()` to get the data. Map over the `events` array and render a `Card` component for each event. Style the container to be a responsive grid.",
+            "status": "pending",
+            "testStrategy": "Verify that the `EventsSection` component renders without errors. Check that it successfully fetches and displays the correct number of event cards based on the data provided by the `ContentContext`.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Filtering UI and Logic for Events",
+            "description": "Add UI elements (e.g., dropdowns, buttons) to the `EventsSection` for filtering events by category and date. Implement the client-side filtering logic using local React state.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use `useState` to manage current filter values. Create a derived state variable `filteredEvents` that applies the filter logic to the full `events` list from the context. Render filtering UI controls and connect their `onChange` handlers to update the filter state.",
+            "status": "pending",
+            "testStrategy": "Test that the filter controls are rendered correctly. Change the filter values and verify that the grid of events updates in real-time to show only the matching events. Test clearing the filters.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create the EventDetailModal Component",
+            "description": "Develop a new component, `EventDetailModal.tsx`, that accepts a single event object as a prop and displays its comprehensive details like venue, artists, description, and gallery images.",
+            "dependencies": [],
+            "details": "Create the file `src/components/EventDetailModal.tsx`. It should accept an `event` prop. Inside the component, render all necessary details: event title, description, venue, artists, date, and associated gallery images. Style this content for clear presentation.",
+            "status": "pending",
+            "testStrategy": "Use Storybook or a temporary test page to render the `EventDetailModal` with mock event data. Verify that all fields from the event object are displayed correctly and the layout is well-formatted.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Integrate Modal with Event Grid using shadcn/ui Dialog",
+            "description": "Wire up the `EventsSection` so that clicking an event `Card` opens the `EventDetailModal` within a `Dialog` from shadcn/ui, passing the correct event data to the modal.",
+            "dependencies": [
+              1,
+              3
+            ],
+            "details": "In `EventsSection.tsx`, manage state for the selected event and the modal's open status. Wrap the event grid with the shadcn/ui `Dialog`. Add an `onClick` handler to each `Card` that updates the selected event state and opens the dialog. Pass the selected event to `EventDetailModal`.",
+            "status": "pending",
+            "testStrategy": "Click on various event cards in the grid. Confirm the modal opens with the correct data for the clicked event. Test the close functionality of the modal (clicking 'x', pressing Escape, clicking the overlay).",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 6,
+        "recommendedSubtasks": 4,
+        "expansionPrompt": "Break this task into subtasks for: 1. Building the EventsSection component and fetching data from context. 2. Implementing the filtering UI and logic. 3. Creating the EventDetailModal component to display detailed event info. 4. Integrating the modal with the event grid using the shadcn/ui Dialog component."
+      },
+      {
+        "id": "6",
+        "title": "Build Remaining Landing Page Content Sections",
+        "description": "Construct all other informational and discovery sections for the landing page, including the Hero, About, Team/Artists, Gallery, and Brand Partners. These sections will all draw data from the `ContentContext`.",
+        "details": "Sequentially build the following components: `HeroSection.tsx` (with animated stats using Framer Motion), `AboutSection.tsx`, `TeamSection.tsx` (for artists/creatives), `GallerySection.tsx` (with a lightbox for full-screen viewing), and `PartnersSection.tsx`. Each component will consume the relevant slice of state from `useContent()` and render it using appropriate shadcn/ui components. Compose these sections within `LandingPage.tsx` in the specified order.",
+        "testStrategy": "For each section, verify that the data from `ContentContext` is rendered correctly. Check that the hero stat animations trigger on load. Test the gallery lightbox functionality (opening, navigating images, closing). Ensure all external links (social media, partner websites) are correct. Validate that all sections are fully responsive.",
+        "priority": "medium",
+        "dependencies": [
+          "4"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Build the Hero Section with Animated Stats",
+            "description": "Create the `HeroSection.tsx` component. This section will be the first thing users see and should include key statistics that animate into view using Framer Motion.",
+            "dependencies": [],
+            "details": "Create the file `src/components/landing/HeroSection.tsx`. Fetch the `heroContent` data from the `useContent()` hook. Use Framer Motion to animate numerical stats when they enter the viewport. Style the section using shadcn/ui components.",
+            "status": "pending",
+            "testStrategy": "Verify that the hero content (title, subtitle, CTA) is correctly rendered from the context. Confirm that the stat animations trigger on load or when the component scrolls into view. Test the call-to-action button's functionality.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Build the About Section",
+            "description": "Create the `AboutSection.tsx` component to display the mission and story of the organization, fetching content from the `ContentContext`.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create the file `src/components/landing/AboutSection.tsx`. Consume the `aboutContent` slice from the `useContent()` hook. Structure the content using `Card` and typography components from shadcn/ui. Ensure the layout is responsive and visually appealing.",
+            "status": "pending",
+            "testStrategy": "Check that the about text, title, and any associated images are rendered correctly from the `ContentContext`. Verify responsive behavior on different screen sizes (desktop, tablet, mobile).",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build the Team/Artists Section",
+            "description": "Create the `TeamSection.tsx` component to showcase the team members or featured artists. Each member will be displayed in a profile card with their details.",
+            "dependencies": [
+              2
+            ],
+            "details": "Create `src/components/landing/TeamSection.tsx`. Fetch the `teamMembers` array from `useContent()`. Map over the array to render a shadcn/ui `Card` for each member, displaying their name, role, photo, and social media links using `lucide-react` icons.",
+            "status": "pending",
+            "testStrategy": "Verify that all team members from the context are displayed correctly. Check that each member's details (name, photo, role) are correct. Test all social media links to ensure they point to the correct URLs and open in a new tab.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Build the Gallery Section with Lightbox",
+            "description": "Create the `GallerySection.tsx` component to display a collection of images. Clicking an image should open it in a full-screen lightbox for better viewing and navigation.",
+            "dependencies": [
+              3
+            ],
+            "details": "Create `src/components/landing/GallerySection.tsx`. Fetch `galleryImages` from `useContent()` and render them in a grid. Implement a lightbox feature using a library like `yet-another-react-lightbox` or a custom implementation with shadcn/ui's `Dialog` component.",
+            "status": "pending",
+            "testStrategy": "Confirm all gallery images from the context are rendered as thumbnails. Test the lightbox functionality: open on click, close with a button or Escape key, and navigate between images within the lightbox view.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Build the Brand Partners Section",
+            "description": "Create the `PartnersSection.tsx` component to display the logos of brand partners. Each logo should link to the respective partner's website.",
+            "dependencies": [
+              4
+            ],
+            "details": "Create `src/components/landing/PartnersSection.tsx`. Fetch the `partners` array from `useContent()`. Render a scrolling marquee or static grid of partner logos. Each logo should be an anchor tag wrapping the image, linking to the partner's external website.",
+            "status": "pending",
+            "testStrategy": "Verify that all partner logos are displayed correctly. Check that each logo links to the correct partner website and that the link opens in a new browser tab. Ensure the layout is clean and responsive.",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 7,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Break this task into 5 subtasks, one for each landing page section to be built: HeroSection (with animations), AboutSection, TeamSection, GallerySection (with lightbox), and PartnersSection."
+      },
+      {
+        "id": "7",
+        "title": "Implement Admin Dashboard Layout and Protected Route",
+        "description": "Create the foundational structure for the admin dashboard, including the main layout with a sidebar, and implement a placeholder route protection mechanism for the `/admin` path.",
+        "details": "Create `src/components/dashboard/DashboardLayout.tsx` which includes a persistent sidebar (using `Sheet` for mobile) for navigation and a main content area to render nested routes. In `src/components/Router.tsx`, create a protected route component that wraps the `/admin` path. This wrapper will contain a placeholder authentication check (e.g., `const isAuthenticated = true;`). If the check fails, it should redirect the user to the homepage (`/`). The sidebar will contain `NavLink` items for each management section (Events, Partners, etc.).",
+        "testStrategy": "Verify that navigating to `/admin` with the auth placeholder set to `true` renders the `DashboardLayout`. Change the placeholder to `false` and confirm that the user is redirected to the homepage. Test the responsiveness of the dashboard layout, ensuring the sidebar collapses into a sheet component on mobile devices.",
+        "priority": "high",
+        "dependencies": [
+          "4"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create DashboardLayout Component with Responsive Sidebar",
+            "description": "Develop the main layout for the admin dashboard, featuring a persistent sidebar for desktop navigation and a collapsible `Sheet` component for mobile viewports. This component will serve as the main shell for all admin pages.",
+            "dependencies": [],
+            "details": "Create the file `src/components/dashboard/DashboardLayout.tsx`. Use shadcn/ui components (`Sheet`, `Button`) to build a responsive navigation sidebar. The sidebar should be always visible on larger screens and collapse into a sheet menu triggered by a button on smaller screens. It will contain placeholder `NavLink` components for future admin sections (Events, Partners, etc.). The layout must include an `<Outlet />` from `react-router-dom` to render nested child routes.",
+            "status": "pending",
+            "testStrategy": "Visually inspect the layout on different screen sizes using browser developer tools. Verify the sidebar is persistent on desktop. On mobile sizes, confirm the sidebar is hidden and can be toggled open/closed using the sheet trigger button. Check that NavLinks are present.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement ProtectedRoute Wrapper with Placeholder Authentication",
+            "description": "Create a reusable `ProtectedRoute` component that wraps routes requiring authentication. For initial development, it will contain a simple, hardcoded boolean to simulate an authenticated or unauthenticated user state.",
+            "dependencies": [],
+            "details": "Create a new component, for instance in `src/components/auth/ProtectedRoute.tsx`. This component will accept `children` as a prop. Inside, implement a placeholder authentication check: `const isAuthenticated = true;`. If `isAuthenticated` is false, the component should use the `Navigate` component from `react-router-dom` to redirect the user to the homepage ('/'). If true, it should render its `children`.",
+            "status": "pending",
+            "testStrategy": "Create a temporary test page or use unit tests to verify the component's logic. Test the case where `isAuthenticated` is set to `false` and assert that a redirect occurs. Then, set it to `true` and assert that the child components are rendered correctly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Update Router to Use ProtectedRoute and DashboardLayout for /admin",
+            "description": "Modify the main application router configuration to incorporate the new `ProtectedRoute` and `DashboardLayout` for all routes under the `/admin` path, establishing the secure entry point for the administrative area.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "In the main router file, likely `src/components/Router.tsx`, import `ProtectedRoute` and `DashboardLayout`. Define a new route structure for the `/admin` path. This parent route should be wrapped with the `ProtectedRoute` component. The `element` for this route should be the `DashboardLayout`, which will in turn render any nested admin pages (e.g., a placeholder `DashboardHome.tsx`) via its `<Outlet />`.",
+            "status": "pending",
+            "testStrategy": "Navigate to `/admin`. With the placeholder auth in `ProtectedRoute` set to true, verify the `DashboardLayout` is rendered. Change the placeholder to `false`, refresh the page, and confirm the application redirects to the homepage ('/'). Ensure a default child route for `/admin` renders inside the layout's content area.",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Break this task into subtasks for: 1. Creating the DashboardLayout component with a responsive sidebar. 2. Implementing the ProtectedRoute component wrapper with placeholder authentication logic. 3. Updating the main Router to include the protected /admin route and its layout."
+      },
+      {
+        "id": "8",
+        "title": "Develop Event Management (CRUD) in Dashboard",
+        "description": "Build the complete CRUD interface for managing events within the admin dashboard. This allows organizers to create, read, update, and delete events, with changes instantly reflecting on the landing page via `ContentContext`.",
+        "details": "Create `DashboardEvents.tsx` to display a table of all events from `ContentContext`, with buttons for 'Edit' and 'Delete'. Implement the delete functionality by calling an update function in the context (e.g., `updateEvents(events.filter(e => e.id !== id))`). Create `DashboardEventsNew.tsx` and an edit view using `react-hook-form` and shadcn/ui `Form` components. Form submissions will call context update functions to add a new event or modify an existing one. Ensure comprehensive form validation.",
+        "testStrategy": "Test the entire CRUD lifecycle: 1. Create a new event and verify it appears in the dashboard list and on the landing page. 2. Edit the event and confirm the changes are reflected in both places. 3. Delete the event and ensure it is removed from both the dashboard and landing page. Test form validation by submitting with missing or invalid data.",
+        "priority": "high",
+        "dependencies": [
+          "2",
+          "7"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create DashboardEvents.tsx with Event Data Table",
+            "description": "Develop the main view for event management, which displays all events from the ContentContext in a structured data table. This view will serve as the entry point for all other event CRUD operations.",
+            "dependencies": [],
+            "details": "Create the file `src/components/dashboard/DashboardEvents.tsx`. Fetch the events array from the `useContent()` hook. Use a table component (e.g., shadcn/ui Table) to render the events, showing key details like title, date, and venue. Include columns for 'Actions' with 'Edit' and 'Delete' buttons.",
+            "status": "pending",
+            "testStrategy": "Verify that the component renders and correctly displays all event data sourced from the `ContentContext`. Check that the table layout is responsive and all intended data columns are present.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement 'Delete Event' Functionality",
+            "description": "Wire up the 'Delete' button in the DashboardEvents.tsx table to remove an event from the global state. The action should prompt the user for confirmation before proceeding.",
+            "dependencies": [
+              1
+            ],
+            "details": "In `DashboardEvents.tsx`, add an `onClick` handler to the 'Delete' button for each event row. This handler should call the context's update function, e.g., `updateEvents(events.filter(e => e.id !== eventToDelete.id))`. Use an `AlertDialog` from shadcn/ui to confirm the deletion with the user.",
+            "status": "pending",
+            "testStrategy": "Click the 'Delete' button for an event. Verify the confirmation dialog appears. Confirm the deletion and check that the event is removed from the dashboard table and the public landing page. Cancel the deletion and ensure the event remains.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create 'New Event' Form Component with react-hook-form",
+            "description": "Build the form for creating new events in a dedicated component. This includes setting up form state management with `react-hook-form`, validation with Zod, and using shadcn/ui components for the UI.",
+            "dependencies": [],
+            "details": "Create the component `src/components/dashboard/DashboardEventsNew.tsx`. Use `react-hook-form` and a Zod schema for comprehensive validation. Build the form layout using `shadcn/ui` components like `Form`, `Input`, `Textarea`, and a date picker for all required event fields.",
+            "status": "pending",
+            "testStrategy": "Render the `DashboardEventsNew.tsx` component. Check that all form fields are present. Test form validation by entering invalid data and ensuring error messages appear. Ensure the form can be filled out with valid data without submission errors.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Create 'Edit Event' View with Pre-filled Form Data",
+            "description": "Develop the view for editing an existing event. This view should reuse the 'New Event' form component but must be pre-populated with the data of the event selected for editing.",
+            "dependencies": [
+              1,
+              3
+            ],
+            "details": "Create a new route for editing, e.g., `/admin/events/edit/:id`. When a user clicks the 'Edit' button in the event table, navigate them to this route. Fetch the specific event's data using the ID from URL parameters and pass it as `defaultValues` to the reusable form component.",
+            "status": "pending",
+            "testStrategy": "From the event list in the dashboard, click the 'Edit' button for an event. Verify that the user is navigated to the edit form and that all form fields are correctly pre-filled with the existing event's data.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Integrate Form Submissions with ContentContext",
+            "description": "Implement the submission logic for both the 'New Event' and 'Edit Event' forms to update the global state via `ContentContext`, ensuring changes are reflected application-wide.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Implement the `onSubmit` handler in the shared form component. Based on whether an event ID is present, either add a new event to the context's events array or update an existing event by mapping over the array and replacing the matching item. Redirect the user back to the event list upon successful submission.",
+            "status": "pending",
+            "testStrategy": "1. Create a new event, submit the form, and verify it appears in the dashboard list and on the landing page. 2. Edit an existing event, submit the form, and verify the changes are reflected in the dashboard list and on the landing page.",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 8,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Break this task into subtasks for: 1. Building the event list view with a data table. 2. Implementing the 'Delete' functionality. 3. Creating the 'New Event' form using react-hook-form. 4. Creating the 'Edit Event' form view. 5. Integrating form submissions to update the global ContentContext."
+      },
+      {
+        "id": "9",
+        "title": "Implement Partner, Team, and Gallery Management (CRUD)",
+        "description": "Develop the CRUD interfaces for managing Brand Partners, Team Members/Artists, and the Image Gallery. These modules will follow the same pattern as Event Management.",
+        "details": "Create three new dashboard components: `DashboardPartners.tsx`, `DashboardTeam.tsx`, and `DashboardGallery.tsx`. Each will implement a full CRUD interface for its respective data type. This involves creating list views, forms for creation/editing (using `react-hook-form`), and connecting them to the corresponding update functions in `ContentContext` (e.g., `updatePartners`, `updateTeam`, `updateGallery`). For gallery management, include file upload handling for new images.",
+        "testStrategy": "For each content type (Partners, Team, Gallery), perform a full CRUD test cycle as described in the Event Management task. Verify that creating, updating, and deleting items in the dashboard results in immediate, real-time updates on the corresponding sections of the public landing page. Test image upload functionality and ensure new images appear in the gallery.",
+        "priority": "medium",
+        "dependencies": [
+          "8"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Build Partner Management CRUD Interface",
+            "description": "Develop the complete CRUD (Create, Read, Update, Delete) interface for managing Brand Partners in the admin dashboard, following the pattern established for Event Management.",
+            "dependencies": [],
+            "details": "Create the `DashboardPartners.tsx` component. This will include a list view of current partners and a form, likely within a `Dialog`, for creating and editing partner entries. Use `react-hook-form` for form management and connect it to the `updatePartners` function from `ContentContext`.",
+            "status": "pending",
+            "testStrategy": "Perform a full CRUD cycle: create a new partner, verify it appears in the list and on the public site. Edit the partner's details and confirm the changes. Delete the partner and ensure it is removed from both the dashboard and public site.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Build Team/Artist Management CRUD Interface",
+            "description": "Develop the complete CRUD interface for managing Team Members and Artists within the admin dashboard.",
+            "dependencies": [],
+            "details": "Create the `DashboardTeam.tsx` component. Implement a list view for all team members/artists and a `react-hook-form` based form for adding and editing entries. This form will connect to the `updateTeam` function in `ContentContext` to persist changes.",
+            "status": "pending",
+            "testStrategy": "Test the creation, update, and deletion of team members. Verify that changes are reflected immediately in the dashboard's list view and on the team section of the public-facing website.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build Gallery Management Interface (List & Delete)",
+            "description": "Create the interface for managing the image gallery, focusing on displaying the list of current images and implementing the delete functionality.",
+            "dependencies": [],
+            "details": "Create `DashboardGallery.tsx`. Implement a responsive grid to display all images from the `gallery` state in `ContentContext`. Each image card should feature a 'delete' button. This button will trigger a confirmation dialog before calling `updateGallery` to remove the item.",
+            "status": "pending",
+            "testStrategy": "Verify that all gallery images from `ContentContext` are displayed correctly. Test the delete functionality, including the confirmation step. Ensure that deleting an image removes it from the dashboard view and the public gallery.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Gallery Image Upload Form and Functionality",
+            "description": "Add the functionality to upload new images to the gallery. This includes creating the upload form and handling the file submission.",
+            "dependencies": [
+              3
+            ],
+            "details": "Within `DashboardGallery.tsx`, add a form for creating new gallery entries. The form, using `react-hook-form`, will include a file input for image uploads. Implement the file handling logic and connect the form submission to the `updateGallery` function in `ContentContext` to add the new image.",
+            "status": "pending",
+            "testStrategy": "Test the image upload form. Select a file and submit it. Verify that the new image appears in the gallery list on the dashboard and on the public site. Test form validation, such as requiring a file to be selected before submission is enabled.",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 7,
+        "recommendedSubtasks": 4,
+        "expansionPrompt": "Break this task into subtasks for: 1. Building the Partner CRUD interface. 2. Building the Team/Artist CRUD interface. 3. Building the Gallery list/delete interface. 4. Implementing the Gallery image upload form and functionality."
+      },
+      {
+        "id": "10",
+        "title": "Build Site Settings and Static Content Editors",
+        "description": "Create the final set of dashboard tools for managing site-wide settings and static content sections like the Hero and About pages. This will provide admins with full control over the platform's messaging and branding.",
+        "details": "Create `DashboardSettings.tsx` with a form to edit fields in the `SiteSettings` object (contact info, social links). Create `DashboardHero.tsx` to edit the `HeroContent` (title, stats) and `DashboardAbout.tsx` to edit the `AboutContent`. All forms will use `react-hook-form` and, upon submission, will call the appropriate update functions in `ContentContext` (e.g., `updateSiteSettings`). The changes must be reflected instantly on the landing page.",
+        "testStrategy": "In the dashboard, modify the site's contact email in the settings editor and verify the footer on the landing page updates immediately. Change a statistic in the Hero editor and confirm the animated counter on the landing page hero reflects the new value. Edit the company story in the About editor and check for the updated text on the About section.",
+        "priority": "medium",
+        "dependencies": [
+          "7"
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Build the Site Settings Editor Form",
+            "description": "Create a new dashboard component, `DashboardSettings.tsx`, that contains a form for editing site-wide settings such as contact information and social media links.",
+            "dependencies": [],
+            "details": "Create the `DashboardSettings.tsx` component. Use `react-hook-form` to build a form that edits fields from the `SiteSettings` object in `ContentContext`. On submission, the form should call the `updateSiteSettings` function from the context.",
+            "status": "pending",
+            "testStrategy": "In the dashboard, navigate to the settings editor. Modify the site's contact email and a social media link. Save the changes and verify that the footer on the main landing page updates instantly with the new information.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Build the Hero Content Editor Form",
+            "description": "Develop the `DashboardHero.tsx` component, which will provide a form to manage the content of the landing page's hero section, including the main title and key statistics.",
+            "dependencies": [],
+            "details": "Implement the `DashboardHero.tsx` component with a `react-hook-form` instance. The form will manage the `HeroContent` object's fields (e.g., title, stats). The form's `onSubmit` handler must invoke the corresponding update function from the `ContentContext`.",
+            "status": "pending",
+            "testStrategy": "Go to the Hero editor in the dashboard. Change the main title and update one of the statistic values. Confirm that the hero section on the landing page immediately reflects the new title and the animated counter for the statistic shows the updated value.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Build the About Content Editor Form",
+            "description": "Create the `DashboardAbout.tsx` component, featuring a form that allows administrators to edit the content of the 'About Us' section, such as the company story and mission statement.",
+            "dependencies": [],
+            "details": "Create the `DashboardAbout.tsx` file. Construct a form using `react-hook-form` to allow editing of the `AboutContent` object. When submitted, the form should trigger the `updateAboutContent` function in the `ContentContext` to persist the changes.",
+            "status": "pending",
+            "testStrategy": "Navigate to the About content editor in the admin dashboard. Modify the text for the company story. Save the form and then view the landing page to ensure the 'About Us' section has been updated with the new content.",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Break this task into subtasks for: 1. Building the Site Settings editor form. 2. Building the Hero Content editor form. 3. Building the About Content editor form. Ensure all forms correctly update the ContentContext."
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-11-06T20:10:18.941Z",
+      "taskCount": 10,
+      "completedCount": 1,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}
