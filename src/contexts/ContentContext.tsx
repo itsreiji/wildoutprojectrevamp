@@ -755,7 +755,7 @@ export const ContentProvider: React.FC<{
     }
   };
 
-  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>, oldPhotoUrl?: string | null): Promise<TeamMember> => {
+  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>, oldAvatarUrl?: string | null): Promise<TeamMember> => {
     try {
       setError(null);
 
@@ -772,9 +772,9 @@ export const ContentProvider: React.FC<{
         throw error;
       }
 
-      // Clean up old photo if a new one was provided
-      if (oldPhotoUrl && updates.photoUrl && oldPhotoUrl !== updates.photoUrl) {
-        await cleanupTeamMemberAsset(oldPhotoUrl);
+      // Clean up old avatar if a new one was provided
+      if (oldAvatarUrl && updates.avatar_url && oldAvatarUrl !== updates.avatar_url) {
+        await cleanupTeamMemberAsset(oldAvatarUrl);
       }
 
       if (data) {
@@ -797,7 +797,7 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
-      // Find the team member to get their photo URL for cleanup
+      // Find the team member to get their avatar URL for cleanup
       const memberToDelete = team.find(member => member.id === id);
 
       // Delete database record first, then clean up storage
@@ -814,8 +814,8 @@ export const ContentProvider: React.FC<{
       }
 
       // Now clean up associated storage assets
-      if (memberToDelete?.photoUrl) {
-        await cleanupTeamMemberAsset(memberToDelete.photoUrl);
+      if (memberToDelete?.avatar_url) {
+        await cleanupTeamMemberAsset(memberToDelete.avatar_url);
       }
 
       // Optimistically update local state
@@ -961,7 +961,7 @@ export const ContentProvider: React.FC<{
     }
   };
 
-  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>, oldUrl?: string | null): Promise<GalleryImage> => {
+  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>, oldImageUrls?: string[] | null): Promise<GalleryImage> => {
     try {
       setError(null);
 
@@ -978,9 +978,15 @@ export const ContentProvider: React.FC<{
         throw error;
       }
 
-      // Clean up old image if a new one was provided
-      if (oldUrl && updates.url && oldUrl !== updates.url) {
-        await cleanupGalleryAsset(oldUrl);
+      // Clean up old images if a new ones were provided
+      if (oldImageUrls && updates.image_urls) {
+        const oldUrls = Array.isArray(oldImageUrls) ? oldImageUrls : [];
+        const newUrls = Array.isArray(updates.image_urls) ? updates.image_urls : [];
+        // Only clean up URLs that are not in the new list
+        const urlsToCleanup = oldUrls.filter((url: string) => !newUrls.includes(url));
+        if (urlsToCleanup.length > 0) {
+          await cleanupGalleryAsset(urlsToCleanup);
+        }
       }
 
       if (data) {
@@ -1003,8 +1009,8 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
-      // Find the gallery image to get its URL for cleanup
-      const imageToDelete = gallery.find(image => image.id === id);
+      // Find the gallery item to get its image URLs for cleanup
+      const itemToDelete = gallery.find(item => item.id === id);
 
       // Delete database record first, then clean up storage
       // This ensures data consistency even if storage cleanup fails
@@ -1014,21 +1020,21 @@ export const ContentProvider: React.FC<{
         .eq('id', id);
 
       if (error) {
-        console.error('Error deleting gallery image:', error);
-        setError(`Failed to delete gallery image: ${error.message}`);
+        console.error('Error deleting gallery item:', error);
+        setError(`Failed to delete gallery item: ${error.message}`);
         throw error;
       }
 
-      // Now clean up associated storage assets
-      if (imageToDelete?.url) {
-        await cleanupGalleryAsset(imageToDelete.url);
+      // Now clean up associated storage assets (image_urls is a JSON array)
+      if (itemToDelete?.image_urls && Array.isArray(itemToDelete.image_urls)) {
+        await cleanupGalleryAsset(itemToDelete.image_urls as string[]);
       }
 
       // Optimistically update local state
       setGallery(prev => prev.filter(image => image.id !== id));
     } catch (err) {
       console.error('Error in deleteGalleryImage:', err);
-      setError('Failed to delete gallery image');
+      setError('Failed to delete gallery item');
       throw err;
     }
   };

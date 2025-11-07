@@ -147,7 +147,7 @@ export const DashboardTeam = React.memo(() => {
 
       try {
         if (editingMember?.id) {
-          // Update existing member
+          // Update existing member (pass old avatar_url for cleanup if media is replaced)
           await updateTeamMember(editingMember.id, memberData, editingMember.avatar_url);
           toast.success('Team member updated successfully!');
         } else {

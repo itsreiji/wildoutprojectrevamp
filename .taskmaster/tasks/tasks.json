@@ -685,10 +685,10 @@
         ]
       },
       {
-        "id": "8",
+        "id": 8,
         "title": "Feature: Implement CMS for Team, Partners, and Gallery",
         "description": "Upgrade the existing dashboard interfaces for Team, Partners, and Gallery with full Supabase-backed CRUD functionality. This task involves evolving the placeholder components (`DashboardTeam.tsx`, etc.) to match the robust implementation pattern established in the Event Management module (Task 7). An OpenSpec proposal has been drafted and is awaiting approval before implementation can begin.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "7"
         ],
@@ -713,7 +713,7 @@
               1
             ],
             "details": "In `src/context/ContentContext.tsx`, add new state arrays (`teamMembers`, `partners`, `galleryItems`) and implement async functions for CRUD operations. All work must strictly adhere to the approved OpenSpec proposal at `openspec/changes/implement-dashboard-cms-crud/`, which details the function signatures and Supabase client interactions, including image handling.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write unit tests for the new context functions using Vitest, mocking the Supabase client to verify correct API calls and state updates upon success or failure. Ensure error handling is robust."
           },
           {
@@ -724,7 +724,7 @@
               2
             ],
             "details": "Refactor `src/components/dashboard/DashboardTeam.tsx` to fetch and display team members from `ContentContext`. Create a new `DashboardTeamForm.tsx` component using `react-hook-form` and reusable UI components. Implementation must follow the checklist in the approved OpenSpec at `openspec/changes/implement-dashboard-cms-crud/`.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Manually test the full CRUD flow. Verify that team members can be created, their details and photo edited, and that they can be deleted. Confirm all UI states (loading, error, success) are handled gracefully."
           },
           {
@@ -735,7 +735,7 @@
               2
             ],
             "details": "Refactor `src/components/dashboard/DashboardPartners.tsx` to use `ContentContext` for data. Create a `DashboardPartnerForm.tsx`. The implementation must strictly follow the patterns and requirements defined in the approved OpenSpec proposal `openspec/changes/implement-dashboard-cms-crud/`.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Perform end-to-end testing of the partner management flow. Confirm that creating, updating, and deleting partners works as expected. Verify logo uploads, updates, and deletions are correctly handled in Supabase Storage."
           },
           {
@@ -746,7 +746,7 @@
               2
             ],
             "details": "Refactor `src/components/dashboard/DashboardGallery.tsx` to display a grid of images from `ContentContext`. Create `DashboardGalleryForm.tsx` for uploads and metadata editing. The entire implementation must adhere to the technical specifications outlined in the approved OpenSpec at `openspec/changes/implement-dashboard-cms-crud/`.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test the complete lifecycle of a gallery item. Verify image uploads are successful and appear in the grid. Test editing metadata and confirm changes are saved. Ensure deleting an item removes both the database record and the corresponding image file from Supabase Storage."
           },
           {
@@ -759,7 +759,7 @@
               5
             ],
             "details": "In `src/components/dashboard/DashboardNav.tsx`, add or enable navigation links for 'Team', 'Partners', and 'Gallery'. Ensure these links correctly navigate to the corresponding views. This component has been implemented in Task 6 and should only require minor additions as specified in the OpenSpec.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Manually check the dashboard sidebar. Click each new link and confirm it renders the correct component (`DashboardTeam.tsx`, etc.). Verify the URL path updates correctly and the active navigation item is highlighted."
           }
         ]
@@ -1031,7 +1031,7 @@
       ],
       "created": "2025-11-07T06:02:41.440Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-07T10:47:17.503Z"
+      "updated": "2025-11-07T12:24:52.460Z"
     }
   }
 }
