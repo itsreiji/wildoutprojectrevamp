@@ -18,8 +18,8 @@ export const DashboardGallery = React.memo(() => {
 
   const filteredImages = gallery.filter(
     (image) =>
-      image.caption.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      image.event?.toLowerCase().includes(searchQuery.toLowerCase())
+      (image.caption || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (image.event || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleUpload = () => {

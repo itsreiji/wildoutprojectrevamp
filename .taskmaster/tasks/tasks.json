@@ -421,10 +421,10 @@
         "expansionPrompt": "Given the extreme complexity and architectural conflict, provide two expansion paths. Path A: Detail the steps to implement the custom router as described, including code for the `RouterProvider`, `useRouter` hook, and `Link` component. Path B: Propose an alternative, framework-aligned implementation using the Next.js App Router, detailing how to create layouts and pages and use `next/link` for navigation."
       },
       {
-        "id": "6",
+        "id": 6,
         "title": "Admin UI: Build Dashboard Layout and Navigation",
         "description": "Refactor the admin dashboard layout to integrate with the new client-side router. This involves migrating from a state-based navigation model to a URL-based system, as outlined in the `integrate-dashboard-router` OpenSpec proposal. The goal is to make the dashboard sections (Events, Team, etc.) addressable via unique URLs like `/admin/events`.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "3",
           "5"
@@ -435,57 +435,192 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Review `integrate-dashboard-router` Proposal and Existing Code",
-            "description": "Analyze the `integrate-dashboard-router` OpenSpec proposal and review the current implementation of `DashboardLayout.tsx`, `SideNav.tsx`, and the custom router from Task 5.",
+            "title": "Router Enhancement: Add nested route matching support",
+            "description": "Add nested route matching support to router (e.g., `/admin/*` matches `/admin/events`, `/admin/team`)",
+            "details": "",
+            "status": "done",
             "dependencies": [],
-            "details": "Familiarize yourself with the proposal located at `openspec/changes/integrate-dashboard-router/`. Examine `src/components/dashboard/DashboardLayout.tsx` and `SideNav.tsx` to understand the current state-based navigation logic (e.g., `currentPage` props, `onNavigate` callbacks). Also, review `src/components/router/index.tsx` to understand the `useRouter` hook and `Link` component APIs.",
-            "status": "pending",
-            "testStrategy": "Confirm that the analysis identifies all files and code sections that need to be refactored to switch from state-based to URL-based routing. Create a checklist of components and props to be removed or modified."
+            "parentTaskId": 6
           },
           {
             "id": 2,
-            "title": "Refactor `SideNav.tsx` to Use Router Link Component",
-            "description": "Update the sidebar navigation to use URL-based links instead of state-based callbacks. The active link should be determined by the current URL path.",
-            "dependencies": [
-              1
-            ],
-            "details": "In `src/components/dashboard/SideNav.tsx`, replace the existing `<a>` or `<div>` elements and their `onClick` handlers with the `Link` component from the custom router (`src/components/router/index.tsx`). Set the `to` prop of each `Link` to the correct admin path (e.g., `to='/admin/events'`). Implement logic to determine the active link by comparing the link's path with the current `location.pathname` from the `useRouter` hook.",
-            "status": "pending",
-            "testStrategy": "Verify that clicking links in the `SideNav` component updates the browser's URL correctly. Check that the styling for the 'active' link is applied correctly based on the current URL path."
+            "title": "Router Enhancement: Update router to extract sub-paths",
+            "description": "Update router to extract sub-paths from nested routes (e.g., `events` from `/admin/events`)",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
           },
           {
             "id": 3,
-            "title": "Update Router Configuration for Nested Admin Routes",
-            "description": "Modify the application's main router configuration to handle nested routes under the `/admin` path, rendering the `DashboardLayout` as the parent layout.",
-            "dependencies": [
-              2
-            ],
-            "details": "In the main application router setup (likely in `App.tsx` or a dedicated routes file), define a parent route for `/admin` that renders the `DashboardLayout.tsx` component. Configure nested routes for each admin section (e.g., `events`, `team`) that render their respective page components inside the `DashboardLayout`'s outlet.",
-            "status": "pending",
-            "testStrategy": "Navigate to `/admin/events` and verify that the `DashboardLayout` is rendered with the `EventsPage` component inside its main content area. Repeat for other admin sections to ensure the nested routing is working correctly."
+            "title": "Dashboard Refactoring: Remove currentPage state",
+            "description": "Remove `currentPage` state from `Dashboard.tsx`",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
           },
           {
             "id": 4,
-            "title": "Refactor `DashboardLayout.tsx` and Remove State Logic",
-            "description": "Update the main layout component to render nested routes and remove all obsolete state-based navigation props and logic.",
-            "dependencies": [
-              3
-            ],
-            "details": "Modify `src/components/dashboard/DashboardLayout.tsx` to remove any props like `currentPage` or `onNavigate`. If the router implementation requires it, add an `<Outlet />` component (or equivalent) in the `main` content area to serve as the rendering target for the nested child routes defined in the previous subtask.",
-            "status": "pending",
-            "testStrategy": "Confirm that the `DashboardLayout` component no longer accepts or uses any state-based navigation props. Check the browser console for any warnings or errors related to removed props. Verify that the layout renders correctly with the child route component."
+            "title": "Dashboard Refactoring: Remove onNavigate callback",
+            "description": "Remove `onNavigate` callback from `Dashboard.tsx`",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
           },
           {
             "id": 5,
-            "title": "Verify Responsiveness and Finalize Integration",
-            "description": "Ensure the existing responsive behavior of the dashboard layout is preserved after the refactoring and clean up any remaining dead code.",
-            "dependencies": [
-              2,
-              4
-            ],
-            "details": "Thoroughly test the dashboard layout across different screen sizes (desktop, tablet, mobile). Verify that the `SideNav` collapses and the hamburger menu in the `Header` toggles its visibility correctly on smaller screens. Remove any unused variables, imports, or functions related to the old navigation system from all modified dashboard components.",
-            "status": "pending",
-            "testStrategy": "Using browser dev tools, confirm the layout adapts correctly to different viewports. Check that the mobile menu toggle functionality is intact. Perform a final code review to ensure no legacy navigation code remains."
+            "title": "Dashboard Refactoring: Use useRouter hook",
+            "description": "Update `Dashboard` to use `useRouter` hook to get current path",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 6,
+            "title": "Dashboard Refactoring: Extract admin sub-path from URL",
+            "description": "Extract admin sub-path from current URL (e.g., `events` from `/admin/events`)",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 7,
+            "title": "Dashboard Refactoring: Update renderPage()",
+            "description": "Update `renderPage()` to use extracted sub-path instead of state",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 8,
+            "title": "DashboardLayout Updates: Remove currentPage prop",
+            "description": "Remove `currentPage` prop from `DashboardLayoutProps` interface",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 9,
+            "title": "DashboardLayout Updates: Remove onNavigate prop",
+            "description": "Remove `onNavigate` prop from `DashboardLayoutProps` interface",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 10,
+            "title": "DashboardLayout Updates: Add useRouter hook",
+            "description": "Add `useRouter` hook to `DashboardLayout` to get current path",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 11,
+            "title": "DashboardLayout Updates: Derive active navigation item",
+            "description": "Derive active navigation item from current URL path",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 12,
+            "title": "DashboardLayout Updates: Update navigation links",
+            "description": "Update navigation links to use router's `navigate` function with full paths (e.g., `/admin/events`)",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 13,
+            "title": "DashboardLayout Updates: Update header page label",
+            "description": "Update header to display current page label based on URL path",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 14,
+            "title": "App Routing Updates: Update App.tsx routes",
+            "description": "Update `App.tsx` routes to support nested admin routes",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 15,
+            "title": "App Routing Updates: Ensure /admin default route",
+            "description": "Ensure `/admin` route still works as default (redirects to `/admin/home` or shows home)",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 16,
+            "title": "App Routing Updates: Test all admin routes",
+            "description": "Test all admin routes: `/admin`, `/admin/home`, `/admin/events`, `/admin/team`, `/admin/partners`, `/admin/gallery`, `/admin/settings`",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 17,
+            "title": "Testing: Verify browser back/forward buttons",
+            "description": "Verify browser back/forward buttons work correctly",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 18,
+            "title": "Testing: Verify direct URL navigation",
+            "description": "Verify direct URL navigation works (e.g., typing `/admin/events` in address bar)",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 19,
+            "title": "Testing: Verify navigation links update correctly",
+            "description": "Verify navigation links update URL and content correctly",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 20,
+            "title": "Testing: Verify active navigation item highlights",
+            "description": "Verify active navigation item highlights correctly based on URL",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 21,
+            "title": "Testing: Test responsive behavior",
+            "description": "Test responsive behavior (mobile sidebar toggle still works)",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
           }
         ]
       },
@@ -910,7 +1045,7 @@
       ],
       "created": "2025-11-07T06:02:41.440Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-07T06:13:22.596Z"
+      "updated": "2025-11-07T08:43:18.194Z"
     }
   }
 }

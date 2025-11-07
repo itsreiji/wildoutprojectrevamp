@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DashboardLayout } from './dashboard/DashboardLayout';
 import { DashboardHome } from './dashboard/DashboardHome';
 import { DashboardHero } from './dashboard/DashboardHero';
@@ -8,12 +8,16 @@ import { DashboardTeam } from './dashboard/DashboardTeam';
 import { DashboardGallery } from './dashboard/DashboardGallery';
 import { DashboardPartners } from './dashboard/DashboardPartners';
 import { DashboardSettings } from './dashboard/DashboardSettings';
+import { useRouter } from './router';
 
 export const Dashboard = React.memo(() => {
-  const [currentPage, setCurrentPage] = useState('home');
+  const { getCurrentSubPath } = useRouter();
+
+  // Extract admin sub-path from URL (e.g., 'events' from '/admin/events')
+  const subPath = getCurrentSubPath() || 'home';
 
   const renderPage = () => {
-    switch (currentPage) {
+    switch (subPath) {
       case 'home':
         return <DashboardHome />;
       case 'hero':
@@ -36,10 +40,7 @@ export const Dashboard = React.memo(() => {
   };
 
   return (
-    <DashboardLayout
-      currentPage={currentPage}
-      onNavigate={setCurrentPage}
-    >
+    <DashboardLayout>
       {renderPage()}
     </DashboardLayout>
   );

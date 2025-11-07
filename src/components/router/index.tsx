@@ -10,6 +10,8 @@ interface Route {
 interface RouterContextValue {
   currentPath: string;
   navigate: (path: string) => void;
+  getSubPath: (basePath: string) => string;
+  getCurrentSubPath: () => string;
 }
 
 // Create router context
@@ -64,8 +66,29 @@ const RouterProviderComponent = ({ children }: { children: React.ReactNode }) =>
     window.scrollTo(0, 0);
   };
 
+  // Function to get sub-path for a given base path
+  const getSubPath = (basePath: string): string => {
+    let actualBasePath = basePath;
+    if (basePath.endsWith('/*')) {
+      actualBasePath = basePath.slice(0, -2); // Remove /*
+    }
+
+    if (currentPath === actualBasePath) {
+      return '';
+    }
+    if (currentPath.startsWith(actualBasePath + '/')) {
+      return currentPath.slice(actualBasePath.length + 1);
+    }
+    return '';
+  };
+
+  // Function to get sub-path assuming current path is under /admin
+  const getCurrentSubPath = (): string => {
+    return getSubPath('/admin');
+  };
+
   return (
-    <RouterContext.Provider value={{ currentPath, navigate }}>
+    <RouterContext.Provider value={{ currentPath, navigate, getSubPath, getCurrentSubPath }}>
       {children}
     </RouterContext.Provider>
   );
@@ -82,8 +105,38 @@ interface RouterProps {
 const RouterComponent = memo(({ routes }: RouterProps) => {
   const { currentPath } = useRouter();
 
-  // Find matching route
-  const RouteComponent = routes[currentPath] || routes['/404'];
+  // Find matching route - support exact matches and nested routes
+  const findMatchingRoute = (path: string): React.ComponentType | undefined => {
+    // First try exact match
+    if (routes[path]) {
+      return routes[path];
+    }
+
+    // Then try nested route matching
+    for (const routePath of Object.keys(routes)) {
+      // Handle routes like "/admin/*"
+      if (routePath.endsWith('/*')) {
+        const basePath = routePath.slice(0, -2);
+        if (path.startsWith(basePath + '/') || path === basePath) {
+          return routes[routePath];
+        }
+      }
+
+      // Handle routes like "/admin" matching /admin/something
+      if (path.startsWith(routePath + '/') && routePath !== '/') {
+        return routes[routePath];
+      }
+    }
+
+    // Fallback to home route if registered and no other match
+    if (routes['/']) {
+      return routes['/'];
+    }
+
+    return undefined;
+  };
+
+  const RouteComponent = findMatchingRoute(currentPath) || routes['/404'];
 
   return RouteComponent ? <RouteComponent /> : null;
 });

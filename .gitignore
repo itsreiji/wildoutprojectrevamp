@@ -76,3 +76,14 @@ coverage/
 
 
 
+
+logs
+*.log
+dev-debug.log
+# Dependency directories
+.vscode
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 

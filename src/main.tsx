@@ -40,8 +40,6 @@ class ErrorBoundary extends React.Component<
   }
 }
 
-console.log("Bootstrapping React app");
-
 const rootElement = document.getElementById("root");
 
 if (!rootElement) {
@@ -49,12 +47,12 @@ if (!rootElement) {
 }
 
 try {
-  createRoot(rootElement).render(
+  const root = createRoot(rootElement);
+  root.render(
     <ErrorBoundary>
       <App />
     </ErrorBoundary>
   );
-  console.log("React app rendered successfully");
 } catch (error) {
   console.error("Failed to render React app:", error);
   rootElement.innerHTML = `
