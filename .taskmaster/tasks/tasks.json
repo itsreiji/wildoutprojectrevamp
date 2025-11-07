@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": "1",
+        "id": 1,
         "title": "Foundation: Setup TypeScript Types and Utility Functions",
         "description": "Successfully established the foundational TypeScript types for all data models (Event, TeamMember, Partner, etc.) and created a library of shared utility functions. This work, guided by the `foundation-types-utils` OpenSpec, provides a strongly-typed foundation for the application's data layer.",
         "status": "done",
@@ -106,7 +106,7 @@
         "expansionPrompt": "Based on the provided subtasks, generate detailed implementation steps for each. For type definitions, ensure all fields from the PRD's data models are included. For utility functions, provide code examples for date formatting, email validation, and a placeholder for an API helper function that fetches events."
       },
       {
-        "id": "2",
+        "id": 2,
         "title": "Configuration: Initialize and Configure Supabase Client",
         "description": "The Supabase client instance has been successfully configured by refactoring hardcoded credentials into environment variables. Database types were generated from the schema, ensuring end-to-end type safety. This work was completed according to the OpenSpec proposal `supabase-client-config`.",
         "status": "done",
@@ -179,7 +179,7 @@
         "expansionPrompt": "Generate a series of shell commands and code snippets to complete the subtasks. Include commands for installing dependencies, creating and populating the `.env.local` file, running the Supabase CLI for type generation, and the full code for the `src/supabase/client.ts` file."
       },
       {
-        "id": "3",
+        "id": 3,
         "title": "UI Layer: Implement Core Reusable Component Library",
         "description": "Build the set of reusable, accessible UI components as specified in the `add-ui-component-library` OpenSpec proposal. This component library will be based on shadcn/ui patterns, using Radix UI primitives and Tailwind CSS, and will include core elements like Button, Input, Dialog, Card, and Form controls.",
         "status": "done",
@@ -268,7 +268,7 @@
         "expansionPrompt": "For each subtask (Input, Card, Form, Dialog, etc.), generate the `shadcn/ui` CLI command to add the component. Then, provide a basic usage example for each component within a React functional component to demonstrate its props and structure."
       },
       {
-        "id": "4",
+        "id": 4,
         "title": "State Management: Implement Global ContentContext",
         "description": "Create the `ContentContext` to manage the global state for all content entities: events, team, partners, gallery, hero, about, and settings. This context will handle fetching data from Supabase and providing it to the application.",
         "details": "Create `src/contexts/ContentContext.tsx`. The provider component, `ContentProvider`, will fetch all initial data from Supabase in a `useEffect` hook. The context will expose the data, loading states, and error states. It will also provide functions to mutate the data (e.g., `addEvent`, `updateTeamMember`), which will call the Supabase client and then update the local state.\n\n```tsx\n// src/contexts/ContentContext.tsx\nimport React, { createContext, useContext, useState, useEffect } from 'react';\nimport { supabaseClient } from '@/supabase/client';\n// ...\n\nconst ContentContext = createContext<any>(null);\n\nexport const ContentProvider = ({ children }) => {\n  const [events, setEvents] = useState([]);\n  // ... other states\n\n  useEffect(() => {\n    const fetchData = async () => {\n      const { data: eventsData } = await supabaseClient.from('events').select('*');\n      setEvents(eventsData || []);\n      // ... fetch other data\n    };\n    fetchData();\n  }, []);\n\n  return <ContentContext.Provider value={{ events, ... }}>{children}</ContentContext.Provider>;\n};\n\nexport const useContent = () => useContext(ContentContext);\n```\n<info added on 2025-11-07T00:45:32.526Z>\n\"\\n\\n## OpenSpec Proposal\\n- **Proposal ID**: implement-content-context-supabase\\n- **Status**: draft (pending review)\\n- **Location**: `openspec/changes/implement-content-context-supabase/`\\n\\nThe proposal, located at `proposal.md` in the directory above, covers the implementation of Supabase data fetching, loading/error states, and mutation functions for the ContentContext.\"\n</info added on 2025-11-07T00:45:32.526Z>",
@@ -278,7 +278,7 @@
           "1",
           "2"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -286,7 +286,7 @@
             "description": "Create the file at `src/contexts/ContentContext.tsx` and define the basic structure. This includes defining the `ContentContextType` interface, creating the context with `createContext`, setting up the `ContentProvider` component, and exporting the `useContent` custom hook.",
             "dependencies": [],
             "details": "In `src/contexts/ContentContext.tsx`, import React and necessary types from `src/types/`. Define an interface `ContentContextType` that outlines all the data arrays (events, team, etc.), loading and error states, and the signatures for future mutation functions. Create the initial context and the `ContentProvider` that returns the `ContentContext.Provider`.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Ensure the file compiles without type errors. Create a simple test page that consumes the context with `useContent` and verifies that the initial (empty) values are provided without crashing the application.",
             "parentId": "undefined"
           },
@@ -298,7 +298,7 @@
               1
             ],
             "details": "Import the `supabaseClient` from `src/supabase/client.ts`. Inside the `useEffect` hook, create an async function `fetchData`. Use `Promise.all` to concurrently fetch data from all required Supabase tables (e.g., `supabaseClient.from('events').select('*')`). Use `useState` hooks to store the data for each entity.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Wrap a test component with the provider. Use `useEffect` in the test component to check if the state variables (e.g., `events`, `team`) are populated with data after the initial render. Mock the `supabaseClient` to return predictable data for testing.",
             "parentId": "undefined"
           },
@@ -310,7 +310,7 @@
               2
             ],
             "details": "Introduce two new states: `loading` (boolean) and `error` (string | null). Set `loading` to `true` before the `Promise.all` call begins. In a `try...catch` block, set `loading` to `false` in the `finally` block. If an error occurs during the fetch, catch it, set the `error` state with an appropriate message, and log the full error.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test three scenarios by mocking `supabaseClient`: 1) Successful fetch: assert `loading` goes from true to false and `error` is null. 2) Failed fetch: assert `loading` goes from true to false and `error` is populated. 3) Slow fetch: verify the `loading` state is true while the promise is unresolved.",
             "parentId": "undefined"
           },
@@ -322,7 +322,7 @@
               1
             ],
             "details": "Define `addEvent`, `updateEvent`, and `deleteEvent` functions within the `ContentProvider`. Each function will take the necessary data as arguments, call the corresponding Supabase method (`.insert()`, `.update()`, `.delete()`), and handle any errors. After a successful mutation, either refetch the events list or apply an optimistic update to the `events` state using the `setEvents` setter.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "In an integration test, call a mutation function like `addEvent`. Mock the `supabaseClient` to simulate a successful API call. Assert that the Supabase client method was called with the correct arguments and that the local `events` state in the context is updated accordingly.",
             "parentId": "undefined"
           },
@@ -335,18 +335,18 @@
               4
             ],
             "details": "Locate the application's root entry point, which is likely `src/pages/_app.tsx` in a Next.js project. Import the `ContentProvider` and wrap the main `<Component {...pageProps} />` with it. This ensures that any page or component in the application can use the `useContent` hook to access global data, loading/error states, and mutation functions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Manually navigate to several different pages of the application. On each page, use browser developer tools to inspect a component that calls `useContent`. Verify that the context provides the expected data without causing any application-wide errors. Confirm that data persists across navigation.",
             "parentId": "undefined"
           }
         ],
         "complexity": 8,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Expand on the provided subtasks. For subtask 1, define the complete `ContentContextType` interface. For subtask 2, write the `useEffect` hook using `Promise.all` to fetch all data entities. For subtask 4, implement the full `addEvent` function, including a placeholder for a Supabase call and the local state update.",
+        "recommendedSubtasks": 8,
+        "expansionPrompt": "Break down the implementation of mutation functions for each major data entity. Create separate subtasks for implementing CRUD functions (create, update, delete) for Team, Partners, and Gallery within the ContentContext, following the pattern established for Events.",
         "updatedAt": "2025-11-07T00:53:19.749Z"
       },
       {
-        "id": "5",
+        "id": 5,
         "title": "Navigation: Implement Custom Client-Side Router",
         "description": "Successfully implemented a custom, lightweight client-side router, completing the work specified in the `refactor-router-system` OpenSpec proposal. The new system uses the React Context API and the browser's History API for navigation and is built around a flexible path-based routes object pattern.",
         "status": "done",
@@ -423,82 +423,74 @@
       {
         "id": "6",
         "title": "Admin UI: Build Dashboard Layout and Navigation",
-        "description": "Implement the main layout for the admin dashboard, including a persistent sidebar for navigation, a header, and a main content area where different management pages will be rendered.",
-        "details": "Create `src/components/dashboard/DashboardLayout.tsx`. This component will render the common UI shell for all dashboard pages. Use UI components from the library (Task 3). The layout should be responsive, with the sidebar collapsing into a menu on smaller screens. Use the custom router's navigation to link to different dashboard sections like Events, Team, Partners, etc.\n\n```tsx\n// src/components/dashboard/DashboardLayout.tsx\nimport { SideNav } from './SideNav'; // To be created\nimport { Header } from './Header'; // To be created\n\nexport const DashboardLayout = ({ children }) => {\n  return (\n    <div className='flex h-screen'>\n      <SideNav />\n      <div className='flex-1 flex flex-col'>\n        <Header />\n        <main className='p-8 flex-1 overflow-y-auto'>{children}</main>\n      </div>\n    </div>\n  );\n};\n```",
-        "testStrategy": "Manually test the layout on various screen sizes (desktop, tablet, mobile) to ensure responsiveness. Verify all navigation links in the sidebar work correctly and load the corresponding (placeholder) page components within the main content area.",
-        "priority": "medium",
+        "description": "Refactor the admin dashboard layout to integrate with the new client-side router. This involves migrating from a state-based navigation model to a URL-based system, as outlined in the `integrate-dashboard-router` OpenSpec proposal. The goal is to make the dashboard sections (Events, Team, etc.) addressable via unique URLs like `/admin/events`.",
+        "status": "pending",
         "dependencies": [
           "3",
           "5"
         ],
-        "status": "pending",
+        "priority": "medium",
+        "details": "This task focuses on updating the existing dashboard components (`DashboardLayout.tsx`, `SideNav.tsx`, `Header.tsx`) to align with the URL-based routing system implemented in Task 5. The `currentPage` prop and other state-based navigation logic will be removed.\n\n## OpenSpec Proposal\n- **Proposal ID**: `integrate-dashboard-router`\n- **Status**: `draft`\n- **Location**: `openspec/changes/integrate-dashboard-router/`\n\nThe `DashboardLayout.tsx` will be refactored to use the application's router context to render the appropriate child page based on the current URL, likely using a nested route outlet pattern. The `SideNav` component will be updated to use the `Link` component from `src/components/router/index.tsx` for navigation.\n\n```tsx\n// src/components/dashboard/DashboardLayout.tsx (Refactored)\nimport { SideNav } from './SideNav';\nimport { Header } from './Header';\nimport { Outlet } from '@/components/router'; // Assuming an Outlet component for nested routes\n\nexport const DashboardLayout = () => {\n  return (\n    <div className='flex h-screen bg-gray-100'>\n      <SideNav />\n      <div className='flex-1 flex flex-col'>\n        <Header />\n        <main className='p-8 flex-1 overflow-y-auto'>\n          <Outlet /> {/* Renders the matched nested route component */}\n        </main>\n      </div>\n    </div>\n  );\n};\n```",
+        "testStrategy": "Manually test the layout on various screen sizes to ensure responsiveness is maintained. Verify that all navigation links in the sidebar update the browser's URL and render the correct page component without a full-page refresh. Test direct navigation by manually entering URLs (e.g., `/admin/team`) into the address bar. Confirm that the previously state-based navigation has been fully removed.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Create Main DashboardLayout Component Structure",
-            "description": "Create the file `src/components/dashboard/DashboardLayout.tsx` and implement the basic flexbox layout to contain a sidebar and a main content area, serving as the shell for all dashboard pages.",
+            "title": "Review `integrate-dashboard-router` Proposal and Existing Code",
+            "description": "Analyze the `integrate-dashboard-router` OpenSpec proposal and review the current implementation of `DashboardLayout.tsx`, `SideNav.tsx`, and the custom router from Task 5.",
             "dependencies": [],
-            "details": "Create a new directory `src/components/dashboard`. Inside, create `DashboardLayout.tsx`. It will accept `children` props and render them in a main content area. The root element will be a flex container with `h-screen` to occupy the full viewport. It will import and render placeholder `SideNav` and `Header` components which will be created in subsequent tasks.",
+            "details": "Familiarize yourself with the proposal located at `openspec/changes/integrate-dashboard-router/`. Examine `src/components/dashboard/DashboardLayout.tsx` and `SideNav.tsx` to understand the current state-based navigation logic (e.g., `currentPage` props, `onNavigate` callbacks). Also, review `src/components/router/index.tsx` to understand the `useRouter` hook and `Link` component APIs.",
             "status": "pending",
-            "testStrategy": "Verify the component renders its children without errors when integrated into the app. The basic two-column structure (for the future sidebar and main content) should be visible.",
-            "parentId": "undefined"
+            "testStrategy": "Confirm that the analysis identifies all files and code sections that need to be refactored to switch from state-based to URL-based routing. Create a checklist of components and props to be removed or modified."
           },
           {
             "id": 2,
-            "title": "Implement the Static SideNav Component",
-            "description": "Create the `src/components/dashboard/SideNav.tsx` component. It will display the primary navigation links for the admin dashboard, such as 'Events', 'Team', and 'Partners'.",
+            "title": "Refactor `SideNav.tsx` to Use Router Link Component",
+            "description": "Update the sidebar navigation to use URL-based links instead of state-based callbacks. The active link should be determined by the current URL path.",
             "dependencies": [
               1
             ],
-            "details": "Create the file `src/components/dashboard/SideNav.tsx`. This component will render a vertical list of navigation items. For now, use simple `div` or `a` elements styled with Tailwind CSS. The component should have a fixed width on desktop and a distinct background color. It will be imported and used by `DashboardLayout.tsx`.",
+            "details": "In `src/components/dashboard/SideNav.tsx`, replace the existing `<a>` or `<div>` elements and their `onClick` handlers with the `Link` component from the custom router (`src/components/router/index.tsx`). Set the `to` prop of each `Link` to the correct admin path (e.g., `to='/admin/events'`). Implement logic to determine the active link by comparing the link's path with the current `location.pathname` from the `useRouter` hook.",
             "status": "pending",
-            "testStrategy": "Visually inspect the sidebar within the dashboard layout to ensure it displays correctly with the intended navigation items. Check that it has the correct width and styling on desktop screens.",
-            "parentId": "undefined"
+            "testStrategy": "Verify that clicking links in the `SideNav` component updates the browser's URL correctly. Check that the styling for the 'active' link is applied correctly based on the current URL path."
           },
           {
             "id": 3,
-            "title": "Implement the Dashboard Header Component",
-            "description": "Create the `src/components/dashboard/Header.tsx` component. This will be the top bar of the main content area, initially simple, but will later hold a mobile menu trigger and user-related actions.",
+            "title": "Update Router Configuration for Nested Admin Routes",
+            "description": "Modify the application's main router configuration to handle nested routes under the `/admin` path, rendering the `DashboardLayout` as the parent layout.",
             "dependencies": [
-              1
+              2
             ],
-            "details": "Create the file `src/components/dashboard/Header.tsx`. This component will be a simple horizontal bar with a background color and a bottom border to separate it from the main content. It will be rendered inside the main content column of the `DashboardLayout.tsx`.",
+            "details": "In the main application router setup (likely in `App.tsx` or a dedicated routes file), define a parent route for `/admin` that renders the `DashboardLayout.tsx` component. Configure nested routes for each admin section (e.g., `events`, `team`) that render their respective page components inside the `DashboardLayout`'s outlet.",
             "status": "pending",
-            "testStrategy": "Visually inspect the header to ensure it renders correctly at the top of the main content area, spanning its full width.",
-            "parentId": "undefined"
+            "testStrategy": "Navigate to `/admin/events` and verify that the `DashboardLayout` is rendered with the `EventsPage` component inside its main content area. Repeat for other admin sections to ensure the nested routing is working correctly."
           },
           {
             "id": 4,
-            "title": "Make the Dashboard Layout Responsive",
-            "description": "Add responsiveness to the `DashboardLayout` so the `SideNav` collapses on smaller screens. Implement a hamburger menu button in the `Header` to toggle the sidebar's visibility on mobile.",
+            "title": "Refactor `DashboardLayout.tsx` and Remove State Logic",
+            "description": "Update the main layout component to render nested routes and remove all obsolete state-based navigation props and logic.",
             "dependencies": [
-              2,
               3
             ],
-            "details": "Use Tailwind CSS responsive prefixes (e.g., `md:flex`, `hidden`) in `DashboardLayout.tsx` and `SideNav.tsx` to hide the sidebar on mobile. Add a `useState` hook to `DashboardLayout` to manage the mobile sidebar's open/closed state. Add a button (hamburger icon) to `Header.tsx` that toggles this state.",
+            "details": "Modify `src/components/dashboard/DashboardLayout.tsx` to remove any props like `currentPage` or `onNavigate`. If the router implementation requires it, add an `<Outlet />` component (or equivalent) in the `main` content area to serve as the rendering target for the nested child routes defined in the previous subtask.",
             "status": "pending",
-            "testStrategy": "Manually test the layout on various screen sizes using browser developer tools. Verify the sidebar is hidden on mobile and visible on desktop. Confirm the hamburger menu appears on mobile and successfully toggles the sidebar's visibility.",
-            "parentId": "undefined"
+            "testStrategy": "Confirm that the `DashboardLayout` component no longer accepts or uses any state-based navigation props. Check the browser console for any warnings or errors related to removed props. Verify that the layout renders correctly with the child route component."
           },
           {
             "id": 5,
-            "title": "Integrate Dashboard with Router and Implement Navigation",
-            "description": "Wire up the `DashboardLayout` to the application's custom router to render for all `/admin/*` routes. Connect the `SideNav` links to the router's navigation function to enable page transitions.",
+            "title": "Verify Responsiveness and Finalize Integration",
+            "description": "Ensure the existing responsive behavior of the dashboard layout is preserved after the refactoring and clean up any remaining dead code.",
             "dependencies": [
+              2,
               4
             ],
-            "details": "Modify the main routing logic (likely within `src/App.tsx` or `src/components/Router.tsx`) to use the `DashboardLayout` as a wrapper for all admin-related routes. In `SideNav.tsx`, import the `useRouter` hook (from Task 5) and attach its `navigate` function to the `onClick` handlers of the navigation links to handle client-side routing.",
+            "details": "Thoroughly test the dashboard layout across different screen sizes (desktop, tablet, mobile). Verify that the `SideNav` collapses and the hamburger menu in the `Header` toggles its visibility correctly on smaller screens. Remove any unused variables, imports, or functions related to the old navigation system from all modified dashboard components.",
             "status": "pending",
-            "testStrategy": "Verify that navigating to an admin URL (e.g., `/admin/events`) renders the full dashboard layout. Click each navigation link in the sidebar and confirm that the URL updates correctly and the content area changes accordingly, without a full page reload.",
-            "parentId": "undefined"
+            "testStrategy": "Using browser dev tools, confirm the layout adapts correctly to different viewports. Check that the mobile menu toggle functionality is intact. Perform a final code review to ensure no legacy navigation code remains."
           }
-        ],
-        "complexity": 5,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Generate the React/TSX code for the subtasks. Provide the code for the main `DashboardLayout.tsx` using flexbox, a static `SideNav.tsx`, and a simple `Header.tsx`. Then, show the modifications needed to make the layout responsive with a mobile menu toggle."
+        ]
       },
       {
-        "id": "7",
+        "id": 7,
         "title": "Feature: Implement Event Management CRUD in Dashboard",
         "description": "Develop the complete CRUD (Create, Read, Update, Delete) functionality for events within the admin dashboard. This includes a page to list all events and a form to create/edit event details.",
         "details": "Create `DashboardEvents.tsx` to display a table or grid of events fetched from `ContentContext`. Add buttons for 'Edit' and 'Delete'. Create `DashboardEventsNew.tsx` with a form managed by `React Hook Form`. The form should include all fields from the `Event` type. On submit, call a function from `ContentContext` to persist the data to Supabase. Also, implement media uploads for `featured_image` and `gallery_images` using Supabase Storage.\n\n```tsx\n// In DashboardEventsNew.tsx\nconst { register, handleSubmit, formState: { errors } } = useForm<Event>();\nconst { createEvent } = useContent(); // from ContentContext\n\nconst onSubmit = (data) => {\n  createEvent(data);\n};\n\nreturn <form onSubmit={handleSubmit(onSubmit)}>...</form>;\n```",
@@ -572,10 +564,10 @@
         ],
         "complexity": 9,
         "recommendedSubtasks": 5,
-        "expansionPrompt": "Break this feature down into a full implementation plan. For the list view, show how to use a `shadcn/ui` Table. For the form, provide a `react-hook-form` setup integrated with `zod` for validation. For the create/update logic, detail the Supabase Storage upload process followed by the database insert/update."
+        "expansionPrompt": "Break this feature down into a full implementation plan. For the list view, show how to use a `shadcn/ui` Table. For the form, provide a `react-hook-form` setup integrated with `zod` for validation. For the create/update logic, detail the Supabase Storage upload process followed by the database insert/update, encapsulated within a `ContentContext` function."
       },
       {
-        "id": "8",
+        "id": 8,
         "title": "Feature: Implement CMS for Team, Partners, and Gallery",
         "description": "Create the dashboard management interfaces for Team Members, Partners/Sponsors, and the site-wide Gallery. Follow the same CRUD pattern established in the Event Management module.",
         "details": "Create three new dashboard pages: `DashboardTeam.tsx`, `DashboardPartners.tsx`, and `DashboardGallery.tsx`. Each page will have a list view and a form for creating/editing items, similar to the event management implementation. Use the corresponding types and context functions (`createTeamMember`, `updatePartner`, etc.) for data operations. Reuse form components and layout patterns to ensure consistency across the dashboard.",
@@ -652,7 +644,7 @@
         "expansionPrompt": "Generate a plan that reuses patterns from Task 7. For subtask 1, define the new functions to be added to `ContentContext`. For subtasks 2, 3, and 4, outline the component structure and specify which components (Table, Card, Form) can be reused or adapted for each CMS section."
       },
       {
-        "id": "9",
+        "id": 9,
         "title": "Public UI: Implement Public-Facing Landing Page",
         "description": "Build the main public `LandingPage.tsx` component, which assembles various sections like Hero, Featured Events, Partners, Team, and About. All content should be dynamically fetched from the `ContentContext`.",
         "details": "Create `src/components/LandingPage.tsx`. This component will use the `useContent` hook to get all necessary data (hero content, events, partners, team members). It will then pass this data as props to smaller, dedicated section components (e.g., `HeroSection`, `FeaturedEventsSection`). Ensure the page is fully responsive and visually matches the Figma design.\n\n```tsx\n// src/components/LandingPage.tsx\nimport { useContent } from '@/contexts/ContentContext';\n// Import section components\n\nexport const LandingPage = () => {\n  const { heroContent, events, partners, team } = useContent();\n\n  return (\n    <div>\n      <HeroSection content={heroContent} />\n      <FeaturedEventsSection events={events} />\n      <PartnersSection partners={partners} />\n      {/* ...other sections */}\n    </div>\n  );\n};\n```",
@@ -729,7 +721,7 @@
         "expansionPrompt": "Generate the skeleton code for `LandingPage.tsx`, showing how it uses the `useContent` hook and passes data to placeholder section components (e.g., `<HeroSection />`, `<FeaturedEventsSection />`). Also, provide an example of one of the section components, showing how it receives and renders the props."
       },
       {
-        "id": "10",
+        "id": 10,
         "title": "Public UI: Implement All-Events Page with Filtering and Search",
         "description": "Develop the `AllEventsPage.tsx` to display all 'upcoming' events. Implement client-side filtering (by date, category), sorting, and a search functionality.",
         "details": "Create `src/components/AllEventsPage.tsx`. Fetch the list of all events from `ContentContext`. Use local state (`useState`) to manage filter criteria (e.g., search query, selected category). Apply these filters to the event list before rendering the event cards. Implement pagination if the list is expected to be long. The search should filter events based on title, description, or artist names.\n\n```tsx\n// src/components/AllEventsPage.tsx\nconst { events } = useContent();\nconst [searchQuery, setSearchQuery] = useState('');\n\nconst filteredEvents = events.filter(event => \n  event.title.toLowerCase().includes(searchQuery.toLowerCase())\n);\n\nreturn <div>{/* Render filter controls and filteredEvents */}</div>;\n```",
@@ -804,16 +796,121 @@
         "complexity": 6,
         "recommendedSubtasks": 5,
         "expansionPrompt": "Provide a detailed implementation plan. Show the state management using `useState` for search query and filters. Write the core filtering logic using `useMemo` to create a derived list of events. Demonstrate how to implement pagination using `slice` and state for the current page."
+      },
+      {
+        "id": 11,
+        "title": "Backend Foundation: Rebuild Supabase Project from Scratch",
+        "description": "Rebuild the Supabase backend from the ground up following the comprehensive OpenSpec proposal `rebuild-supabase-from-scratch`. This task establishes a production-ready backend, including an advanced database schema, robust authentication, fine-grained security policies, and scalable serverless functions, all based on 2025 best practices.",
+        "status": "done",
+        "dependencies": [
+          "1"
+        ],
+        "priority": "high",
+        "details": "## OpenSpec Proposal\n- **Proposal ID**: `rebuild-supabase-from-scratch`\n- **Status**: approved\n- **Location**: `openspec/changes/rebuild-supabase-from-scratch/`\n\nThis task implements the full backend architecture as defined in the `rebuild-supabase-from-scratch` OpenSpec. The implementation will follow the 4-agent strategy detailed in the proposal's `tasks.md` to ensure a clear separation of concerns and expert-level execution for each component.\n\n### 1. Agent 1: Infrastructure & Database Foundation\n- **Responsibility**: Local Environment Setup, Core Schema, and Migrations.\n- Initialize the local Supabase environment and create the core database schema for entities like `events`, `team_members`, `partners`, and `gallery_items` through SQL migration files.\n\n### 2. Agent 2: Authentication & Security Layer\n- **Responsibility**: User Profile Management and Auth Triggers.\n- Create the `profiles` table to store user-specific data, an `updated_at` trigger for automatic timestamp management, and a trigger to populate the `profiles` table upon new user registration.\n\n### 3. Agent 3: Row-Level Security Implementation\n- **Responsibility**: Fine-Grained Access Control.\n- Enable RLS on all tables with a default-deny policy. Implement specific policies for public read access and more privileged access for authenticated and admin users, securing the application's data layer.\n\n### 4. Agent 4: Storage & Edge Functions\n- **Responsibility**: File Storage and Serverless Logic.\n- Configure Supabase Storage buckets (`media`, `avatars`) with appropriate security policies. Implement initial Deno-based Edge Functions for server-side logic such as handling contact form submissions.",
+        "testStrategy": "Verification will follow the 4-agent structure, ensuring each area of responsibility is thoroughly tested.\n\n1.  **Infrastructure & Database**: Execute `supabase db reset` to validate all migration files. Use a DB client to inspect the final schema, ensuring tables (`events`, `team_members`, etc.) match the spec. \n\n2.  **Authentication Layer**: Verify the `profiles` table and `updated_at` function exist. Register a new user and confirm the signup trigger correctly creates a corresponding row in the `profiles` table.\n\n3.  **Row-Level Security**: Write a dedicated test suite (e.g., using Vitest) to test RLS policies. The suite must impersonate anonymous, authenticated, and admin roles to attempt CRUD operations on all tables and assert that permissions are enforced correctly.\n\n4.  **Storage & Edge Functions**: Test file operations (upload, download, delete) on storage buckets for each user role. Test Edge Functions locally using `supabase functions serve` and write integration tests to validate their behavior.",
+        "subtasks": [
+          {
+            "id": 11,
+            "title": "Agent 1: Initialize Local Supabase Project and Link to Remote",
+            "description": "Initialize the local development environment using the Supabase CLI, link it to the remote Supabase project, and establish the basic workflow.",
+            "dependencies": [],
+            "details": "**1. Clean Slate Setup:**\n- Remove existing `supabase/` directory if present\n- Execute `supabase init` to create new local development environment\n\n**2. Project Linking:**\n- Create new project in Supabase dashboard and obtain project reference\n- Link local environment: `supabase link --project-ref <project-ref>`\n- Configure `.env` file with local and remote credentials\n\n**3. Verification:**\n- Verify connection: `supabase status` shows healthy local services\n- Confirm project linking: `supabase db remote changes` reports no changes\n- Ensure `supabase/migrations` directory is created\n\n**4. Documentation:**\n- Document the standard workflow (`supabase start`, `supabase db reset`, `supabase gen types`)\n- Create `.env.example` template for team members",
+            "status": "done",
+            "testStrategy": "Confirm `supabase status` shows all local services are active. Verify the project is linked by running a remote command like `supabase db pull`. Ensure `supabase/migrations` directory is created.",
+            "parentId": "11"
+          },
+          {
+            "id": 11,
+            "title": "Agent 1: Database Schema Migration for Core Entities (Enhanced)",
+            "description": "Create the first SQL migration file for the core data schema, including tables for events, team_members, partners, and gallery_items.",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "Create migration: `supabase migration new 01_database_schema`\n\n**1. Implement 3NF Normalized Schema:**\n- Create `events` table with UUID primary key, strategic denormalization columns\n- Create `partners`, `team_members`, `gallery_items` with proper relationships\n- Use PostgreSQL advanced types: `uuid`, `timestamptz`, `jsonb`\n\n**2. Strategic Denormalization for Performance:**\n- Add `partner_name` column in `events` table for read optimization\n- Implement triggers to keep denormalized data synchronized:\n```sql\nCREATE OR REPLACE FUNCTION update_event_partner_name() \nRETURNS TRIGGER AS $$\nBEGIN\n  UPDATE events SET partner_name = NEW.name WHERE partner_id = NEW.id;\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\nCREATE TRIGGER on_partner_name_update\nAFTER UPDATE OF name ON partners\nFOR EACH ROW EXECUTE FUNCTION update_event_partner_name();\n```\n\n**3. Advanced Indexing Strategy:**\n```sql\n-- Foreign key indexes (mandatory)\nCREATE INDEX idx_events_partner_id ON events(partner_id);\n\n-- WHERE clause optimization\nCREATE INDEX idx_events_category ON events(category);\nCREATE INDEX idx_events_start_date ON events(start_date DESC);\nCREATE INDEX idx_events_status ON events(status) WHERE status = 'published';\n\n-- Full-text search with pg_trgm\nCREATE EXTENSION IF NOT EXISTS pg_trgm;\nCREATE INDEX idx_events_search ON events USING gin (title gin_trgm_ops, description gin_trgm_ops);\n```\n\n**4. Database Views and Functions:**\n- Create `public_events_view` for simplified public queries:\n```sql\nCREATE OR REPLACE VIEW public_events_view AS\nSELECT e.id, e.title, e.start_date, e.featured_image, \n       p.name as partner_name, p.logo_url as partner_logo\nFROM events e\nLEFT JOIN partners p ON e.partner_id = p.id\nWHERE e.status = 'published';\n```\n- Implement RPC functions for complex multi-table operations\n- Create materialized views for analytics data",
+            "status": "done",
+            "testStrategy": "Run `supabase db reset` to apply the migration. Connect to the local database and verify that all specified tables and columns have been created correctly. Check for primary keys, foreign keys, and default values.",
+            "parentId": "11"
+          },
+          {
+            "id": 11,
+            "title": "Agent 2: Auth Schema: Create `profiles` Table and `updated_at` Trigger",
+            "description": "Create a migration for the `profiles` table to store public user data and a reusable trigger function to automatically update `updated_at` timestamps.",
+            "dependencies": [
+              "11.2"
+            ],
+            "details": "Create migration: `supabase migration new 02_auth_schema`\n\n**1. Enhanced profiles table with RBAC:**\n```sql\nCREATE TABLE public.profiles (\n    id uuid REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,\n    username text UNIQUE,\n    full_name text,\n    avatar_url text,\n    role text DEFAULT 'user' CHECK (role IN ('admin', 'editor', 'user')),\n    metadata jsonb DEFAULT '{}',\n    created_at timestamptz DEFAULT now(),\n    updated_at timestamptz DEFAULT now()\n);\n```\n\n**2. Custom JWT Claims for Role-Based Access Control:**\n```sql\nCREATE OR REPLACE FUNCTION public.update_user_claims()\nRETURNS TRIGGER AS $$\nBEGIN\n  UPDATE auth.users\n  SET raw_app_meta_data = raw_app_meta_data || jsonb_build_object('role', NEW.role)\n  WHERE id = NEW.id;\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql SECURITY DEFINER;\n\nCREATE TRIGGER on_profile_role_update\nAFTER UPDATE OF role ON public.profiles\nFOR EACH ROW EXECUTE FUNCTION public.update_user_claims();\n```\n\n**3. Enhanced `updated_at` Trigger:**\n```sql\nCREATE OR REPLACE FUNCTION handle_updated_at()\nRETURNS TRIGGER AS $$\nBEGIN\n  NEW.updated_at = now();\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n```\n\n**4. Audit Logging Setup:**\n```sql\nCREATE TABLE public.audit_log (\n    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n    table_name text NOT NULL,\n    record_id uuid NOT NULL,\n    action text NOT NULL CHECK (action IN ('INSERT', 'UPDATE', 'DELETE')),\n    old_data jsonb,\n    new_data jsonb,\n    user_id uuid REFERENCES auth.users(id),\n    created_at timestamptz DEFAULT now()\n);\n```",
+            "status": "done",
+            "testStrategy": "Run `supabase db reset`. Verify the `profiles` table exists and is linked to `auth.users`. Manually run an `UPDATE` on a test row in a table with the trigger and confirm its `updated_at` column is automatically set to the current timestamp.",
+            "parentId": "11"
+          },
+          {
+            "id": 11,
+            "title": "Agent 2: Create Trigger to Populate `profiles` Table on New User Signup",
+            "description": "Implement a database trigger that automatically creates a new entry in the `profiles` table whenever a new user signs up via Supabase Auth.",
+            "dependencies": [
+              "11.3"
+            ],
+            "details": "Create migration: `supabase migration new 03_user_signup_automation`\n\n**1. Implement automatic profile creation:**\n```sql\nCREATE OR REPLACE FUNCTION public.handle_new_user()\nRETURNS TRIGGER AS $$\nBEGIN\n  INSERT INTO public.profiles (id, full_name, avatar_url, role)\n  VALUES (\n    NEW.id,\n    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),\n    COALESCE(NEW.raw_user_meta_data->>'avatar_url', ''),\n    'user'\n  );\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql SECURITY DEFINER;\n```\n\n**2. Create trigger for automatic execution:**\n```sql\nCREATE TRIGGER on_auth_user_created\n  AFTER INSERT ON auth.users\n  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();\n\nCREATE TRIGGER on_profile_role_update\n  AFTER UPDATE OF role ON public.profiles\n  FOR EACH ROW EXECUTE FUNCTION public.update_user_claims();\n```\n\n**3. Testing:** Verify trigger creates profiles for new signups and automatically propagates role to JWT claims.",
+            "status": "done",
+            "testStrategy": "Create a new user via the Supabase JS client or UI. Query the `profiles` table to confirm that a corresponding record was automatically created with the correct `user_id` and any available metadata.",
+            "parentId": "11"
+          },
+          {
+            "id": 11,
+            "title": "Agent 3: Row-Level Security (RLS) for Public Read Access (Enhanced)",
+            "description": "Enable Row-Level Security on all core tables and implement policies that allow public, read-only access to non-sensitive data.",
+            "dependencies": [
+              "11.2"
+            ],
+            "details": "Create migration: `supabase migration new 04_rls_public_access`\n\n**1. Default Deny Principle (Security Foundation):**\n```sql\n-- Enable RLS on all tables\nALTER TABLE public.events ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.partners ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.team_members ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.gallery_items ENABLE ROW LEVEL SECURITY;\n\n-- CRITICAL: Default deny policy\nCREATE POLICY \"default_deny_all\" ON public.events FOR ALL USING (false);\nCREATE POLICY \"default_deny_all\" ON public.partners FOR ALL USING (false);\nCREATE POLICY \"default_deny_all\" ON public.team_members FOR ALL USING (false);\nCREATE POLICY \"default_deny_all\" ON public.gallery_items FOR ALL USING (false);\n```\n\n**2. Helper Functions for JWT Claims:**\n```sql\nCREATE OR REPLACE FUNCTION get_my_claim(claim TEXT) RETURNS JSONB AS $$\n  SELECT coalesce(current_setting('request.jwt.claims', true)::jsonb -> 'app_metadata' -> claim, 'null'::jsonb);\n$$ LANGUAGE sql STABLE SECURITY DEFINER;\n```\n\n**3. Public Read Access Policies:**\n```sql\n-- Public events (published only)\nCREATE POLICY \"public_read_published_events\" ON public.events\nFOR SELECT USING (status = 'published');\n\n-- Public partners (active only)\nCREATE POLICY \"public_read_active_partners\" ON public.partners\nFOR SELECT USING (status = 'active');\n\n-- Public team members\nCREATE POLICY \"public_read_team\" ON public.team_members\nFOR SELECT USING (status = 'active');\n\n-- Public gallery items\nCREATE POLICY \"public_read_gallery\" ON public.gallery_items\nFOR SELECT USING (status = 'published');\n```",
+            "status": "done",
+            "testStrategy": "Using a JS test suite (e.g., Vitest), initialize an anonymous Supabase client. Perform `select` queries on tables like `events` and `gallery_items` and assert that data is returned. Attempt `insert`, `update`, or `delete` and assert that they fail due to RLS.",
+            "parentId": "11"
+          },
+          {
+            "id": 11,
+            "title": "Agent 3: Row-Level Security (RLS) for Authenticated and Admin Users (Enhanced)",
+            "description": "Implement RLS policies that grant appropriate create, update, and delete permissions to authenticated users and elevated permissions for admin roles.",
+            "dependencies": [
+              "11.4",
+              "11.5"
+            ],
+            "details": "Create migration: `supabase migration new 05_rls_admin_authenticated`\n\n**1. Role-Based Admin Policies:**\n```sql\n-- Admin full access policies for all tables\nCREATE POLICY \"admin_full_access_events\" ON public.events\nFOR ALL USING ((get_my_claim('role') ->> 'role') = 'admin')\nWITH CHECK ((get_my_claim('role') ->> 'role') = 'admin');\n\nCREATE POLICY \"admin_full_access_partners\" ON public.partners\nFOR ALL USING ((get_my_claim('role') ->> 'role') = 'admin')\nWITH CHECK ((get_my_claim('role') ->> 'role') = 'admin');\n```\n\n**2. User Profile Management:**\n```sql\n-- Users can manage their own profiles\nCREATE POLICY \"users_update_own_profile\" ON public.profiles\nFOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);\n\n-- Users can read all profiles (for public team members)\nCREATE POLICY \"read_profiles_public\" ON public.profiles\nFOR SELECT USING (true);\n```\n\n**3. Authenticated User Basic Access:**\n```sql\n-- Authenticated users can read all published content\nCREATE POLICY \"authenticated_read_published\" ON public.events\nFOR SELECT USING (auth.role() = 'authenticated' AND status = 'published');\n```\n\n**4. Enhanced Storage Policies:**\n```sql\n-- Admin upload to public media\nCREATE POLICY \"admin_upload_public_media\" ON storage.objects\nFOR INSERT TO authenticated\nWITH CHECK (bucket_id = 'public_media' AND (get_my_claim('role') ->> 'role') = 'admin');\n\n-- User avatar management\nCREATE POLICY \"user_manage_own_avatar\" ON storage.objects\nFOR ALL TO authenticated\nUSING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text)\nWITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);\n```",
+            "status": "done",
+            "testStrategy": "Extend the RLS test suite. Create test users with 'authenticated' and 'admin' roles. For each role, attempt CRUD operations on all tables and assert that permissions succeed or fail exactly as defined in the policies.",
+            "parentId": "11"
+          },
+          {
+            "id": 11,
+            "title": "Agent 4: Configure Storage Buckets and Edge Functions (Enhanced)",
+            "description": "Set up storage buckets for public media and private avatars, secure them with RLS policies, and implement initial serverless Edge Functions.",
+            "dependencies": [
+              "11.1",
+              "11.5"
+            ],
+            "details": "Create migration: `supabase migration new 06_storage_and_functions`\n\n**1. Optimized Storage Buckets with RLS:**\n```sql\n-- Create optimized buckets\nINSERT INTO storage.buckets (id, name, public) VALUES \n('public_media', 'public_media', true),\n('avatars', 'avatars', false),\n('admin_content', 'admin_content', false);\n```\n\n**2. Advanced Storage RLS Policies:**\n```sql\n-- Public read access to media (CDN cached)\nCREATE POLICY \"public_read_media_optimized\" ON storage.objects\nFOR SELECT USING (\n  bucket_id = 'public_media' \n  AND (storage.foldername(name))[1] IN ('events', 'partners', 'gallery')\n);\n\n-- Admin full control\nCREATE POLICY \"admin_storage_full_access\" ON storage.objects\nFOR ALL USING ((get_my_claim('role') ->> 'role') = 'admin')\nWITH CHECK ((get_my_claim('role') ->> 'role') = 'admin');\n```\n\n**3. Edge Functions for Complex Operations:**\n```bash\n# Initialize Edge Functions\nsupabase functions new admin-bulk-operations\n```\n\n**4. Production Edge Function Template:**\n```typescript\n// functions/admin-bulk-operations/index.ts\nimport { createClient } from 'https://esm.sh/@supabase/supabase-js@2'\n\nconst corsHeaders = {\n  'Access-Control-Allow-Origin': '*',\n  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',\n}\n\nDeno.serve(async (req) => {\n  if (req.method === 'OPTIONS') {\n    return new Response('ok', { headers: corsHeaders })\n  }\n\n  try {\n    // Create admin client\n    const supabaseAdmin = createClient(\n      Deno.env.get('SUPABASE_URL')!,\n      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!\n    )\n\n    const { operation, data } = await req.json()\n\n    // Bulk operations with proper validation\n    switch (operation) {\n      case 'archive_past_events':\n        const result = await supabaseAdmin\n          .from('events')\n          .update({ status: 'archived' })\n          .lt('end_date', new Date().toISOString())\n        break\n    }\n\n    return new Response(JSON.stringify({ success: true }), {\n      headers: { ...corsHeaders, 'Content-Type': 'application/json' },\n    })\n  } catch (error) {\n    return new Response(JSON.stringify({ error: error.message }), {\n      status: 400,\n      headers: { ...corsHeaders, 'Content-Type': 'application/json' },\n    })\n  }\n})\n```\n\n**5. Performance Monitoring & Security:**\n```sql\n-- Create performance monitoring view\nCREATE VIEW database_performance AS\nSELECT \n  schemaname, tablename,\n  n_tup_ins as inserts, n_tup_upd as updates, n_tup_del as deletes,\n  n_live_tup as live_tuples, n_dead_tup as dead_tuples\nFROM pg_stat_user_tables;\n```",
+            "status": "done",
+            "testStrategy": "For storage, write tests to upload/download/delete files from each bucket as an anonymous user, authenticated user, and admin, asserting that the storage RLS policies work. For functions, run `supabase functions serve` and use a tool like `curl` or a test script to invoke the `contact-form-handler` and verify the response.",
+            "parentId": "11"
+          }
+        ],
+        "complexity": 10,
+        "recommendedSubtasks": 7,
+        "expansionPrompt": "Create a detailed subtask breakdown. Create one subtask for project initialization. Create separate subtasks for each major table's SQL migration script. Dedicate a subtask to setting up the auth trigger for `profiles`. Create two separate subtasks for RLS: one for public-read policies and another for authenticated/admin write policies. Finally, create subtasks for Storage configuration and Edge Function setup.",
+        "updatedAt": "2025-11-07T05:13:55.968Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-11-07T00:53:19.749Z",
-      "taskCount": 10,
+      "lastModified": "2025-11-07T05:13:55.969Z",
+      "taskCount": 11,
       "completedCount": 4,
       "tags": [
         "master"
-      ]
+      ],
+      "created": "2025-11-07T06:02:41.440Z",
+      "description": "Tasks for master context",
+      "updated": "2025-11-07T06:13:22.596Z"
     }
   }
 }

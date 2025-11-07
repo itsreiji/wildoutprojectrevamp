@@ -7,6 +7,7 @@ import { Dashboard } from './components/Dashboard';
 import { AllEventsPage } from './components/AllEventsPage';
 import { Toaster } from './components/ui/sonner';
 import TestComponents from './components/ui/test-components';
+// import { DummyDataToggle } from './components/DummyDataToggle'; // Commented out - toggle disabled
 
 // Define routes object mapping paths to components
 const routes = {
@@ -18,12 +19,23 @@ const routes = {
 };
 
 function App() {
+  // Use dummy data in development by default
+  const isDevelopment = import.meta.env.DEV;
+  const useDummyDataDefault = isDevelopment;
+
   return (
     <ThemeProvider defaultTheme="system" attribute="class">
-      <ContentProvider>
+      <ContentProvider useDummyData={useDummyDataDefault}>
         <RouterProvider>
           <Router routes={routes} />
         </RouterProvider>
+
+        {/* Development-only dummy data toggle - DISABLED */}
+        {/* {isDevelopment && (
+          <div className="fixed top-4 right-4 z-50 max-w-sm">
+            <DummyDataToggle />
+          </div>
+        )} */}
       </ContentProvider>
       <Toaster />
     </ThemeProvider>

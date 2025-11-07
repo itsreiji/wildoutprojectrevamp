@@ -10,426 +10,591 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "15.1.8"
   }
   public: {
     Tables: {
-      artists: {
+      audit_log: {
         Row: {
-          bio: string | null
-          created_at: string | null
-          genre: string | null
+          action: string
+          created_at: string
           id: string
-          name: string
-          social_links: Json | null
-          status: string | null
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string
+          table_name: string
+          user_id: string | null
         }
         Insert: {
-          bio?: string | null
-          created_at?: string | null
-          genre?: string | null
+          action: string
+          created_at?: string
           id?: string
-          name: string
-          social_links?: Json | null
-          status?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id: string
+          table_name: string
+          user_id?: string | null
         }
         Update: {
-          bio?: string | null
-          created_at?: string | null
-          genre?: string | null
+          action?: string
+          created_at?: string
           id?: string
-          name?: string
-          social_links?: Json | null
-          status?: string | null
-        }
-        Relationships: []
-      }
-      benefits_members: {
-        Row: {
-          created_at: string | null
-          description: string
-          icon: string
-          id: string
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description: string
-          icon: string
-          id?: string
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string
-          icon?: string
-          id?: string
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      benefits_partners: {
-        Row: {
-          created_at: string | null
-          description: string
-          icon: string
-          id: string
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description: string
-          icon: string
-          id?: string
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string
-          icon?: string
-          id?: string
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      events: {
-        Row: {
-          artist_ids: string[] | null
-          artists: string
-          created_at: string | null
-          day_name: string
-          description: string | null
-          event_date: string
-          id: string
-          status: string | null
-          time: string | null
-          updated_at: string | null
-          venue: string
-          venue_id: string | null
-        }
-        Insert: {
-          artist_ids?: string[] | null
-          artists: string
-          created_at?: string | null
-          day_name: string
-          description?: string | null
-          event_date: string
-          id?: string
-          status?: string | null
-          time?: string | null
-          updated_at?: string | null
-          venue: string
-          venue_id?: string | null
-        }
-        Update: {
-          artist_ids?: string[] | null
-          artists?: string
-          created_at?: string | null
-          day_name?: string
-          description?: string | null
-          event_date?: string
-          id?: string
-          status?: string | null
-          time?: string | null
-          updated_at?: string | null
-          venue?: string
-          venue_id?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string
+          table_name?: string
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "events_venue_id_fkey"
-            columns: ["venue_id"]
+            foreignKeyName: "audit_log_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "venues"
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_artists: {
+        Row: {
+          artist_name: string
+          created_at: string
+          event_id: string
+          id: string
+          performance_time: string | null
+          role: string
+        }
+        Insert: {
+          artist_name: string
+          created_at?: string
+          event_id: string
+          id?: string
+          performance_time?: string | null
+          role?: string
+        }
+        Update: {
+          artist_name?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          performance_time?: string | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_artists_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          capacity: number | null
+          category: string
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          location: string | null
+          metadata: Json
+          partner_id: string | null
+          partner_name: string | null
+          price_range: string | null
+          start_date: string
+          status: string
+          ticket_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          location?: string | null
+          metadata?: Json
+          partner_id?: string | null
+          partner_name?: string | null
+          price_range?: string | null
+          start_date: string
+          status?: string
+          ticket_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          location?: string | null
+          metadata?: Json
+          partner_id?: string | null
+          partner_name?: string | null
+          price_range?: string | null
+          start_date?: string
+          status?: string
+          ticket_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
       }
       gallery_items: {
         Row: {
-          alt: string
-          created_at: string | null
+          category: string
+          created_at: string
+          description: string | null
           id: string
-          img: string
+          image_urls: Json
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
         }
         Insert: {
-          alt: string
-          created_at?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
           id?: string
-          img: string
+          image_urls?: Json
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
         }
         Update: {
-          alt?: string
-          created_at?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
           id?: string
-          img?: string
+          image_urls?: Json
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
       partners: {
         Row: {
-          created_at: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          featured: boolean
           id: string
-          logo: string
+          logo_url: string | null
           name: string
-          updated_at: string | null
-          url: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          logo: string
-          name: string
-          updated_at?: string | null
-          url?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          logo?: string
-          name?: string
-          updated_at?: string | null
-          url?: string | null
-        }
-        Relationships: []
-      }
-      photo_moments: {
-        Row: {
-          caption: string
-          created_at: string | null
-          id: string
-          img: string
-        }
-        Insert: {
-          caption: string
-          created_at?: string | null
-          id?: string
-          img: string
-        }
-        Update: {
-          caption?: string
-          created_at?: string | null
-          id?: string
-          img?: string
-        }
-        Relationships: []
-      }
-      settings: {
-        Row: {
-          contact_email: string
-          content_config: Json
-          created_at: string | null
-          id: string
-          primary_color: string
-          seo_settings: Json
-          site_description: string
-          site_name: string
           social_links: Json
-          theme: string
-          updated_at: string | null
+          status: string
+          updated_at: string
+          website_url: string | null
         }
         Insert: {
-          contact_email?: string
-          content_config?: Json
-          created_at?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean
           id?: string
-          primary_color?: string
-          seo_settings?: Json
-          site_description?: string
-          site_name?: string
+          logo_url?: string | null
+          name: string
           social_links?: Json
-          theme?: string
-          updated_at?: string | null
+          status?: string
+          updated_at?: string
+          website_url?: string | null
         }
         Update: {
-          contact_email?: string
-          content_config?: Json
-          created_at?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          featured?: boolean
           id?: string
-          primary_color?: string
-          seo_settings?: Json
-          site_description?: string
-          site_name?: string
+          logo_url?: string | null
+          name?: string
           social_links?: Json
-          theme?: string
-          updated_at?: string | null
+          status?: string
+          updated_at?: string
+          website_url?: string | null
         }
         Relationships: []
       }
-      teams: {
+      profiles: {
         Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          metadata: Json
+          role: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          metadata?: Json
+          role?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          metadata?: Json
+          role?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          avatar_url: string | null
           bio: string | null
           created_at: string
-          department: string | null
           email: string | null
-          featured: boolean | null
           id: string
           name: string
-          phone: string | null
-          photo_url: string | null
-          role: string
-          socials: Json | null
-          sort_order: number
-          status: string | null
+          social_links: Json
+          status: string
+          title: string | null
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           bio?: string | null
           created_at?: string
-          department?: string | null
           email?: string | null
-          featured?: boolean | null
           id?: string
           name: string
-          phone?: string | null
-          photo_url?: string | null
-          role?: string
-          socials?: Json | null
-          sort_order?: number
-          status?: string | null
+          social_links?: Json
+          status?: string
+          title?: string | null
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           bio?: string | null
-          created_at?: string | null
-          department?: string | null
+          created_at?: string
           email?: string | null
-          featured?: boolean | null
           id?: string
           name?: string
-          phone?: string | null
-          photo_url?: string | null
-          role?: string
-          socials?: Json | null
-          sort_order?: number
-          status?: string | null
+          social_links?: Json
+          status?: string
+          title?: string | null
           updated_at?: string
-        }
-        Relationships: []
-      }
-      venues: {
-        Row: {
-          address: string | null
-          capacity: number | null
-          city: string | null
-          contact_info: Json | null
-          created_at: string | null
-          id: string
-          name: string
-          status: string | null
-        }
-        Insert: {
-          address?: string | null
-          capacity?: number | null
-          city?: string | null
-          contact_info?: Json | null
-          created_at?: string | null
-          id?: string
-          name: string
-          status?: string | null
-        }
-        Update: {
-          address?: string | null
-          capacity?: number | null
-          city?: string | null
-          contact_info?: Json | null
-          created_at?: string | null
-          id?: string
-          name?: string
-          status?: string | null
         }
         Relationships: []
       }
     }
     Views: {
-      v_performance_summary: {
+      active_partners_view: {
         Row: {
-          active_events: number | null
-          metric_type: string | null
-          total_events: number | null
-          unique_artists: number | null
-          unique_venues: number | null
-          upcoming_events: number | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          featured: boolean
+          id: string
+          logo_url: string | null
+          name: string
+          social_links: Json
+          status: string
+          updated_at: string
+          website_url: string | null
+        }
+        Relationships: []
+      }
+      active_team_view: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          social_links: Json
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Relationships: []
+      }
+      audit_summary: {
+        Row: {
+          action: string
+          action_count: number
+          last_action: string | null
+          table_name: string
+        }
+        Relationships: []
+      }
+      database_performance: {
+        Row: {
+          dead_tup: number | null
+          last_analyze: string | null
+          last_autoanalyze: string | null
+          live_tup: number | null
+          modifications_since_analyze: number | null
+          schemaname: string | null
+          tablename: string | null
+          tup_del: number | null
+          tup_ins: number | null
+          tup_upd: number | null
+        }
+        Relationships: []
+      }
+      events_by_month: {
+        Row: {
+          category: string
+          event_count: number
+          month: string
+          unique_partners: number
+        }
+        Relationships: []
+      }
+      partner_engagement: {
+        Row: {
+          avg_event_duration_hours: number | null
+          id: string
+          last_event_date: string | null
+          name: string
+          total_events: number
+        }
+        Relationships: []
+      }
+      public_events_view: {
+        Row: {
+          artists: string[] | null
+          category: string
+          description: string | null
+          end_date: string
+          id: string
+          location: string | null
+          partner_logo_url: string | null
+          partner_name: string | null
+          partner_website_url: string | null
+          price_range: string | null
+          start_date: string
+          status: string
+          ticket_url: string | null
+          title: string
+        }
+        Relationships: []
+      }
+      published_gallery_view: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_urls: Json
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Relationships: []
+      }
+      storage_usage: {
+        Row: {
+          bucket_id: string
+          total_files: number
+          total_size_bytes: number | null
+          total_size_human: string | null
         }
         Relationships: []
       }
     }
     Functions: {
-      get_database_health_metrics: {
-        Args: never
+      create_data_export_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
+      generate_unique_username: {
+        Args: {
+          base_name: string
+          user_id: string
+        }
+        Returns: string
+      }
+      get_current_user_role_via_jwt: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_my_claim: {
+        Args: {
+          claim: string
+        }
+        Returns: Json
+      }
+      get_recent_security_events: {
+        Args: {
+          hours_back?: number
+        }
         Returns: {
-          metric_name: string
-          metric_unit: string
-          metric_value: number
+          created_at: string
+          details: Json
+          event_type: string
+          user_id: string
+          user_role: string
         }[]
       }
-      get_events_by_date: {
-        Args: { end_date: string; start_date: string }
+      get_system_health: {
+        Args: Record<PropertyKey, never>
         Returns: {
-          day_name: string
-          event_date: string
-          events: Json
+          metric: string
+          status: string
+          value: string
         }[]
       }
-      get_events_grouped_by_date: {
-        Args: { end_date?: string; event_status?: string; start_date?: string }
+      get_table_policies: {
+        Args: {
+          target_table: string
+        }
         Returns: {
-          day_name: string
-          event_date: string
-          events: Json
+          cmd: string | null
+          permissive: string | null
+          qual: string | null
+          roles: string[] | null
+          policyname: string | null
+          with_check: string | null
+        }[]
+      }
+      get_user_avatar_url: {
+        Args: {
+          user_id: string
+        }
+        Returns: string | null
+      }
+      get_user_profile: {
+        Args: {
+          user_id?: string
+        }
+        Returns: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          metadata: Json
+          role: string
+          updated_at: string
+          username: string | null
         }[]
       }
       get_events_with_details: {
         Args: {
-          end_date?: string
-          event_status?: string
+          category_filter?: string
           limit_count?: number
           offset_count?: number
-          start_date?: string
+          status_filter?: string
         }
         Returns: {
-          artist_ids: string[]
-          artists: Json
-          day_name: string
-          description: string
-          event_date: string
-          event_id: string
-          event_time: string
-          status: string
-          total_count: number
-          venue_address: string
-          venue_capacity: number
-          venue_city: string
-          venue_email: string
-          venue_id: string
-          venue_images: string[]
-          venue_instagram: string
-          venue_name: string
-          venue_phone: string
-          venue_website: string
+          artists: string[]
+          capacity: number | null
+          category: string
+          description: string | null
+          end_date: string
+          id: string
+          location: string | null
+          partner_logo_url: string | null
+          partner_name: string | null
+          partner_website_url: string | null
+          price_range: string | null
+          start_date: string
+          ticket_url: string | null
+          title: string
         }[]
       }
-      get_past_events_week: {
-        Args: never
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_admin_via_jwt: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_editor_or_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_editor_or_admin_via_jwt: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      log_security_event: {
+        Args: {
+          details?: Json
+          event_type: string
+        }
+        Returns: undefined
+      }
+      search_events: {
+        Args: {
+          limit_count?: number
+          search_query: string
+        }
         Returns: {
-          day_name: string
-          event_date: string
-          events: Json
+          description: string | null
+          id: string
+          partner_name: string | null
+          rank: number
+          start_date: string
+          title: string
         }[]
       }
-      get_upcoming_events_week: {
-        Args: never
+      test_rls_policies: {
+        Args: Record<PropertyKey, never>
         Returns: {
-          day_name: string
-          event_date: string
-          events: Json
+          policy_count: number
+          rls_enabled: boolean
+          table_name: string
         }[]
+      }
+      update_user_role: {
+        Args: {
+          new_role: string
+          target_user_id: string
+        }
+        Returns: boolean
+      }
+      validate_file_upload: {
+        Args: {
+          bucket_name: string
+          file_name: string
+          file_size: number
+        }
+        Returns: boolean
       }
     }
     Enums: {

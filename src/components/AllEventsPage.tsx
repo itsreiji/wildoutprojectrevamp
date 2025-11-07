@@ -11,7 +11,7 @@ import { useRouter } from './router/index';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 export const AllEventsPage = React.memo(() => {
-  const { navigateTo } = useRouter();
+  const { navigate } = useRouter();
   const { events } = useContent();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,7 +43,7 @@ export const AllEventsPage = React.memo(() => {
                 </div>
               </div>
               <Button
-                onClick={() => navigateTo('landing')}
+                onClick={() => navigate('/')}
                 variant="outline"
                 className="border-white/10 text-white/70 hover:bg-white/5 rounded-xl"
               >
@@ -100,7 +100,7 @@ export const AllEventsPage = React.memo(() => {
                   {/* Event Image */}
                   <div className="relative h-56 overflow-hidden">
                     <ImageWithFallback
-                      src={event.image}
+                      src={event.image || ''}
                       alt={event.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -137,41 +137,61 @@ export const AllEventsPage = React.memo(() => {
 
                     <div className="space-y-2">
                       {/* Date & Time */}
-                      <div className="flex items-center text-sm text-white/70">
-                        <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span>
-                          {new Date(event.date).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
-                        </span>
-                        <Clock className="h-4 w-4 ml-4 mr-2 text-[#E93370]" />
-                        <span>{event.time.split(' - ')[0]}</span>
-                      </div>
+                      {(event.date || event.start_date) && (
+                        <div className="flex items-center text-sm text-white/70">
+                          <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
+                          <span>
+                            {event.date
+                              ? new Date(event.date).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })
+                              : new Date(event.start_date).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })}
+                          </span>
+                          {event.time && (
+                            <>
+                              <Clock className="h-4 w-4 ml-4 mr-2 text-[#E93370]" />
+                              <span>{event.time.split(' - ')[0]}</span>
+                            </>
+                          )}
+                        </div>
+                      )}
 
                       {/* Venue */}
-                      <div className="flex items-center text-sm text-white/70">
-                        <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="line-clamp-1">{event.venue}</span>
-                      </div>
+                      {(event.venue || event.location) && (
+                        <div className="flex items-center text-sm text-white/70">
+                          <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
+                          <span className="line-clamp-1">{event.venue || event.location || 'TBD'}</span>
+                        </div>
+                      )}
 
                       {/* Attendance */}
-                      <div className="flex items-center justify-between pt-2 border-t border-white/10">
-                        <div className="flex items-center text-sm text-white/70">
-                          <Users className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span>{event.attendees}/{event.capacity}</span>
+                      {(event.attendees !== undefined || event.capacity !== null) && (
+                        <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                          <div className="flex items-center text-sm text-white/70">
+                            <Users className="h-4 w-4 mr-2 text-[#E93370]" />
+                            <span>{event.attendees || 0}/{event.capacity || 'N/A'}</span>
+                          </div>
+                          {(event.price || event.price_range) && (
+                            <span className="text-sm text-[#E93370]">{event.price || event.price_range || 'TBD'}</span>
+                          )}
                         </div>
-                        <span className="text-sm text-[#E93370]">{event.price}</span>
-                      </div>
+                      )}
 
                       {/* Progress Bar */}
-                      <div className="w-full bg-white/10 rounded-full h-1.5">
-                        <div
-                          className="bg-[#E93370] h-1.5 rounded-full transition-all duration-500"
-                          style={{ width: `${Math.min((event.attendees / event.capacity) * 100, 100)}%` }}
-                        />
-                      </div>
+                      {event.attendees !== undefined && event.capacity !== null && event.capacity > 0 && (
+                        <div className="w-full bg-white/10 rounded-full h-1.5">
+                          <div
+                            className="bg-[#E93370] h-1.5 rounded-full transition-all duration-500"
+                            style={{ width: `${Math.min(((event.attendees || 0) / event.capacity) * 100, 100)}%` }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

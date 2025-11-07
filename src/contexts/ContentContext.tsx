@@ -1,104 +1,196 @@
 /* @refresh reset */
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Event, TeamMember, Partner, GalleryImage, HeroContent, AboutContent, SiteSettings } from '../types';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { supabaseClient } from '../supabase/client';
+import type { Tables, TablesInsert, TablesUpdate } from '../supabase/types';
+import { DUMMY_EVENTS, DUMMY_EVENT_ARTISTS, DUMMY_TEAM_MEMBERS, DUMMY_PARTNERS, DUMMY_GALLERY_ITEMS } from '../data/dummyData';
 
-// Export types for other components that need them
-export type { Event, TeamMember, Partner, GalleryImage, HeroContent, AboutContent, SiteSettings };
+// Re-export types from the new Supabase schema
+export type Event = {
+  id: string;
+  title: string;
+  description: string | null;
+  start_date: string;
+  end_date: string;
+  location: string | null;
+  category: string;
+  status: string;
+  capacity: number | null;
+  price_range: string | null;
+  ticket_url: string | null;
+  partner_name: string | null;
+  metadata: any;
+  created_at: string;
+  updated_at: string;
+  // Legacy/compatibility fields for UI components
+  date?: string;
+  time?: string;
+  venue?: string;
+  venueAddress?: string;
+  image?: string;
+  attendees?: number;
+  price?: string;
+  artists?: Array<{
+    name: string;
+    role: string;
+    image: string;
+  }>;
+  gallery?: string[];
+  highlights?: string[];
+  // Joined data from views/functions
+  partner_logo_url?: string | null;
+  partner_website_url?: string | null;
+};
 
-// Initial Data
+export type TeamMember = Tables<'team_members'>;
+export type Partner = Tables<'partners'>;
+export type GalleryImage = Tables<'gallery_items'>;
+
+// Legacy types for backward compatibility (to be updated)
+export type HeroContent = {
+  title: string;
+  subtitle: string;
+  backgroundImage: string;
+  ctaText: string;
+  ctaLink: string;
+};
+
+export type AboutContent = {
+  title: string;
+  description: string;
+  mission: string;
+  values: string[];
+  stats: Array<{ label: string; value: string }>;
+};
+
+export type SiteSettings = {
+  siteName: string;
+  siteDescription: string;
+  contactEmail: string;
+  primaryColor: string;
+  socialLinks: Record<string, string>;
+};
+
+// =============================================
+// DATA FETCHING FUNCTIONS (New Supabase Schema)
+// =============================================
+
+// Events fetching with new schema
+const fetchEvents = async (): Promise<Event[]> => {
+  try {
+    // Use the public_events view for querying
+    const { data, error } = await supabaseClient
+      .from('public_events')
+      .select('*')
+      .order('start_date', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching events:', error);
+      return [];
+    }
+
+    return (data || []).map(event => ({
+      ...event,
+      // Transform view data to match Event type
+      date: event.start_date.split('T')[0], // Extract date part
+      time: `${new Date(event.start_date).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })} - ${new Date(event.end_date).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })}`,
+      venue: event.location || 'TBD',
+      venueAddress: event.location || '',
+      category: event.category,
+      status: event.status,
+      capacity: event.max_attendees || undefined,
+      price: event.price ? `${event.currency} ${event.price}` : 'TBD',
+      // Keep the new schema fields
+      start_date: event.start_date,
+      end_date: event.end_date,
+      location: event.location,
+      partner_name: event.partner_name,
+      ticket_url: event.ticket_url,
+      price_range: event.price ? `${event.currency} ${event.price}` : undefined,
+    })) as Event[];
+  } catch (error) {
+    console.error('Error in fetchEvents:', error);
+    return [];
+  }
+};
+
+// Team members fetching
+const fetchTeamMembers = async (): Promise<TeamMember[]> => {
+  try {
+    const { data, error } = await supabaseClient
+      .from('team_members')
+      .select('*')
+      .eq('status', 'active')
+      .order('display_order')
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching team members:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchTeamMembers:', error);
+    return [];
+  }
+};
+
+// Partners fetching
+const fetchPartners = async (): Promise<Partner[]> => {
+  try {
+    const { data, error } = await supabaseClient
+      .from('partners')
+      .select('*')
+      .eq('status', 'active')
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching partners:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchPartners:', error);
+    return [];
+  }
+};
+
+// Gallery fetching
+const fetchGallery = async (): Promise<GalleryImage[]> => {
+  try {
+    const { data, error } = await supabaseClient
+      .from('gallery_items')
+      .select('*')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching gallery:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in fetchGallery:', error);
+    return [];
+  }
+};
+
+// =============================================
+// LEGACY DATA (For Backward Compatibility During Migration)
+// =============================================
+
+// Placeholder for legacy data structure until full migration
 const INITIAL_EVENTS: Event[] = [
-  {
-    id: '1',
-    title: 'Neon Nights: Electronic Odyssey',
-    description: 'Experience an unforgettable night of electronic music featuring Indonesia\'s top DJs and international guest artists. Immerse yourself in cutting-edge visuals and world-class production.',
-    date: '2025-11-15',
-    time: '21:00 - 04:00',
-    venue: 'Jakarta Convention Center',
-    venueAddress: 'Jl. Gatot Subroto, Jakarta Pusat',
-    image: 'https://images.unsplash.com/photo-1709131482554-53117b122a35?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuaWdodGxpZmUlMjBwYXJ0eSUyMGV2ZW50fGVufDF8fHx8MTc2MTgzNzA3Nnww&ixlib=rb-4.1.0&q=80&w=1080',
-    category: 'Music Festival',
-    capacity: 5000,
-    attendees: 3200,
-    price: 'IDR 250K - 500K',
-    artists: [
-      { name: 'DJ Stellar', role: 'Headliner', image: 'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?w=400' },
-      { name: 'Luna Beats', role: 'Supporting', image: 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400' },
-      { name: 'Midnight Mix', role: 'Opening', image: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400' },
-    ],
-    gallery: [
-      'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800',
-      'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?w=800',
-      'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800',
-    ],
-    highlights: [
-      'International DJ lineup',
-      'State-of-the-art sound system',
-      '3D visual mapping',
-      'VIP lounge access',
-      'Food & beverage vendors',
-    ],
-    status: 'upcoming',
-  },
-  {
-    id: '2',
-    title: 'Urban Art Exhibition',
-    description: 'Discover vibrant world of Indonesian street art and contemporary visual culture. Featuring works from emerging and established artists.',
-    date: '2025-11-20',
-    time: '18:00 - 23:00',
-    venue: 'Museum MACAN',
-    venueAddress: 'Jl. Panjang No.5, Jakarta Barat',
-    image: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcnQlMjBleGhpYml0aW9uJTIwbW9kZXJufGVufDF8fHx8MTc2MTc2MDA1N3ww&ixlib=rb-4.1.0&q=80&w=1080',
-    category: 'Art & Culture',
-    capacity: 800,
-    attendees: 450,
-    price: 'IDR 150K',
-    artists: [
-      { name: 'Eko Nugroho', role: 'Featured Artist', image: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400' },
-      { name: 'Wedha Abdul Rasyid', role: 'Guest Artist', image: 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400' },
-    ],
-    gallery: [
-      'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=800',
-      'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=800',
-    ],
-    highlights: [
-      'Live art performances',
-      'Interactive installations',
-      'Artist meet & greet',
-      'Limited edition prints',
-      'Complimentary drinks',
-    ],
-    status: 'upcoming',
-  },
-  {
-    id: '3',
-    title: 'Sunset Sessions Vol. 12',
-    description: 'An intimate rooftop experience featuring acoustic performances, craft cocktails, and stunning city views as the sun sets over Jakarta.',
-    date: '2025-11-25',
-    time: '17:00 - 22:00',
-    venue: 'Cloud Lounge',
-    venueAddress: 'Jl. Jend. Sudirman, Jakarta Selatan',
-    image: 'https://images.unsplash.com/photo-1656283384093-1e227e621fad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMGNvbmNlcnQlMjBjcm93ZHxlbnwxfHx8fDE3NjE4MzMwMzF8MA&ixlib=rb-4.1.0&q=80&w=1080',
-    category: 'Live Music',
-    capacity: 300,
-    attendees: 285,
-    price: 'IDR 200K',
-    artists: [
-      { name: 'Tulus', role: 'Headliner', image: 'https://images.unsplash.com/photo-1656283384093-1e227e621fad?w=400' },
-      { name: 'Raisa', role: 'Special Guest', image: 'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=400' },
-    ],
-    gallery: [
-      'https://images.unsplash.com/photo-1656283384093-1e227e621fad?w=800',
-      'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800',
-    ],
-    highlights: [
-      'Rooftop venue with city views',
-      'Acoustic performances',
-      'Craft cocktail menu',
-      'Sunset viewing deck',
-      'Limited capacity for intimate experience',
-    ],
-    status: 'upcoming',
-  },
+  // This would be removed after migration is complete
+  // For now, keeping minimal placeholder data
   {
     id: '4',
     title: 'Bass Rebellion: Underground Series',
@@ -343,6 +435,8 @@ interface ContentContextType {
   hero: HeroContent;
   about: AboutContent;
   settings: SiteSettings;
+  loading?: boolean;
+  error?: string | null;
   updateEvents: (events: Event[]) => void;
   updatePartners: (partners: Partner[]) => void;
   updateGallery: (gallery: GalleryImage[]) => void;
@@ -350,18 +444,529 @@ interface ContentContextType {
   updateHero: (hero: HeroContent) => void;
   updateAbout: (about: AboutContent) => void;
   updateSettings: (settings: SiteSettings) => void;
+  // Event mutations
+  addEvent: (event: TablesInsert<'events'>) => Promise<Event>;
+  updateEvent: (id: string, updates: TablesUpdate<'events'>) => Promise<Event>;
+  deleteEvent: (id: string) => Promise<void>;
+  // Team member mutations
+  addTeamMember: (member: TablesInsert<'team_members'>) => Promise<TeamMember>;
+  updateTeamMember: (id: string, updates: TablesUpdate<'team_members'>) => Promise<TeamMember>;
+  deleteTeamMember: (id: string) => Promise<void>;
+  // Partner mutations
+  addPartner: (partner: TablesInsert<'partners'>) => Promise<Partner>;
+  updatePartner: (id: string, updates: TablesUpdate<'partners'>) => Promise<Partner>;
+  deletePartner: (id: string) => Promise<void>;
+  // Gallery mutations
+  addGalleryImage: (item: TablesInsert<'gallery_items'>) => Promise<GalleryImage>;
+  updateGalleryImage: (id: string, updates: TablesUpdate<'gallery_items'>) => Promise<GalleryImage>;
+  deleteGalleryImage: (id: string) => Promise<void>;
+  // Dummy data control
+  useDummyData: boolean;
+  setUseDummyData: (use: boolean) => void;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
-export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [events, setEvents] = useState<Event[]>(INITIAL_EVENTS);
-  const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
-  const [gallery, setGallery] = useState<GalleryImage[]>(INITIAL_GALLERY);
-  const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
+export const ContentProvider: React.FC<{
+  children: ReactNode;
+  useDummyData?: boolean;
+}> = ({ children, useDummyData: initialUseDummyData = false }) => {
+  // Initialize with empty arrays - data will be fetched on mount
+  const [events, setEvents] = useState<Event[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [team, setTeam] = useState<TeamMember[]>([]);
   const [hero, setHero] = useState<HeroContent>(INITIAL_HERO);
   const [about, setAbout] = useState<AboutContent>(INITIAL_ABOUT);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [useDummyData, setUseDummyData] = useState(initialUseDummyData);
+
+  // Fetch data from new Supabase schema on mount or when dummy data flag changes
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        if (useDummyData) {
+          // Use dummy data for development/testing
+          console.log('🔧 Using dummy data for development');
+
+          // Transform dummy events to match Event type
+          const dummyEvents: Event[] = DUMMY_EVENTS.map(event => ({
+            ...event,
+            id: event.id || `event-${Date.now()}-${Math.random()}`,
+            date: event.start_date.split('T')[0],
+            time: `${new Date(event.start_date).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })} - ${new Date(event.end_date).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
+            })}`,
+            venue: event.location || 'TBD',
+            venueAddress: event.location || '',
+            category: event.category,
+            status: event.status,
+            capacity: event.capacity || undefined,
+            price: event.price_range || 'TBD',
+            start_date: event.start_date,
+            end_date: event.end_date,
+            location: event.location,
+            partner_name: event.partner_name,
+            ticket_url: event.ticket_url,
+            price_range: event.price_range,
+          }));
+
+          // Set dummy data
+          setEvents(dummyEvents);
+          setPartners(DUMMY_PARTNERS.map(p => ({ ...p, id: p.id || `partner-${Date.now()}-${Math.random()}` })));
+          setGallery(DUMMY_GALLERY_ITEMS.map(g => ({ ...g, id: g.id || `gallery-${Date.now()}-${Math.random()}` })));
+          setTeam(DUMMY_TEAM_MEMBERS.map(t => ({ ...t, id: t.id || `team-${Date.now()}-${Math.random()}` })));
+
+        } else {
+          // Fetch all data concurrently from Supabase
+          const [eventsData, partnersData, galleryData, teamData] = await Promise.all([
+            fetchEvents(),
+            fetchPartners(),
+            fetchGallery(),
+            fetchTeamMembers(),
+          ]);
+
+          // Update state with fetched data
+          setEvents(eventsData);
+          setPartners(partnersData);
+          setGallery(galleryData);
+          setTeam(teamData);
+        }
+
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError('Failed to load data');
+
+        // Fallback to legacy data if Supabase fails
+        console.warn('Falling back to legacy data structure');
+        setEvents(INITIAL_EVENTS);
+        setPartners(INITIAL_PARTNERS);
+        setGallery(INITIAL_GALLERY);
+        setTeam(INITIAL_TEAM);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [useDummyData]);
+
+  // =============================================
+  // MUTATION FUNCTIONS
+  // =============================================
+
+  // Event Mutations
+  const addEvent = async (event: TablesInsert<'events'>): Promise<Event> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .from('events')
+        .insert(event)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error adding event:', error);
+        setError(`Failed to add event: ${error.message}`);
+        throw error;
+      }
+
+      if (data) {
+        // Transform the database response to match Event type
+        const newEvent: Event = {
+          ...data,
+          date: data.start_date.split('T')[0],
+          time: `${new Date(data.start_date).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })} - ${new Date(data.end_date).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })}`,
+          venue: data.location || 'TBD',
+          venueAddress: data.location || '',
+          category: data.category,
+          status: data.status,
+          capacity: data.capacity || undefined,
+          price: data.price_range || 'TBD',
+          start_date: data.start_date,
+          end_date: data.end_date,
+          location: data.location,
+          partner_name: data.partner_name,
+          ticket_url: data.ticket_url,
+          price_range: data.price_range,
+        };
+
+        // Optimistically update local state
+        setEvents(prev => [...prev, newEvent]);
+
+        return newEvent;
+      }
+
+      throw new Error('No data returned from insert operation');
+    } catch (err) {
+      console.error('Error in addEvent:', err);
+      setError('Failed to add event');
+      throw err;
+    }
+  };
+
+  const updateEvent = async (id: string, updates: TablesUpdate<'events'>): Promise<Event> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .from('events')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating event:', error);
+        setError(`Failed to update event: ${error.message}`);
+        throw error;
+      }
+
+      if (data) {
+        // Transform the database response to match Event type
+        const updatedEvent: Event = {
+          ...data,
+          date: data.start_date.split('T')[0],
+          time: `${new Date(data.start_date).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })} - ${new Date(data.end_date).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })}`,
+          venue: data.location || 'TBD',
+          venueAddress: data.location || '',
+          category: data.category,
+          status: data.status,
+          capacity: data.capacity || undefined,
+          price: data.price_range || 'TBD',
+          start_date: data.start_date,
+          end_date: data.end_date,
+          location: data.location,
+          partner_name: data.partner_name,
+          ticket_url: data.ticket_url,
+          price_range: data.price_range,
+        };
+
+        // Optimistically update local state
+        setEvents(prev => prev.map(event =>
+          event.id === id ? updatedEvent : event
+        ));
+
+        return updatedEvent;
+      }
+
+      throw new Error('No data returned from update operation');
+    } catch (err) {
+      console.error('Error in updateEvent:', err);
+      setError('Failed to update event');
+      throw err;
+    }
+  };
+
+  const deleteEvent = async (id: string): Promise<void> => {
+    try {
+      setError(null);
+
+      const { error } = await supabaseClient
+        .from('events')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting event:', error);
+        setError(`Failed to delete event: ${error.message}`);
+        throw error;
+      }
+
+      // Optimistically update local state
+      setEvents(prev => prev.filter(event => event.id !== id));
+    } catch (err) {
+      console.error('Error in deleteEvent:', err);
+      setError('Failed to delete event');
+      throw err;
+    }
+  };
+
+  // Team Member Mutations
+  const addTeamMember = async (member: TablesInsert<'team_members'>): Promise<TeamMember> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .from('team_members')
+        .insert(member)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error adding team member:', error);
+        setError(`Failed to add team member: ${error.message}`);
+        throw error;
+      }
+
+      if (data) {
+        // Optimistically update local state
+        setTeam(prev => [...prev, data]);
+        return data;
+      }
+
+      throw new Error('No data returned from insert operation');
+    } catch (err) {
+      console.error('Error in addTeamMember:', err);
+      setError('Failed to add team member');
+      throw err;
+    }
+  };
+
+  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>): Promise<TeamMember> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .from('team_members')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating team member:', error);
+        setError(`Failed to update team member: ${error.message}`);
+        throw error;
+      }
+
+      if (data) {
+        // Optimistically update local state
+        setTeam(prev => prev.map(member =>
+          member.id === id ? data : member
+        ));
+        return data;
+      }
+
+      throw new Error('No data returned from update operation');
+    } catch (err) {
+      console.error('Error in updateTeamMember:', err);
+      setError('Failed to update team member');
+      throw err;
+    }
+  };
+
+  const deleteTeamMember = async (id: string): Promise<void> => {
+    try {
+      setError(null);
+
+      const { error } = await supabaseClient
+        .from('team_members')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting team member:', error);
+        setError(`Failed to delete team member: ${error.message}`);
+        throw error;
+      }
+
+      // Optimistically update local state
+      setTeam(prev => prev.filter(member => member.id !== id));
+    } catch (err) {
+      console.error('Error in deleteTeamMember:', err);
+      setError('Failed to delete team member');
+      throw err;
+    }
+  };
+
+  // Partner Mutations
+  const addPartner = async (partner: TablesInsert<'partners'>): Promise<Partner> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .from('partners')
+        .insert(partner)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error adding partner:', error);
+        setError(`Failed to add partner: ${error.message}`);
+        throw error;
+      }
+
+      if (data) {
+        // Optimistically update local state
+        setPartners(prev => [...prev, data]);
+        return data;
+      }
+
+      throw new Error('No data returned from insert operation');
+    } catch (err) {
+      console.error('Error in addPartner:', err);
+      setError('Failed to add partner');
+      throw err;
+    }
+  };
+
+  const updatePartner = async (id: string, updates: TablesUpdate<'partners'>): Promise<Partner> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .from('partners')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating partner:', error);
+        setError(`Failed to update partner: ${error.message}`);
+        throw error;
+      }
+
+      if (data) {
+        // Optimistically update local state
+        setPartners(prev => prev.map(partner =>
+          partner.id === id ? data : partner
+        ));
+        return data;
+      }
+
+      throw new Error('No data returned from update operation');
+    } catch (err) {
+      console.error('Error in updatePartner:', err);
+      setError('Failed to update partner');
+      throw err;
+    }
+  };
+
+  const deletePartner = async (id: string): Promise<void> => {
+    try {
+      setError(null);
+
+      const { error } = await supabaseClient
+        .from('partners')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting partner:', error);
+        setError(`Failed to delete partner: ${error.message}`);
+        throw error;
+      }
+
+      // Optimistically update local state
+      setPartners(prev => prev.filter(partner => partner.id !== id));
+    } catch (err) {
+      console.error('Error in deletePartner:', err);
+      setError('Failed to delete partner');
+      throw err;
+    }
+  };
+
+  // Gallery Mutations
+  const addGalleryImage = async (item: TablesInsert<'gallery_items'>): Promise<GalleryImage> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .from('gallery_items')
+        .insert(item)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error adding gallery image:', error);
+        setError(`Failed to add gallery image: ${error.message}`);
+        throw error;
+      }
+
+      if (data) {
+        // Optimistically update local state
+        setGallery(prev => [...prev, data]);
+        return data;
+      }
+
+      throw new Error('No data returned from insert operation');
+    } catch (err) {
+      console.error('Error in addGalleryImage:', err);
+      setError('Failed to add gallery image');
+      throw err;
+    }
+  };
+
+  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>): Promise<GalleryImage> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .from('gallery_items')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating gallery image:', error);
+        setError(`Failed to update gallery image: ${error.message}`);
+        throw error;
+      }
+
+      if (data) {
+        // Optimistically update local state
+        setGallery(prev => prev.map(image =>
+          image.id === id ? data : image
+        ));
+        return data;
+      }
+
+      throw new Error('No data returned from update operation');
+    } catch (err) {
+      console.error('Error in updateGalleryImage:', err);
+      setError('Failed to update gallery image');
+      throw err;
+    }
+  };
+
+  const deleteGalleryImage = async (id: string): Promise<void> => {
+    try {
+      setError(null);
+
+      const { error } = await supabaseClient
+        .from('gallery_items')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting gallery image:', error);
+        setError(`Failed to delete gallery image: ${error.message}`);
+        throw error;
+      }
+
+      // Optimistically update local state
+      setGallery(prev => prev.filter(image => image.id !== id));
+    } catch (err) {
+      console.error('Error in deleteGalleryImage:', err);
+      setError('Failed to delete gallery image');
+      throw err;
+    }
+  };
 
   const value = {
     events,
@@ -378,6 +983,28 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
     updateHero: setHero,
     updateAbout: setAbout,
     updateSettings: setSettings,
+    // Add loading and error states for UI feedback
+    loading,
+    error,
+    // Dummy data control
+    useDummyData,
+    setUseDummyData,
+    // Event mutations
+    addEvent,
+    updateEvent,
+    deleteEvent,
+    // Team member mutations
+    addTeamMember,
+    updateTeamMember,
+    deleteTeamMember,
+    // Partner mutations
+    addPartner,
+    updatePartner,
+    deletePartner,
+    // Gallery mutations
+    addGalleryImage,
+    updateGalleryImage,
+    deleteGalleryImage,
   };
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;

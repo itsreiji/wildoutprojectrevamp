@@ -79,10 +79,10 @@ const NavigationComponent = () => {
               ))}
               <Link
                 to="/admin"
-                className="ml-2 border-[#E93370]/50 text-[#E93370] hover:bg-[#E93370]/10 rounded-lg"
+                className="group ml-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#E93370] border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] hover:text-white rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 active:scale-95"
               >
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                Admin
+                <LayoutDashboard className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                <span>Admin</span>
               </Link>
             </nav>
 
@@ -151,10 +151,10 @@ const NavigationComponent = () => {
                     ))}
                     <Link
                       to="/admin"
-                      className="w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center"
+                      className="group w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center gap-3 border border-[#E93370]/20 hover:border-[#E93370] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50"
                     >
-                      <LayoutDashboard className="mr-2 h-5 w-5" />
-                      Admin Dashboard
+                      <LayoutDashboard className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                      <span className="font-medium">Admin Dashboard</span>
                     </Link>
                   </div>
                 </nav>

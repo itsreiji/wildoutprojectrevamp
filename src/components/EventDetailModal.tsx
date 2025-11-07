@@ -53,12 +53,12 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
               {/* Hero Image */}
               <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
                 <ImageWithFallback
-                  src={event.image}
+                  src={event.image || ''}
                   alt={event.title}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                
+
                 {/* Floating Info */}
                 <div className="absolute bottom-6 left-6 right-6">
                   <Badge className="mb-4 bg-[#E93370]/90 text-white border-0">
@@ -68,24 +68,36 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                     {event.title}
                   </h2>
                   <div className="flex flex-wrap gap-4 text-white/90">
-                    <div className="flex items-center bg-black/60 backdrop-blur-xl rounded-full px-4 py-2">
-                      <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
-                      <span className="text-sm">
-                        {new Date(event.date).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex items-center bg-black/60 backdrop-blur-xl rounded-full px-4 py-2">
-                      <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
-                      <span className="text-sm">{event.time}</span>
-                    </div>
-                    <div className="flex items-center bg-black/60 backdrop-blur-xl rounded-full px-4 py-2">
-                      <Users className="h-4 w-4 mr-2 text-[#E93370]" />
-                      <span className="text-sm">{event.attendees}/{event.capacity}</span>
-                    </div>
+                    {(event.date || event.start_date) && (
+                      <div className="flex items-center bg-black/60 backdrop-blur-xl rounded-full px-4 py-2">
+                        <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
+                        <span className="text-sm">
+                          {event.date
+                            ? new Date(event.date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })
+                            : new Date(event.start_date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })}
+                        </span>
+                      </div>
+                    )}
+                    {event.time && (
+                      <div className="flex items-center bg-black/60 backdrop-blur-xl rounded-full px-4 py-2">
+                        <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
+                        <span className="text-sm">{event.time}</span>
+                      </div>
+                    )}
+                    {(event.attendees !== undefined || event.capacity !== null) && (
+                      <div className="flex items-center bg-black/60 backdrop-blur-xl rounded-full px-4 py-2">
+                        <Users className="h-4 w-4 mr-2 text-[#E93370]" />
+                        <span className="text-sm">{event.attendees || 0}/{event.capacity || 'N/A'}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -96,7 +108,7 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                 <div className="flex flex-wrap gap-4">
                   <Button className="flex-1 bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl">
                     <Ticket className="mr-2 h-5 w-5" />
-                    Get Tickets - {event.price}
+                    Get Tickets{event.price || event.price_range ? ` - ${event.price || event.price_range}` : ''}
                   </Button>
                   <Button variant="outline" className="border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl">
                     <Heart className="h-5 w-5" />
@@ -118,48 +130,52 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                     </div>
 
                     {/* Highlights */}
-                    <div>
-                      <h3 className="text-2xl text-white mb-3">Event Highlights</h3>
-                      <ul className="space-y-2">
-                        {event.highlights.map((highlight, index) => (
-                          <li key={index} className="flex items-start text-white/70">
-                            <div className="w-2 h-2 bg-[#E93370] rounded-full mt-2 mr-3 flex-shrink-0" />
-                            {highlight}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    {event.highlights && event.highlights.length > 0 && (
+                      <div>
+                        <h3 className="text-2xl text-white mb-3">Event Highlights</h3>
+                        <ul className="space-y-2">
+                          {event.highlights.map((highlight, index) => (
+                            <li key={index} className="flex items-start text-white/70">
+                              <div className="w-2 h-2 bg-[#E93370] rounded-full mt-2 mr-3 flex-shrink-0" />
+                              {highlight}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
                     {/* Artists */}
-                    <div>
-                      <h3 className="text-2xl text-white mb-4">
-                        <Music className="inline h-6 w-6 mr-2 text-[#E93370]" />
-                        Artist Lineup
-                      </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {event.artists.map((artist, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center space-x-4 p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
-                          >
-                            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                              <ImageWithFallback
-                                src={artist.image}
-                                alt={artist.name}
-                                className="w-full h-full object-cover"
-                              />
+                    {event.artists && event.artists.length > 0 && (
+                      <div>
+                        <h3 className="text-2xl text-white mb-4">
+                          <Music className="inline h-6 w-6 mr-2 text-[#E93370]" />
+                          Artist Lineup
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {event.artists.map((artist, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center space-x-4 p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
+                            >
+                              <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                                <ImageWithFallback
+                                  src={artist.image}
+                                  alt={artist.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div>
+                                <div className="text-white">{artist.name}</div>
+                                <div className="text-sm text-[#E93370]">{artist.role}</div>
+                              </div>
                             </div>
-                            <div>
-                              <div className="text-white">{artist.name}</div>
-                              <div className="text-sm text-[#E93370]">{artist.role}</div>
-                            </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Gallery */}
-                    {event.gallery.length > 0 && (
+                    {event.gallery && event.gallery.length > 0 && (
                       <div>
                         <h3 className="text-2xl text-white mb-4">Event Gallery</h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -183,23 +199,27 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                   {/* Right Column - Venue Info */}
                   <div className="space-y-6">
                     {/* Venue Card */}
-                    <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 space-y-4">
-                      <h3 className="text-xl text-white">
-                        <MapPin className="inline h-5 w-5 mr-2 text-[#E93370]" />
-                        Venue
-                      </h3>
-                      <div>
-                        <div className="text-white mb-1">{event.venue}</div>
-                        <div className="text-sm text-white/60">{event.venueAddress}</div>
+                    {(event.venue || event.location) && (
+                      <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 space-y-4">
+                        <h3 className="text-xl text-white">
+                          <MapPin className="inline h-5 w-5 mr-2 text-[#E93370]" />
+                          Venue
+                        </h3>
+                        <div>
+                          <div className="text-white mb-1">{event.venue || event.location || 'TBD'}</div>
+                          {event.venueAddress && (
+                            <div className="text-sm text-white/60">{event.venueAddress}</div>
+                          )}
+                        </div>
+                        <Button
+                          variant="outline"
+                          className="w-full border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl"
+                        >
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Get Directions
+                        </Button>
                       </div>
-                      <Button
-                        variant="outline"
-                        className="w-full border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl"
-                      >
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        Get Directions
-                      </Button>
-                    </div>
+                    )}
 
                     {/* Map Placeholder */}
                     <div className="aspect-square rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
@@ -215,33 +235,50 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                     <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 space-y-3">
                       <h3 className="text-xl text-white mb-4">Event Info</h3>
                       <div className="space-y-3 text-sm">
-                        <div>
-                          <div className="text-white/60">Date</div>
-                          <div className="text-white">
-                            {new Date(event.date).toLocaleDateString('en-US', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })}
+                        {(event.date || event.start_date) && (
+                          <div>
+                            <div className="text-white/60">Date</div>
+                            <div className="text-white">
+                              {event.date
+                                ? new Date(event.date).toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                  })
+                                : new Date(event.start_date).toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                  })}
+                            </div>
                           </div>
-                        </div>
-                        <div>
-                          <div className="text-white/60">Time</div>
-                          <div className="text-white">{event.time}</div>
-                        </div>
-                        <div>
-                          <div className="text-white/60">Capacity</div>
-                          <div className="text-white">{event.capacity} people</div>
-                        </div>
-                        <div>
-                          <div className="text-white/60">Current Attendees</div>
-                          <div className="text-white">{event.attendees} registered</div>
-                        </div>
-                        <div>
-                          <div className="text-white/60">Price Range</div>
-                          <div className="text-white">{event.price}</div>
-                        </div>
+                        )}
+                        {event.time && (
+                          <div>
+                            <div className="text-white/60">Time</div>
+                            <div className="text-white">{event.time}</div>
+                          </div>
+                        )}
+                        {event.capacity !== null && (
+                          <div>
+                            <div className="text-white/60">Capacity</div>
+                            <div className="text-white">{event.capacity} people</div>
+                          </div>
+                        )}
+                        {event.attendees !== undefined && (
+                          <div>
+                            <div className="text-white/60">Current Attendees</div>
+                            <div className="text-white">{event.attendees} registered</div>
+                          </div>
+                        )}
+                        {(event.price || event.price_range) && (
+                          <div>
+                            <div className="text-white/60">Price Range</div>
+                            <div className="text-white">{event.price || event.price_range || 'TBD'}</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

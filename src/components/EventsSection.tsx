@@ -10,7 +10,7 @@ import { useRouter } from './router/index';
 
 export const EventsSection = React.memo(() => {
   const { events } = useContent();
-  const { navigateTo } = useRouter();
+  const { navigate } = useRouter();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   return (
@@ -34,7 +34,7 @@ export const EventsSection = React.memo(() => {
               Discover the hottest events in Indonesia's creative scene
             </p>
             <Button
-              onClick={() => setShowAllEvents(true)}
+              onClick={() => navigate('/events')}
               className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
             >
               View All Events
@@ -57,7 +57,7 @@ export const EventsSection = React.memo(() => {
                   {/* Event Image */}
                   <div className="relative h-64 overflow-hidden">
                     <ImageWithFallback
-                      src={event.image}
+                      src={event.image || ''}
                       alt={event.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -69,10 +69,12 @@ export const EventsSection = React.memo(() => {
                     </Badge>
 
                     {/* Capacity Indicator */}
-                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90">
-                      <Users className="inline h-4 w-4 mr-1" />
-                      {event.attendees}/{event.capacity}
-                    </div>
+                    {(event.attendees !== undefined || event.capacity !== null) && (
+                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90">
+                        <Users className="inline h-4 w-4 mr-1" />
+                        {event.attendees || 0}/{event.capacity || 'N/A'}
+                      </div>
+                    )}
                   </div>
 
                   {/* Event Info */}
@@ -86,52 +88,69 @@ export const EventsSection = React.memo(() => {
                     </p>
 
                     <div className="space-y-2">
-                      <div className="flex items-center text-white/70">
-                        <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">
-                          {new Date(event.date).toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-white/70">
-                        <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">{event.time}</span>
-                      </div>
-                      <div className="flex items-center text-white/70">
-                        <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">{event.venue}</span>
-                      </div>
-                      <div className="flex items-center text-white/70">
-                        <Ticket className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">{event.price}</span>
-                      </div>
+                      {(event.date || event.start_date) && (
+                        <div className="flex items-center text-white/70">
+                          <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
+                          <span className="text-sm">
+                            {event.date
+                              ? new Date(event.date).toLocaleDateString('en-US', {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })
+                              : new Date(event.start_date).toLocaleDateString('en-US', {
+                                  weekday: 'long',
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })}
+                          </span>
+                        </div>
+                      )}
+                      {event.time && (
+                        <div className="flex items-center text-white/70">
+                          <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
+                          <span className="text-sm">{event.time}</span>
+                        </div>
+                      )}
+                      {(event.venue || event.location) && (
+                        <div className="flex items-center text-white/70">
+                          <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
+                          <span className="text-sm">{event.venue || event.location || 'TBD'}</span>
+                        </div>
+                      )}
+                      {(event.price || event.price_range) && (
+                        <div className="flex items-center text-white/70">
+                          <Ticket className="h-4 w-4 mr-2 text-[#E93370]" />
+                          <span className="text-sm">{event.price || event.price_range || 'TBD'}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Artists Preview */}
-                    <div className="flex items-center space-x-2">
-                      <Music className="h-4 w-4 text-[#E93370]" />
-                      <div className="flex -space-x-2">
-                        {event.artists.slice(0, 3).map((artist, idx) => (
-                          <div
-                            key={idx}
-                            className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
-                          >
-                            <ImageWithFallback
-                              src={artist.image}
-                              alt={artist.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
+                    {event.artists && event.artists.length > 0 && (
+                      <div className="flex items-center space-x-2">
+                        <Music className="h-4 w-4 text-[#E93370]" />
+                        <div className="flex -space-x-2">
+                          {event.artists.slice(0, 3).map((artist, idx) => (
+                            <div
+                              key={idx}
+                              className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
+                            >
+                              <ImageWithFallback
+                                src={artist.image}
+                                alt={artist.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <span className="text-sm text-white/60">
+                          {event.artists.length} {event.artists.length === 1 ? 'Artist' : 'Artists'}
+                        </span>
                       </div>
-                      <span className="text-sm text-white/60">
-                        {event.artists.length} {event.artists.length === 1 ? 'Artist' : 'Artists'}
-                      </span>
-                    </div>
+                    )}
 
                     {/* CTA Button */}
                     <Button
