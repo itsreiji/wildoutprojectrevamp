@@ -53,7 +53,7 @@ export const DashboardLayout = React.memo(
     const isMobile = viewportWidth < 768;
     const isCompact = viewportWidth >= 768 && viewportWidth < 1280;
     const showLabels = isMobile || !isCompact;
-    const sidebarWidth = isMobile ? 288 : isCompact ? 96 : 320;
+    const sidebarWidth = isMobile ? 288 : isCompact ? 96 : 240;
 
     useEffect(() => {
       if (isMobile) {
@@ -101,14 +101,14 @@ export const DashboardLayout = React.memo(
         >
           <div className="flex h-full flex-col">
             {/* Header */}
-            <div className="border-b border-white/10 px-4 py-6">
-              <div className="mb-6 flex items-center justify-between">
+            <div className="flex h-20 items-center border-b border-white/10 px-4">
+              <div className="relative flex w-full items-center justify-center">
                 <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
                 <button
                   type="button"
                   onClick={() => setSidebarOpen(false)}
                   className={cn(
-                    'flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/60 transition-colors hover:text-white',
+                    'absolute right-0 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/60 transition-colors hover:text-white',
                     !isMobile && 'hidden'
                   )}
                 >
@@ -116,7 +116,6 @@ export const DashboardLayout = React.memo(
                   <span className="sr-only">Close navigation</span>
                 </button>
               </div>
-              {showLabels && <div className="text-sm text-white/60">Admin Dashboard</div>}
             </div>
 
             {/* Navigation */}
@@ -151,7 +150,7 @@ export const DashboardLayout = React.memo(
             </nav>
 
             {/* Footer Actions */}
-            <div className="space-y-2 border-t border-white/10 px-3 py-4">
+            <div className="mt-auto space-y-2 border-t border-white/10 px-3 py-4">
               <Link
                 to="/"
                 aria-label="Back to site"
@@ -186,7 +185,7 @@ export const DashboardLayout = React.memo(
         <div className="flex min-h-screen flex-1 flex-col bg-[#0a0a0a]">
           {/* Top Bar */}
           <header className="sticky top-0 z-20 border-b border-white/10 bg-black/40 backdrop-blur-xl">
-            <div className="flex items-center justify-between px-4 py-4 lg:px-8">
+            <div className="flex h-20 items-center justify-between px-4 lg:px-8">
               <div className="flex items-center space-x-4">
                 <button
                   type="button"
@@ -200,12 +199,6 @@ export const DashboardLayout = React.memo(
                 >
                   <Menu className="h-5 w-5" />
                 </button>
-                <div>
-                  <h2 className="text-xl">
-                    {NAVIGATION_ITEMS.find((item) => item.id === currentPage)?.label}
-                  </h2>
-                  <p className="text-sm text-white/60">Manage your content</p>
-                </div>
               </div>
 
               <div className="flex items-center space-x-3">

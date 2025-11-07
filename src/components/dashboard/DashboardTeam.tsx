@@ -1,79 +1,183 @@
+/**
+ * DashboardTeam Component
+ *
+ * Manages the complete CRUD workflow for team members in the dashboard.
+ * Features:
+ * - Display team members in a grid with search/filter capabilities
+ * - Create new team members with avatar uploads
+ * - Edit existing team members with avatar replacement
+ * - Delete team members with confirmation and storage cleanup
+ *
+ * File Upload Pipeline:
+ * - Client-side validation for image type and size (max 10MB)
+ * - Avatars are stored in Supabase Storage (event-media bucket)
+ * - Uploads are validated before database mutations
+ * - If mutation fails, uploaded files are automatically cleaned up
+ * - Public URLs are stored in team member avatar_url field
+ *
+ * Error Handling:
+ * - Delete dialog stays open if deletion fails, allowing user to retry
+ * - Granular error messages for each upload/operation
+ * - Toast notifications for success and failure states
+ */
+
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Plus, Search, Edit, Trash2, Mail, Phone } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Mail, Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
-import { Textarea } from '../ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useContent, TeamMember } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
+import { DashboardTeamForm, TeamFormValues } from './DashboardTeamForm';
+import { supabaseClient } from '@/supabase/client';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
 
 export const DashboardTeam = React.memo(() => {
-  const { team, updateTeam } = useContent();
+  const { team = [], addTeamMember, updateTeamMember, deleteTeamMember } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    role: '',
-    email: '',
-    phone: '',
-    bio: '',
-    photoUrl: '',
-  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const filteredTeam = team.filter((member) =>
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.role.toLowerCase().includes(searchQuery.toLowerCase())
+    member.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleCreate = () => {
     setEditingMember(null);
-    setFormData({ name: '', role: '', email: '', phone: '', bio: '', photoUrl: '' });
     setIsDialogOpen(true);
   };
 
   const handleEdit = (member: TeamMember) => {
     setEditingMember(member);
-    setFormData({
-      name: member.name,
-      role: member.role,
-      email: member.email,
-      phone: member.phone || '',
-      bio: member.bio,
-      photoUrl: member.photoUrl || '',
-    });
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to remove this team member?')) {
-      updateTeam(team.filter((m) => m.id !== id));
-      toast.success('Team member removed successfully!');
+  const handleDelete = async (id: string) => {
+    setIsDeleting(true);
+    try {
+      await deleteTeamMember(id);
+      toast.success('Team member deleted successfully!');
+      setIsDeleteDialogOpen(false);
+      setDeletingMemberId(null);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete team member.';
+      toast.error(errorMessage);
+      console.error('Delete error:', error);
+      // Keep the dialog open on error so user can retry or cancel
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const handleSubmit = () => {
-    if (editingMember) {
-      updateTeam(
-        team.map((m) =>
-          m.id === editingMember.id ? { ...m, ...formData } : m
-        )
-      );
-      toast.success('Team member updated successfully!');
-    } else {
-      const newMember: TeamMember = {
-        id: Date.now().toString(),
-        ...formData,
-        status: 'active',
-      };
-      updateTeam([...team, newMember]);
-      toast.success('Team member added successfully!');
+  // Validate file type and size
+  const validateFile = (file: File): { valid: boolean; message?: string } => {
+    const maxSizeMB = 10;
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+      return { valid: false, message: `File size exceeds ${maxSizeMB}MB limit` };
     }
-    setIsDialogOpen(false);
+
+    if (!file.type.startsWith('image/')) {
+      return { valid: false, message: 'Only image files are allowed' };
+    }
+
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validImageTypes.includes(file.type)) {
+      return { valid: false, message: 'Only JPEG, PNG, WebP, and GIF formats are supported' };
+    }
+
+    return { valid: true };
+  };
+
+  const handleSubmit = async (values: TeamFormValues) => {
+    setIsSubmitting(true);
+    try {
+      let avatarUrl: string | undefined = editingMember?.avatar_url;
+      const newUploadedFiles: string[] = [];
+
+      // Handle avatar upload
+      if (values.avatar_file) {
+        const file = values.avatar_file as File;
+        const validation = validateFile(file);
+
+        if (!validation.valid) {
+          toast.error(`Avatar: ${validation.message}`);
+          setIsSubmitting(false);
+          return;
+        }
+
+        try {
+          toast.loading('Uploading avatar...');
+          const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+          const { data, error } = await supabaseClient.storage
+            .from('event-media')
+            .upload(uniqueName, file);
+
+          if (error) throw error;
+
+          const { data: { publicUrl } } = supabaseClient.storage.from('event-media').getPublicUrl(data.path);
+          avatarUrl = publicUrl;
+          newUploadedFiles.push(data.path);
+          toast.dismiss();
+        } catch (error) {
+          toast.error(`Failed to upload avatar: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Prepare team member data
+      const memberData = {
+        name: values.name,
+        title: values.title,
+        email: values.email,
+        bio: values.bio || null,
+        avatar_url: avatarUrl || null,
+        social_links: values.social_links || {},
+      };
+
+      try {
+        if (editingMember?.id) {
+          // Update existing member
+          await updateTeamMember(editingMember.id, memberData, editingMember.avatar_url);
+          toast.success('Team member updated successfully!');
+        } else {
+          // Create new member
+          await addTeamMember({
+            ...memberData,
+            status: 'active',
+          });
+          toast.success('Team member added successfully!');
+        }
+        setIsDialogOpen(false);
+      } catch (error) {
+        // If mutation fails and we uploaded files, clean them up
+        if (newUploadedFiles.length > 0) {
+          try {
+            await supabaseClient.storage
+              .from('event-media')
+              .remove(newUploadedFiles);
+          } catch (cleanupError) {
+            console.error('Error cleaning up uploaded files:', cleanupError);
+          }
+        }
+
+        const errorMessage = error instanceof Error ? error.message : 'Failed to save team member';
+        toast.error(errorMessage);
+        console.error('Save error:', error);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -117,10 +221,10 @@ export const DashboardTeam = React.memo(() => {
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
-                {member.photoUrl ? (
+                {member.avatar_url ? (
                   <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#E93370]/30">
                     <ImageWithFallback
-                      src={member.photoUrl}
+                      src={member.avatar_url}
                       alt={member.name}
                       className="w-full h-full object-cover"
                     />
@@ -141,7 +245,7 @@ export const DashboardTeam = React.memo(() => {
             {/* Info */}
             <div className="mb-4">
               <h3 className="text-xl text-white mb-1">{member.name}</h3>
-              <p className="text-sm text-[#E93370]">{member.role}</p>
+              <p className="text-sm text-[#E93370]">{member.title}</p>
             </div>
 
             <p className="text-sm text-white/60 mb-4 line-clamp-2">{member.bio}</p>
@@ -154,14 +258,6 @@ export const DashboardTeam = React.memo(() => {
                   {member.email}
                 </a>
               </div>
-              {member.phone && (
-                <div className="flex items-center space-x-2 text-sm text-white/70">
-                  <Phone className="h-4 w-4 text-[#E93370]" />
-                  <a href={`tel:${member.phone}`} className="hover:text-[#E93370] transition-colors">
-                    {member.phone}
-                  </a>
-                </div>
-              )}
             </div>
 
             {/* Actions */}
@@ -175,14 +271,41 @@ export const DashboardTeam = React.memo(() => {
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleDelete(member.id)}
-                className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <AlertDialog open={isDeleteDialogOpen && deletingMemberId === member.id} onOpenChange={(open) => {
+                if (!open) setDeletingMemberId(null);
+                setIsDeleteDialogOpen(open);
+              }}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setDeletingMemberId(member.id)}
+                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-black/95 backdrop-blur-xl border-white/10">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-white">Delete Team Member?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-white/70">
+                      Are you sure you want to delete <span className="font-semibold text-white">{member.name}</span>? This action cannot be undone. Their avatar will be removed from storage.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="bg-white/10 text-white hover:bg-white/20 border-white/20">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDelete(member.id)}
+                      disabled={isDeleting}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {isDeleting ? 'Deleting...' : 'Delete'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </motion.div>
         ))}
@@ -203,101 +326,14 @@ export const DashboardTeam = React.memo(() => {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter full name"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="role">Role/Position</Label>
-                <Input
-                  id="role"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  placeholder="e.g., Event Manager"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="email@wildout.id"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone (Optional)</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+62 812 3456 7890"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="photoUrl">Photo URL (Optional)</Label>
-              <Input
-                id="photoUrl"
-                value={formData.photoUrl}
-                onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
-                placeholder="https://example.com/photo.jpg"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                value={formData.bio}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                placeholder="Enter team member bio"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[100px]"
-              />
-            </div>
-
-            {formData.photoUrl && (
-              <div className="rounded-xl overflow-hidden border border-white/10">
-                <ImageWithFallback
-                  src={formData.photoUrl}
-                  alt="Preview"
-                  className="w-32 h-32 object-cover mx-auto"
-                />
-              </div>
-            )}
+          <div className="max-h-[60vh] overflow-y-auto">
+            <DashboardTeamForm
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+              defaultValues={editingMember || undefined}
+              onCancel={() => setIsDialogOpen(false)}
+            />
           </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-              className="border-white/10 text-white/70 hover:bg-white/5"
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white">
-              {editingMember ? 'Update Member' : 'Add Member'}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

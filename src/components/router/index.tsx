@@ -1,4 +1,49 @@
 import React, { useState, useEffect, createContext, useContext, memo } from 'react';
+import {
+  DashboardAbout,
+  DashboardEvents,
+  DashboardGallery,
+  DashboardHero,
+  DashboardHome,
+  DashboardLayout,
+  DashboardPartners,
+  DashboardSettings,
+  DashboardTeam,
+} from '../dashboard/index';
+
+const MemoDashboardAbout = memo(DashboardAbout);
+const MemoDashboardEvents = memo(DashboardEvents);
+const MemoDashboardGallery = memo(DashboardGallery);
+const MemoDashboardHero = memo(DashboardHero);
+const MemoDashboardHome = memo(DashboardHome);
+const MemoDashboardLayout = memo(DashboardLayout);
+const MemoDashboardPartners = memo(DashboardPartners);
+const MemoDashboardSettings = memo(DashboardSettings);
+const MemoDashboardTeam = memo(DashboardTeam);
+
+const routes = {
+  '/': MemoDashboardHome,
+  '/home': MemoDashboardHome,
+  '/about': MemoDashboardAbout,
+  '/events': MemoDashboardEvents,
+  '/gallery': MemoDashboardGallery,
+  '/hero': MemoDashboardHero,
+  '/partners': MemoDashboardPartners,
+  '/team': MemoDashboardTeam,
+  '/settings': MemoDashboardSettings,
+};
+
+export {
+  DashboardAbout,
+  DashboardEvents,
+  DashboardGallery,
+  DashboardHero,
+  DashboardHome,
+  DashboardLayout,
+  DashboardPartners,
+  DashboardSettings,
+  DashboardTeam,
+};
 
 // Route interface for type safety
 interface Route {

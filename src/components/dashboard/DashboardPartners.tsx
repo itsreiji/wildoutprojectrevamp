@@ -1,20 +1,50 @@
+/**
+ * DashboardPartners Component
+ *
+ * Manages the complete CRUD workflow for partners in the dashboard.
+ * Features:
+ * - Display partners in a grid with search/filter capabilities
+ * - Create new partners with logo uploads
+ * - Edit existing partners with logo replacement
+ * - Delete partners with confirmation and storage cleanup
+ * - Support for featured partners highlighting
+ *
+ * File Upload Pipeline:
+ * - Client-side validation for image type and size (max 10MB)
+ * - Logos are stored in Supabase Storage (event-media bucket)
+ * - Uploads are validated before database mutations
+ * - If mutation fails, uploaded files are automatically cleaned up
+ * - Public URLs are stored in partner logo_url field
+ *
+ * Error Handling:
+ * - Delete dialog stays open if deletion fails, allowing user to retry
+ * - Granular error messages for each upload/operation
+ * - Toast notifications for success and failure states
+ */
+
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Plus, Search, Edit, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { useContent, Partner } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
+import { DashboardPartnerForm, PartnerFormValues } from './DashboardPartnerForm';
+import { supabaseClient } from '@/supabase/client';
+import { ImageWithFallback } from '../figma/ImageWithFallback';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
 
 export const DashboardPartners = React.memo(() => {
-  const { partners, updatePartners } = useContent();
+  const { partners = [], addPartner, updatePartner, deletePartner } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
-  const [formData, setFormData] = useState({ name: '', category: '', website: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingPartnerId, setDeletingPartnerId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const filteredPartners = partners.filter((partner) =>
     partner.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -22,41 +52,134 @@ export const DashboardPartners = React.memo(() => {
 
   const handleCreate = () => {
     setEditingPartner(null);
-    setFormData({ name: '', category: '', website: '' });
     setIsDialogOpen(true);
   };
 
   const handleEdit = (partner: Partner) => {
     setEditingPartner(partner);
-    setFormData({ name: partner.name, category: partner.category, website: partner.website });
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this partner?')) {
-      updatePartners(partners.filter((p) => p.id !== id));
+  const handleDelete = async (id: string) => {
+    setIsDeleting(true);
+    try {
+      await deletePartner(id);
       toast.success('Partner deleted successfully!');
+      setIsDeleteDialogOpen(false);
+      setDeletingPartnerId(null);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete partner.';
+      toast.error(errorMessage);
+      console.error('Delete error:', error);
+      // Keep the dialog open on error so user can retry or cancel
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const handleSubmit = () => {
-    if (editingPartner) {
-      updatePartners(
-        partners.map((p) =>
-          p.id === editingPartner.id ? { ...p, ...formData } : p
-        )
-      );
-      toast.success('Partner updated successfully!');
-    } else {
-      const newPartner: Partner = {
-        id: Date.now().toString(),
-        ...formData,
-        status: 'active',
-      };
-      updatePartners([...partners, newPartner]);
-      toast.success('Partner added successfully!');
+  // Validate file type and size
+  const validateFile = (file: File): { valid: boolean; message?: string } => {
+    const maxSizeMB = 10;
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+      return { valid: false, message: `File size exceeds ${maxSizeMB}MB limit` };
     }
-    setIsDialogOpen(false);
+
+    if (!file.type.startsWith('image/')) {
+      return { valid: false, message: 'Only image files are allowed' };
+    }
+
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!validImageTypes.includes(file.type)) {
+      return { valid: false, message: 'Only JPEG, PNG, WebP, and GIF formats are supported' };
+    }
+
+    return { valid: true };
+  };
+
+  const handleSubmit = async (values: PartnerFormValues) => {
+    setIsSubmitting(true);
+    try {
+      let logoUrl: string | undefined = editingPartner?.logo_url;
+      const newUploadedFiles: string[] = [];
+
+      // Handle logo upload
+      if (values.logo_file) {
+        const file = values.logo_file as File;
+        const validation = validateFile(file);
+
+        if (!validation.valid) {
+          toast.error(`Logo: ${validation.message}`);
+          setIsSubmitting(false);
+          return;
+        }
+
+        try {
+          toast.loading('Uploading logo...');
+          const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+          const { data, error } = await supabaseClient.storage
+            .from('event-media')
+            .upload(uniqueName, file);
+
+          if (error) throw error;
+
+          const { data: { publicUrl } } = supabaseClient.storage.from('event-media').getPublicUrl(data.path);
+          logoUrl = publicUrl;
+          newUploadedFiles.push(data.path);
+          toast.dismiss();
+        } catch (error) {
+          toast.error(`Failed to upload logo: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Prepare partner data
+      const partnerData = {
+        name: values.name,
+        website_url: values.website_url || null,
+        description: values.description || null,
+        contact_email: values.contact_email || null,
+        contact_phone: values.contact_phone || null,
+        featured: values.featured || false,
+        logo_url: logoUrl || null,
+        social_links: values.social_links || {},
+      };
+
+      try {
+        if (editingPartner?.id) {
+          // Update existing partner
+          await updatePartner(editingPartner.id, partnerData, editingPartner.logo_url);
+          toast.success('Partner updated successfully!');
+        } else {
+          // Create new partner
+          await addPartner({
+            ...partnerData,
+            status: 'active',
+          });
+          toast.success('Partner added successfully!');
+        }
+        setIsDialogOpen(false);
+      } catch (error) {
+        // If mutation fails and we uploaded files, clean them up
+        if (newUploadedFiles.length > 0) {
+          try {
+            await supabaseClient.storage
+              .from('event-media')
+              .remove(newUploadedFiles);
+          } catch (cleanupError) {
+            console.error('Error cleaning up uploaded files:', cleanupError);
+          }
+        }
+
+        const errorMessage = error instanceof Error ? error.message : 'Failed to save partner';
+        toast.error(errorMessage);
+        console.error('Save error:', error);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -95,31 +218,65 @@ export const DashboardPartners = React.memo(() => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300"
+            className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 relative"
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-16 h-16 rounded-xl bg-[#E93370]/10 flex items-center justify-center">
-                <span className="text-2xl text-[#E93370]">{partner.name.charAt(0)}</span>
+            {/* Featured Badge */}
+            {partner.featured && (
+              <div className="absolute top-4 right-4">
+                <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">Featured</Badge>
               </div>
+            )}
+
+            {/* Status Badge */}
+            <div className="flex items-start justify-between mb-4">
               <Badge className={partner.status === 'active' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-gray-500/20 text-gray-400 border-gray-500/30'}>
                 {partner.status}
               </Badge>
             </div>
 
+            {/* Logo */}
+            {partner.logo_url ? (
+              <div className="w-full h-24 rounded-lg overflow-hidden border border-white/10 mb-4 bg-white/5 flex items-center justify-center">
+                <ImageWithFallback
+                  src={partner.logo_url}
+                  alt={partner.name}
+                  className="w-full h-full object-contain p-2"
+                />
+              </div>
+            ) : (
+              <div className="w-full h-24 rounded-lg overflow-hidden border border-white/10 mb-4 bg-white/5 flex items-center justify-center">
+                <span className="text-sm text-white/40">No logo</span>
+              </div>
+            )}
+
+            {/* Info */}
             <h3 className="text-xl text-white mb-2">{partner.name}</h3>
-            <p className="text-sm text-white/60 mb-4">{partner.category}</p>
+            {partner.description && (
+              <p className="text-sm text-white/60 mb-4 line-clamp-2">{partner.description}</p>
+            )}
 
-            <a
-              href={`https://${partner.website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-sm text-[#E93370] hover:text-[#E93370]/80 mb-4"
-            >
-              <ExternalLink className="h-4 w-4" />
-              <span>{partner.website}</span>
-            </a>
+            {/* Contact Info */}
+            <div className="space-y-2 mb-4 text-sm text-white/70">
+              {partner.contact_email && (
+                <div>
+                  <span className="text-white/40">Email:</span>{' '}
+                  <a href={`mailto:${partner.contact_email}`} className="text-[#E93370] hover:text-[#E93370]/80">
+                    {partner.contact_email}
+                  </a>
+                </div>
+              )}
+              {partner.website_url && (
+                <div>
+                  <span className="text-white/40">Website:</span>{' '}
+                  <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="text-[#E93370] hover:text-[#E93370]/80 inline-flex items-center gap-1">
+                    Visit <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              )}
+            </div>
 
-            <div className="flex space-x-2">
+            {/* Actions */}
+            <div className="flex space-x-2 mt-6">
               <Button
                 size="sm"
                 variant="outline"
@@ -129,14 +286,41 @@ export const DashboardPartners = React.memo(() => {
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleDelete(partner.id)}
-                className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <AlertDialog open={isDeleteDialogOpen && deletingPartnerId === partner.id} onOpenChange={(open) => {
+                if (!open) setDeletingPartnerId(null);
+                setIsDeleteDialogOpen(open);
+              }}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setDeletingPartnerId(partner.id)}
+                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-black/95 backdrop-blur-xl border-white/10">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-white">Delete Partner?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-white/70">
+                      Are you sure you want to delete <span className="font-semibold text-white">{partner.name}</span>? This action cannot be undone. Their logo will be removed from storage.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="bg-white/10 text-white hover:bg-white/20 border-white/20">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDelete(partner.id)}
+                      disabled={isDeleting}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {isDeleting ? 'Deleting...' : 'Delete'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </motion.div>
         ))}
@@ -150,60 +334,21 @@ export const DashboardPartners = React.memo(() => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white">
+        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl">
-              {editingPartner ? 'Edit Partner' : 'Add New Partner'}
+              {editingPartner ? 'Edit Partner' : 'Add Partner'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Partner Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter partner name"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Input
-                id="category"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="e.g., Music, Lifestyle, Technology"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="website">Website</Label>
-              <Input
-                id="website"
-                value={formData.website}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                placeholder="example.com"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
+          <div className="max-h-[60vh] overflow-y-auto">
+            <DashboardPartnerForm
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+              defaultValues={editingPartner || undefined}
+              onCancel={() => setIsDialogOpen(false)}
+            />
           </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-              className="border-white/10 text-white/70 hover:bg-white/5"
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white">
-              {editingPartner ? 'Update Partner' : 'Add Partner'}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

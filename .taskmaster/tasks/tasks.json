@@ -430,7 +430,7 @@
           "5"
         ],
         "priority": "medium",
-        "details": "This task focuses on updating the existing dashboard components (`DashboardLayout.tsx`, `SideNav.tsx`, `Header.tsx`) to align with the URL-based routing system implemented in Task 5. The `currentPage` prop and other state-based navigation logic will be removed.\n\n## OpenSpec Proposal\n- **Proposal ID**: `integrate-dashboard-router`\n- **Status**: `draft`\n- **Location**: `openspec/changes/integrate-dashboard-router/`\n\nThe `DashboardLayout.tsx` will be refactored to use the application's router context to render the appropriate child page based on the current URL, likely using a nested route outlet pattern. The `SideNav` component will be updated to use the `Link` component from `src/components/router/index.tsx` for navigation.\n\n```tsx\n// src/components/dashboard/DashboardLayout.tsx (Refactored)\nimport { SideNav } from './SideNav';\nimport { Header } from './Header';\nimport { Outlet } from '@/components/router'; // Assuming an Outlet component for nested routes\n\nexport const DashboardLayout = () => {\n  return (\n    <div className='flex h-screen bg-gray-100'>\n      <SideNav />\n      <div className='flex-1 flex flex-col'>\n        <Header />\n        <main className='p-8 flex-1 overflow-y-auto'>\n          <Outlet /> {/* Renders the matched nested route component */}\n        </main>\n      </div>\n    </div>\n  );\n};\n```",
+        "details": "## OpenSpec Proposal\n- **Proposal ID**: `integrate-dashboard-router`\n- **Status**: implemented\n- **Location**: `openspec/changes/integrate-dashboard-router/`\n\n## Implementation Summary\nAll deliverables from the proposal are complete:\n- `src/components/router/index.tsx` now supports `/admin/*` nested routes and exposes helpers such as `getCurrentSubPath`.\n- `src/components/Dashboard.tsx` derives the active dashboard page from the router instead of local state.\n- `src/components/dashboard/DashboardLayout.tsx` removes the legacy `currentPage` props, updates navigation links to use `Link`, and keeps the responsive sidebar experience.\n- `src/App.tsx` registers the `/admin/*` route so deep linking, browser history, and direct navigation all work.\n\nManual testing covered sidebar navigation, direct URL entry (for example `/admin/events`), and browser back/forward navigation to confirm the new routing flow.",
         "testStrategy": "Manually test the layout on various screen sizes to ensure responsiveness is maintained. Verify that all navigation links in the sidebar update the browser's URL and render the correct page component without a full-page refresh. Test direct navigation by manually entering URLs (e.g., `/admin/team`) into the address bar. Confirm that the previously state-based navigation has been fully removed.",
         "subtasks": [
           {
@@ -627,156 +627,142 @@
       {
         "id": 7,
         "title": "Feature: Implement Event Management CRUD in Dashboard",
-        "description": "Develop the complete CRUD (Create, Read, Update, Delete) functionality for events within the admin dashboard. This includes a page to list all events and a form to create/edit event details.",
-        "details": "Create `DashboardEvents.tsx` to display a table or grid of events fetched from `ContentContext`. Add buttons for 'Edit' and 'Delete'. Create `DashboardEventsNew.tsx` with a form managed by `React Hook Form`. The form should include all fields from the `Event` type. On submit, call a function from `ContentContext` to persist the data to Supabase. Also, implement media uploads for `featured_image` and `gallery_images` using Supabase Storage.\n\n```tsx\n// In DashboardEventsNew.tsx\nconst { register, handleSubmit, formState: { errors } } = useForm<Event>();\nconst { createEvent } = useContent(); // from ContentContext\n\nconst onSubmit = (data) => {\n  createEvent(data);\n};\n\nreturn <form onSubmit={handleSubmit(onSubmit)}>...</form>;\n```",
-        "testStrategy": "Perform end-to-end testing: 1. Create a new event and verify it appears in the event list and the Supabase database. 2. Edit the event and confirm the changes are saved. 3. Delete the event and ensure it's removed from the UI and database. Test form validation for all required fields.",
-        "priority": "medium",
+        "description": "Refine and harden the existing Event Management CRUD functionality to align with the accepted OpenSpec proposal. The core create, read, update, and delete flow is already implemented in `DashboardEvents.tsx` and `DashboardEventForm.tsx`. This task now focuses on production-readiness improvements, including upload validation, safer asset handling, robust error feedback, and improved UX.",
+        "status": "done",
         "dependencies": [
           "4",
           "6"
         ],
-        "status": "pending",
+        "priority": "medium",
+        "details": "The implementation must follow the detailed checklist in the accepted OpenSpec proposal located at `openspec/changes/implement-event-management-crud/tasks.md`. All work should modify the existing components (`DashboardEvents.tsx`, `DashboardEventForm.tsx`) and context (`ContentContext`).\n\nKey refinements include:\n- **File Uploads:** Implement client-side validation for file types/sizes and display upload progress.\n- **Asset Management:** Ensure old images in Supabase Storage are deleted and replaced when an event's image is updated.\n- **State Management:** Guarantee the event form is properly reset when closing the modal to prevent stale data.\n- **Error Handling:** Centralize error handling within `ContentContext` to provide structured error feedback to the UI.\n- **UX:** Implement an accessible confirmation dialog for delete operations.\n\n<info added on 2025-11-07T08:50:42.841Z>\nAn OpenSpec proposal for this feature has been created and is ready for review.\nProposal Location: `openspec/changes/implement-event-management-crud/`\n</info added on 2025-11-07T08:50:42.841Z>",
+        "testStrategy": "Perform targeted testing on the new refinements. 1. Test file upload validation by attempting to upload incorrect file types and sizes. 2. Verify upload progress indicators are displayed and accurate. 3. When editing an event, replace an image and confirm the old file is deleted from Supabase Storage. 4. Test the delete flow, ensuring the accessible confirmation dialog works and that all associated assets are removed from storage upon confirmation. 5. Trigger server errors (e.g., via network throttling) and verify that user-friendly error messages are displayed.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Create Event List View in Dashboard",
-            "description": "Create the `DashboardEvents.tsx` component to display a list of all events. This component will fetch event data from `ContentContext` and render it in a table, including 'Edit' and 'Delete' buttons for each event.",
+            "title": "Harden Event List Interactions",
+            "description": "Improve the event list view in `DashboardEvents.tsx` by implementing proper loading, empty, and error states, and ensuring accessibility and responsiveness.",
             "dependencies": [],
-            "details": "Create a new file `src/app/dashboard/events/page.tsx` (or equivalent route). This component will consume the `events` array from `ContentContext`. Use the `Table` component from `src/components/ui` to structure the data. For each event, display key fields like title, date, and status. Add placeholder `Button` components for 'Edit' and 'Delete' that will be wired up in later tasks. Include a 'Create New Event' button that will navigate to the creation page.",
-            "status": "pending",
-            "testStrategy": "Verify the component renders a table of events correctly. Confirm that the 'Create New Event', 'Edit', and 'Delete' buttons are visible for each event row. Test that the page handles an empty list of events gracefully.",
-            "parentId": "undefined"
+            "details": "As outlined in `openspec/changes/implement-event-management-crud/tasks.md`, this involves: 1. Showing a loading state in `DashboardEvents.tsx` while fetching data. 2. Implementing a clear empty state message when no events exist. 3. Displaying a user-friendly error message if the data fetch fails. 4. Ensuring the event list is responsive and all interactive elements are accessible.",
+            "status": "done",
+            "testStrategy": "Verify loading indicators appear on load. Check the empty state by clearing the events table. Simulate a fetch error to test the error message. Use keyboard navigation and check responsiveness in dev tools."
           },
           {
             "id": 2,
-            "title": "Build Event Creation/Edit Form Component",
-            "description": "Develop the `DashboardEventsForm.tsx` component using `React Hook Form` to handle event data entry. The form should include all fields specified in the `Event` type, such as title, description, date, and location.",
-            "dependencies": [
-              1
-            ],
-            "details": "Create a reusable form component `src/components/dashboard/DashboardEventsForm.tsx`. Use `React Hook Form` and integrate with `shadcn/ui` components (`Input`, `Textarea`, `DatePicker`, etc.). The form should accept an optional `defaultValues` prop for editing existing events. For now, the submit handler can log the form data to the console. Do not implement file uploads in this step.",
-            "status": "pending",
-            "testStrategy": "Manually test the form by filling out all fields. Verify that `React Hook Form` validation works as expected for required fields. Check that the form state is managed correctly. If passing `defaultValues`, confirm the form fields are pre-populated.",
-            "parentId": "undefined"
+            "title": "Refine Form Experience",
+            "description": "Enhance the usability and robustness of the `DashboardEventForm.tsx` component with improved state management and validation.",
+            "dependencies": [],
+            "details": "Based on the OpenSpec, this requires: 1. Implementing a full form reset using `react-hook-form`'s `reset()` method when the modal is closed or after submission. 2. Adding `zod` schema-based validation for real-time feedback. 3. Showing a loading spinner on the submit button during form submission to prevent double-clicks.",
+            "status": "done",
+            "testStrategy": "Open the form, enter data, close it, and reopen to confirm fields are cleared. Trigger validation errors for each field. Click submit and verify the button enters a disabled/loading state."
           },
           {
             "id": 3,
-            "title": "Implement Event Creation and File Upload Logic",
-            "description": "Integrate the event form with `ContentContext` to create new events in Supabase. This includes implementing the `createEvent` function and handling file uploads for `featured_image` and `gallery_images` to Supabase Storage.",
-            "dependencies": [
-              2
-            ],
-            "details": "Create a new page `src/app/dashboard/events/new/page.tsx` that uses the `DashboardEventsForm`. In `ContentContext`, implement `createEvent(eventData)`. This function will first upload any media files to a designated Supabase Storage bucket (e.g., 'event-media') and get their public URLs. Then, it will insert the event data, including the media URLs, into the 'events' table. The form's `onSubmit` handler should call this context function and redirect to the events list on success.",
-            "status": "pending",
-            "testStrategy": "Perform an end-to-end test: Fill out and submit the 'New Event' form. Verify the new event appears in the Supabase 'events' table with correct data. Check Supabase Storage to confirm that the featured image and gallery images have been uploaded successfully. Ensure the user is redirected back to the event list.",
-            "parentId": "undefined"
+            "title": "Secure File Upload Pipeline",
+            "description": "Improve the security and user experience of file uploads for event images within the event form.",
+            "dependencies": [],
+            "details": "Following the OpenSpec, implement: 1. Client-side validation for file type and size in `DashboardEventForm.tsx`. 2. A `Progress` component to provide upload feedback. 3. Graceful error handling for upload failures in `ContentContext.tsx`. 4. Use of unique file names (e.g., UUIDs) to prevent conflicts in Supabase Storage.",
+            "status": "done",
+            "testStrategy": "Attempt to upload invalid files to verify errors. For valid files, confirm the progress bar appears. Simulate an upload failure and check for a user-friendly error message. Verify uploaded files in Supabase Storage have unique names."
           },
           {
             "id": 4,
-            "title": "Implement Event Update Functionality",
-            "description": "Enable editing of existing events. This involves creating a dynamic route for editing, fetching the specific event's data, populating the form, and handling the update logic via `ContentContext`.",
-            "dependencies": [
-              2,
-              3
-            ],
-            "details": "Create a dynamic route `src/app/dashboard/events/edit/[id]/page.tsx`. This page will fetch the event ID from the URL params. In `ContentContext`, create a `getEventById(id)` function to retrieve a single event from Supabase. Use this data to populate the `DashboardEventsForm` via its `defaultValues` prop. Implement an `updateEvent(id, eventData)` function in the context to update the record in Supabase. The form's `onSubmit` will call this update function.",
-            "status": "pending",
-            "testStrategy": "Navigate to an event's edit page from the list view. Confirm the form is pre-populated with the correct data. Modify several fields and submit the form. Verify the changes are reflected in both the UI list and the Supabase database. Test that image uploads also work during an update.",
-            "parentId": "undefined"
+            "title": "Strengthen Update & Context Logic",
+            "description": "Refactor the core data manipulation logic in `ContentContext.tsx` for better error handling, asset management, and state synchronization.",
+            "dependencies": [],
+            "details": "This subtask involves: 1. Refactoring `createEvent`, `updateEvent`, and `deleteEvent` in `ContentContext.tsx` to return a standard `{ data, error }` object. 2. Ensuring the logic for updating an event's image also deletes the old image file from Supabase Storage. 3. Guaranteeing the local context state syncs correctly after any CUD operation.",
+            "status": "done",
+            "testStrategy": "Simulate an API error and verify the UI handles the returned error object. Edit an event's image and confirm in Supabase Storage that the old file is deleted. Update an event and confirm the list view updates without a page refresh."
           },
           {
             "id": 5,
-            "title": "Implement Event Deletion with Confirmation",
-            "description": "Wire up the 'Delete' button in the event list. Implement the `deleteEvent` function in `ContentContext`, which should remove the event from the database and its associated images from Supabase Storage. Add a confirmation dialog to prevent accidental deletion.",
-            "dependencies": [
-              1
-            ],
-            "details": "In `ContentContext`, create a `deleteEvent(id)` function. This function must first delete any associated files from Supabase Storage before deleting the event record from the table. In `DashboardEvents.tsx`, wire the 'Delete' button to trigger an `AlertDialog` component from `shadcn/ui`. On confirmation within the dialog, call the `deleteEvent` function from the context with the event's ID.",
-            "status": "pending",
-            "testStrategy": "Click the 'Delete' button for an event. Verify a confirmation dialog appears. Click 'Cancel' and confirm nothing happens. Click 'Delete' again, then 'Confirm'. Verify the event is removed from the UI list and the Supabase database. Check Supabase Storage to ensure the associated files have also been deleted.",
-            "parentId": "undefined"
+            "title": "Validate Deletion Flow",
+            "description": "Implement a safe and clear deletion process with user confirmation and proper cleanup.",
+            "dependencies": [],
+            "details": "As per the OpenSpec: 1. In `DashboardEvents.tsx`, implement an accessible `AlertDialog` from `shadcn/ui` to confirm the delete action. 2. Update the `deleteEvent` function in `ContentContext.tsx` to remove all associated assets (images) from Supabase Storage. 3. Use a `Toast` notification to inform the user of success or failure.",
+            "status": "done",
+            "testStrategy": "Test the confirmation dialog's 'Cancel' and 'Confirm' actions. After confirming deletion, verify the event and all its associated images are removed from the database and Supabase Storage respectively. Check for the success toast."
           }
-        ],
-        "complexity": 9,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Break this feature down into a full implementation plan. For the list view, show how to use a `shadcn/ui` Table. For the form, provide a `react-hook-form` setup integrated with `zod` for validation. For the create/update logic, detail the Supabase Storage upload process followed by the database insert/update, encapsulated within a `ContentContext` function."
+        ]
       },
       {
-        "id": 8,
+        "id": "8",
         "title": "Feature: Implement CMS for Team, Partners, and Gallery",
-        "description": "Create the dashboard management interfaces for Team Members, Partners/Sponsors, and the site-wide Gallery. Follow the same CRUD pattern established in the Event Management module.",
-        "details": "Create three new dashboard pages: `DashboardTeam.tsx`, `DashboardPartners.tsx`, and `DashboardGallery.tsx`. Each page will have a list view and a form for creating/editing items, similar to the event management implementation. Use the corresponding types and context functions (`createTeamMember`, `updatePartner`, etc.) for data operations. Reuse form components and layout patterns to ensure consistency across the dashboard.",
-        "testStrategy": "For each module (Team, Partners, Gallery), perform full E2E CRUD tests. Verify that creating, updating, and deleting items works correctly and the data is persisted in Supabase. Check that image uploads for team member photos and partner logos are functional.",
-        "priority": "medium",
+        "description": "Upgrade the existing dashboard interfaces for Team, Partners, and Gallery with full Supabase-backed CRUD functionality. This task involves evolving the placeholder components (`DashboardTeam.tsx`, etc.) to match the robust implementation pattern established in the Event Management module (Task 7). An OpenSpec proposal has been drafted and is awaiting approval before implementation can begin.",
+        "status": "pending",
         "dependencies": [
           "7"
         ],
-        "status": "pending",
+        "priority": "medium",
+        "details": "The primary goal is to enhance `src/components/dashboard/` components—`DashboardTeam.tsx`, `DashboardPartners.tsx`, and `DashboardGallery.tsx`—by connecting them to `ContentContext` for state management. New form components will handle create/update operations, including image uploads to Supabase Storage, aligning with patterns from `DashboardEvents.tsx`.\n\n**Implementation is blocked pending review and approval of the drafted OpenSpec proposal located at `openspec/changes/implement-dashboard-cms-crud/`.** This proposal has been validated with `openspec validate --strict` and contains the detailed implementation checklist that must be followed once approved.",
+        "testStrategy": "Once the OpenSpec proposal is approved, each module (Team, Partners, Gallery) will require full E2E CRUD testing. Testing will verify that creating, updating, and deleting items via the UI correctly persists data in Supabase. Special attention must be given to testing image uploads for team photos, partner logos, and gallery images, including validation and replacement of existing assets, as specified in the proposal.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Implement Data Layer for Team, Partners, and Gallery in ContentContext",
-            "description": "Extend the existing `ContentContext.tsx` to manage state and CRUD operations for Team Members, Partners, and Gallery Items. This involves adding new state arrays and creating async functions for create, read, update, and delete operations that interact with the Supabase client.",
+            "title": "Propose OpenSpec for Team, Partner, and Gallery CMS",
+            "description": "An OpenSpec proposal has been drafted and validated, outlining the plan to implement full CRUD functionality for the Team, Partner, and Gallery management sections. This document is awaiting review and approval and will serve as the technical blueprint for the subsequent implementation tasks.",
             "dependencies": [],
-            "details": "In `src/context/ContentContext.tsx`, add state variables for `teamMembers`, `partners`, and `galleryItems`. Implement and export functions like `fetchTeamMembers`, `createTeamMember`, `updateTeamMember`, `deleteTeamMember`, and repeat this pattern for `Partner` and `GalleryItem`. These functions will encapsulate the Supabase API calls, including storage calls for image uploads (team member photos, partner logos, gallery images).",
-            "status": "pending",
-            "testStrategy": "Write unit tests for the new context functions to ensure they correctly call the Supabase client. Mock the Supabase client to verify parameters and return values. Check that state updates correctly upon successful operations.",
-            "parentId": "undefined"
+            "details": "The OpenSpec proposal has been created at `openspec/changes/implement-dashboard-cms-crud/` and successfully validated using `openspec validate --strict`. It defines the Supabase table schemas, `ContentContext.tsx` function additions, UI/UX for list/form views, and file handling specifications. It is awaiting final review and approval before implementation can begin.",
+            "status": "done",
+            "testStrategy": "The proposal has passed automated validation. The final step is a manual review by the project lead to grant approval for implementation."
           },
           {
             "id": 2,
-            "title": "Build Team Management CRUD Interface",
-            "description": "Create the dashboard page for managing team members. This includes a list view to display all members and a form for adding or editing a team member, including their photo.",
+            "title": "Implement Data Layer for Team, Partners, and Gallery in ContentContext",
+            "description": "Extend the existing `ContentContext.tsx` to manage state and CRUD operations for Team Members, Partners, and Gallery Items, based on the approved OpenSpec.",
             "dependencies": [
               1
             ],
-            "details": "Create files under `src/app/dashboard/team/`. The main page (`page.tsx`) will fetch and display team members from `ContentContext` in a data table, similar to `DashboardEvents`. Implement `new/page.tsx` and `[id]/edit/page.tsx` with a `react-hook-form` instance that uses the `TeamMember` type. Reuse existing `Input`, `Textarea`, and a file upload component for the form fields.",
+            "details": "In `src/context/ContentContext.tsx`, add new state arrays (`teamMembers`, `partners`, `galleryItems`) and implement async functions for CRUD operations. All work must strictly adhere to the approved OpenSpec proposal at `openspec/changes/implement-dashboard-cms-crud/`, which details the function signatures and Supabase client interactions, including image handling.",
             "status": "pending",
-            "testStrategy": "Manually test the full CRUD flow. Create a new team member, verify they appear in the list. Edit their details and photo, and confirm the changes are saved. Delete the member and ensure they are removed from the UI and the database.",
-            "parentId": "undefined"
+            "testStrategy": "Write unit tests for the new context functions using Vitest, mocking the Supabase client to verify correct API calls and state updates upon success or failure. Ensure error handling is robust."
           },
           {
             "id": 3,
-            "title": "Build Partner Management CRUD Interface",
-            "description": "Create the dashboard page for managing partners and sponsors. This includes a list view to display all partners and a form for adding or editing partner details, including their logo.",
+            "title": "Upgrade Team Management CRUD Interface",
+            "description": "Enhance the existing `DashboardTeam.tsx` component to provide a full CRUD interface for managing team members, including photo uploads.",
             "dependencies": [
-              1
+              2
             ],
-            "details": "Create files under `src/app/dashboard/partners/`. The main page (`page.tsx`) will display partners from `ContentContext` in a data table. Implement `new/page.tsx` and `[id]/edit/page.tsx` with a form based on the `Partner` type. Follow the same component and form management patterns established in the Team and Event modules.",
+            "details": "Refactor `src/components/dashboard/DashboardTeam.tsx` to fetch and display team members from `ContentContext`. Create a new `DashboardTeamForm.tsx` component using `react-hook-form` and reusable UI components. Implementation must follow the checklist in the approved OpenSpec at `openspec/changes/implement-dashboard-cms-crud/`.",
             "status": "pending",
-            "testStrategy": "Perform end-to-end testing. Add a new partner with a logo, check if it's displayed correctly. Update the partner's information and verify the changes persist. Delete the partner and confirm its removal.",
-            "parentId": "undefined"
+            "testStrategy": "Manually test the full CRUD flow. Verify that team members can be created, their details and photo edited, and that they can be deleted. Confirm all UI states (loading, error, success) are handled gracefully."
           },
           {
             "id": 4,
-            "title": "Build Gallery Management CRUD Interface",
-            "description": "Create the dashboard page for managing site-wide gallery images. This will primarily feature a grid view of images and a form for uploading new images and editing their associated metadata (e.g., title, description).",
+            "title": "Upgrade Partner Management CRUD Interface",
+            "description": "Enhance the existing `DashboardPartners.tsx` component to provide a full CRUD interface for managing partners and sponsors, including logo uploads.",
             "dependencies": [
-              1
+              2
             ],
-            "details": "Create files under `src/app/dashboard/gallery/`. The main `page.tsx` will fetch and display images from `ContentContext`, likely in a `Card`-based grid. Implement `new/page.tsx` and `[id]/edit/page.tsx` with a form focused on image uploads and text inputs for metadata, based on the `GalleryItem` type. This may require a more visual layout than the other data tables.",
+            "details": "Refactor `src/components/dashboard/DashboardPartners.tsx` to use `ContentContext` for data. Create a `DashboardPartnerForm.tsx`. The implementation must strictly follow the patterns and requirements defined in the approved OpenSpec proposal `openspec/changes/implement-dashboard-cms-crud/`.",
             "status": "pending",
-            "testStrategy": "Test the full CRUD lifecycle for gallery items. Upload a new image and verify it appears in the gallery grid. Edit its title/description and confirm the update. Delete the image and ensure it's removed from storage and the database.",
-            "parentId": "undefined"
+            "testStrategy": "Perform end-to-end testing of the partner management flow. Confirm that creating, updating, and deleting partners works as expected. Verify logo uploads, updates, and deletions are correctly handled in Supabase Storage."
           },
           {
             "id": 5,
-            "title": "Update Dashboard Navigation to Include New Pages",
-            "description": "Integrate the new Team, Partner, and Gallery management pages into the main dashboard navigation sidebar to make them accessible to administrators.",
+            "title": "Upgrade Gallery Management CRUD Interface",
+            "description": "Enhance the `DashboardGallery.tsx` component to manage a collection of gallery images, including uploads and metadata editing.",
             "dependencies": [
-              2,
-              3,
-              4
+              2
             ],
-            "details": "Locate the dashboard sidebar or layout component (e.g., `src/app/dashboard/layout.tsx` or a dedicated `Sidebar.tsx` component). Add new navigation links for 'Team', 'Partners', and 'Gallery'. Point these links to `/dashboard/team`, `/dashboard/partners`, and `/dashboard/gallery` respectively. Ensure the active link styling works correctly.",
+            "details": "Refactor `src/components/dashboard/DashboardGallery.tsx` to display a grid of images from `ContentContext`. Create `DashboardGalleryForm.tsx` for uploads and metadata editing. The entire implementation must adhere to the technical specifications outlined in the approved OpenSpec at `openspec/changes/implement-dashboard-cms-crud/`.",
             "status": "pending",
-            "testStrategy": "Manually verify the dashboard sidebar. Click on each new link (Team, Partners, Gallery) and confirm it navigates to the correct page. Check that the active state of the navigation item is highlighted correctly when on the corresponding page.",
-            "parentId": "undefined"
+            "testStrategy": "Test the complete lifecycle of a gallery item. Verify image uploads are successful and appear in the grid. Test editing metadata and confirm changes are saved. Ensure deleting an item removes both the database record and the corresponding image file from Supabase Storage."
+          },
+          {
+            "id": 6,
+            "title": "Update Dashboard Navigation to Include New Pages",
+            "description": "Integrate the Team, Partner, and Gallery management pages into the main dashboard navigation sidebar to ensure they are accessible.",
+            "dependencies": [
+              3,
+              4,
+              5
+            ],
+            "details": "In `src/components/dashboard/DashboardNav.tsx`, add or enable navigation links for 'Team', 'Partners', and 'Gallery'. Ensure these links correctly navigate to the corresponding views. This component has been implemented in Task 6 and should only require minor additions as specified in the OpenSpec.",
+            "status": "pending",
+            "testStrategy": "Manually check the dashboard sidebar. Click each new link and confirm it renders the correct component (`DashboardTeam.tsx`, etc.). Verify the URL path updates correctly and the active navigation item is highlighted."
           }
-        ],
-        "complexity": 7,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Generate a plan that reuses patterns from Task 7. For subtask 1, define the new functions to be added to `ContentContext`. For subtasks 2, 3, and 4, outline the component structure and specify which components (Table, Card, Form) can be reused or adapted for each CMS section."
+        ]
       },
       {
         "id": 9,
@@ -1045,7 +1031,7 @@
       ],
       "created": "2025-11-07T06:02:41.440Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-07T08:43:18.194Z"
+      "updated": "2025-11-07T10:47:17.503Z"
     }
   }
 }

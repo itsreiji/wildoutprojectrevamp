@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { supabaseClient } from '../supabase/client';
 import type { Tables, TablesInsert, TablesUpdate } from '../supabase/types';
 import { DUMMY_EVENTS, DUMMY_EVENT_ARTISTS, DUMMY_TEAM_MEMBERS, DUMMY_PARTNERS, DUMMY_GALLERY_ITEMS } from '../data/dummyData';
+import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
 
 // Re-export types from the new Supabase schema
 export type Event = {
@@ -684,18 +685,37 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
-      const { error } = await supabaseClient
+      // First, get the event to find out about associated images
+      const { data: eventToDelete, error: fetchError } = await supabaseClient
+        .from('events')
+        .select('metadata')
+        .eq('id', id)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching event for deletion:', fetchError);
+        // We can still proceed to try and delete the db record
+      }
+
+      // Delete database record first, then clean up storage
+      // This ensures data consistency even if storage cleanup fails
+      const { error: deleteError } = await supabaseClient
         .from('events')
         .delete()
         .eq('id', id);
 
-      if (error) {
-        console.error('Error deleting event:', error);
-        setError(`Failed to delete event: ${error.message}`);
-        throw error;
+      if (deleteError) {
+        console.error('Error deleting event:', deleteError);
+        setError(`Failed to delete event: ${deleteError.message}`);
+        throw deleteError;
       }
 
-      // Optimistically update local state
+      // Now clean up associated storage assets
+      if (eventToDelete?.metadata) {
+        await cleanupEventAssets(eventToDelete.metadata);
+      }
+
+      // Optimistically update local state after successful deletion
       setEvents(prev => prev.filter(event => event.id !== id));
     } catch (err) {
       console.error('Error in deleteEvent:', err);
@@ -735,7 +755,7 @@ export const ContentProvider: React.FC<{
     }
   };
 
-  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>): Promise<TeamMember> => {
+  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>, oldPhotoUrl?: string | null): Promise<TeamMember> => {
     try {
       setError(null);
 
@@ -750,6 +770,11 @@ export const ContentProvider: React.FC<{
         console.error('Error updating team member:', error);
         setError(`Failed to update team member: ${error.message}`);
         throw error;
+      }
+
+      // Clean up old photo if a new one was provided
+      if (oldPhotoUrl && updates.photoUrl && oldPhotoUrl !== updates.photoUrl) {
+        await cleanupTeamMemberAsset(oldPhotoUrl);
       }
 
       if (data) {
@@ -772,6 +797,11 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
+      // Find the team member to get their photo URL for cleanup
+      const memberToDelete = team.find(member => member.id === id);
+
+      // Delete database record first, then clean up storage
+      // This ensures data consistency even if storage cleanup fails
       const { error } = await supabaseClient
         .from('team_members')
         .delete()
@@ -781,6 +811,11 @@ export const ContentProvider: React.FC<{
         console.error('Error deleting team member:', error);
         setError(`Failed to delete team member: ${error.message}`);
         throw error;
+      }
+
+      // Now clean up associated storage assets
+      if (memberToDelete?.photoUrl) {
+        await cleanupTeamMemberAsset(memberToDelete.photoUrl);
       }
 
       // Optimistically update local state
@@ -823,7 +858,7 @@ export const ContentProvider: React.FC<{
     }
   };
 
-  const updatePartner = async (id: string, updates: TablesUpdate<'partners'>): Promise<Partner> => {
+  const updatePartner = async (id: string, updates: TablesUpdate<'partners'>, oldLogoUrl?: string | null): Promise<Partner> => {
     try {
       setError(null);
 
@@ -838,6 +873,11 @@ export const ContentProvider: React.FC<{
         console.error('Error updating partner:', error);
         setError(`Failed to update partner: ${error.message}`);
         throw error;
+      }
+
+      // Clean up old logo if a new one was provided
+      if (oldLogoUrl && updates.logo_url && oldLogoUrl !== updates.logo_url) {
+        await cleanupPartnerAsset(oldLogoUrl);
       }
 
       if (data) {
@@ -860,6 +900,11 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
+      // Find the partner to get their logo URL for cleanup
+      const partnerToDelete = partners.find(partner => partner.id === id);
+
+      // Delete database record first, then clean up storage
+      // This ensures data consistency even if storage cleanup fails
       const { error } = await supabaseClient
         .from('partners')
         .delete()
@@ -869,6 +914,11 @@ export const ContentProvider: React.FC<{
         console.error('Error deleting partner:', error);
         setError(`Failed to delete partner: ${error.message}`);
         throw error;
+      }
+
+      // Now clean up associated storage assets
+      if (partnerToDelete?.logo_url) {
+        await cleanupPartnerAsset(partnerToDelete.logo_url);
       }
 
       // Optimistically update local state
@@ -911,7 +961,7 @@ export const ContentProvider: React.FC<{
     }
   };
 
-  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>): Promise<GalleryImage> => {
+  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>, oldUrl?: string | null): Promise<GalleryImage> => {
     try {
       setError(null);
 
@@ -926,6 +976,11 @@ export const ContentProvider: React.FC<{
         console.error('Error updating gallery image:', error);
         setError(`Failed to update gallery image: ${error.message}`);
         throw error;
+      }
+
+      // Clean up old image if a new one was provided
+      if (oldUrl && updates.url && oldUrl !== updates.url) {
+        await cleanupGalleryAsset(oldUrl);
       }
 
       if (data) {
@@ -948,6 +1003,11 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
+      // Find the gallery image to get its URL for cleanup
+      const imageToDelete = gallery.find(image => image.id === id);
+
+      // Delete database record first, then clean up storage
+      // This ensures data consistency even if storage cleanup fails
       const { error } = await supabaseClient
         .from('gallery_items')
         .delete()
@@ -957,6 +1017,11 @@ export const ContentProvider: React.FC<{
         console.error('Error deleting gallery image:', error);
         setError(`Failed to delete gallery image: ${error.message}`);
         throw error;
+      }
+
+      // Now clean up associated storage assets
+      if (imageToDelete?.url) {
+        await cleanupGalleryAsset(imageToDelete.url);
       }
 
       // Optimistically update local state

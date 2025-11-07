@@ -3,7 +3,7 @@ import { DashboardLayout } from './dashboard/DashboardLayout';
 import { DashboardHome } from './dashboard/DashboardHome';
 import { DashboardHero } from './dashboard/DashboardHero';
 import { DashboardAbout } from './dashboard/DashboardAbout';
-import { DashboardEventsNew } from './dashboard/DashboardEventsNew';
+import { DashboardEvents } from './dashboard/DashboardEvents';
 import { DashboardTeam } from './dashboard/DashboardTeam';
 import { DashboardGallery } from './dashboard/DashboardGallery';
 import { DashboardPartners } from './dashboard/DashboardPartners';
@@ -25,7 +25,7 @@ export const Dashboard = React.memo(() => {
       case 'about':
         return <DashboardAbout />;
       case 'events':
-        return <DashboardEventsNew />;
+        return <DashboardEvents />;
       case 'team':
         return <DashboardTeam />;
       case 'gallery':
