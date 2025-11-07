@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
-import { useRouter } from './Router';
+// Navigation doesn't directly use useRouter, but Link component does
+import { Link } from './router/Link';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 const NAV_ITEMS = [
@@ -14,8 +15,9 @@ const NAV_ITEMS = [
   { id: 'partners', label: 'Partners', href: '#partners' },
 ];
 
-export const Navigation = React.memo(() => {
-  const { navigateTo } = useRouter();
+const NavigationComponent = () => {
+  // Note: Navigation uses Link component which handles routing internally
+  // We don't need to destructure navigate here since we're not using it
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -75,14 +77,13 @@ export const Navigation = React.memo(() => {
                   {item.label}
                 </button>
               ))}
-              <Button
-                onClick={() => navigateTo('admin')}
-                variant="outline"
+              <Link
+                to="/admin"
                 className="ml-2 border-[#E93370]/50 text-[#E93370] hover:bg-[#E93370]/10 rounded-lg"
               >
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 Admin
-              </Button>
+              </Link>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -148,19 +149,13 @@ export const Navigation = React.memo(() => {
                         {item.label}
                       </motion.button>
                     ))}
-                    <motion.button
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: NAV_ITEMS.length * 0.05 }}
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        navigateTo('admin');
-                      }}
+                    <Link
+                      to="/admin"
                       className="w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center"
                     >
                       <LayoutDashboard className="mr-2 h-5 w-5" />
                       Admin Dashboard
-                    </motion.button>
+                    </Link>
                   </div>
                 </nav>
 
@@ -177,6 +172,7 @@ export const Navigation = React.memo(() => {
       </AnimatePresence>
     </>
   );
-});
+};
 
+export const Navigation = memo(NavigationComponent);
 Navigation.displayName = 'Navigation';

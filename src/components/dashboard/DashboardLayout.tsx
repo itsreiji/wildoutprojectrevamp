@@ -15,7 +15,8 @@ import {
   Info,
 } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useRouter } from '../Router';
+import { useRouter } from '../router';
+import { Link } from '../router/Link';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 interface DashboardLayoutProps {
@@ -37,7 +38,7 @@ const NAVIGATION_ITEMS = [
 
 export const DashboardLayout = React.memo(
   ({ children, currentPage, onNavigate }: DashboardLayoutProps) => {
-    const { navigateTo } = useRouter();
+    const { navigate } = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -85,12 +86,8 @@ export const DashboardLayout = React.memo(
                 const isActive = currentPage === item.id;
 
                 return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      onNavigate(item.id);
-                      setSidebarOpen(false);
-                    }}
+                  <Link
+                    to={item.id}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                       isActive
                         ? 'bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20'
@@ -99,21 +96,20 @@ export const DashboardLayout = React.memo(
                   >
                     <Icon className="h-5 w-5 flex-shrink-0" />
                     <span>{item.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </nav>
 
             {/* Footer Actions */}
             <div className="p-4 border-t border-white/10 space-y-2">
-              <Button
-                variant="outline"
+              <Link
+                to="/"
                 className="w-full border-white/10 text-white/70 hover:bg-white/5 hover:text-white rounded-xl"
-                onClick={() => navigateTo('landing')}
               >
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Back to Site
-              </Button>
+              </Link>
               <Button
                 variant="outline"
                 className="w-full border-[#E93370]/50 text-[#E93370] hover:bg-[#E93370]/10 rounded-xl"

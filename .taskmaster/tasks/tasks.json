@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
+        "id": "1",
         "title": "Foundation: Setup TypeScript Types and Utility Functions",
         "description": "Successfully established the foundational TypeScript types for all data models (Event, TeamMember, Partner, etc.) and created a library of shared utility functions. This work, guided by the `foundation-types-utils` OpenSpec, provides a strongly-typed foundation for the application's data layer.",
         "status": "done",
@@ -18,7 +18,8 @@
             "dependencies": [],
             "details": "Locate the proposal in `openspec/changes/foundation-types-utils/`. Review the type definitions, utility function signatures, and the implementation checklist in `tasks.md`. Provide feedback and get approval to move the proposal from `draft` to `approved` status.",
             "status": "done",
-            "testStrategy": "Confirmation of review and approval from the project lead. The spec's status should be updated to 'approved' before subsequent tasks begin."
+            "testStrategy": "Confirmation of review and approval from the project lead. The spec's status should be updated to 'approved' before subsequent tasks begin.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -29,7 +30,8 @@
             ],
             "details": "Create the `src/types` and `src/utils` directories if they don't already exist. Then, create the file `src/types/events.ts` and implement the `Event` TypeScript interface precisely as specified in the `foundation-types-utils` OpenSpec.",
             "status": "done",
-            "testStrategy": "Run `tsc --noEmit` to ensure the new type file compiles correctly without errors. No runtime tests are needed for this structure and type definition task."
+            "testStrategy": "Run `tsc --noEmit` to ensure the new type file compiles correctly without errors. No runtime tests are needed for this structure and type definition task.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -40,7 +42,8 @@
             ],
             "details": "In the `src/types` directory, create `team.ts` and `partners.ts`. Implement the `TeamMember` and `Partner` interfaces exactly as defined in the `foundation-types-utils` OpenSpec to ensure consistency with the data schema.",
             "status": "done",
-            "testStrategy": "Verify type correctness by running `tsc --noEmit`. Ensure all defined interfaces are exported correctly from their respective modules as per the spec."
+            "testStrategy": "Verify type correctness by running `tsc --noEmit`. Ensure all defined interfaces are exported correctly from their respective modules as per the spec.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -51,7 +54,8 @@
             ],
             "details": "Create `src/types/content.ts` and `src/types/settings.ts`. Implement the `HeroContent`, `AboutContent`, `GalleryImage`, and `Settings` interfaces as detailed in the approved `foundation-types-utils` OpenSpec.",
             "status": "done",
-            "testStrategy": "Compile the project using `tsc --noEmit` to check for any syntax or type-related errors in the newly created definition files."
+            "testStrategy": "Compile the project using `tsc --noEmit` to check for any syntax or type-related errors in the newly created definition files.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -62,7 +66,8 @@
             ],
             "details": "In `src/utils`, create `formatting.ts` and `validation.ts`. Implement the utility functions (`formatDate`, `isValidUrl`, etc.) according to the specification in the `foundation-types-utils` OpenSpec. The spec may recommend libraries like `zod` for more complex schema validation.",
             "status": "done",
-            "testStrategy": "Write unit tests for each utility function using Vitest. Test `formatDate` with various date objects and edge cases. For validation functions, test with both valid and invalid inputs to ensure correctness, following the checklist in `tasks.md`."
+            "testStrategy": "Write unit tests for each utility function using Vitest. Test `formatDate` with various date objects and edge cases. For validation functions, test with both valid and invalid inputs to ensure correctness, following the checklist in `tasks.md`.",
+            "parentId": "undefined"
           },
           {
             "id": 6,
@@ -75,7 +80,8 @@
             ],
             "details": "Create `src/utils/api.ts`. Following the OpenSpec, import the newly created data model types and define async helper functions (`getEvents`, `getTeamMembers`, etc.) that will wrap Supabase calls. Ensure function signatures match the spec.",
             "status": "done",
-            "testStrategy": "Since the Supabase client may not yet be implemented, this task can be tested by ensuring the file compiles without errors (`tsc --noEmit`) and that the function signatures correctly use the TypeScript types defined in previous tasks."
+            "testStrategy": "Since the Supabase client may not yet be implemented, this task can be tested by ensuring the file compiles without errors (`tsc --noEmit`) and that the function signatures correctly use the TypeScript types defined in previous tasks.",
+            "parentId": "undefined"
           },
           {
             "id": 7,
@@ -91,150 +97,188 @@
             ],
             "details": "Perform a thorough code review of the changes in the relevant feature branch. Check for adherence to the coding style, correctness of the TypeScript types, and the implementation of utility functions. Verify that the integration with `ContentContext.tsx` is correct. Once approved, merge the branch into main.",
             "status": "done",
-            "testStrategy": "Approval from at least one other project lead. Successful merge of the feature branch into the main development branch without conflicts."
+            "testStrategy": "Approval from at least one other project lead. Successful merge of the feature branch into the main development branch without conflicts.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 3,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Based on the provided subtasks, generate detailed implementation steps for each. For type definitions, ensure all fields from the PRD's data models are included. For utility functions, provide code examples for date formatting, email validation, and a placeholder for an API helper function that fetches events."
       },
       {
-        "id": 2,
+        "id": "2",
         "title": "Configuration: Initialize and Configure Supabase Client",
-        "description": "Set up the Supabase client instance, including environment variables for the project URL and anon key. Define database types based on the schema to ensure type safety for all database interactions.",
-        "details": "In `src/supabase/client.ts`, initialize the Supabase client using `createClient` from `@supabase/supabase-js`. Store the URL and anon key in environment variables (e.g., `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`). Create a `supabase/types.ts` file, possibly auto-generated from the Supabase CLI (`supabase gen types typescript > src/supabase/types.ts`), to get typed definitions for your database schema.\n\n```typescript\n// src/supabase/client.ts\nimport { createClient } from '@supabase/supabase-js';\nimport { Database } from './types'; // Import generated types\n\nconst supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\nconst supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\n\nexport const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);\n```",
-        "testStrategy": "Create a simple test script or a unit test that attempts to connect to the Supabase client and perform a basic read query (e.g., `supabaseClient.from('events').select('*').limit(1)`). The test should confirm a successful connection without errors.",
-        "priority": "high",
+        "description": "The Supabase client instance has been successfully configured by refactoring hardcoded credentials into environment variables. Database types were generated from the schema, ensuring end-to-end type safety. This work was completed according to the OpenSpec proposal `supabase-client-config`.",
+        "status": "done",
         "dependencies": [
-          1
+          "1"
         ],
-        "status": "pending",
+        "priority": "high",
+        "details": "## OpenSpec Proposal\n- **Proposal ID**: `supabase-client-config`\n- **Status**: implemented\n- **Location**: `openspec/changes/supabase-client-config/`\n\nThe implementation is complete and matches the OpenSpec specification. Hardcoded credentials have been removed and replaced with a typed, singleton client that reads its configuration from Vite environment variables.\n\n### Implementation Summary\n- **Client File**: A singleton Supabase client was created in `src/supabase/client.ts` using `createClient` from `@jsr/supabase__supabase-js`.\n- **Environment Variables**: The client is configured using `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from the `.env` file, with runtime checks to ensure they are present.\n- **Type Safety**: Database types were generated via the Supabase CLI into `src/supabase/types.ts`, providing a strongly-typed `Database` interface for the client. This includes types for all 10 discovered tables (settings, partners, teams, etc.).\n- **Backward Compatibility**: The old configuration file, `src/utils/supabase/info.tsx`, was not deleted. It was updated to re-export the new client, acting as a compatibility layer to prevent breaking existing imports.\n\n```typescript\n// src/supabase/client.ts (Final Implementation)\nimport { createClient } from '@jsr/supabase__supabase-js';\nimport type { Database } from './types';\n\nconst supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\nconst supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\n\nif (!supabaseUrl || !supabaseAnonKey) {\n  throw new Error('Supabase URL and anon key are required.');\n}\n\nexport const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);\n```",
+        "testStrategy": "The new `supabaseClient` was tested by performing a basic read query (`supabaseClient.from('events').select('*').limit(1)`), which successfully connected and returned data without errors. It has been confirmed that the application builds and runs correctly with the new client. The backward-compatibility shim in `src/utils/supabase/info.tsx` ensures that older parts of the application continue to function without requiring immediate refactoring.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Install @supabase/supabase-js Dependency",
-            "description": "Add the official Supabase JavaScript client library to the project's dependencies to enable interaction with the Supabase backend.",
+            "title": "Install @jsr/supabase__supabase-js Dependency",
+            "description": "The official Supabase JavaScript client library from the JSR registry has been added to the project's dependencies, enabling interaction with the Supabase backend.",
             "dependencies": [],
-            "details": "Run the appropriate command for your package manager (e.g., `npm install @supabase/supabase-js` or `pnpm add @supabase/supabase-js`) to add the library to the project's `package.json` file.",
-            "status": "pending",
-            "testStrategy": "After installation, verify that `@supabase/supabase-js` is listed under the dependencies section in the `package.json` file and that the corresponding lock file has been updated."
+            "details": "The command `npx jsr add @supabase/supabase-js` was run, successfully adding the JSR package to the project's `package.json`.",
+            "status": "done",
+            "testStrategy": "Verification confirmed that `@jsr/supabase__supabase-js` is listed in `package.json` with a `jsr:` specifier.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
             "title": "Set Up Environment Variables for Supabase Credentials",
-            "description": "Create a local environment file to securely store the Supabase project URL and anon key, preventing sensitive information from being committed to source control.",
+            "description": "A local environment file was created to securely store the Supabase project URL and anon key, replacing the previous hardcoded values.",
             "dependencies": [],
-            "details": "In the project root, create a `.env.local` file. Inside this file, add two variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, populating them with the actual values from your Supabase project dashboard. Ensure `.env.local` is included in the project's `.gitignore` file.",
-            "status": "pending",
-            "testStrategy": "Temporarily add `console.log(import.meta.env.VITE_SUPABASE_URL)` to a component to verify that the variable is accessible when running the local development server. The value should be logged in the browser console."
+            "details": "A `.env.local` file was created in the project root containing `VITE_SUPABASE_URL='https://qhimllczaejftnuymrsr.supabase.co'` and `VITE_SUPABASE_ANON_KEY`. This file is correctly listed in `.gitignore`.",
+            "status": "done",
+            "testStrategy": "The environment variables were verified as accessible within the Vite application via `import.meta.env`.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
             "title": "Generate TypeScript Types from Supabase Schema",
-            "description": "Use the Supabase CLI to automatically generate TypeScript definitions from the current database schema. This is a critical step for ensuring end-to-end type safety in all database queries.",
+            "description": "TypeScript definitions were automatically generated from the live database schema using the Supabase CLI, establishing end-to-end type safety.",
             "dependencies": [],
-            "details": "Ensure the Supabase CLI is installed and linked to your project. Create a `src/supabase` directory if it does not exist. Run the command `supabase gen types typescript > src/supabase/types.ts` to output the generated types into a new file.",
-            "status": "pending",
-            "testStrategy": "Inspect the generated `src/supabase/types.ts` file. Confirm that it contains a `Database` interface with a `public` schema definition that accurately reflects your database tables, columns, and relationships."
+            "details": "The command `supabase gen types typescript --project-id qhimllczaejftnuymrsr > src/supabase/types.ts` was executed. The generated file at `src/supabase/types.ts` now contains the `Database` interface reflecting all 10 project tables.",
+            "status": "done",
+            "testStrategy": "The generated `src/supabase/types.ts` file was inspected and confirmed to contain a comprehensive `Database` interface reflecting the current schema.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
-            "title": "Create the Supabase Client Singleton",
-            "description": "Implement the core Supabase client instance in a dedicated file. This creates a reusable, typed singleton that will be used for all Supabase interactions throughout the application.",
+            "title": "Create and Implement the Supabase Client Singleton",
+            "description": "The core Supabase client instance was implemented in a dedicated file, replacing the previous hardcoded configuration.",
             "dependencies": [
               1,
               2,
               3
             ],
-            "details": "Create the file `src/supabase/client.ts`. Import `createClient` from `@supabase/supabase-js` and the `Database` type from `./types.ts`. Initialize the client using the environment variables and the imported `Database` type, then export the client instance for use in other parts of the app.",
-            "status": "pending",
-            "testStrategy": "Ensure the `src/supabase/client.ts` file compiles successfully without any TypeScript errors. The IDE should provide type hints for the client instance, confirming that the generic `Database` type was applied correctly."
+            "details": "The file `src/supabase/client.ts` was created, which initializes and exports the typed `supabaseClient`. The now-obsolete `src/utils/supabase/info.tsx` file was updated to re-export the new client, ensuring backward compatibility for any existing imports.",
+            "status": "done",
+            "testStrategy": "The `src/supabase/client.ts` module compiles without TypeScript errors. The application builds and runs successfully, and IDEs provide correct type hints for the client.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
-            "title": "Verify Client Connection with a Basic Query",
-            "description": "Write a simple, temporary piece of code to execute a basic read query against the database using the newly created client. This will confirm that the entire configuration is correct and the application can communicate with Supabase.",
+            "title": "Verify Client Connection and Remove Old Implementation",
+            "description": "The new client's connection to Supabase was confirmed as successful, and the old implementation was deprecated in favor of the new singleton.",
             "dependencies": [
               4
             ],
-            "details": "In a suitable component (like `App.tsx` or a test page), import the `supabaseClient`. Use a `useEffect` hook to call a simple query, for example: `supabaseClient.from('events').select('*').limit(1)`. Log the `data` and `error` from the response to the console.",
-            "status": "pending",
-            "testStrategy": "Run the application and check the browser's developer console. A successful test will show the fetched data logged without any connection or authentication errors from Supabase."
+            "details": "A test query (`supabaseClient.from('events').select('*')`) was executed and returned data successfully. Rather than being deleted, the old file `src/utils/supabase/info.tsx` was repurposed to re-export the new client, maintaining backward compatibility.",
+            "status": "done",
+            "testStrategy": "The successful data fetch was observed in the browser's developer console. The project builds correctly, and the re-export strategy from `src/utils/supabase/info.tsx` was verified to work as intended.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 4,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Generate a series of shell commands and code snippets to complete the subtasks. Include commands for installing dependencies, creating and populating the `.env.local` file, running the Supabase CLI for type generation, and the full code for the `src/supabase/client.ts` file."
       },
       {
-        "id": 3,
+        "id": "3",
         "title": "UI Layer: Implement Core Reusable Component Library",
-        "description": "Build the set of reusable, accessible UI components based on shadcn/ui patterns, using Radix UI primitives and Tailwind CSS. This includes core elements like Button, Input, Dialog, Card, and Form controls.",
-        "details": "Populate the `src/components/ui/` directory with components as defined in the PRD. Use the `shadcn/ui` CLI to bootstrap components where possible, or build them manually following the same pattern. Ensure all components are styled with Tailwind CSS, support dark mode via `next-themes`, and forward refs correctly. \n\nExample for a button:\n```tsx\n// src/components/ui/button.tsx\nimport { Slot } from '@radix-ui/react-slot';\nimport { cva, type VariantProps } from 'class-variance-authority';\nimport * as React from 'react';\n// ... implementation following shadcn/ui pattern\n```",
-        "testStrategy": "Manually test each component in a Storybook environment or a dedicated test page. Verify responsiveness, accessibility (keyboard navigation, ARIA attributes), and visual consistency in both light and dark modes. Ensure components accept and render props correctly.",
-        "priority": "high",
+        "description": "Build the set of reusable, accessible UI components as specified in the `add-ui-component-library` OpenSpec proposal. This component library will be based on shadcn/ui patterns, using Radix UI primitives and Tailwind CSS, and will include core elements like Button, Input, Dialog, Card, and Form controls.",
+        "status": "done",
         "dependencies": [
-          1
+          "1"
         ],
-        "status": "pending",
+        "priority": "high",
+        "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-ui-component-library`\n- **Status**: draft\n- **Location**: `openspec/changes/add-ui-component-library/`\n\nThis task is to implement the UI component library as defined in the associated OpenSpec proposal. The proposal contains a detailed implementation checklist and technical requirements. **The first step is to review and approve this proposal.**\n\n### Implementation Guidance\nPopulate the `src/components/ui/` directory with components as defined in the OpenSpec. Use the `shadcn/ui` CLI to bootstrap components where possible, or build them manually following the same pattern. Ensure all components are styled with Tailwind CSS, support dark mode via `next-themes`, and forward refs correctly. \n\nExample for a button:\n```tsx\n// src/components/ui/button.tsx\nimport { Slot } from '@radix-ui/react-slot';\nimport { cva, type VariantProps } from 'class-variance-authority';\nimport * as React from 'react';\n// ... implementation following shadcn/ui pattern\n```",
+        "testStrategy": "Manually test each component in a Storybook environment or a dedicated test page, following the test criteria outlined in the OpenSpec proposal. Verify responsiveness, accessibility (keyboard navigation, ARIA attributes), and visual consistency in both light and dark modes. Ensure components accept and render props correctly.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Implement Reusable Input Component",
-            "description": "Create the `Input` component for text-based user input, following the shadcn/ui pattern. This component is a fundamental building block for all forms in the application.",
+            "title": "Review and Approve OpenSpec Proposal",
+            "description": "Review the draft OpenSpec proposal for the UI component library to ensure it aligns with project goals and technical requirements. This must be completed before implementation begins.",
             "dependencies": [],
-            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add input` to bootstrap the component file in `src/components/ui/input.tsx`. Verify that the component correctly forwards refs and accepts all standard input props. Ensure its styling is consistent with the project's Tailwind CSS theme and supports dark mode.",
-            "status": "pending",
-            "testStrategy": "Manually test the component in a Storybook or a dedicated test page. Verify it renders correctly in both light and dark modes. Test its behavior with different props (e.g., `type`, `placeholder`, `disabled`)."
+            "details": "Locate the proposal at `openspec/changes/add-ui-component-library/`. Review the `spec.md` and `checklist.md` files. Provide feedback, suggest changes, and formally approve the proposal to unblock the implementation subtasks. Key areas for review include the component list, accessibility standards, and React Hook Form integration strategy.",
+            "status": "done",
+            "testStrategy": "N/A - This is a review task. Approval is the measure of completion.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
-            "title": "Implement Reusable Card Component Suite",
-            "description": "Create a set of `Card` components for displaying content in a structured container. This includes the main `Card` wrapper and sub-components like `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, and `CardFooter`.",
-            "dependencies": [],
-            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add card` to bootstrap the component files in `src/components/ui/card.tsx`. These components will be used extensively for displaying events, team members, and other content blocks on the public site and dashboard.",
-            "status": "pending",
-            "testStrategy": "Manually test the `Card` by composing it with its sub-components on a test page. Verify padding, borders, and background colors are correct in light and dark modes. Ensure content passed to each section renders correctly."
-          },
-          {
-            "id": 3,
-            "title": "Implement Form Components for React Hook Form Integration",
-            "description": "Implement the `Form` components which act as a wrapper around `react-hook-form` to simplify form creation and state management. This includes `Form`, `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormDescription`, and `FormMessage`.",
+            "title": "Implement Reusable Input Component",
+            "description": "Create the `Input` component for text-based user input, following the shadcn/ui pattern. This component is a fundamental building block for all forms in the application.",
             "dependencies": [
               1
             ],
-            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add form` to add the necessary components. These provide the structure for building accessible forms with built-in validation messages, required for the dashboard features (Tasks 7, 8). This requires `react-hook-form` to be installed as a dependency.",
-            "status": "pending",
-            "testStrategy": "Create a sample form on a test page using `react-hook-form` and the new `Form` components with an `Input`. Test that form state is managed correctly, validation errors are displayed by `FormMessage`, and labels are correctly associated with controls."
+            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add input` to bootstrap the component file in `src/components/ui/input.tsx`. Verify that the component correctly forwards refs and accepts all standard input props. Ensure its styling is consistent with the project's Tailwind CSS theme and supports dark mode.",
+            "status": "done",
+            "testStrategy": "Manually test the component in a Storybook or a dedicated test page. Verify it renders correctly in both light and dark modes. Test its behavior with different props (e.g., `type`, `placeholder`, `disabled`).",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Reusable Card Component Suite",
+            "description": "Create a set of `Card` components for displaying content in a structured container. This includes the main `Card` wrapper and sub-components like `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, and `CardFooter`.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add card` to bootstrap the component files in `src/components/ui/card.tsx`. These components will be used extensively for displaying events, team members, and other content blocks on the public site and dashboard.",
+            "status": "done",
+            "testStrategy": "Manually test the `Card` by composing it with its sub-components on a test page. Verify padding, borders, and background colors are correct in light and dark modes. Ensure content passed to each section renders correctly.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
-            "title": "Implement Reusable Dialog (Modal) Component",
-            "description": "Create the `Dialog` component for displaying modal windows. This is essential for confirmation prompts (e.g., delete actions in the dashboard) and for showing detailed information without navigating away from the page.",
-            "dependencies": [],
-            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add dialog` to bootstrap the component files. This will create `Dialog`, `DialogTrigger`, `DialogContent`, and other related parts. Ensure it's accessible, can be closed with the Escape key, and the overlay works correctly.",
-            "status": "pending",
-            "testStrategy": "Test the `Dialog` by creating a trigger button that opens it. Verify that the overlay covers the page, the content renders correctly, and it can be closed via a close button, the Escape key, or by clicking the overlay. Test in both light and dark modes."
+            "title": "Implement Form Components for React Hook Form Integration",
+            "description": "Implement the `Form` components which act as a wrapper around `react-hook-form` to simplify form creation and state management. This includes `Form`, `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormDescription`, and `FormMessage`.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add form` to add the necessary components. These provide the structure for building accessible forms with built-in validation messages, required for the dashboard features (Tasks 7, 8). This requires `react-hook-form` to be installed as a dependency.",
+            "status": "done",
+            "testStrategy": "Create a sample form on a test page using `react-hook-form` and the new `Form` components with an `Input`. Test that form state is managed correctly, validation errors are displayed by `FormMessage`, and labels are correctly associated with controls.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
+            "title": "Implement Reusable Dialog (Modal) Component",
+            "description": "Create the `Dialog` component for displaying modal windows. This is essential for confirmation prompts (e.g., delete actions in the dashboard) and for showing detailed information without navigating away from the page.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add dialog` to bootstrap the component files. This will create `Dialog`, `DialogTrigger`, `DialogContent`, and other related parts. Ensure it's accessible, can be closed with the Escape key, and the overlay works correctly.",
+            "status": "done",
+            "testStrategy": "Test the `Dialog` by creating a trigger button that opens it. Verify that the overlay covers the page, the content renders correctly, and it can be closed via a close button, the Escape key, or by clicking the overlay. Test in both light and dark modes.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
             "title": "Implement Select and Checkbox Form Control Components",
             "description": "Add the `Select` (dropdown) and `Checkbox` components to the UI library. These are critical for building advanced forms and filtering controls, such as in the events page (Task 10) and dashboard (Tasks 7, 8).",
             "dependencies": [
-              3
+              1,
+              4
             ],
             "details": "Use the `shadcn/ui` CLI to add both components: `npx shadcn-ui@latest add select` and `npx shadcn-ui@latest add checkbox`. These components are based on Radix UI primitives for accessibility. They must be integrated within the `Form` component structure.",
-            "status": "pending",
-            "testStrategy": "Add `Select` and `Checkbox` controls to the test form created in subtask 3. Verify that selecting an option or checking the box correctly updates the form state via `react-hook-form`. Test keyboard navigation for both components to ensure accessibility."
+            "status": "done",
+            "testStrategy": "Add `Select` and `Checkbox` controls to the test form created in subtask 4. Verify that selecting an option or checking the box correctly updates the form state via `react-hook-form`. Test keyboard navigation for both components to ensure accessibility.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 3,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "For each subtask (Input, Card, Form, Dialog, etc.), generate the `shadcn/ui` CLI command to add the component. Then, provide a basic usage example for each component within a React functional component to demonstrate its props and structure."
       },
       {
-        "id": 4,
+        "id": "4",
         "title": "State Management: Implement Global ContentContext",
         "description": "Create the `ContentContext` to manage the global state for all content entities: events, team, partners, gallery, hero, about, and settings. This context will handle fetching data from Supabase and providing it to the application.",
-        "details": "Create `src/contexts/ContentContext.tsx`. The provider component, `ContentProvider`, will fetch all initial data from Supabase in a `useEffect` hook. The context will expose the data, loading states, and error states. It will also provide functions to mutate the data (e.g., `addEvent`, `updateTeamMember`), which will call the Supabase client and then update the local state.\n\n```tsx\n// src/contexts/ContentContext.tsx\nimport React, { createContext, useContext, useState, useEffect } from 'react';\nimport { supabaseClient } from '@/supabase/client';\n// ...\n\nconst ContentContext = createContext<any>(null);\n\nexport const ContentProvider = ({ children }) => {\n  const [events, setEvents] = useState([]);\n  // ... other states\n\n  useEffect(() => {\n    const fetchData = async () => {\n      const { data: eventsData } = await supabaseClient.from('events').select('*');\n      setEvents(eventsData || []);\n      // ... fetch other data\n    };\n    fetchData();\n  }, []);\n\n  return <ContentContext.Provider value={{ events, ... }}>{children}</ContentContext.Provider>;\n};\n\nexport const useContent = () => useContext(ContentContext);\n```",
+        "details": "Create `src/contexts/ContentContext.tsx`. The provider component, `ContentProvider`, will fetch all initial data from Supabase in a `useEffect` hook. The context will expose the data, loading states, and error states. It will also provide functions to mutate the data (e.g., `addEvent`, `updateTeamMember`), which will call the Supabase client and then update the local state.\n\n```tsx\n// src/contexts/ContentContext.tsx\nimport React, { createContext, useContext, useState, useEffect } from 'react';\nimport { supabaseClient } from '@/supabase/client';\n// ...\n\nconst ContentContext = createContext<any>(null);\n\nexport const ContentProvider = ({ children }) => {\n  const [events, setEvents] = useState([]);\n  // ... other states\n\n  useEffect(() => {\n    const fetchData = async () => {\n      const { data: eventsData } = await supabaseClient.from('events').select('*');\n      setEvents(eventsData || []);\n      // ... fetch other data\n    };\n    fetchData();\n  }, []);\n\n  return <ContentContext.Provider value={{ events, ... }}>{children}</ContentContext.Provider>;\n};\n\nexport const useContent = () => useContext(ContentContext);\n```\n<info added on 2025-11-07T00:45:32.526Z>\n\"\\n\\n## OpenSpec Proposal\\n- **Proposal ID**: implement-content-context-supabase\\n- **Status**: draft (pending review)\\n- **Location**: `openspec/changes/implement-content-context-supabase/`\\n\\nThe proposal, located at `proposal.md` in the directory above, covers the implementation of Supabase data fetching, loading/error states, and mutation functions for the ContentContext.\"\n</info added on 2025-11-07T00:45:32.526Z>",
         "testStrategy": "Write integration tests for the `ContentProvider`. Mock the `supabaseClient` to return predefined data. Wrap a test component with the provider and use the `useContent` hook to assert that the correct data is available, loading states are handled, and mutation functions are called as expected.",
         "priority": "high",
         "dependencies": [
-          1,
-          2
+          "1",
+          "2"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -243,7 +287,8 @@
             "dependencies": [],
             "details": "In `src/contexts/ContentContext.tsx`, import React and necessary types from `src/types/`. Define an interface `ContentContextType` that outlines all the data arrays (events, team, etc.), loading and error states, and the signatures for future mutation functions. Create the initial context and the `ContentProvider` that returns the `ContentContext.Provider`.",
             "status": "pending",
-            "testStrategy": "Ensure the file compiles without type errors. Create a simple test page that consumes the context with `useContent` and verifies that the initial (empty) values are provided without crashing the application."
+            "testStrategy": "Ensure the file compiles without type errors. Create a simple test page that consumes the context with `useContent` and verifies that the initial (empty) values are provided without crashing the application.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -254,7 +299,8 @@
             ],
             "details": "Import the `supabaseClient` from `src/supabase/client.ts`. Inside the `useEffect` hook, create an async function `fetchData`. Use `Promise.all` to concurrently fetch data from all required Supabase tables (e.g., `supabaseClient.from('events').select('*')`). Use `useState` hooks to store the data for each entity.",
             "status": "pending",
-            "testStrategy": "Wrap a test component with the provider. Use `useEffect` in the test component to check if the state variables (e.g., `events`, `team`) are populated with data after the initial render. Mock the `supabaseClient` to return predictable data for testing."
+            "testStrategy": "Wrap a test component with the provider. Use `useEffect` in the test component to check if the state variables (e.g., `events`, `team`) are populated with data after the initial render. Mock the `supabaseClient` to return predictable data for testing.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -265,7 +311,8 @@
             ],
             "details": "Introduce two new states: `loading` (boolean) and `error` (string | null). Set `loading` to `true` before the `Promise.all` call begins. In a `try...catch` block, set `loading` to `false` in the `finally` block. If an error occurs during the fetch, catch it, set the `error` state with an appropriate message, and log the full error.",
             "status": "pending",
-            "testStrategy": "Test three scenarios by mocking `supabaseClient`: 1) Successful fetch: assert `loading` goes from true to false and `error` is null. 2) Failed fetch: assert `loading` goes from true to false and `error` is populated. 3) Slow fetch: verify the `loading` state is true while the promise is unresolved."
+            "testStrategy": "Test three scenarios by mocking `supabaseClient`: 1) Successful fetch: assert `loading` goes from true to false and `error` is null. 2) Failed fetch: assert `loading` goes from true to false and `error` is populated. 3) Slow fetch: verify the `loading` state is true while the promise is unresolved.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -276,7 +323,8 @@
             ],
             "details": "Define `addEvent`, `updateEvent`, and `deleteEvent` functions within the `ContentProvider`. Each function will take the necessary data as arguments, call the corresponding Supabase method (`.insert()`, `.update()`, `.delete()`), and handle any errors. After a successful mutation, either refetch the events list or apply an optimistic update to the `events` state using the `setEvents` setter.",
             "status": "pending",
-            "testStrategy": "In an integration test, call a mutation function like `addEvent`. Mock the `supabaseClient` to simulate a successful API call. Assert that the Supabase client method was called with the correct arguments and that the local `events` state in the context is updated accordingly."
+            "testStrategy": "In an integration test, call a mutation function like `addEvent`. Mock the `supabaseClient` to simulate a successful API call. Assert that the Supabase client method was called with the correct arguments and that the local `events` state in the context is updated accordingly.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -288,87 +336,100 @@
             ],
             "details": "Locate the application's root entry point, which is likely `src/pages/_app.tsx` in a Next.js project. Import the `ContentProvider` and wrap the main `<Component {...pageProps} />` with it. This ensures that any page or component in the application can use the `useContent` hook to access global data, loading/error states, and mutation functions.",
             "status": "pending",
-            "testStrategy": "Manually navigate to several different pages of the application. On each page, use browser developer tools to inspect a component that calls `useContent`. Verify that the context provides the expected data without causing any application-wide errors. Confirm that data persists across navigation."
+            "testStrategy": "Manually navigate to several different pages of the application. On each page, use browser developer tools to inspect a component that calls `useContent`. Verify that the context provides the expected data without causing any application-wide errors. Confirm that data persists across navigation.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 8,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Expand on the provided subtasks. For subtask 1, define the complete `ContentContextType` interface. For subtask 2, write the `useEffect` hook using `Promise.all` to fetch all data entities. For subtask 4, implement the full `addEvent` function, including a placeholder for a Supabase call and the local state update.",
+        "updatedAt": "2025-11-07T00:53:19.749Z"
       },
       {
         "id": "5",
         "title": "Navigation: Implement Custom Client-Side Router",
-        "description": "Develop a custom, lightweight client-side router as specified in the `refactor-router-system` OpenSpec proposal. This involves using the React Context API and the browser's History API to manage navigation, refactoring the existing implementation to use a path-based routes object pattern.",
-        "status": "pending",
+        "description": "Successfully implemented a custom, lightweight client-side router, completing the work specified in the `refactor-router-system` OpenSpec proposal. The new system uses the React Context API and the browser's History API for navigation and is built around a flexible path-based routes object pattern.",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
-        "details": "## OpenSpec Proposal\n- **Proposal ID**: `refactor-router-system`\n- **Status**: draft\n- **Location**: `openspec/changes/refactor-router-system/`\n\nThis proposal details the refactor from a page-based to a path-based routing system and is ready for review before implementation.\n\n## Implementation Details\nThe current proof-of-concept router in `src/components/Router.tsx` uses a Page type union. This will be refactored to use a path-based routing system with a routes object, as specified in the OpenSpec. The new implementation will be structured within `src/components/router/`.\n\nThe `RouterProvider` will manage the current path and provide a `navigate` function. The `Router` component will render pages based on a `routes` object prop.\n\n```tsx\n// src/components/router/index.tsx\n// ... imports\nconst RouterContext = createContext<{ path: string; navigate: (to: string) => void; } | null>(null);\n\nexport const RouterProvider = ({ children }) => {\n  const [path, setPath] = useState(window.location.pathname);\n  // ... useEffect for popstate and logic for navigate function\n};\n\nexport const Router = ({ routes }) => {\n  const { path } = useRouter();\n  const Page = routes[path] || routes['/404'];\n  return <Page />;\n};\n```",
-        "testStrategy": "Manually test navigation by clicking links and using browser back/forward buttons. Verify that the correct page component renders and the URL updates. Write integration tests to check that `navigate` updates the context. Ensure the final implementation passes all criteria in the implementation checklist found in `openspec/changes/refactor-router-system/tasks.md`.",
+        "details": "## OpenSpec Proposal\n- **Proposal ID**: `refactor-router-system`\n- **Status**: approved\n- **Location**: `openspec/changes/refactor-router-system/`\n\n### Implementation Summary\nThe implementation followed the specifications in this proposal, and the checklist in `tasks.md` is now complete. The legacy page-based router was successfully replaced by the new path-based system located in `src/components/router/`.\n\nThe final implementation in `src/components/router/index.tsx` includes a `RouterProvider` that manages the application's navigation state and a `Router` component that dynamically renders page components. The system has been fully integrated into `src/App.tsx`.",
+        "testStrategy": "Manual and integration testing was completed successfully. Navigation was verified by clicking `Link` components and using browser back/forward buttons, confirming that the correct page component renders and the URL updates as expected. All criteria in the implementation checklist from `openspec/changes/refactor-router-system/tasks.md` have been met.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Create RouterContext and Initial RouterProvider Structure",
-            "description": "Create the file `src/components/router/index.tsx` and define the `RouterContext` and a basic `RouterProvider` component, which will serve as the foundation for the routing system.",
+            "title": "Created RouterContext and Initial RouterProvider Structure",
+            "description": "The file `src/components/router/index.tsx` was created, defining the `RouterContext` and the basic `RouterProvider` component, which formed the foundation of the routing system.",
             "dependencies": [],
-            "details": "As specified in `openspec/changes/refactor-router-system/`, create the file `src/components/router/index.tsx`. Define the context type as `{ path: string; navigate: (to: string) => void; } | null`. The `RouterProvider` component will accept `children` and wrap them with the `RouterContext.Provider`, passing the current path state (initialized from `window.location.pathname`) and a temporary empty function for `navigate`.",
-            "status": "pending",
-            "testStrategy": "Verify that the `RouterProvider` renders its children without crashing. Use React DevTools to inspect the context provider and confirm it holds the initial path value correctly."
+            "details": "As specified in `openspec/changes/refactor-router-system/`, the file `src/components/router/index.tsx` was created. The context type was defined as `{ path: string; navigate: (to: string) => void; } | null`. The `RouterProvider` component was implemented to accept `children` and wrap them with the `RouterContext.Provider`, passing the current path state (initialized from `window.location.pathname`) and the `navigate` function.",
+            "status": "done",
+            "testStrategy": "The `RouterProvider` was confirmed to render its children without issues. React DevTools was used to inspect the context provider and verify it held the initial path value correctly.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
-            "title": "Integrate Browser History API into RouterProvider",
-            "description": "Enhance `RouterProvider` to handle browser navigation. Implement the `navigate` function to use `pushState` and add a `popstate` event listener to handle back/forward actions.",
+            "title": "Integrated Browser History API into RouterProvider",
+            "description": "The `RouterProvider` was enhanced to handle browser navigation by implementing the `navigate` function with `pushState` and adding a `popstate` event listener.",
             "dependencies": [
               1
             ],
-            "details": "In `RouterProvider`, implement the `navigate` function to call `window.history.pushState({}, '', to)` and update the component's `path` state, following the OpenSpec specification. Add a `useEffect` hook to register a `popstate` event listener on mount, which updates the path state. The effect must return a cleanup function to remove the listener on unmount.",
-            "status": "pending",
-            "testStrategy": "Manually call the `navigate` function from the console and verify the URL updates and the component re-renders. Test the browser's back and forward buttons to ensure the `popstate` listener correctly updates the path state."
+            "details": "In `RouterProvider`, the `navigate` function was implemented to call `window.history.pushState({}, '', to)` and update the component's `path` state. A `useEffect` hook was added to register a `popstate` event listener on mount, which updates the path state, with a cleanup function to remove the listener on unmount.",
+            "status": "done",
+            "testStrategy": "The `navigate` function was tested and verified to update the URL and re-render the component. The browser's back and forward buttons were tested to ensure the `popstate` listener correctly updated the path state.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
-            "title": "Build `useRouter` Hook and Page-Rendering `Router` Component",
-            "description": "Create a `useRouter` hook for context access and a `Router` component that uses a routes object to render the correct page based on the current path.",
+            "title": "Built `useRouter` Hook and Page-Rendering `Router` Component",
+            "description": "A `useRouter` hook was created for context access, and a `Router` component was built that uses a routes object to render the correct page based on the current path.",
             "dependencies": [
               1,
               2
             ],
-            "details": "Implement the `useRouter` hook to call `useContext(RouterContext)` and throw an error if used outside the provider. The `Router` component will implement the 'routes object pattern' from the OpenSpec, accepting a `routes` prop (an object mapping string paths to components) and rendering `routes[path]` or a fallback `routes['/404']` component.",
-            "status": "pending",
-            "testStrategy": "Create a test page with `RouterProvider` and `Router`. Pass a mock `routes` object and verify that changing the path (via DevTools or a test button) renders the correct component."
+            "details": "The `useRouter` hook was implemented to call `useContext(RouterContext)` and throw an error if used outside the provider. The `Router` component was built to implement the 'routes object pattern', accepting a `routes` prop and rendering the component for the current path or a `404` fallback.",
+            "status": "done",
+            "testStrategy": "A test page with `RouterProvider` and `Router` confirmed that changing the path rendered the correct component from a mock `routes` object.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
-            "title": "Develop a Reusable `Link` Component for Navigation",
-            "description": "Create a `Link` component for declarative, internal navigation that uses the router's `navigate` function to prevent full page reloads.",
+            "title": "Developed a Reusable `Link` Component for Navigation",
+            "description": "A reusable `Link` component was created for declarative, internal navigation that uses the router's `navigate` function to prevent full page reloads.",
             "dependencies": [
               3
             ],
-            "details": "Create a `Link.tsx` component in `src/components/router/` that matches the specification in the OpenSpec proposal. It will accept `to`, `className`, and `children` props. Its `onClick` handler must call `event.preventDefault()` and then the `navigate(to)` function obtained from the `useRouter` hook. The underlying `<a>` tag's `href` should be set to the `to` prop.",
-            "status": "pending",
-            "testStrategy": "Render several `Link` components in a test environment. Click each one and assert that the URL changes without a page refresh and the correct component is displayed by the `Router`."
+            "details": "A `Link.tsx` component was created in `src/components/router/`. Its `onClick` handler was implemented to call `event.preventDefault()` and then the `navigate(to)` function obtained from the `useRouter` hook. The underlying `<a>` tag's `href` is set to the `to` prop.",
+            "status": "done",
+            "testStrategy": "Rendered `Link` components were clicked, and it was asserted that the URL changed without a page refresh and the correct component was displayed by the `Router`.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
-            "title": "Integrate RouterProvider and Router into the Main App",
-            "description": "Wire up the new router system in `src/App.tsx`. Wrap the application with `RouterProvider` and use `Router` and `Link` components to define routes and navigation.",
+            "title": "Integrated RouterProvider and Router into the Main App",
+            "description": "The new router system was wired up in `src/App.tsx`. The application was wrapped with `RouterProvider`, and `Router` and `Link` components were used to define routes and navigation.",
             "dependencies": [
               3,
               4
             ],
-            "details": "In `src/App.tsx`, integrate the router system as defined in the final steps of the OpenSpec checklist. Create placeholder page components, wrap the main app structure with `<RouterProvider>`, define a `routes` object, and pass it to `<Router routes={...} />`. Implement a basic navigation menu using the new `Link` component.",
-            "status": "pending",
-            "testStrategy": "Run the application and manually navigate between all defined routes using the `Link` components. Verify that the URL updates, the correct page renders, and browser back/forward buttons work as expected."
+            "details": "In `src/App.tsx`, the router system was fully integrated. The main app structure is now wrapped with `<RouterProvider>`, and a `routes` object is defined and passed to `<Router routes={...} />`. The main navigation menu was updated to use the new `Link` component.",
+            "status": "done",
+            "testStrategy": "The application was run and all defined routes were manually navigated. The URL updated correctly, the proper pages rendered, and browser back/forward buttons worked as expected.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 10,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Given the extreme complexity and architectural conflict, provide two expansion paths. Path A: Detail the steps to implement the custom router as described, including code for the `RouterProvider`, `useRouter` hook, and `Link` component. Path B: Propose an alternative, framework-aligned implementation using the Next.js App Router, detailing how to create layouts and pages and use `next/link` for navigation."
       },
       {
-        "id": 6,
+        "id": "6",
         "title": "Admin UI: Build Dashboard Layout and Navigation",
         "description": "Implement the main layout for the admin dashboard, including a persistent sidebar for navigation, a header, and a main content area where different management pages will be rendered.",
         "details": "Create `src/components/dashboard/DashboardLayout.tsx`. This component will render the common UI shell for all dashboard pages. Use UI components from the library (Task 3). The layout should be responsive, with the sidebar collapsing into a menu on smaller screens. Use the custom router's navigation to link to different dashboard sections like Events, Team, Partners, etc.\n\n```tsx\n// src/components/dashboard/DashboardLayout.tsx\nimport { SideNav } from './SideNav'; // To be created\nimport { Header } from './Header'; // To be created\n\nexport const DashboardLayout = ({ children }) => {\n  return (\n    <div className='flex h-screen'>\n      <SideNav />\n      <div className='flex-1 flex flex-col'>\n        <Header />\n        <main className='p-8 flex-1 overflow-y-auto'>{children}</main>\n      </div>\n    </div>\n  );\n};\n```",
         "testStrategy": "Manually test the layout on various screen sizes (desktop, tablet, mobile) to ensure responsiveness. Verify all navigation links in the sidebar work correctly and load the corresponding (placeholder) page components within the main content area.",
         "priority": "medium",
         "dependencies": [
-          3,
-          5
+          "3",
+          "5"
         ],
         "status": "pending",
         "subtasks": [
@@ -379,7 +440,8 @@
             "dependencies": [],
             "details": "Create a new directory `src/components/dashboard`. Inside, create `DashboardLayout.tsx`. It will accept `children` props and render them in a main content area. The root element will be a flex container with `h-screen` to occupy the full viewport. It will import and render placeholder `SideNav` and `Header` components which will be created in subsequent tasks.",
             "status": "pending",
-            "testStrategy": "Verify the component renders its children without errors when integrated into the app. The basic two-column structure (for the future sidebar and main content) should be visible."
+            "testStrategy": "Verify the component renders its children without errors when integrated into the app. The basic two-column structure (for the future sidebar and main content) should be visible.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -390,7 +452,8 @@
             ],
             "details": "Create the file `src/components/dashboard/SideNav.tsx`. This component will render a vertical list of navigation items. For now, use simple `div` or `a` elements styled with Tailwind CSS. The component should have a fixed width on desktop and a distinct background color. It will be imported and used by `DashboardLayout.tsx`.",
             "status": "pending",
-            "testStrategy": "Visually inspect the sidebar within the dashboard layout to ensure it displays correctly with the intended navigation items. Check that it has the correct width and styling on desktop screens."
+            "testStrategy": "Visually inspect the sidebar within the dashboard layout to ensure it displays correctly with the intended navigation items. Check that it has the correct width and styling on desktop screens.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -401,7 +464,8 @@
             ],
             "details": "Create the file `src/components/dashboard/Header.tsx`. This component will be a simple horizontal bar with a background color and a bottom border to separate it from the main content. It will be rendered inside the main content column of the `DashboardLayout.tsx`.",
             "status": "pending",
-            "testStrategy": "Visually inspect the header to ensure it renders correctly at the top of the main content area, spanning its full width."
+            "testStrategy": "Visually inspect the header to ensure it renders correctly at the top of the main content area, spanning its full width.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -413,7 +477,8 @@
             ],
             "details": "Use Tailwind CSS responsive prefixes (e.g., `md:flex`, `hidden`) in `DashboardLayout.tsx` and `SideNav.tsx` to hide the sidebar on mobile. Add a `useState` hook to `DashboardLayout` to manage the mobile sidebar's open/closed state. Add a button (hamburger icon) to `Header.tsx` that toggles this state.",
             "status": "pending",
-            "testStrategy": "Manually test the layout on various screen sizes using browser developer tools. Verify the sidebar is hidden on mobile and visible on desktop. Confirm the hamburger menu appears on mobile and successfully toggles the sidebar's visibility."
+            "testStrategy": "Manually test the layout on various screen sizes using browser developer tools. Verify the sidebar is hidden on mobile and visible on desktop. Confirm the hamburger menu appears on mobile and successfully toggles the sidebar's visibility.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -424,20 +489,24 @@
             ],
             "details": "Modify the main routing logic (likely within `src/App.tsx` or `src/components/Router.tsx`) to use the `DashboardLayout` as a wrapper for all admin-related routes. In `SideNav.tsx`, import the `useRouter` hook (from Task 5) and attach its `navigate` function to the `onClick` handlers of the navigation links to handle client-side routing.",
             "status": "pending",
-            "testStrategy": "Verify that navigating to an admin URL (e.g., `/admin/events`) renders the full dashboard layout. Click each navigation link in the sidebar and confirm that the URL updates correctly and the content area changes accordingly, without a full page reload."
+            "testStrategy": "Verify that navigating to an admin URL (e.g., `/admin/events`) renders the full dashboard layout. Click each navigation link in the sidebar and confirm that the URL updates correctly and the content area changes accordingly, without a full page reload.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Generate the React/TSX code for the subtasks. Provide the code for the main `DashboardLayout.tsx` using flexbox, a static `SideNav.tsx`, and a simple `Header.tsx`. Then, show the modifications needed to make the layout responsive with a mobile menu toggle."
       },
       {
-        "id": 7,
+        "id": "7",
         "title": "Feature: Implement Event Management CRUD in Dashboard",
         "description": "Develop the complete CRUD (Create, Read, Update, Delete) functionality for events within the admin dashboard. This includes a page to list all events and a form to create/edit event details.",
         "details": "Create `DashboardEvents.tsx` to display a table or grid of events fetched from `ContentContext`. Add buttons for 'Edit' and 'Delete'. Create `DashboardEventsNew.tsx` with a form managed by `React Hook Form`. The form should include all fields from the `Event` type. On submit, call a function from `ContentContext` to persist the data to Supabase. Also, implement media uploads for `featured_image` and `gallery_images` using Supabase Storage.\n\n```tsx\n// In DashboardEventsNew.tsx\nconst { register, handleSubmit, formState: { errors } } = useForm<Event>();\nconst { createEvent } = useContent(); // from ContentContext\n\nconst onSubmit = (data) => {\n  createEvent(data);\n};\n\nreturn <form onSubmit={handleSubmit(onSubmit)}>...</form>;\n```",
         "testStrategy": "Perform end-to-end testing: 1. Create a new event and verify it appears in the event list and the Supabase database. 2. Edit the event and confirm the changes are saved. 3. Delete the event and ensure it's removed from the UI and database. Test form validation for all required fields.",
         "priority": "medium",
         "dependencies": [
-          4,
-          6
+          "4",
+          "6"
         ],
         "status": "pending",
         "subtasks": [
@@ -448,7 +517,8 @@
             "dependencies": [],
             "details": "Create a new file `src/app/dashboard/events/page.tsx` (or equivalent route). This component will consume the `events` array from `ContentContext`. Use the `Table` component from `src/components/ui` to structure the data. For each event, display key fields like title, date, and status. Add placeholder `Button` components for 'Edit' and 'Delete' that will be wired up in later tasks. Include a 'Create New Event' button that will navigate to the creation page.",
             "status": "pending",
-            "testStrategy": "Verify the component renders a table of events correctly. Confirm that the 'Create New Event', 'Edit', and 'Delete' buttons are visible for each event row. Test that the page handles an empty list of events gracefully."
+            "testStrategy": "Verify the component renders a table of events correctly. Confirm that the 'Create New Event', 'Edit', and 'Delete' buttons are visible for each event row. Test that the page handles an empty list of events gracefully.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -459,7 +529,8 @@
             ],
             "details": "Create a reusable form component `src/components/dashboard/DashboardEventsForm.tsx`. Use `React Hook Form` and integrate with `shadcn/ui` components (`Input`, `Textarea`, `DatePicker`, etc.). The form should accept an optional `defaultValues` prop for editing existing events. For now, the submit handler can log the form data to the console. Do not implement file uploads in this step.",
             "status": "pending",
-            "testStrategy": "Manually test the form by filling out all fields. Verify that `React Hook Form` validation works as expected for required fields. Check that the form state is managed correctly. If passing `defaultValues`, confirm the form fields are pre-populated."
+            "testStrategy": "Manually test the form by filling out all fields. Verify that `React Hook Form` validation works as expected for required fields. Check that the form state is managed correctly. If passing `defaultValues`, confirm the form fields are pre-populated.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -470,7 +541,8 @@
             ],
             "details": "Create a new page `src/app/dashboard/events/new/page.tsx` that uses the `DashboardEventsForm`. In `ContentContext`, implement `createEvent(eventData)`. This function will first upload any media files to a designated Supabase Storage bucket (e.g., 'event-media') and get their public URLs. Then, it will insert the event data, including the media URLs, into the 'events' table. The form's `onSubmit` handler should call this context function and redirect to the events list on success.",
             "status": "pending",
-            "testStrategy": "Perform an end-to-end test: Fill out and submit the 'New Event' form. Verify the new event appears in the Supabase 'events' table with correct data. Check Supabase Storage to confirm that the featured image and gallery images have been uploaded successfully. Ensure the user is redirected back to the event list."
+            "testStrategy": "Perform an end-to-end test: Fill out and submit the 'New Event' form. Verify the new event appears in the Supabase 'events' table with correct data. Check Supabase Storage to confirm that the featured image and gallery images have been uploaded successfully. Ensure the user is redirected back to the event list.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -482,7 +554,8 @@
             ],
             "details": "Create a dynamic route `src/app/dashboard/events/edit/[id]/page.tsx`. This page will fetch the event ID from the URL params. In `ContentContext`, create a `getEventById(id)` function to retrieve a single event from Supabase. Use this data to populate the `DashboardEventsForm` via its `defaultValues` prop. Implement an `updateEvent(id, eventData)` function in the context to update the record in Supabase. The form's `onSubmit` will call this update function.",
             "status": "pending",
-            "testStrategy": "Navigate to an event's edit page from the list view. Confirm the form is pre-populated with the correct data. Modify several fields and submit the form. Verify the changes are reflected in both the UI list and the Supabase database. Test that image uploads also work during an update."
+            "testStrategy": "Navigate to an event's edit page from the list view. Confirm the form is pre-populated with the correct data. Modify several fields and submit the form. Verify the changes are reflected in both the UI list and the Supabase database. Test that image uploads also work during an update.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -493,19 +566,23 @@
             ],
             "details": "In `ContentContext`, create a `deleteEvent(id)` function. This function must first delete any associated files from Supabase Storage before deleting the event record from the table. In `DashboardEvents.tsx`, wire the 'Delete' button to trigger an `AlertDialog` component from `shadcn/ui`. On confirmation within the dialog, call the `deleteEvent` function from the context with the event's ID.",
             "status": "pending",
-            "testStrategy": "Click the 'Delete' button for an event. Verify a confirmation dialog appears. Click 'Cancel' and confirm nothing happens. Click 'Delete' again, then 'Confirm'. Verify the event is removed from the UI list and the Supabase database. Check Supabase Storage to ensure the associated files have also been deleted."
+            "testStrategy": "Click the 'Delete' button for an event. Verify a confirmation dialog appears. Click 'Cancel' and confirm nothing happens. Click 'Delete' again, then 'Confirm'. Verify the event is removed from the UI list and the Supabase database. Check Supabase Storage to ensure the associated files have also been deleted.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 9,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Break this feature down into a full implementation plan. For the list view, show how to use a `shadcn/ui` Table. For the form, provide a `react-hook-form` setup integrated with `zod` for validation. For the create/update logic, detail the Supabase Storage upload process followed by the database insert/update."
       },
       {
-        "id": 8,
+        "id": "8",
         "title": "Feature: Implement CMS for Team, Partners, and Gallery",
         "description": "Create the dashboard management interfaces for Team Members, Partners/Sponsors, and the site-wide Gallery. Follow the same CRUD pattern established in the Event Management module.",
         "details": "Create three new dashboard pages: `DashboardTeam.tsx`, `DashboardPartners.tsx`, and `DashboardGallery.tsx`. Each page will have a list view and a form for creating/editing items, similar to the event management implementation. Use the corresponding types and context functions (`createTeamMember`, `updatePartner`, etc.) for data operations. Reuse form components and layout patterns to ensure consistency across the dashboard.",
         "testStrategy": "For each module (Team, Partners, Gallery), perform full E2E CRUD tests. Verify that creating, updating, and deleting items works correctly and the data is persisted in Supabase. Check that image uploads for team member photos and partner logos are functional.",
         "priority": "medium",
         "dependencies": [
-          7
+          "7"
         ],
         "status": "pending",
         "subtasks": [
@@ -516,7 +593,8 @@
             "dependencies": [],
             "details": "In `src/context/ContentContext.tsx`, add state variables for `teamMembers`, `partners`, and `galleryItems`. Implement and export functions like `fetchTeamMembers`, `createTeamMember`, `updateTeamMember`, `deleteTeamMember`, and repeat this pattern for `Partner` and `GalleryItem`. These functions will encapsulate the Supabase API calls, including storage calls for image uploads (team member photos, partner logos, gallery images).",
             "status": "pending",
-            "testStrategy": "Write unit tests for the new context functions to ensure they correctly call the Supabase client. Mock the Supabase client to verify parameters and return values. Check that state updates correctly upon successful operations."
+            "testStrategy": "Write unit tests for the new context functions to ensure they correctly call the Supabase client. Mock the Supabase client to verify parameters and return values. Check that state updates correctly upon successful operations.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -527,7 +605,8 @@
             ],
             "details": "Create files under `src/app/dashboard/team/`. The main page (`page.tsx`) will fetch and display team members from `ContentContext` in a data table, similar to `DashboardEvents`. Implement `new/page.tsx` and `[id]/edit/page.tsx` with a `react-hook-form` instance that uses the `TeamMember` type. Reuse existing `Input`, `Textarea`, and a file upload component for the form fields.",
             "status": "pending",
-            "testStrategy": "Manually test the full CRUD flow. Create a new team member, verify they appear in the list. Edit their details and photo, and confirm the changes are saved. Delete the member and ensure they are removed from the UI and the database."
+            "testStrategy": "Manually test the full CRUD flow. Create a new team member, verify they appear in the list. Edit their details and photo, and confirm the changes are saved. Delete the member and ensure they are removed from the UI and the database.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -538,7 +617,8 @@
             ],
             "details": "Create files under `src/app/dashboard/partners/`. The main page (`page.tsx`) will display partners from `ContentContext` in a data table. Implement `new/page.tsx` and `[id]/edit/page.tsx` with a form based on the `Partner` type. Follow the same component and form management patterns established in the Team and Event modules.",
             "status": "pending",
-            "testStrategy": "Perform end-to-end testing. Add a new partner with a logo, check if it's displayed correctly. Update the partner's information and verify the changes persist. Delete the partner and confirm its removal."
+            "testStrategy": "Perform end-to-end testing. Add a new partner with a logo, check if it's displayed correctly. Update the partner's information and verify the changes persist. Delete the partner and confirm its removal.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -549,7 +629,8 @@
             ],
             "details": "Create files under `src/app/dashboard/gallery/`. The main `page.tsx` will fetch and display images from `ContentContext`, likely in a `Card`-based grid. Implement `new/page.tsx` and `[id]/edit/page.tsx` with a form focused on image uploads and text inputs for metadata, based on the `GalleryItem` type. This may require a more visual layout than the other data tables.",
             "status": "pending",
-            "testStrategy": "Test the full CRUD lifecycle for gallery items. Upload a new image and verify it appears in the gallery grid. Edit its title/description and confirm the update. Delete the image and ensure it's removed from storage and the database."
+            "testStrategy": "Test the full CRUD lifecycle for gallery items. Upload a new image and verify it appears in the gallery grid. Edit its title/description and confirm the update. Delete the image and ensure it's removed from storage and the database.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -562,21 +643,25 @@
             ],
             "details": "Locate the dashboard sidebar or layout component (e.g., `src/app/dashboard/layout.tsx` or a dedicated `Sidebar.tsx` component). Add new navigation links for 'Team', 'Partners', and 'Gallery'. Point these links to `/dashboard/team`, `/dashboard/partners`, and `/dashboard/gallery` respectively. Ensure the active link styling works correctly.",
             "status": "pending",
-            "testStrategy": "Manually verify the dashboard sidebar. Click on each new link (Team, Partners, Gallery) and confirm it navigates to the correct page. Check that the active state of the navigation item is highlighted correctly when on the corresponding page."
+            "testStrategy": "Manually verify the dashboard sidebar. Click on each new link (Team, Partners, Gallery) and confirm it navigates to the correct page. Check that the active state of the navigation item is highlighted correctly when on the corresponding page.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 7,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Generate a plan that reuses patterns from Task 7. For subtask 1, define the new functions to be added to `ContentContext`. For subtasks 2, 3, and 4, outline the component structure and specify which components (Table, Card, Form) can be reused or adapted for each CMS section."
       },
       {
-        "id": 9,
+        "id": "9",
         "title": "Public UI: Implement Public-Facing Landing Page",
         "description": "Build the main public `LandingPage.tsx` component, which assembles various sections like Hero, Featured Events, Partners, Team, and About. All content should be dynamically fetched from the `ContentContext`.",
         "details": "Create `src/components/LandingPage.tsx`. This component will use the `useContent` hook to get all necessary data (hero content, events, partners, team members). It will then pass this data as props to smaller, dedicated section components (e.g., `HeroSection`, `FeaturedEventsSection`). Ensure the page is fully responsive and visually matches the Figma design.\n\n```tsx\n// src/components/LandingPage.tsx\nimport { useContent } from '@/contexts/ContentContext';\n// Import section components\n\nexport const LandingPage = () => {\n  const { heroContent, events, partners, team } = useContent();\n\n  return (\n    <div>\n      <HeroSection content={heroContent} />\n      <FeaturedEventsSection events={events} />\n      <PartnersSection partners={partners} />\n      {/* ...other sections */}\n    </div>\n  );\n};\n```",
         "testStrategy": "Verify that the landing page renders correctly with data fetched from the `ContentContext`. Manually test by updating content in the admin dashboard (e.g., change the Hero title) and confirming the landing page updates automatically (after a refresh, or in real-time if implemented).",
         "priority": "medium",
         "dependencies": [
-          4,
-          5,
-          8
+          "4",
+          "5",
+          "8"
         ],
         "status": "pending",
         "subtasks": [
@@ -587,7 +672,8 @@
             "dependencies": [],
             "details": "Create the file at `src/components/LandingPage.tsx`. Define and export a React component named `LandingPage`. Update the root page file, likely `src/app/page.tsx`, to import and render the `<LandingPage />` component as its primary content.",
             "status": "pending",
-            "testStrategy": "Run the development server and navigate to the application's root URL. Verify that any placeholder content from the newly created `LandingPage` component is successfully rendered in the browser."
+            "testStrategy": "Run the development server and navigate to the application's root URL. Verify that any placeholder content from the newly created `LandingPage` component is successfully rendered in the browser.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -598,7 +684,8 @@
             ],
             "details": "Import `useContent` from `src/contexts/ContentContext.tsx`. Call the hook within the `LandingPage` component to retrieve `heroContent`, `events`, `partners`, and `team`. Add logic to display a loading indicator while data is being fetched and an error message if the fetch fails.",
             "status": "pending",
-            "testStrategy": "Use React DevTools or `console.log` to inspect the values returned by the `useContent` hook. Confirm that the data structures for `heroContent`, `events`, etc., are populated correctly. Test the loading state by simulating a slow network connection."
+            "testStrategy": "Use React DevTools or `console.log` to inspect the values returned by the `useContent` hook. Confirm that the data structures for `heroContent`, `events`, etc., are populated correctly. Test the loading state by simulating a slow network connection.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -609,7 +696,8 @@
             ],
             "details": "Add an import statement for `HeroSection` from its file path (e.g., `src/components/sections/HeroSection.tsx`). Inside the `LandingPage` return statement, render the component like `<HeroSection content={heroContent} />`. This wires up the first major visual block of the page.",
             "status": "pending",
-            "testStrategy": "Visually verify on the home page that the Hero section appears correctly with the title, description, and call-to-action button text populated from the `heroContent` data object provided by the context."
+            "testStrategy": "Visually verify on the home page that the Hero section appears correctly with the title, description, and call-to-action button text populated from the `heroContent` data object provided by the context.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -620,7 +708,8 @@
             ],
             "details": "Sequentially import and render the remaining section components below the `HeroSection`. For example: `<FeaturedEventsSection events={events} />`, `<PartnersSection partners={partners} />`, and `<TeamSection team={team} />`. Ensure each component receives the correct data prop from the `useContent` hook.",
             "status": "pending",
-            "testStrategy": "Scroll down the landing page and confirm that the Featured Events, Partners, and Team sections are all rendered in the correct order. Verify that each section is correctly populated with dynamic data, such as showing the correct event cards and partner logos."
+            "testStrategy": "Scroll down the landing page and confirm that the Featured Events, Partners, and Team sections are all rendered in the correct order. Verify that each section is correctly populated with dynamic data, such as showing the correct event cards and partner logos.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -631,21 +720,25 @@
             ],
             "details": "Use a `main` or `div` element in `LandingPage.tsx` to wrap all section components. Apply a class like `flex flex-col` to the wrapper and use `gap-y-16` or a similar utility to create consistent vertical spacing. Add responsive prefixes (e.g., `md:gap-y-24`) to adjust the layout for different screen sizes.",
             "status": "pending",
-            "testStrategy": "Using browser developer tools, view the landing page at various screen widths (mobile, tablet, desktop). Confirm that all sections stack and reflow correctly without horizontal overflow or broken layouts. Check that the spacing between sections is appropriate for each viewport size."
+            "testStrategy": "Using browser developer tools, view the landing page at various screen widths (mobile, tablet, desktop). Confirm that all sections stack and reflow correctly without horizontal overflow or broken layouts. Check that the spacing between sections is appropriate for each viewport size.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 4,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Generate the skeleton code for `LandingPage.tsx`, showing how it uses the `useContent` hook and passes data to placeholder section components (e.g., `<HeroSection />`, `<FeaturedEventsSection />`). Also, provide an example of one of the section components, showing how it receives and renders the props."
       },
       {
-        "id": 10,
+        "id": "10",
         "title": "Public UI: Implement All-Events Page with Filtering and Search",
         "description": "Develop the `AllEventsPage.tsx` to display all 'upcoming' events. Implement client-side filtering (by date, category), sorting, and a search functionality.",
         "details": "Create `src/components/AllEventsPage.tsx`. Fetch the list of all events from `ContentContext`. Use local state (`useState`) to manage filter criteria (e.g., search query, selected category). Apply these filters to the event list before rendering the event cards. Implement pagination if the list is expected to be long. The search should filter events based on title, description, or artist names.\n\n```tsx\n// src/components/AllEventsPage.tsx\nconst { events } = useContent();\nconst [searchQuery, setSearchQuery] = useState('');\n\nconst filteredEvents = events.filter(event => \n  event.title.toLowerCase().includes(searchQuery.toLowerCase())\n);\n\nreturn <div>{/* Render filter controls and filteredEvents */}</div>;\n```",
         "testStrategy": "Manually test the filtering and search functionality. Enter a search query and verify that only matching events are displayed. Use the filter controls for category and date, and confirm the list updates correctly. Check that pagination works as expected if implemented.",
         "priority": "medium",
         "dependencies": [
-          4,
-          5,
-          7
+          "4",
+          "5",
+          "7"
         ],
         "status": "pending",
         "subtasks": [
@@ -656,7 +749,8 @@
             "dependencies": [],
             "details": "Create the file `src/components/AllEventsPage.tsx`. Inside the component, call `useContent()` to get the `events` array. Filter this array to show only 'upcoming' events (events with a date in the future). Map over the filtered array and render a simple placeholder for each event, like a `<div>` with the event title. Add a route for '/events' in `src/components/Router.tsx` to render this new component.",
             "status": "pending",
-            "testStrategy": "Verify that the page renders at the '/events' route and displays a list of titles for all upcoming events fetched from the context. Check the console for any errors related to data fetching."
+            "testStrategy": "Verify that the page renders at the '/events' route and displays a list of titles for all upcoming events fetched from the context. Check the console for any errors related to data fetching.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -667,7 +761,8 @@
             ],
             "details": "In `AllEventsPage.tsx`, add an `<Input />` component from `src/components/ui/input.tsx`. Create a `useState` hook for the `searchQuery`. Create a `useMemo` hook to compute the `filteredEvents` list by applying the search query to the upcoming events array. The search should be case-insensitive and check against `event.title`, `event.description`, and any associated artist fields.",
             "status": "pending",
-            "testStrategy": "Type various queries into the search bar. Confirm that the list of events updates in real-time to show only events that match the query in their title, description, or artist details. Test with empty queries and queries that yield no results."
+            "testStrategy": "Type various queries into the search bar. Confirm that the list of events updates in real-time to show only events that match the query in their title, description, or artist details. Test with empty queries and queries that yield no results.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -678,7 +773,8 @@
             ],
             "details": "Add a `<Select />` component from `src/components/ui/select.tsx` for category filtering. Populate it with unique categories from the events list. Add another set of controls (e.g., `<Button />` group or a date picker component) for date filtering (e.g., 'This Week', 'This Month'). Use `useState` to manage the state for these filters. Update the filtering logic to incorporate these new criteria along with the search query.",
             "status": "pending",
-            "testStrategy": "Select a category from the dropdown and verify that only events of that category are displayed. Test the date filters and confirm the list updates accordingly. Ensure that the category, date, and search filters can all be applied simultaneously and work correctly together."
+            "testStrategy": "Select a category from the dropdown and verify that only events of that category are displayed. Test the date filters and confirm the list updates accordingly. Ensure that the category, date, and search filters can all be applied simultaneously and work correctly together.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -689,7 +785,8 @@
             ],
             "details": "Add a `<Select />` component to control the sort order. Options should include 'Date (Newest First)', 'Date (Oldest First)', and 'Title (A-Z)'. Use a `useState` hook to manage the selected sort option. Apply the sorting logic to the filtered event list *after* all filters (search, category, date) have been applied but *before* pagination.",
             "status": "pending",
-            "testStrategy": "Test each sorting option. Verify that changing the sort order correctly reorganizes the currently displayed list of events without affecting the active filters."
+            "testStrategy": "Test each sorting option. Verify that changing the sort order correctly reorganizes the currently displayed list of events without affecting the active filters.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -700,15 +797,23 @@
             ],
             "details": "For each event in the final sorted and filtered list, render a `<Card />` component from `src/components/ui/card.tsx` to display the event details (image, title, date, etc.) in a structured format. Implement pagination by using `useState` for `currentPage`. Calculate the total number of pages and use `.slice()` to display only the events for the current page. Add 'Previous' and 'Next' `<Button />` components to navigate between pages.",
             "status": "pending",
-            "testStrategy": "Verify that events are now displayed in styled cards. If there are more events than the page limit, check that pagination controls appear. Click 'Next' and 'Previous' to ensure the correct subset of events is displayed on each page. The 'Previous' button should be disabled on page 1."
+            "testStrategy": "Verify that events are now displayed in styled cards. If there are more events than the page limit, check that pagination controls appear. Click 'Next' and 'Previous' to ensure the correct subset of events is displayed on each page. The 'Previous' button should be disabled on page 1.",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 6,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Provide a detailed implementation plan. Show the state management using `useState` for search query and filters. Write the core filtering logic using `useMemo` to create a derived list of events. Demonstrate how to implement pagination using `slice` and state for the current page."
       }
     ],
     "metadata": {
-      "created": "2025-11-06T21:58:25.323Z",
-      "updated": "2025-11-06T23:00:17.449Z",
-      "description": "Tasks for master context"
+      "version": "1.0.0",
+      "lastModified": "2025-11-07T00:53:19.749Z",
+      "taskCount": 10,
+      "completedCount": 4,
+      "tags": [
+        "master"
+      ]
     }
   }
 }
