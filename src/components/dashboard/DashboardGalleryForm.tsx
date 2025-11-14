@@ -82,7 +82,7 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
   };
 
   const form = useForm<GalleryFormValues>({
-    resolver: zodResolver(galleryFormSchema),
+    resolver: zodResolver(galleryFormSchema) as Resolver<GalleryFormValues>,
     defaultValues: getDefaultValues(),
   });
 

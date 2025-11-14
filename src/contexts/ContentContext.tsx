@@ -22,6 +22,32 @@ export type HeroContent = HeroContentDto;
 export type AboutContent = AboutContentDto;
 export type SiteSettings = SiteSettingsDto;
 
+const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> | null => {
+  if (!value || typeof value === 'string') return null;
+  if (Array.isArray(value)) return null;
+  return Object.entries(value as Record<string, Json | undefined>).reduce<Record<string, string | null>>(
+    (acc, [key, entry]) => {
+      if (typeof entry === 'string') {
+        acc[key] = entry;
+      } else if (typeof entry === 'number' || typeof entry === 'boolean') {
+        acc[key] = String(entry);
+      } else if (entry === null || entry === undefined) {
+        acc[key] = null;
+      }
+      return acc;
+    },
+    {}
+  );
+};
+
+const ensureStringArray = (value: Json | undefined): string[] | undefined => {
+  if (!value) return undefined;
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string');
+  }
+  return undefined;
+};
+
 // =============================================
 // DATA FETCHING FUNCTIONS (New Supabase Schema)
 // =============================================
@@ -318,23 +344,6 @@ const normalizeMetadata = (value: Json | null | undefined): EventMetadata => {
   return {};
 };
 
-const ensureStringArray = (value: Json | undefined): string[] => {
-  if (Array.isArray(value)) {
-    return value.filter((item): item is string => typeof item === 'string');
-  }
-  return [];
-};
-
-const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> | null => {
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    return Object.entries(value).reduce<Record<string, string | null>>((acc, [key, val]) => {
-      acc[key] = val == null ? null : String(val);
-      return acc;
-    }, {});
-  }
-  return null;
-};
-
 type DummyEvent = (typeof DUMMY_EVENTS)[number] & {
   attendees?: number | null;
   price?: string | null;
@@ -454,18 +463,21 @@ export const ContentProvider: React.FC<{
           );
 
           setGallery(
-            DUMMY_GALLERY_ITEMS.map(g => ({
-              id: g.id || `gallery-${Date.now()}-${Math.random()}`,
-              title: g.title,
-              description: g.description ?? null,
-              category: g.category ?? null,
-              status: g.status ?? 'published',
-              tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
-              image_urls: ensureStringArray(g.image_urls),
-              url: ensureStringArray(g.image_urls)[0] || '',
-              created_at: g.created_at ?? new Date().toISOString(),
-              updated_at: g.updated_at ?? new Date().toISOString(),
-            }))
+            DUMMY_GALLERY_ITEMS.map(g => {
+              const imageUrls = ensureStringArray(g.image_urls) ?? [];
+              return {
+                id: g.id || `gallery-${Date.now()}-${Math.random()}`,
+                title: g.title,
+                description: g.description ?? null,
+                category: g.category ?? null,
+                status: g.status ?? 'published',
+                tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
+                image_urls: imageUrls,
+                url: imageUrls[0] || '',
+                created_at: g.created_at ?? new Date().toISOString(),
+                updated_at: g.updated_at ?? new Date().toISOString(),
+              };
+            })
           );
 
           setTeam(
