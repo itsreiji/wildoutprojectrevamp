@@ -9,8 +9,6 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-  Form,
-  FormField,
   FormItem,
   FormLabel,
   FormControl,
@@ -81,7 +79,7 @@ export default function TestComponents() {
       </Card>
 
       {/* Checkbox Test */}
-      <Card className="mb-6">
+          <Card className="mb-6">
         <CardHeader>
           <CardTitle>Checkbox Component</CardTitle>
           <CardDescription>Test checkbox with form integration</CardDescription>
@@ -90,8 +88,10 @@ export default function TestComponents() {
           <div className="flex items-center space-x-2">
             <Checkbox
               id="test-checkbox"
-              checked={checkboxValue}
-              onCheckedChange={setCheckboxValue}
+                  checked={checkboxValue}
+                  onCheckedChange={(checked: boolean | "indeterminate") =>
+                    setCheckboxValue(checked === "indeterminate" ? true : checked)
+                  }
             />
             <FormLabel htmlFor="test-checkbox">Accept terms and conditions</FormLabel>
           </div>
@@ -100,24 +100,22 @@ export default function TestComponents() {
       </Card>
 
       {/* Form Test */}
-      <Card className="mb-6">
+          <Card className="mb-6">
         <CardHeader>
           <CardTitle>Form Components</CardTitle>
           <CardDescription>Test form with React Hook Form integration</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form>
-            <FormField name="email">
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="Enter your email" />
-                </FormControl>
-                <FormDescription>Enter your email address</FormDescription>
-                <FormMessage />
-              </FormItem>
-            </FormField>
-          </Form>
+          <div>
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="Enter your email" />
+              </FormControl>
+              <FormDescription>Enter your email address</FormDescription>
+              <FormMessage />
+            </FormItem>
+          </div>
         </CardContent>
       </Card>
 

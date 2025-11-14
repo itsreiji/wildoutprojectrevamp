@@ -101,7 +101,7 @@ export const DashboardPartners = React.memo(() => {
   const handleSubmit = async (values: PartnerFormValues) => {
     setIsSubmitting(true);
     try {
-      let logoUrl: string | undefined = editingPartner?.logo_url;
+      let logoUrl: string | undefined = editingPartner?.logo_url ?? undefined;
       const newUploadedFiles: string[] = [];
 
       // Handle logo upload

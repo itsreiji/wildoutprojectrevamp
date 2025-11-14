@@ -7,7 +7,7 @@ import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useContent, Event } from '../contexts/ContentContext';
-import { useRouter } from './router/index';
+import { useRouter } from './router';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 export const AllEventsPage = React.memo(() => {
@@ -17,11 +17,16 @@ export const AllEventsPage = React.memo(() => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
-  const categories = ['all', ...Array.from(new Set(events.map(e => e.category)))];
+  const categories = [
+    'all',
+    ...Array.from(new Set(events.map(e => e.category).filter((category): category is string => Boolean(category))))
+  ];
 
   const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const description = event.description ?? '';
+    const matchesSearch =
+      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = filterCategory === 'all' || event.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -132,7 +137,7 @@ export const AllEventsPage = React.memo(() => {
                     </h3>
 
                     <p className="text-white/60 text-sm mb-4 line-clamp-2 flex-1">
-                      {event.description}
+                      {event.description ?? 'No description available.'}
                     </p>
 
                     <div className="space-y-2">
@@ -171,11 +176,14 @@ export const AllEventsPage = React.memo(() => {
                       )}
 
                       {/* Attendance */}
-                      {(event.attendees !== undefined || event.capacity !== null) && (
+                      {((event.attendees !== undefined && event.attendees !== null) ||
+                        (event.capacity !== undefined && event.capacity !== null)) && (
                         <div className="flex items-center justify-between pt-2 border-t border-white/10">
                           <div className="flex items-center text-sm text-white/70">
                             <Users className="h-4 w-4 mr-2 text-[#E93370]" />
-                            <span>{event.attendees || 0}/{event.capacity || 'N/A'}</span>
+                            <span>
+                              {event.attendees ?? 0}/{event.capacity ?? 'N/A'}
+                            </span>
                           </div>
                           {(event.price || event.price_range) && (
                             <span className="text-sm text-[#E93370]">{event.price || event.price_range || 'TBD'}</span>
@@ -184,11 +192,20 @@ export const AllEventsPage = React.memo(() => {
                       )}
 
                       {/* Progress Bar */}
-                      {event.attendees !== undefined && event.capacity !== null && event.capacity > 0 && (
+                      {event.attendees !== undefined &&
+                        event.attendees !== null &&
+                        event.capacity !== undefined &&
+                        event.capacity !== null &&
+                        event.capacity > 0 && (
                         <div className="w-full bg-white/10 rounded-full h-1.5">
                           <div
                             className="bg-[#E93370] h-1.5 rounded-full transition-all duration-500"
-                            style={{ width: `${Math.min(((event.attendees || 0) / event.capacity) * 100, 100)}%` }}
+                            style={{
+                              width: `${Math.min(
+                                ((event.attendees ?? 0) / (event.capacity ?? 0)) * 100,
+                                100
+                              )}%`
+                            }}
                           />
                         </div>
                       )}

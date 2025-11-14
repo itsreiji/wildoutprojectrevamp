@@ -1,84 +1,35 @@
 /* @refresh reset */
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { supabaseClient } from '../supabase/client';
-import type { Tables, TablesInsert, TablesUpdate } from '../supabase/types';
+import type { Json, Tables, TablesInsert, TablesUpdate } from '../supabase/types';
 import { DUMMY_EVENTS, DUMMY_EVENT_ARTISTS, DUMMY_TEAM_MEMBERS, DUMMY_PARTNERS, DUMMY_GALLERY_ITEMS } from '../data/dummyData';
 import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
+import type {
+  Event as LandingEvent,
+  TeamMember as TeamMemberDto,
+  Partner as PartnerDto,
+  HeroContent as HeroContentDto,
+  AboutContent as AboutContentDto,
+  GalleryImage as GalleryImageDto,
+  SiteSettings as SiteSettingsDto,
+} from '@/types';
 
-// Re-export types from the new Supabase schema
-export type Event = {
-  id: string;
-  title: string;
-  description: string | null;
-  start_date: string;
-  end_date: string;
-  location: string | null;
-  category: string;
-  status: string;
-  capacity: number | null;
-  price_range: string | null;
-  ticket_url: string | null;
-  partner_name: string | null;
-  metadata: any;
-  created_at: string;
-  updated_at: string;
-  // Legacy/compatibility fields for UI components
-  date?: string;
-  time?: string;
-  venue?: string;
-  venueAddress?: string;
-  image?: string;
-  attendees?: number;
-  price?: string;
-  artists?: Array<{
-    name: string;
-    role: string;
-    image: string;
-  }>;
-  gallery?: string[];
-  highlights?: string[];
-  // Joined data from views/functions
-  partner_logo_url?: string | null;
-  partner_website_url?: string | null;
-};
-
-export type TeamMember = Tables<'team_members'>;
-export type Partner = Tables<'partners'>;
-export type GalleryImage = Tables<'gallery_items'>;
-
-// Legacy types for backward compatibility (to be updated)
-export type HeroContent = {
-  title: string;
-  subtitle: string;
-  backgroundImage: string;
-  ctaText: string;
-  ctaLink: string;
-};
-
-export type AboutContent = {
-  title: string;
-  description: string;
-  mission: string;
-  values: string[];
-  stats: Array<{ label: string; value: string }>;
-};
-
-export type SiteSettings = {
-  siteName: string;
-  siteDescription: string;
-  contactEmail: string;
-  primaryColor: string;
-  socialLinks: Record<string, string>;
-};
+export type Event = LandingEvent;
+export type TeamMember = TeamMemberDto;
+export type Partner = PartnerDto;
+export type GalleryImage = GalleryImageDto;
+export type HeroContent = HeroContentDto;
+export type AboutContent = AboutContentDto;
+export type SiteSettings = SiteSettingsDto;
 
 // =============================================
 // DATA FETCHING FUNCTIONS (New Supabase Schema)
 // =============================================
 
 // Events fetching with new schema
-const fetchEvents = async (): Promise<Event[]> => {
+const fetchEvents = async (): Promise<LandingEvent[]> => {
   try {
-    // Use the public_events view for querying
+// Use the public_events_view for querying
     const { data, error } = await supabaseClient
       .from('public_events')
       .select('*')
@@ -89,9 +40,11 @@ const fetchEvents = async (): Promise<Event[]> => {
       return [];
     }
 
-    return (data || []).map(event => ({
-      ...event,
-      // Transform view data to match Event type
+    const rows = (data || []) as PublicEventsViewRow[];
+    return rows.map(event => ({
+      id: event.id,
+      title: event.title,
+      description: event.description,
       date: event.start_date.split('T')[0], // Extract date part
       time: `${new Date(event.start_date).toLocaleTimeString('en-US', {
         hour: '2-digit',
@@ -102,18 +55,24 @@ const fetchEvents = async (): Promise<Event[]> => {
       })}`,
       venue: event.location || 'TBD',
       venueAddress: event.location || '',
-      category: event.category,
-      status: event.status,
+      image: event.image || event.banner_image || '',
+      category: event.category || null,
+      status: (event.status as LandingEvent['status']) || 'upcoming',
       capacity: event.max_attendees || undefined,
-      price: event.price ? `${event.currency} ${event.price}` : 'TBD',
-      // Keep the new schema fields
+      attendees: event.attendees,
+      price: event.price ? `${event.currency} ${event.price}` : event.price,
+      price_range: event.price ? `${event.currency} ${event.price}` : event.price_range,
+      ticket_url: event.ticket_url,
+      artists: event.artists || [],
+      gallery: event.gallery || [],
+      highlights: event.highlights || [],
       start_date: event.start_date,
       end_date: event.end_date,
       location: event.location,
       partner_name: event.partner_name,
-      ticket_url: event.ticket_url,
-      price_range: event.price ? `${event.currency} ${event.price}` : undefined,
-    })) as Event[];
+      partner_logo_url: event.partner_logo_url,
+      partner_website_url: event.partner_website_url,
+    })) as LandingEvent[];
   } catch (error) {
     console.error('Error in fetchEvents:', error);
     return [];
@@ -121,7 +80,7 @@ const fetchEvents = async (): Promise<Event[]> => {
 };
 
 // Team members fetching
-const fetchTeamMembers = async (): Promise<TeamMember[]> => {
+const fetchTeamMembers = async (): Promise<TeamMemberDto[]> => {
   try {
     const { data, error } = await supabaseClient
       .from('team_members')
@@ -135,7 +94,7 @@ const fetchTeamMembers = async (): Promise<TeamMember[]> => {
       return [];
     }
 
-    return data || [];
+    return (data || []) as TeamMemberDto[];
   } catch (error) {
     console.error('Error in fetchTeamMembers:', error);
     return [];
@@ -143,7 +102,7 @@ const fetchTeamMembers = async (): Promise<TeamMember[]> => {
 };
 
 // Partners fetching
-const fetchPartners = async (): Promise<Partner[]> => {
+const fetchPartners = async (): Promise<PartnerDto[]> => {
   try {
     const { data, error } = await supabaseClient
       .from('partners')
@@ -156,7 +115,7 @@ const fetchPartners = async (): Promise<Partner[]> => {
       return [];
     }
 
-    return data || [];
+    return (data || []) as PartnerDto[];
   } catch (error) {
     console.error('Error in fetchPartners:', error);
     return [];
@@ -164,7 +123,7 @@ const fetchPartners = async (): Promise<Partner[]> => {
 };
 
 // Gallery fetching
-const fetchGallery = async (): Promise<GalleryImage[]> => {
+const fetchGallery = async (): Promise<GalleryImageDto[]> => {
   try {
     const { data, error } = await supabaseClient
       .from('gallery_items')
@@ -177,7 +136,7 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
       return [];
     }
 
-    return data || [];
+    return (data || []) as GalleryImageDto[];
   } catch (error) {
     console.error('Error in fetchGallery:', error);
     return [];
@@ -188,231 +147,107 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
 // LEGACY DATA (For Backward Compatibility During Migration)
 // =============================================
 
+
+
+
 // Placeholder for legacy data structure until full migration
-const INITIAL_EVENTS: Event[] = [
-  // This would be removed after migration is complete
-  // For now, keeping minimal placeholder data
+const INITIAL_EVENTS: LandingEvent[] = [
   {
-    id: '4',
+    id: 'initial-event-1',
     title: 'Bass Rebellion: Underground Series',
-    description: 'Dive deep into underground bass music scene with Indonesia\'s finest dubstep, drum & bass, and trap artists. This is not for the faint of heart.',
+    description: "Dive deep into underground bass music with Indonesia's finest dubstep, drum & bass, and trap artists.",
     date: '2025-12-01',
     time: '22:00 - 05:00',
     venue: 'The Bunker',
     venueAddress: 'Jl. Kemang Raya, Jakarta Selatan',
-    image: 'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaiUyMHBlcmZvcm1hbmNlJTIwY2x1YnxlbnwxfHx8fDE3NjE4MTgwMjR8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: 'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?auto=format&fit=crop&w=1200&q=80',
     category: 'Club Night',
     capacity: 1500,
     attendees: 1200,
     price: 'IDR 150K',
+    price_range: 'IDR 150K',
+    ticket_url: null,
+    status: 'upcoming',
     artists: [
       { name: 'Bass Monkey', role: 'Headliner', image: 'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?w=400' },
-      { name: 'Subsonic', role: 'Supporting', image: 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400' },
-      { name: 'Frequency', role: 'Opening', image: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400' },
     ],
-    gallery: [
-      'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?w=800',
-      'https://images.unsplash.com/photo-1656283384093-1e227e621fad?w=800',
-    ],
-    highlights: [
-      'Underground warehouse venue',
-      'Heavy bass sound system',
-      'Live visuals and lasers',
-      'Multiple stages',
-      'After-hours access',
-    ],
-    status: 'upcoming',
+    gallery: [],
+    highlights: ['Underground warehouse venue', 'Heavy bass sound system'],
+    start_date: '2025-12-01T22:00:00Z',
+    end_date: '2025-12-02T05:00:00Z',
+    location: 'The Bunker',
+    partner_name: 'WildOut!',
+    partner_logo_url: null,
+    partner_website_url: 'https://wildout.id',
   },
 ];
 
-const INITIAL_PARTNERS: Partner[] = [
-  { id: '1', name: 'Spotify', category: 'Music', website: 'spotify.com', status: 'active' },
-  { id: '2', name: 'Red Bull', category: 'Energy', website: 'redbull.com', status: 'active' },
-  { id: '3', name: 'Heineken', category: 'Beverage', website: 'heineken.com', status: 'active' },
-  { id: '4', name: 'Nike', category: 'Lifestyle', website: 'nike.com', status: 'active' },
-  { id: '5', name: 'Adidas', category: 'Lifestyle', website: 'adidas.com', status: 'active' },
-  { id: '6', name: 'Apple Music', category: 'Music', website: 'apple.com/music', status: 'active' },
-  { id: '7', name: 'Corona', category: 'Beverage', website: 'corona.com', status: 'active' },
-  { id: '8', name: 'Converse', category: 'Lifestyle', website: 'converse.com', status: 'active' },
-  { id: '9', name: 'Gojek', category: 'Technology', website: 'gojek.com', status: 'active' },
-  { id: '10', name: 'Tokopedia', category: 'E-commerce', website: 'tokopedia.com', status: 'active' },
-  { id: '11', name: 'BCA', category: 'Financial', website: 'bca.co.id', status: 'active' },
-  { id: '12', name: 'Telkomsel', category: 'Telecom', website: 'telkomsel.com', status: 'active' },
-];
-
-const INITIAL_GALLERY: GalleryImage[] = [
-  { id: '1', url: 'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800', caption: 'Neon Nights Festival', uploadDate: '2025-10-28', event: 'Neon Nights' },
-  { id: '2', url: 'https://images.unsplash.com/photo-1656283384093-1e227e621fad?w=800', caption: 'Concert Crowd', uploadDate: '2025-10-27', event: 'Sunset Sessions' },
-  { id: '3', url: 'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?w=800', caption: 'DJ Performance', uploadDate: '2025-10-26', event: 'Bass Rebellion' },
-  { id: '4', url: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=800', caption: 'Art Exhibition', uploadDate: '2025-10-25', event: 'Urban Art' },
-  { id: '5', url: 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=800', caption: 'Creative Team', uploadDate: '2025-10-24' },
-  { id: '6', url: 'https://images.unsplash.com/photo-1758922801699-09d8d788f90c?w=800', caption: 'Brand Partnership', uploadDate: '2025-10-23' },
-];
-
-const INITIAL_TEAM: TeamMember[] = [
+const INITIAL_PARTNERS: PartnerDto[] = [
   {
-    id: '1',
+    id: 'partner-1',
+    name: 'Spotify',
+    category: 'Music',
+    status: 'active',
+    website_url: 'https://spotify.com',
+    description: 'Streaming partner',
+    featured: true,
+    social_links: { instagram: 'https://instagram.com/spotify' },
+  },
+];
+
+const INITIAL_GALLERY: GalleryImageDto[] = [
+  {
+    id: 'gallery-1',
+    url: 'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800',
+    caption: 'Neon Nights Festival',
+    uploadDate: '2025-10-28',
+    event: 'Neon Nights',
+  },
+];
+
+const INITIAL_TEAM: TeamMemberDto[] = [
+  {
+    id: 'team-1',
     name: 'Sarah Chen',
     role: 'CEO & Founder',
+    title: 'Founder & CEO',
     email: 'sarah@wildout.id',
     phone: '+62 812 3456 7890',
-    bio: 'Visionary leader with 10+ years experience in nightlife and entertainment industry',
+    bio: 'Visionary leader with 10+ years in nightlife and entertainment.',
     photoUrl: 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400',
     status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Michael Rodriguez',
-    role: 'Creative Director',
-    email: 'michael@wildout.id',
-    phone: '+62 813 7654 3210',
-    bio: 'Award-winning creative with passion for innovative event experiences',
-    photoUrl: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400',
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'Aisha Patel',
-    role: 'Marketing Director',
-    email: 'aisha@wildout.id',
-    phone: '+62 814 8765 4321',
-    bio: 'Digital marketing strategist specializing in community engagement',
-    photoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400',
-    status: 'active',
-  },
-  {
-    id: '4',
-    name: 'David Kim',
-    role: 'Operations Manager',
-    email: 'david@wildout.id',
-    phone: '+62 815 2468 1357',
-    bio: 'Expert in logistics and operational excellence for large-scale events',
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-    status: 'active',
-  },
-  {
-    id: '5',
-    name: 'Priya Sharma',
-    role: 'Event Coordinator',
-    email: 'priya@wildout.id',
-    phone: '+62 816 9753 8642',
-    bio: 'Meticulous planner ensuring flawless event execution',
-    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400',
-    status: 'active',
-  },
-  {
-    id: '6',
-    name: 'James Wilson',
-    role: 'Technical Director',
-    email: 'james@wildout.id',
-    phone: '+62 817 3698 5274',
-    bio: 'Audio-visual expert with cutting-edge production knowledge',
-    photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-    status: 'active',
-  },
-  {
-    id: '7',
-    name: 'Natasha Williams',
-    role: 'Social Media Manager',
-    email: 'natasha@wildout.id',
-    phone: '+62 818 7531 9864',
-    bio: 'Content creator building vibrant online communities',
-    photoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-    status: 'active',
-  },
-  {
-    id: '8',
-    name: 'Alex Zhang',
-    role: 'Sponsorship Manager',
-    email: 'alex@wildout.id',
-    phone: '+62 819 8524 7136',
-    bio: 'Building strategic partnerships with leading brands',
-    photoUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
-    status: 'active',
-  },
-  {
-    id: '9',
-    name: 'Maria Santos',
-    role: 'Artist Relations',
-    email: 'maria@wildout.id',
-    phone: '+62 820 1472 5836',
-    bio: 'Connecting top talent with incredible event opportunities',
-    photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-    status: 'active',
-  },
-  {
-    id: '10',
-    name: 'Ryan Thompson',
-    role: 'Design Lead',
-    email: 'ryan@wildout.id',
-    phone: '+62 821 9517 3648',
-    bio: 'Creating stunning visual identities for memorable events',
-    photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
-    status: 'active',
-  },
-  {
-    id: '11',
-    name: 'Lily Anderson',
-    role: 'Customer Experience',
-    email: 'lily@wildout.id',
-    phone: '+62 822 7539 5148',
-    bio: 'Ensuring every guest has an unforgettable experience',
-    photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
-    status: 'active',
-  },
-  {
-    id: '12',
-    name: 'Omar Hassan',
-    role: 'Finance Manager',
-    email: 'omar@wildout.id',
-    phone: '+62 823 8642 9753',
-    bio: 'Managing financial strategy and sustainable growth',
-    photoUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
-    status: 'active',
+    social_links: { instagram: 'https://instagram.com/sarah' },
   },
 ];
 
-const INITIAL_HERO: HeroContent = {
+const INITIAL_HERO: HeroContentDto = {
   title: 'WildOut!',
   subtitle: 'Media Digital Nightlife & Event Multi-Platform',
-  description: "Indonesia's premier creative community connecting artists, events, and experiences. Join us in celebrating nightlife culture and creative collaborations.",
+  description: "Indonesia's premier creative community connecting artists, events, and experiences.",
   stats: {
     events: '500+',
     members: '50K+',
     partners: '100+',
   },
+  ctaText: 'Explore Events',
+  ctaLink: '/events',
 };
 
-const INITIAL_ABOUT: AboutContent = {
+const INITIAL_ABOUT: AboutContentDto = {
   title: 'About WildOut!',
-  subtitle: "Indonesia's leading creative community platform, connecting artists, events, and experiences since 2020. We're more than just events – we're a movement.",
-  story: [
-    "Founded in 2020, WildOut! emerged from a simple idea: to create a platform that celebrates Indonesia's vibrant creative culture. What started as small gatherings has grown into one of the country's most influential creative communities.",
-    "We've hosted over 500 events, connected more than 50,000 creative professionals, and partnered with 100+ brands to bring unforgettable experiences to our community. From intimate art exhibitions to massive music festivals, we're dedicated to showcasing the best of Indonesia's creative talent.",
-    "Our mission is to empower artists, connect communities, and push boundaries of what's possible in nightlife and event culture. Join us in shaping the future of Indonesia's creative scene.",
-  ],
+  subtitle: "Indonesia's leading creative community platform, connecting artists, events, and experiences since 2020.",
   foundedYear: '2020',
+  story: [
+    'Founded in 2020, WildOut! celebrates Indonesia�s creative culture.',
+    'We host community-driven events that bring artists, venues, and sponsors together.',
+  ],
   features: [
-    {
-      title: 'Community First',
-      description: 'We bring together passionate creatives, artists, and event enthusiasts to build lasting connections.',
-    },
-    {
-      title: 'Unforgettable Experiences',
-      description: 'Every event is crafted to deliver unique, memorable moments that resonate with our community.',
-    },
-    {
-      title: 'Collaborative Spirit',
-      description: 'We partner with local and international brands to create opportunities for growth and collaboration.',
-    },
-    {
-      title: 'Creative Innovation',
-      description: 'Pushing boundaries with cutting-edge production, technology, and artistic expression.',
-    },
+    { title: 'Community First', description: 'We build lasting connections.' },
+    { title: 'Unforgettable Experiences', description: 'Every event is crafted to be memorable.' },
   ],
 };
 
-const INITIAL_SETTINGS: SiteSettings = {
+const INITIAL_SETTINGS: SiteSettingsDto = {
   siteName: 'WildOut!',
   siteDescription: 'Media Digital Nightlife & Event Multi-Platform',
   tagline: "Indonesia's premier creative community platform",
@@ -451,11 +286,11 @@ interface ContentContextType {
   deleteEvent: (id: string) => Promise<void>;
   // Team member mutations
   addTeamMember: (member: TablesInsert<'team_members'>) => Promise<TeamMember>;
-  updateTeamMember: (id: string, updates: TablesUpdate<'team_members'>) => Promise<TeamMember>;
+  updateTeamMember: (id: string, updates: TablesUpdate<'team_members'>, oldAvatarUrl?: string | null) => Promise<TeamMember>;
   deleteTeamMember: (id: string) => Promise<void>;
   // Partner mutations
   addPartner: (partner: TablesInsert<'partners'>) => Promise<Partner>;
-  updatePartner: (id: string, updates: TablesUpdate<'partners'>) => Promise<Partner>;
+  updatePartner: (id: string, updates: TablesUpdate<'partners'>, oldLogoUrl?: string | null) => Promise<Partner>;
   deletePartner: (id: string) => Promise<void>;
   // Gallery mutations
   addGalleryImage: (item: TablesInsert<'gallery_items'>) => Promise<GalleryImage>;
@@ -465,6 +300,72 @@ interface ContentContextType {
   useDummyData: boolean;
   setUseDummyData: (use: boolean) => void;
 }
+
+type EventMetadata = Json extends infer T
+  ? T extends object
+    ? {
+        highlights?: string[];
+        gallery?: string[];
+        featured_image?: string;
+      } & Record<string, Json | undefined>
+    : { highlights?: string[]; gallery?: string[]; featured_image?: string }
+  : never;
+
+const normalizeMetadata = (value: Json | null | undefined): EventMetadata => {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return value as EventMetadata;
+  }
+  return {};
+};
+
+const ensureStringArray = (value: Json | undefined): string[] => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string');
+  }
+  return [];
+};
+
+const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> | null => {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return Object.entries(value).reduce<Record<string, string | null>>((acc, [key, val]) => {
+      acc[key] = val == null ? null : String(val);
+      return acc;
+    }, {});
+  }
+  return null;
+};
+
+type DummyEvent = (typeof DUMMY_EVENTS)[number] & {
+  attendees?: number | null;
+  price?: string | null;
+  partner_logo_url?: string | null;
+  partner_website_url?: string | null;
+};
+
+ type PublicEventsViewRow = {
+  id: string;
+  title: string;
+  description: string | null;
+  start_date: string;
+  end_date: string;
+  location: string | null;
+  image?: string | null;
+  banner_image?: string | null;
+  category?: string | null;
+  status?: string;
+  max_attendees?: number | null;
+  attendees?: number | null;
+  price?: number | null;
+  currency?: string | null;
+  price_range?: string | null;
+  ticket_url?: string | null;
+  artists?: unknown[];
+  gallery?: string[];
+  highlights?: string[];
+  partner_name?: string | null;
+  partner_logo_url?: string | null;
+  partner_website_url?: string | null;
+};
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
@@ -496,36 +397,88 @@ export const ContentProvider: React.FC<{
           console.log('🔧 Using dummy data for development');
 
           // Transform dummy events to match Event type
-          const dummyEvents: Event[] = DUMMY_EVENTS.map(event => ({
-            ...event,
-            id: event.id || `event-${Date.now()}-${Math.random()}`,
-            date: event.start_date.split('T')[0],
-            time: `${new Date(event.start_date).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit'
-            })} - ${new Date(event.end_date).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit'
-            })}`,
-            venue: event.location || 'TBD',
-            venueAddress: event.location || '',
-            category: event.category,
-            status: event.status,
-            capacity: event.capacity || undefined,
-            price: event.price_range || 'TBD',
-            start_date: event.start_date,
-            end_date: event.end_date,
-            location: event.location,
-            partner_name: event.partner_name,
-            ticket_url: event.ticket_url,
-            price_range: event.price_range,
-          }));
+          const dummyEvents: Event[] = DUMMY_EVENTS.map((event) => {
+            const enrichedEvent = event as DummyEvent;
+          const metadata = normalizeMetadata(enrichedEvent.metadata);
+            const highlights = ensureStringArray(metadata.highlights);
+            const galleryImages = ensureStringArray(metadata.gallery);
+
+            return {
+              id: event.id || `event-${Date.now()}-${Math.random()}`,
+              title: event.title,
+              description: event.description ?? null,
+              date: event.start_date.split('T')[0],
+              time: `${new Date(event.start_date).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+              })} - ${new Date(event.end_date).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+              })}`,
+              venue: event.location || 'TBD',
+              venueAddress: event.location || '',
+              image: metadata.featured_image || '',
+              category: event.category ?? null,
+              status: (event.status as Event['status']) || 'upcoming',
+              capacity: event.capacity ?? null,
+              attendees: enrichedEvent.attendees ?? null,
+              price: enrichedEvent.price ?? enrichedEvent.price_range ?? null,
+              price_range: enrichedEvent.price_range ?? null,
+              ticket_url: event.ticket_url ?? null,
+              artists: [],
+              gallery: galleryImages,
+              highlights,
+              start_date: event.start_date,
+              end_date: event.end_date,
+              location: event.location ?? null,
+              partner_name: event.partner_name ?? null,
+              partner_logo_url: enrichedEvent.partner_logo_url ?? null,
+              partner_website_url: enrichedEvent.partner_website_url ?? null,
+              metadata,
+              created_at: event.start_date,
+              updated_at: event.end_date,
+            };
+          });
 
           // Set dummy data
           setEvents(dummyEvents);
-          setPartners(DUMMY_PARTNERS.map(p => ({ ...p, id: p.id || `partner-${Date.now()}-${Math.random()}` })));
-          setGallery(DUMMY_GALLERY_ITEMS.map(g => ({ ...g, id: g.id || `gallery-${Date.now()}-${Math.random()}` })));
-          setTeam(DUMMY_TEAM_MEMBERS.map(t => ({ ...t, id: t.id || `team-${Date.now()}-${Math.random()}` })));
+          setPartners(
+            DUMMY_PARTNERS.map(p => ({
+              ...p,
+              id: p.id || `partner-${Date.now()}-${Math.random()}`,
+              category: null,
+              website_url: p.website_url ?? null,
+              status: (p.status as 'active' | 'inactive') || 'active',
+              social_links: normalizeSocialLinks(p.social_links),
+            }))
+          );
+
+          setGallery(
+            DUMMY_GALLERY_ITEMS.map(g => ({
+              id: g.id || `gallery-${Date.now()}-${Math.random()}`,
+              title: g.title,
+              description: g.description ?? null,
+              category: g.category ?? null,
+              status: g.status ?? 'published',
+              tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
+              image_urls: ensureStringArray(g.image_urls),
+              url: ensureStringArray(g.image_urls)[0] || '',
+              created_at: g.created_at ?? new Date().toISOString(),
+              updated_at: g.updated_at ?? new Date().toISOString(),
+            }))
+          );
+
+          setTeam(
+            DUMMY_TEAM_MEMBERS.map(t => ({
+              ...t,
+              id: t.id || `team-${Date.now()}-${Math.random()}`,
+              role: null,
+              phone: null,
+              photoUrl: null,
+              social_links: normalizeSocialLinks(t.social_links),
+              status: (t.status as 'active' | 'inactive') || 'active',
+            }))
+          );
 
         } else {
           // Fetch all data concurrently from Supabase

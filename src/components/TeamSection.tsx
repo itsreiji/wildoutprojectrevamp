@@ -1,11 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Mail, Phone, Linkedin, Twitter } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useContent } from '../contexts/ContentContext';
+import type { TeamMember } from '../contexts/ContentContext';
 
-export const TeamSection = React.memo(() => {
-  const { team } = useContent();
+export const TeamSection = React.memo(({ team }: TeamSectionProps) => {
   const activeTeam = team.filter(member => member.status === 'active');
 
   return (
@@ -49,7 +48,7 @@ export const TeamSection = React.memo(() => {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
-                  
+
                   {/* Info Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     <h3 className="text-xl text-white mb-1">{member.name}</h3>
@@ -60,7 +59,7 @@ export const TeamSection = React.memo(() => {
                 {/* Bio & Contact */}
                 <div className="p-6 space-y-4">
                   <p className="text-sm text-white/70 line-clamp-2">{member.bio}</p>
-                  
+
                   <div className="space-y-2">
                     {member.email && (
                       <a
@@ -111,5 +110,9 @@ export const TeamSection = React.memo(() => {
     </section>
   );
 });
+
+export type TeamSectionProps = {
+  team: TeamMember[];
+};
 
 TeamSection.displayName = 'TeamSection';

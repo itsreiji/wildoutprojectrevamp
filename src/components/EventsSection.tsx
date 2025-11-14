@@ -5,11 +5,10 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
-import { useContent, Event } from '../contexts/ContentContext';
-import { useRouter } from './router/index';
+import type { Event } from '../contexts/ContentContext';
+import { useRouter } from './router';
 
-export const EventsSection = React.memo(() => {
-  const { events } = useContent();
+export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
   const { navigate } = useRouter();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
@@ -176,5 +175,9 @@ export const EventsSection = React.memo(() => {
     </>
   );
 });
+
+export type EventsSectionProps = {
+  events: Event[];
+};
 
 EventsSection.displayName = 'EventsSection';

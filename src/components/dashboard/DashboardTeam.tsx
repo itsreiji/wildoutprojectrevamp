@@ -101,7 +101,7 @@ export const DashboardTeam = React.memo(() => {
   const handleSubmit = async (values: TeamFormValues) => {
     setIsSubmitting(true);
     try {
-      let avatarUrl: string | undefined = editingMember?.avatar_url;
+      let avatarUrl: string | undefined = editingMember?.avatar_url ?? undefined;
       const newUploadedFiles: string[] = [];
 
       // Handle avatar upload

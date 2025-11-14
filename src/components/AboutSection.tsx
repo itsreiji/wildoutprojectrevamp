@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, Zap, Users, Sparkles } from 'lucide-react';
-import { useContent } from '../contexts/ContentContext';
+import type { AboutContent } from '../contexts/ContentContext';
 
 const ICON_MAP: Record<number, any> = {
   0: Heart,
@@ -10,8 +10,7 @@ const ICON_MAP: Record<number, any> = {
   3: Sparkles,
 };
 
-export const AboutSection = React.memo(() => {
-  const { about } = useContent();
+export const AboutSection = React.memo(({ about }: AboutSectionProps) => {
   return (
     <section id="about" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -117,5 +116,9 @@ export const AboutSection = React.memo(() => {
     </section>
   );
 });
+
+export type AboutSectionProps = {
+  about: AboutContent;
+};
 
 AboutSection.displayName = 'AboutSection';

@@ -23,7 +23,7 @@
 
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { useEffect } from 'react';
 import { Button } from '../ui/button';
 import {
@@ -45,7 +45,7 @@ const teamFormSchema = z.object({
   email: z.string().email('Email must be a valid email address'),
   bio: z.string().optional().nullable(),
   avatar_file: z.any().optional(),
-  social_links: z.record(z.string()).optional().nullable(),
+  social_links: z.record(z.string(), z.string().nullable()).optional().nullable(),
 });
 
 export type TeamFormValues = z.infer<typeof teamFormSchema>;
@@ -79,7 +79,7 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
   };
 
   const form = useForm<TeamFormValues>({
-    resolver: zodResolver(teamFormSchema),
+    resolver: zodResolver(teamFormSchema) as Resolver<TeamFormValues>,
     defaultValues: getDefaultValues(),
   });
 

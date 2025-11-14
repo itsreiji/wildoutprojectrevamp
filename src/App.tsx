@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemeProvider } from 'next-themes';
 import { ContentProvider } from './contexts/ContentContext';
-import { Router, RouterProvider } from './components/router/index';
+import { Router, RouterProvider } from './components/router';
 import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { AllEventsPage } from './components/AllEventsPage';

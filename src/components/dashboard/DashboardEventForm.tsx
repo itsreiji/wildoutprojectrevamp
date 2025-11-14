@@ -63,9 +63,7 @@ const eventFormSchema = z.object({
   ),
   location: z.string().optional().nullable(),
   category: z.string().min(1, 'Category is required'),
-  status: z.enum(['upcoming', 'ongoing', 'completed'], {
-    errorMap: () => ({ message: 'Please select a valid event status' }),
-  }),
+  status: z.enum(['upcoming', 'ongoing', 'completed']),
   capacity: z
     .union([z.number().min(0, 'Capacity must be 0 or greater'), z.null()])
     .optional(),

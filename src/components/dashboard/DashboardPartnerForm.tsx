@@ -22,7 +22,7 @@
 
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { useEffect } from 'react';
 import { Button } from '../ui/button';
 import {
@@ -46,7 +46,7 @@ const partnerFormSchema = z.object({
   contact_phone: z.string().optional().nullable(),
   featured: z.boolean().optional().default(false),
   logo_file: z.any().optional(),
-  social_links: z.record(z.string()).optional().nullable(),
+  social_links: z.record(z.string(), z.string().nullable()).optional().nullable(),
 });
 
 export type PartnerFormValues = z.infer<typeof partnerFormSchema>;
@@ -84,7 +84,7 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
   };
 
   const form = useForm<PartnerFormValues>({
-    resolver: zodResolver(partnerFormSchema),
+    resolver: zodResolver(partnerFormSchema) as Resolver<PartnerFormValues>,
     defaultValues: getDefaultValues(),
   });
 

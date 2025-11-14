@@ -1,10 +1,9 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Sparkles } from 'lucide-react';
-import { useContent } from '../contexts/ContentContext';
+import type { Partner } from '../contexts/ContentContext';
 
-export const PartnersSection = React.memo(() => {
-  const { partners } = useContent();
+export const PartnersSection = React.memo(({ partners }: PartnersSectionProps) => {
   const activePartners = partners.filter(p => p.status === 'active');
   return (
     <section id="partners" className="relative py-20 px-4">
@@ -49,7 +48,7 @@ export const PartnersSection = React.memo(() => {
                     {partner.name.charAt(0)}
                   </div>
                 </div>
-                
+
                 {/* Partner Info */}
                 <div className="text-center">
                   <div className="text-white group-hover:text-[#E93370] transition-colors duration-300">
@@ -92,5 +91,9 @@ export const PartnersSection = React.memo(() => {
     </section>
   );
 });
+
+export type PartnersSectionProps = {
+  partners: Partner[];
+};
 
 PartnersSection.displayName = 'PartnersSection';

@@ -2,10 +2,9 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Calendar, Users } from 'lucide-react';
 import { Button } from './ui/button';
-import { useContent } from '../contexts/ContentContext';
+import type { HeroContent } from '../contexts/ContentContext';
 
-export const HeroSection = React.memo(() => {
-  const { hero, events, partners } = useContent();
+export const HeroSection = React.memo(({ hero }: HeroSectionProps) => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
@@ -140,5 +139,9 @@ export const HeroSection = React.memo(() => {
     </section>
   );
 });
+
+export type HeroSectionProps = {
+  hero: HeroContent;
+};
 
 HeroSection.displayName = 'HeroSection';

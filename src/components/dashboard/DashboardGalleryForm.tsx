@@ -23,7 +23,7 @@
 
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import {
@@ -44,8 +44,8 @@ const galleryFormSchema = z.object({
   title: z.string().min(1, 'Gallery title is required'),
   description: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
-  tags: z.array(z.string()).optional().default([]),
-  image_files: z.array(z.any()).optional().default([]),
+  tags: z.array(z.string()).default([]),
+  image_files: z.array(z.any()).default([]),
 });
 
 export type GalleryFormValues = z.infer<typeof galleryFormSchema>;

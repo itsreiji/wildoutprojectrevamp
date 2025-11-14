@@ -25,8 +25,8 @@ export const DashboardHome = React.memo(() => {
     const upcomingEvents = events.filter((e) => e.status === 'upcoming').length;
     const ongoingEvents = events.filter((e) => e.status === 'ongoing').length;
     const completedEvents = events.filter((e) => e.status === 'completed').length;
-    const totalAttendees = events.reduce((sum, e) => sum + e.attendees, 0);
-    const totalCapacity = events.reduce((sum, e) => sum + e.capacity, 0);
+    const totalAttendees = events.reduce((sum, e) => sum + (e.attendees ?? 0), 0);
+    const totalCapacity = events.reduce((sum, e) => sum + (e.capacity ?? 0), 0);
     const avgAttendanceRate = totalCapacity > 0 ? (totalAttendees / totalCapacity) * 100 : 0;
 
     return {
@@ -54,7 +54,8 @@ export const DashboardHome = React.memo(() => {
   // Event category distribution
   const categoryData = useMemo(() => {
     const categories = events.reduce((acc, event) => {
-      acc[event.category] = (acc[event.category] || 0) + 1;
+      const key = event.category ?? 'Uncategorized';
+      acc[key] = (acc[key] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
@@ -74,7 +75,7 @@ export const DashboardHome = React.memo(() => {
   // Recent activity
   const recentActivity = useMemo(() => {
     const activities = [];
-    
+
     // Add recent events
     events.slice(0, 3).forEach((event) => {
       activities.push({
@@ -244,7 +245,7 @@ export const DashboardHome = React.memo(() => {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                       outerRadius={100}
                       fill="#8884d8"
                       dataKey="value"
@@ -417,13 +418,15 @@ export const DashboardHome = React.memo(() => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                 {events.slice(0, 3).map((event) => {
-                  const rate = (event.attendees / event.capacity) * 100;
+                  const attendees = event.attendees ?? 0;
+                  const capacity = event.capacity ?? 0;
+                  const rate = capacity > 0 ? (attendees / capacity) * 100 : 0;
                   return (
                     <div key={event.id} className="p-4 rounded-xl bg-white/5 border border-white/10">
                       <p className="text-sm text-white/90 mb-2 truncate">{event.title}</p>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs text-white/60">
-                          {event.attendees}/{event.capacity}
+                          {attendees}/{capacity || 'N/A'}
                         </span>
                         <span className="text-xs text-[#E93370]">{Math.round(rate)}%</span>
                       </div>
