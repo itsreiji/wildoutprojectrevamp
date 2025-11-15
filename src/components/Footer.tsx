@@ -33,7 +33,7 @@ const FOOTER_LINKS = {
 
 export const Footer = React.memo(() => {
   const { settings } = useContent();
-  
+
   const socialLinks = [
     { icon: Instagram, href: settings.socialMedia.instagram, label: 'Instagram' },
     { icon: Twitter, href: settings.socialMedia.twitter, label: 'Twitter' },
@@ -56,12 +56,12 @@ export const Footer = React.memo(() => {
               <div className="mb-4">
                 <img src={logo} alt={settings.siteName} className="h-12 w-auto object-contain" />
               </div>
-              <p className="text-white/60 mb-6 leading-relaxed">
+              <p className="text-white mb-6 leading-relaxed">
                 {settings.tagline}
               </p>
 
               {/* Contact Info */}
-              <div className="space-y-3 text-sm text-white/60">
+              <div className="space-y-3 text-sm text-white">
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
                   <a href={`mailto:${settings.email}`} className="hover:text-[#E93370] transition-colors">
@@ -99,7 +99,7 @@ export const Footer = React.memo(() => {
                   <li key={linkIndex}>
                     <a
                       href={link.href}
-                      className="text-white/60 hover:text-[#E93370] transition-colors text-sm"
+                      className="text-white hover:text-[#E93370] transition-colors text-sm"
                     >
                       {link.label}
                     </a>
@@ -123,7 +123,7 @@ export const Footer = React.memo(() => {
               <h4 className="text-2xl text-white mb-2">
                 Stay in the Loop
               </h4>
-              <p className="text-white/60 mb-6">
+              <p className="text-white mb-6">
                 Get the latest updates on events, exclusive offers, and community news
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -150,7 +150,7 @@ export const Footer = React.memo(() => {
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             {/* Copyright */}
-            <p className="text-white/40 text-sm">
+            <p className="text-white text-sm">
               © {new Date().getFullYear()} {settings.siteName}. All rights reserved.
             </p>
 
@@ -163,7 +163,7 @@ export const Footer = React.memo(() => {
                     key={index}
                     href={social.href}
                     aria-label={social.label}
-                    className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 hover:bg-[#E93370]/10 flex items-center justify-center text-white/60 hover:text-[#E93370] transition-all duration-300"
+                    className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 hover:bg-[#E93370]/10 flex items-center justify-center text-white hover:text-[#E93370] transition-all duration-300"
                   >
                     <Icon className="h-5 w-5" />
                   </a>
@@ -172,7 +172,7 @@ export const Footer = React.memo(() => {
             </div>
 
             {/* Additional Links */}
-            <div className="flex items-center gap-4 text-sm text-white/40">
+            <div className="flex items-center gap-4 text-sm text-white">
               <a href="#" className="hover:text-[#E93370] transition-colors">
                 Privacy
               </a>

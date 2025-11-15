@@ -57,6 +57,8 @@ interface RouterContextValue {
   navigate: (path: string) => void;
   getSubPath: (basePath: string) => string;
   getCurrentSubPath: () => string;
+  adminBasePath: string;
+  getAdminPath: (subPath?: string) => string;
 }
 
 // Create router context
@@ -73,6 +75,9 @@ export const useRouter = () => {
 
 // Router provider component
 const RouterProviderComponent = ({ children }: { children: React.ReactNode }) => {
+  // Configurable admin base path - defaults to /sadmin
+  const adminBasePath = import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin';
+
   const [currentPath, setCurrentPath] = useState<string>(() => {
     // Initialize with current window path
     return window.location.pathname;
@@ -127,13 +132,19 @@ const RouterProviderComponent = ({ children }: { children: React.ReactNode }) =>
     return '';
   };
 
-  // Function to get sub-path assuming current path is under /admin
+  // Function to get sub-path assuming current path is under admin base path
   const getCurrentSubPath = (): string => {
-    return getSubPath('/admin');
+    return getSubPath(adminBasePath);
+  };
+
+  // Function to construct admin paths
+  const getAdminPath = (subPath?: string): string => {
+    const path = subPath ? `/${subPath}` : '';
+    return `${adminBasePath}${path}`;
   };
 
   return (
-    <RouterContext.Provider value={{ currentPath, navigate, getSubPath, getCurrentSubPath }}>
+    <RouterContext.Provider value={{ currentPath, navigate, getSubPath, getCurrentSubPath, adminBasePath, getAdminPath }}>
       {children}
     </RouterContext.Provider>
   );
@@ -150,7 +161,7 @@ interface RouterProps {
 const RouterComponent = memo(({ routes }: RouterProps) => {
   const { currentPath } = useRouter();
 
-  // Find matching route - support exact matches and nested routes
+    // Find matching route - support exact matches and nested routes
   const findMatchingRoute = (path: string): React.ComponentType | undefined => {
     // First try exact match
     if (routes[path]) {
@@ -159,7 +170,7 @@ const RouterComponent = memo(({ routes }: RouterProps) => {
 
     // Then try nested route matching
     for (const routePath of Object.keys(routes)) {
-      // Handle routes like "/admin/*"
+      // Handle routes like "/sadmin/*" (configurable admin base path)
       if (routePath.endsWith('/*')) {
         const basePath = routePath.slice(0, -2);
         if (path.startsWith(basePath + '/') || path === basePath) {
@@ -167,7 +178,7 @@ const RouterComponent = memo(({ routes }: RouterProps) => {
         }
       }
 
-      // Handle routes like "/admin" matching /admin/something
+      // Handle routes like "/sadmin" matching /sadmin/something
       if (path.startsWith(routePath + '/') && routePath !== '/') {
         return routes[routePath];
       }

@@ -11,12 +11,21 @@ import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 
 export const DashboardSettings = React.memo(() => {
-  const { settings, updateSettings } = useContent();
+  const { settings, saveSiteSettings } = useContent();
   const [formData, setFormData] = useState(settings);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    updateSettings(formData);
-    toast.success('Settings saved successfully!');
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveSiteSettings(formData);
+      toast.success('Settings saved successfully!');
+    } catch (error) {
+      toast.error('Failed to save settings');
+      console.error('Save error:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -84,10 +93,11 @@ export const DashboardSettings = React.memo(() => {
 
             <Button
               onClick={handleSave}
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20"
+              disabled={isSaving}
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50"
             >
               <Save className="mr-2 h-4 w-4" />
-              Save All Settings
+              {isSaving ? 'Saving...' : 'Save All Settings'}
             </Button>
           </CardContent>
         </Card>

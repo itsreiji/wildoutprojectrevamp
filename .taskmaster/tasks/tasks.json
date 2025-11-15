@@ -776,7 +776,7 @@
           "5",
           "8"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -784,7 +784,7 @@
             "description": "Create the initial file `src/components/LandingPage.tsx` with a basic functional component structure. This component will serve as the main assembler for all landing page sections. Then, integrate it into the root page of the application.",
             "dependencies": [],
             "details": "Create the file at `src/components/LandingPage.tsx`. Define and export a React component named `LandingPage`. Update the root page file, likely `src/app/page.tsx`, to import and render the `<LandingPage />` component as its primary content.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run the development server and navigate to the application's root URL. Verify that any placeholder content from the newly created `LandingPage` component is successfully rendered in the browser.",
             "parentId": "undefined"
           },
@@ -796,7 +796,7 @@
               1
             ],
             "details": "Import `useContent` from `src/contexts/ContentContext.tsx`. Call the hook within the `LandingPage` component to retrieve `heroContent`, `events`, `partners`, and `team`. Add logic to display a loading indicator while data is being fetched and an error message if the fetch fails.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Use React DevTools or `console.log` to inspect the values returned by the `useContent` hook. Confirm that the data structures for `heroContent`, `events`, etc., are populated correctly. Test the loading state by simulating a slow network connection.",
             "parentId": "undefined"
           },
@@ -808,7 +808,7 @@
               2
             ],
             "details": "Add an import statement for `HeroSection` from its file path (e.g., `src/components/sections/HeroSection.tsx`). Inside the `LandingPage` return statement, render the component like `<HeroSection content={heroContent} />`. This wires up the first major visual block of the page.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Visually verify on the home page that the Hero section appears correctly with the title, description, and call-to-action button text populated from the `heroContent` data object provided by the context.",
             "parentId": "undefined"
           },
@@ -820,7 +820,7 @@
               3
             ],
             "details": "Sequentially import and render the remaining section components below the `HeroSection`. For example: `<FeaturedEventsSection events={events} />`, `<PartnersSection partners={partners} />`, and `<TeamSection team={team} />`. Ensure each component receives the correct data prop from the `useContent` hook.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Scroll down the landing page and confirm that the Featured Events, Partners, and Team sections are all rendered in the correct order. Verify that each section is correctly populated with dynamic data, such as showing the correct event cards and partner logos.",
             "parentId": "undefined"
           },
@@ -832,7 +832,7 @@
               4
             ],
             "details": "Use a `main` or `div` element in `LandingPage.tsx` to wrap all section components. Apply a class like `flex flex-col` to the wrapper and use `gap-y-16` or a similar utility to create consistent vertical spacing. Add responsive prefixes (e.g., `md:gap-y-24`) to adjust the layout for different screen sizes.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Using browser developer tools, view the landing page at various screen widths (mobile, tablet, desktop). Confirm that all sections stack and reflow correctly without horizontal overflow or broken layouts. Check that the spacing between sections is appropriate for each viewport size.",
             "parentId": "undefined"
           }
@@ -845,25 +845,24 @@
         "id": 10,
         "title": "Public UI: Implement All-Events Page with Filtering and Search",
         "description": "Develop the `AllEventsPage.tsx` to display all 'upcoming' events. Implement client-side filtering (by date, category), sorting, and a search functionality.",
-        "details": "Create `src/components/AllEventsPage.tsx`. Fetch the list of all events from `ContentContext`. Use local state (`useState`) to manage filter criteria (e.g., search query, selected category). Apply these filters to the event list before rendering the event cards. Implement pagination if the list is expected to be long. The search should filter events based on title, description, or artist names.\n\n```tsx\n// src/components/AllEventsPage.tsx\nconst { events } = useContent();\nconst [searchQuery, setSearchQuery] = useState('');\n\nconst filteredEvents = events.filter(event => \n  event.title.toLowerCase().includes(searchQuery.toLowerCase())\n);\n\nreturn <div>{/* Render filter controls and filteredEvents */}</div>;\n```",
-        "testStrategy": "Manually test the filtering and search functionality. Enter a search query and verify that only matching events are displayed. Use the filter controls for category and date, and confirm the list updates correctly. Check that pagination works as expected if implemented.",
-        "priority": "medium",
+        "status": "done",
         "dependencies": [
           "4",
           "5",
           "7"
         ],
-        "status": "pending",
+        "priority": "medium",
+        "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\n## Implementation Details\nCreate `src/components/AllEventsPage.tsx`. Fetch the list of all events from `ContentContext`. Use local state (`useState`) to manage filter criteria (e.g., search query, selected category). Apply these filters to the event list before rendering the event cards. Implement pagination if the list is expected to be long. The search should filter events based on title, description, or artist names.\n\n```tsx\n// src/components/AllEventsPage.tsx\nconst { events } = useContent();\nconst [searchQuery, setSearchQuery] = useState('');\n\nconst filteredEvents = events.filter(event => \n  event.title.toLowerCase().includes(searchQuery.toLowerCase())\n);\n\nreturn <div>{/* Render filter controls and filteredEvents */}</div>;\n```",
+        "testStrategy": "Manually test the filtering and search functionality. Enter a search query and verify that only matching events are displayed. Use the filter controls for category and date, and confirm the list updates correctly. Check that pagination works as expected if implemented.",
         "subtasks": [
           {
             "id": 1,
             "title": "Create AllEventsPage Component and Fetch Events",
             "description": "Create the basic structure for the `AllEventsPage.tsx` component. Use the `useContent` hook to fetch the list of all events and display a preliminary list of upcoming events to ensure data is being correctly retrieved.",
             "dependencies": [],
-            "details": "Create the file `src/components/AllEventsPage.tsx`. Inside the component, call `useContent()` to get the `events` array. Filter this array to show only 'upcoming' events (events with a date in the future). Map over the filtered array and render a simple placeholder for each event, like a `<div>` with the event title. Add a route for '/events' in `src/components/Router.tsx` to render this new component.",
-            "status": "pending",
-            "testStrategy": "Verify that the page renders at the '/events' route and displays a list of titles for all upcoming events fetched from the context. Check the console for any errors related to data fetching.",
-            "parentId": "undefined"
+            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nCreate the file `src/components/AllEventsPage.tsx`. Inside the component, call `useContent()` to get the `events` array. Filter this array to show only 'upcoming' events (events with a date in the future). Map over the filtered array and render a simple placeholder for each event, like a `<div>` with the event title. Add a route for '/events' in `src/components/Router.tsx` to render this new component.",
+            "status": "done",
+            "testStrategy": "Verify that the page renders at the '/events' route and displays a list of titles for all upcoming events fetched from the context. Check the console for any errors related to data fetching."
           },
           {
             "id": 2,
@@ -872,10 +871,9 @@
             "dependencies": [
               1
             ],
-            "details": "In `AllEventsPage.tsx`, add an `<Input />` component from `src/components/ui/input.tsx`. Create a `useState` hook for the `searchQuery`. Create a `useMemo` hook to compute the `filteredEvents` list by applying the search query to the upcoming events array. The search should be case-insensitive and check against `event.title`, `event.description`, and any associated artist fields.",
-            "status": "pending",
-            "testStrategy": "Type various queries into the search bar. Confirm that the list of events updates in real-time to show only events that match the query in their title, description, or artist details. Test with empty queries and queries that yield no results.",
-            "parentId": "undefined"
+            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nIn `AllEventsPage.tsx`, add an `<Input />` component from `src/components/ui/input.tsx`. Create a `useState` hook for the `searchQuery`. Create a `useMemo` hook to compute the `filteredEvents` list by applying the search query to the upcoming events array. The search should be case-insensitive and check against `event.title`, `event.description`, and any associated artist fields.",
+            "status": "done",
+            "testStrategy": "Type various queries into the search bar. Confirm that the list of events updates in real-time to show only events that match the query in their title, description, or artist details. Test with empty queries and queries that yield no results."
           },
           {
             "id": 3,
@@ -884,10 +882,9 @@
             "dependencies": [
               2
             ],
-            "details": "Add a `<Select />` component from `src/components/ui/select.tsx` for category filtering. Populate it with unique categories from the events list. Add another set of controls (e.g., `<Button />` group or a date picker component) for date filtering (e.g., 'This Week', 'This Month'). Use `useState` to manage the state for these filters. Update the filtering logic to incorporate these new criteria along with the search query.",
-            "status": "pending",
-            "testStrategy": "Select a category from the dropdown and verify that only events of that category are displayed. Test the date filters and confirm the list updates accordingly. Ensure that the category, date, and search filters can all be applied simultaneously and work correctly together.",
-            "parentId": "undefined"
+            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nAdd a `<Select />` component from `src/components/ui/select.tsx` for category filtering. Populate it with unique categories from the events list. Add another set of controls (e.g., `<Button />` group or a date picker component) for date filtering (e.g., 'This Week', 'This Month'). Use `useState` to manage the state for these filters. Update the filtering logic to incorporate these new criteria along with the search query.",
+            "status": "done",
+            "testStrategy": "Select a category from the dropdown and verify that only events of that category are displayed. Test the date filters and confirm the list updates accordingly. Ensure that the category, date, and search filters can all be applied simultaneously and work correctly together."
           },
           {
             "id": 4,
@@ -896,10 +893,9 @@
             "dependencies": [
               3
             ],
-            "details": "Add a `<Select />` component to control the sort order. Options should include 'Date (Newest First)', 'Date (Oldest First)', and 'Title (A-Z)'. Use a `useState` hook to manage the selected sort option. Apply the sorting logic to the filtered event list *after* all filters (search, category, date) have been applied but *before* pagination.",
-            "status": "pending",
-            "testStrategy": "Test each sorting option. Verify that changing the sort order correctly reorganizes the currently displayed list of events without affecting the active filters.",
-            "parentId": "undefined"
+            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nAdd a `<Select />` component to control the sort order. Options should include 'Date (Newest First)', 'Date (Oldest First)', and 'Title (A-Z)'. Use a `useState` hook to manage the selected sort option. Apply the sorting logic to the filtered event list *after* all filters (search, category, date) have been applied but *before* pagination.",
+            "status": "done",
+            "testStrategy": "Test each sorting option. Verify that changing the sort order correctly reorganizes the currently displayed list of events without affecting the active filters."
           },
           {
             "id": 5,
@@ -908,15 +904,11 @@
             "dependencies": [
               4
             ],
-            "details": "For each event in the final sorted and filtered list, render a `<Card />` component from `src/components/ui/card.tsx` to display the event details (image, title, date, etc.) in a structured format. Implement pagination by using `useState` for `currentPage`. Calculate the total number of pages and use `.slice()` to display only the events for the current page. Add 'Previous' and 'Next' `<Button />` components to navigate between pages.",
-            "status": "pending",
-            "testStrategy": "Verify that events are now displayed in styled cards. If there are more events than the page limit, check that pagination controls appear. Click 'Next' and 'Previous' to ensure the correct subset of events is displayed on each page. The 'Previous' button should be disabled on page 1.",
-            "parentId": "undefined"
+            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nFor each event in the final sorted and filtered list, render a `<Card />` component from `src/components/ui/card.tsx` to display the event details (image, title, date, etc.) in a structured format. Implement pagination by using `useState` for `currentPage`. Calculate the total number of pages and use `.slice()` to display only the events for the current page. Add 'Previous' and 'Next' `<Button />` components to navigate between pages.",
+            "status": "done",
+            "testStrategy": "Verify that events are now displayed in styled cards. If there are more events than the page limit, check that pagination controls appear. Click 'Next' and 'Previous' to ensure the correct subset of events is displayed on each page. The 'Previous' button should be disabled on page 1."
           }
-        ],
-        "complexity": 6,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Provide a detailed implementation plan. Show the state management using `useState` for search query and filters. Write the core filtering logic using `useMemo` to create a derived list of events. Demonstrate how to implement pagination using `slice` and state for the current page."
+        ]
       },
       {
         "id": 11,
@@ -1019,6 +1011,23 @@
         "recommendedSubtasks": 7,
         "expansionPrompt": "Create a detailed subtask breakdown. Create one subtask for project initialization. Create separate subtasks for each major table's SQL migration script. Dedicate a subtask to setting up the auth trigger for `profiles`. Create two separate subtasks for RLS: one for public-read policies and another for authenticated/admin write policies. Finally, create subtasks for Storage configuration and Edge Function setup.",
         "updatedAt": "2025-11-07T05:13:55.968Z"
+      },
+      {
+        "id": 12,
+        "title": "Implement Public Content Synchronization and Unified Admin Interface",
+        "description": "Create a new unified admin interface at /sadmin to manage all public-facing singleton content (e.g., Hero, About, site settings). Implement the backend synchronization, including database schema updates and ContentContext mutations, to persist these changes in Supabase.",
+        "details": "This task will be guided by a new OpenSpec proposal: 'update-public-admin-content-sync'.\n\n1.  **Database Schema:** Create a new migration file in the Supabase project (established in Task #11) to define tables for singleton content. A table named `public_content` with columns like `section` (e.g., 'hero', 'about') and `data` (JSONB) is recommended to store unstructured content. This will centralize content previously managed in separate modules (Task #8) or hardcoded.\n\n2.  **Router Configuration:** Modify the router setup in `src/components/router/index.tsx` (from Task #5) to include a new, admin-protected route for `/sadmin`. This will render a new `SAdminPage` component.\n\n3.  **Unified Admin UI:** Create `src/components/dashboard/SAdminPage.tsx`. This component will serve as the new centralized UI for editing all general site content. It should use the `useContent` hook to get the current data and provide forms built with reusable components from the UI library (Task #3) to edit it. The form's `onSubmit` handler will call new mutation functions on the `ContentContext`.\n\n4.  **State Management:** Enhance `ContentContext` (`src/contexts/ContentContext.tsx`, from Task #4) by adding state for the new `public_content`. Implement new async mutation functions like `updatePublicContent(section, data)` that call the Supabase client to `upsert` records in the new table. These functions must update the context's state to ensure the UI reflects the changes.\n\n5.  **Data Seeding Script:** Create a standalone script (e.g., `scripts/seed-public-content.ts`) to read the current hardcoded or disparate content from the application and insert it into the new Supabase tables. This ensures a non-destructive migration of existing content to the new system.",
+        "testStrategy": "1.  **Schema and Seeding:** Apply the new database migration locally and run the seeding script. Use a database client to connect to Supabase and verify that the `public_content` table is created and populated with the correct initial data.\n2.  **Admin UI CRUD Test:** Log in as an admin, navigate to `/sadmin`, and confirm the form fields are pre-populated. Modify a piece of content (e.g., the 'About Us' text), save the form, and verify the change persists after a page refresh. Check the `public_content` table in Supabase to confirm the `data` JSONB was updated correctly.\n3.  **Public UI Verification:** After saving a change in the admin UI, navigate to the public-facing page that displays that content (e.g., the `LandingPage.tsx` from Task #9). Verify that the updated content is displayed correctly, confirming the end-to-end data flow through `ContentContext`.\n4.  **Routing and Authorization:** Attempt to access `/sadmin` while logged out and as a non-admin user. Confirm that access is denied and the user is redirected or shown an appropriate error message, validating the route protection.",
+        "status": "pending",
+        "dependencies": [
+          11,
+          9,
+          8,
+          5,
+          4
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
@@ -1031,7 +1040,7 @@
       ],
       "created": "2025-11-07T06:02:41.440Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-14T11:43:02.990Z"
+      "updated": "2025-11-15T03:22:21.482Z"
     }
   }
 }

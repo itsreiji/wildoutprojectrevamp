@@ -2,8 +2,8 @@ import React, { useState, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
-// Navigation doesn't directly use useRouter, but Link component does
 import { Link } from './router/Link';
+import { useRouter } from './router';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 const NAV_ITEMS = [
@@ -16,8 +16,7 @@ const NAV_ITEMS = [
 ];
 
 const NavigationComponent = () => {
-  // Note: Navigation uses Link component which handles routing internally
-  // We don't need to destructure navigate here since we're not using it
+  const { getAdminPath } = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -78,7 +77,7 @@ const NavigationComponent = () => {
                 </button>
               ))}
               <Link
-                to="/admin"
+                to={getAdminPath()}
                 className="group ml-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#E93370] border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] hover:text-white rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 active:scale-95"
               >
                 <LayoutDashboard className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
@@ -150,7 +149,7 @@ const NavigationComponent = () => {
                       </motion.button>
                     ))}
                     <Link
-                      to="/admin"
+                      to={getAdminPath()}
                       className="group w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center gap-3 border border-[#E93370]/20 hover:border-[#E93370] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50"
                     >
                       <LayoutDashboard className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />

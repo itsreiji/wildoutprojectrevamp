@@ -10,12 +10,21 @@ import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 
 export const DashboardHero = React.memo(() => {
-  const { hero, updateHero } = useContent();
+  const { hero, saveHeroContent } = useContent();
   const [formData, setFormData] = useState(hero);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    updateHero(formData);
-    toast.success('Hero section updated successfully!');
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveHeroContent(formData);
+      toast.success('Hero section updated successfully!');
+    } catch (error) {
+      toast.error('Failed to save hero section');
+      console.error('Save error:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -142,10 +151,11 @@ export const DashboardHero = React.memo(() => {
 
             <Button
               onClick={handleSave}
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20"
+              disabled={isSaving}
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50"
             >
               <Save className="mr-2 h-4 w-4" />
-              Save Hero Section
+              {isSaving ? 'Saving...' : 'Save Hero Section'}
             </Button>
           </CardContent>
         </Card>

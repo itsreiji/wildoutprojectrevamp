@@ -10,12 +10,21 @@ import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 
 export const DashboardAbout = React.memo(() => {
-  const { about, updateAbout } = useContent();
+  const { about, saveAboutContent } = useContent();
   const [formData, setFormData] = useState(about);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    updateAbout(formData);
-    toast.success('About section updated successfully!');
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveAboutContent(formData);
+      toast.success('About section updated successfully!');
+    } catch (error) {
+      toast.error('Failed to save about section');
+      console.error('Save error:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAddStoryParagraph = () => {
@@ -242,10 +251,11 @@ export const DashboardAbout = React.memo(() => {
       <div className="flex justify-end">
         <Button
           onClick={handleSave}
-          className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20"
+          disabled={isSaving}
+          className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50"
         >
           <Save className="mr-2 h-4 w-4" />
-          Save About Section
+          {isSaving ? 'Saving...' : 'Save About Section'}
         </Button>
       </div>
     </div>

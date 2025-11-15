@@ -52,6 +52,88 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
 // DATA FETCHING FUNCTIONS (New Supabase Schema)
 // =============================================
 
+// Content fetching functions for site-wide content
+const fetchHeroContent = async (): Promise<HeroContent> => {
+  try {
+    const { data, error } = await supabaseClient.rpc('get_hero_content');
+
+    if (error) {
+      console.error('Error fetching hero content:', error);
+      return INITIAL_HERO;
+    }
+
+    if (data) {
+      return {
+        title: data.title,
+        subtitle: data.subtitle,
+        description: data.description,
+        stats: data.stats as HeroContent['stats'],
+        ctaText: data.cta_text,
+        ctaLink: data.cta_link,
+      };
+    }
+
+    return INITIAL_HERO;
+  } catch (error) {
+    console.error('Error in fetchHeroContent:', error);
+    return INITIAL_HERO;
+  }
+};
+
+const fetchAboutContent = async (): Promise<AboutContent> => {
+  try {
+    const { data, error } = await supabaseClient.rpc('get_about_content');
+
+    if (error) {
+      console.error('Error fetching about content:', error);
+      return INITIAL_ABOUT;
+    }
+
+    if (data) {
+      return {
+        title: data.title,
+        subtitle: data.subtitle,
+        foundedYear: data.founded_year,
+        story: data.story,
+        features: data.features as AboutContent['features'],
+      };
+    }
+
+    return INITIAL_ABOUT;
+  } catch (error) {
+    console.error('Error in fetchAboutContent:', error);
+    return INITIAL_ABOUT;
+  }
+};
+
+const fetchSiteSettings = async (): Promise<SiteSettings> => {
+  try {
+    const { data, error } = await supabaseClient.rpc('get_site_settings');
+
+    if (error) {
+      console.error('Error fetching site settings:', error);
+      return INITIAL_SETTINGS;
+    }
+
+    if (data) {
+      return {
+        siteName: data.site_name,
+        siteDescription: data.site_description,
+        tagline: data.tagline,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        socialMedia: data.social_media as SiteSettings['socialMedia'],
+      };
+    }
+
+    return INITIAL_SETTINGS;
+  } catch (error) {
+    console.error('Error in fetchSiteSettings:', error);
+    return INITIAL_SETTINGS;
+  }
+};
+
 // Events fetching with new schema
 const fetchEvents = async (): Promise<LandingEvent[]> => {
   try {
@@ -322,6 +404,10 @@ interface ContentContextType {
   addGalleryImage: (item: TablesInsert<'gallery_items'>) => Promise<GalleryImage>;
   updateGalleryImage: (id: string, updates: TablesUpdate<'gallery_items'>) => Promise<GalleryImage>;
   deleteGalleryImage: (id: string) => Promise<void>;
+  // Content mutations
+  saveHeroContent: (content: HeroContent) => Promise<void>;
+  saveAboutContent: (content: AboutContent) => Promise<void>;
+  saveSiteSettings: (settings: SiteSettings) => Promise<void>;
   // Dummy data control
   useDummyData: boolean;
   setUseDummyData: (use: boolean) => void;
@@ -494,11 +580,14 @@ export const ContentProvider: React.FC<{
 
         } else {
           // Fetch all data concurrently from Supabase
-          const [eventsData, partnersData, galleryData, teamData] = await Promise.all([
+          const [eventsData, partnersData, galleryData, teamData, heroData, aboutData, settingsData] = await Promise.all([
             fetchEvents(),
             fetchPartners(),
             fetchGallery(),
             fetchTeamMembers(),
+            fetchHeroContent(),
+            fetchAboutContent(),
+            fetchSiteSettings(),
           ]);
 
           // Update state with fetched data
@@ -506,6 +595,9 @@ export const ContentProvider: React.FC<{
           setPartners(partnersData);
           setGallery(galleryData);
           setTeam(teamData);
+          setHero(heroData);
+          setAbout(aboutData);
+          setSettings(settingsData);
         }
 
       } catch (err) {
@@ -1004,6 +1096,103 @@ export const ContentProvider: React.FC<{
     }
   };
 
+  // Content Mutations
+  const saveHeroContent = async (content: HeroContent): Promise<void> => {
+    try {
+      setError(null);
+
+      const { error } = await supabaseClient
+        .from('hero_content')
+        .upsert({
+          id: '00000000-0000-0000-0000-000000000001', // Fixed ID for singleton
+          title: content.title,
+          subtitle: content.subtitle,
+          description: content.description,
+          stats: content.stats,
+          cta_text: content.ctaText,
+          cta_link: content.ctaLink,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Error saving hero content:', error);
+        setError(`Failed to save hero content: ${error.message}`);
+        throw error;
+      }
+
+      // Optimistically update local state
+      setHero(content);
+    } catch (err) {
+      console.error('Error in saveHeroContent:', err);
+      setError('Failed to save hero content');
+      throw err;
+    }
+  };
+
+  const saveAboutContent = async (content: AboutContent): Promise<void> => {
+    try {
+      setError(null);
+
+      const { error } = await supabaseClient
+        .from('about_content')
+        .upsert({
+          id: '00000000-0000-0000-0000-000000000002', // Fixed ID for singleton
+          title: content.title,
+          subtitle: content.subtitle,
+          founded_year: content.foundedYear,
+          story: content.story,
+          features: content.features,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Error saving about content:', error);
+        setError(`Failed to save about content: ${error.message}`);
+        throw error;
+      }
+
+      // Optimistically update local state
+      setAbout(content);
+    } catch (err) {
+      console.error('Error in saveAboutContent:', err);
+      setError('Failed to save about content');
+      throw err;
+    }
+  };
+
+  const saveSiteSettings = async (settings: SiteSettings): Promise<void> => {
+    try {
+      setError(null);
+
+      const { error } = await supabaseClient
+        .from('site_settings')
+        .upsert({
+          id: '00000000-0000-0000-0000-000000000003', // Fixed ID for singleton
+          site_name: settings.siteName,
+          site_description: settings.siteDescription,
+          tagline: settings.tagline,
+          email: settings.email,
+          phone: settings.phone,
+          address: settings.address,
+          social_media: settings.socialMedia,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Error saving site settings:', error);
+        setError(`Failed to save site settings: ${error.message}`);
+        throw error;
+      }
+
+      // Optimistically update local state
+      setSettings(settings);
+    } catch (err) {
+      console.error('Error in saveSiteSettings:', err);
+      setError('Failed to save site settings');
+      throw err;
+    }
+  };
+
   const value = {
     events,
     partners,
@@ -1041,6 +1230,10 @@ export const ContentProvider: React.FC<{
     addGalleryImage,
     updateGalleryImage,
     deleteGalleryImage,
+    // Content mutations
+    saveHeroContent,
+    saveAboutContent,
+    saveSiteSettings,
   };
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;

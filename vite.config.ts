@@ -59,5 +59,7 @@
       port: 5173,
       strictPort: true,
       open: true,
+      host: '0.0.0.0',
+      allowedHosts: ['hyakutake-in.ts.net', '*.hyakutake-in.ts.net', '0.0.0.0', 'skypiea-pc.hyakutake-in.ts.net'],
     },
   });
