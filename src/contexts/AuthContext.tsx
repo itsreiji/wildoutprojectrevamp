@@ -1,6 +1,22 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { supabaseClient } from '../supabase/client';
-import type { Session, User, AuthError } from '@supabase/auth-js';
+// Local Supabase auth types (package doesn't export directly)
+export interface User {
+  id: string;
+  email?: string;
+  app_metadata?: { role?: string };
+  user_metadata?: { role?: string };
+}
+
+export interface Session {
+  user: User | null;
+  access_token?: string;
+  expires_at?: number;
+}
+
+export interface AuthError {
+  message: string;
+}
 
 export type AuthRole = 'admin' | 'editor' | 'user' | 'anonymous';
 
@@ -373,15 +389,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Try to validate/update the session in database
           supabaseClient.rpc('validate_user_session', {
             session_token_param: nextSession.access_token
-          }).catch(err => {
+          }).catch((err: unknown) => {
             console.warn('⚠️ Failed to update session on token refresh:', err);
             // If validation fails, try to create a new session record
             supabaseClient.rpc('create_user_session', {
               session_token: nextSession.access_token,
               expiry_hours: 24
-            }).catch(createErr => {
+            }).catch((createErr: unknown) => {
               // Ignore duplicate key errors (session already exists)
-              if (!createErr.message?.includes('duplicate') && !createErr.message?.includes('unique')) {
+              if (!String(createErr).includes('duplicate') && !String(createErr).includes('unique')) {
                 console.warn('⚠️ Failed to create session on token refresh:', createErr);
               }
             });
