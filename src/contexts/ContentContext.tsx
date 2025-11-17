@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { supabaseClient } from '../supabase/client';
 import { useAuth } from './AuthContext';
+import type { AuthRole } from './AuthContext';
 import type { Json, Tables, TablesInsert, TablesUpdate } from '../supabase/types';
 import { DUMMY_EVENTS, DUMMY_EVENT_ARTISTS, DUMMY_TEAM_MEMBERS, DUMMY_PARTNERS, DUMMY_GALLERY_ITEMS } from '../data/dummyData';
 import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
@@ -215,7 +216,26 @@ const fetchEvents = async (): Promise<LandingEvent[]> => {
     }
 
     const rows = (data || []) as PublicEventsViewRow[];
-    return rows.map(event => ({
+    const now = new Date();
+
+    return rows.map(event => {
+      // Convert 'published' status to 'upcoming' or 'ongoing' based on dates
+      let eventStatus: LandingEvent['status'] = 'upcoming';
+      if (event.status === 'published') {
+        const startDate = new Date(event.start_date);
+        const endDate = new Date(event.end_date);
+        if (now >= startDate && now <= endDate) {
+          eventStatus = 'ongoing';
+        } else if (now < startDate) {
+          eventStatus = 'upcoming';
+        } else {
+          eventStatus = 'completed';
+        }
+      } else {
+        eventStatus = (event.status as LandingEvent['status']) || 'upcoming';
+      }
+
+      return {
       id: event.id,
       title: event.title,
       description: event.description,
@@ -231,7 +251,7 @@ const fetchEvents = async (): Promise<LandingEvent[]> => {
       venueAddress: event.location || '',
       image: event.image || event.banner_image || '',
       category: event.category || null,
-      status: (event.status as LandingEvent['status']) || 'upcoming',
+      status: eventStatus,
       capacity: event.max_attendees || undefined,
       attendees: event.attendees,
       price: event.price ? `${event.currency} ${event.price}` : event.price,
@@ -246,7 +266,8 @@ const fetchEvents = async (): Promise<LandingEvent[]> => {
       partner_name: event.partner_name,
       partner_logo_url: event.partner_logo_url,
       partner_website_url: event.partner_website_url,
-    })) as LandingEvent[];
+      };
+    }) as LandingEvent[];
   } catch (error) {
     console.error('Error in fetchEvents:', error);
     return [];
@@ -542,7 +563,18 @@ export const ContentProvider: React.FC<{
   useDummyData?: boolean;
 }> = ({ children, useDummyData: initialUseDummyData = false }) => {
   // Get user authentication state
-  const { user, role } = useAuth();
+  // Note: ContentProvider must be inside AuthProvider
+  let user = null;
+  let role: AuthRole = 'anonymous';
+  try {
+    const authContext = useAuth();
+    user = authContext.user;
+    role = authContext.role;
+  } catch (error) {
+    // If AuthProvider is not available, continue with defaults
+    // This should not happen in normal operation, but ensures Provider still renders
+    console.warn('ContentProvider: AuthProvider not available, using defaults');
+  }
 
   // Initialize with empty arrays - data will be fetched on mount
   const [events, setEvents] = useState<Event[]>([]);
@@ -1561,7 +1593,7 @@ export const ContentProvider: React.FC<{
     }
   };
 
-  const value = {
+  const value: ContentContextType = {
     events,
     partners,
     gallery,
@@ -1611,6 +1643,7 @@ export const ContentProvider: React.FC<{
     updateSectionContent,
   };
 
+  // Ensure Provider always renders children, even if there are initialization errors
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;
 };
 

@@ -1,15 +1,51 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from '../router';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { loading, role, user, isAuthenticated } = useAuth();
+  const { loading, role, user, isAuthenticated, validateSession } = useAuth();
   const { navigate } = useRouter();
+  const [isValidating, setIsValidating] = useState(true);
+  const [sessionValid, setSessionValid] = useState<boolean | null>(null);
+
+  // Validate session on mount and when auth state changes
+  useEffect(() => {
+    const checkSession = async () => {
+      if (loading) {
+        setIsValidating(true);
+        return;
+      }
+
+      if (!isAuthenticated || !user) {
+        setIsValidating(false);
+        setSessionValid(false);
+        return;
+      }
+
+      // Validate session
+      setIsValidating(true);
+      try {
+        const isValid = await validateSession();
+        setSessionValid(isValid);
+        if (!isValid) {
+          console.log('🚫 Session validation failed, redirecting to login');
+        }
+      } catch (error) {
+        console.error('Session validation error:', error);
+        setSessionValid(false);
+      } finally {
+        setIsValidating(false);
+      }
+    };
+
+    checkSession();
+  }, [loading, isAuthenticated, user, validateSession]);
 
   // Debug logging
-  console.log('🔐 AdminGuard check:', { loading, role, user: user?.email, isAuthenticated });
+  console.log('🔐 AdminGuard check:', { loading, isValidating, sessionValid, role, user: user?.email, isAuthenticated });
 
-  if (loading) {
+  // Show loading state while checking
+  if (loading || isValidating) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#040404] text-white">
         <div className="text-center">
@@ -20,9 +56,9 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
     );
   }
 
-  // If not authenticated, redirect to login
-  if (!isAuthenticated || !user) {
-    console.log('🚫 Not authenticated, redirecting to login');
+  // If session validation failed or not authenticated, redirect to login
+  if (sessionValid === false || !isAuthenticated || !user) {
+    console.log('🚫 Not authenticated or session invalid, redirecting to login');
     navigate(`${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`);
     return null;
   }

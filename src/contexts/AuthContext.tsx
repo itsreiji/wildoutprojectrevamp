@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 import { supabaseClient } from '../supabase/client';
 import type { Session, User, AuthError } from '@supabase/auth-js';
 
-type AuthRole = 'admin' | 'editor' | 'user' | 'anonymous';
+export type AuthRole = 'admin' | 'editor' | 'user' | 'anonymous';
 
 // Cache for user profile data to avoid repeated database calls
 interface CachedProfile {
@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const incomingUser = incomingSession?.user ?? null;
     setSession(incomingSession);
     setUser(incomingUser);
-    
+
     // Only update sessionId if we have a valid session and token
     // Don't overwrite with null if we already have a valid sessionId
     if (incomingSession?.access_token) {
@@ -118,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Only clear sessionId if session is explicitly null
       setSessionId(null);
     }
-    
+
     setLastActivity(Date.now());
 
     // For synchronous updates, set role to anonymous initially
@@ -449,14 +449,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.session?.access_token) {
         let retries = 3;
         let sessionCreated = false;
-        
+
         while (retries > 0 && !sessionCreated) {
           try {
             const { error: sessionError } = await supabaseClient.rpc('create_user_session', {
               session_token: data.session.access_token,
               expiry_hours: 24
             });
-            
+
             if (sessionError) {
               // If it's a duplicate key error, try to update existing session instead
               if (sessionError.message?.includes('duplicate') || sessionError.message?.includes('unique')) {

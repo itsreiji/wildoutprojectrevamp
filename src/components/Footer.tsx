@@ -41,7 +41,7 @@ export const Footer = React.memo(() => {
     { icon: Youtube, href: settings.socialMedia.youtube, label: 'Youtube' },
   ];
   return (
-    <footer className="relative pt-20 pb-8 px-4 bg-black/80 backdrop-blur-xl">
+    <footer className="relative pt-20 pb-8 px-4 bg-black/70 backdrop-blur-2xl border-t border-white/20 shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
       <div className="container mx-auto max-w-7xl">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
@@ -56,27 +56,27 @@ export const Footer = React.memo(() => {
               <div className="mb-4">
                 <img src={logo} alt={settings.siteName} className="h-12 w-auto object-contain" />
               </div>
-              <p className="text-white mb-6 leading-relaxed">
+              <p className="text-white mb-6 leading-relaxed text-base drop-shadow-sm">
                 {settings.tagline}
               </p>
 
               {/* Contact Info */}
-              <div className="space-y-3 text-sm text-white">
+              <div className="space-y-3 text-sm">
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a href={`mailto:${settings.email}`} className="text-white hover:text-[#E93370] transition-colors">
+                  <a href={`mailto:${settings.email}`} className="text-white hover:text-[#E93370] transition-colors font-medium drop-shadow-sm">
                     {settings.email}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="text-white hover:text-[#E93370] transition-colors">
+                  <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="text-white hover:text-[#E93370] transition-colors font-medium drop-shadow-sm">
                     {settings.phone}
                   </a>
                 </div>
                 <div className="flex items-start">
                   <MapPin className="h-4 w-4 mr-2 mt-0.5 text-[#E93370] flex-shrink-0" />
-                  <span className="text-white">{settings.address}</span>
+                  <span className="text-white font-medium drop-shadow-sm">{settings.address}</span>
                 </div>
               </div>
             </motion.div>
@@ -91,7 +91,7 @@ export const Footer = React.memo(() => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <h4 className="text-white mb-4 capitalize font-semibold">
+              <h4 className="text-white mb-4 capitalize font-semibold text-base drop-shadow-sm">
                 {category}
               </h4>
               <ul className="space-y-2">
@@ -99,7 +99,7 @@ export const Footer = React.memo(() => {
                   <li key={linkIndex}>
                     <a
                       href={link.href}
-                      className="text-white hover:text-[#E93370] transition-colors text-sm"
+                      className="text-white hover:text-[#E93370] transition-colors text-sm font-medium drop-shadow-sm"
                     >
                       {link.label}
                     </a>
@@ -118,12 +118,12 @@ export const Footer = React.memo(() => {
           transition={{ duration: 0.6 }}
           className="mb-12"
         >
-          <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+          <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg">
             <div className="max-w-2xl mx-auto text-center">
-              <h4 className="text-2xl text-white mb-2">
+              <h4 className="text-2xl text-white mb-2 font-semibold drop-shadow-sm">
                 Stay in the Loop
               </h4>
-              <p className="text-white mb-6">
+              <p className="text-white mb-6 text-base drop-shadow-sm">
                 Get the latest updates on events, exclusive offers, and community news
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -146,21 +146,21 @@ export const Footer = React.memo(() => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="pt-8 border-t border-white/10"
+          className="pt-8 border-t border-white/20"
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             {/* Copyright */}
             <div className="flex flex-col items-center md:items-start gap-2">
-              <p className="text-white text-sm">
+              <p className="text-white text-sm font-medium drop-shadow-sm">
                 © {new Date().getFullYear()} {settings.siteName}. All rights reserved.
               </p>
-              <p className="text-white text-sm">
+              <p className="text-white text-sm font-medium drop-shadow-sm">
                 Made by{' '}
                 <a
                   href="https://instagram.com/itsreiji"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-bold text-[#E93370] border border-[#E93370]/60 bg-[#E93370]/15 hover:bg-[#E93370]/25 hover:border-[#E93370] hover:text-white px-2 py-0.5 rounded transition-all duration-300"
+                  className="font-bold text-[#E93370] border border-[#E93370]/60 bg-[#E93370]/15 hover:bg-[#E93370]/25 hover:border-[#E93370] hover:text-white px-2 py-0.5 rounded transition-all duration-300 drop-shadow-sm"
                 >
                   EJI
                 </a>
@@ -185,16 +185,16 @@ export const Footer = React.memo(() => {
             </div>
 
             {/* Additional Links */}
-            <div className="flex items-center gap-4 text-sm text-white">
-              <a href="#" className="hover:text-[#E93370] transition-colors">
+            <div className="flex items-center gap-4 text-sm text-white font-medium">
+              <a href="#" className="hover:text-[#E93370] transition-colors drop-shadow-sm">
                 Privacy
               </a>
-              <span className="text-white/70">•</span>
-              <a href="#" className="hover:text-[#E93370] transition-colors">
+              <span className="text-white/90">•</span>
+              <a href="#" className="hover:text-[#E93370] transition-colors drop-shadow-sm">
                 Terms
               </a>
-              <span className="text-white/70">•</span>
-              <a href="#" className="hover:text-[#E93370] transition-colors">
+              <span className="text-white/90">•</span>
+              <a href="#" className="hover:text-[#E93370] transition-colors drop-shadow-sm">
                 Cookies
               </a>
             </div>

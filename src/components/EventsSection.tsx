@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, MapPin, Clock, Users, Music, Ticket, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
@@ -8,9 +8,68 @@ import { EventDetailModal } from './EventDetailModal';
 import type { Event } from '../contexts/ContentContext';
 import { useRouter } from './router';
 
+// Number of days ahead to show upcoming events (30 days)
+const UPCOMING_DAYS = 30;
+
+const parseEventDate = (event: Event): Date | null => {
+  const dateValue = event.start_date || event.date;
+  if (!dateValue) return null;
+  try {
+    const parsed = new Date(dateValue);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  } catch {
+    return null;
+  }
+};
+
 export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
   const { navigate } = useRouter();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
+  // Filter and sort upcoming events (within next 30 days)
+  const upcomingEvents = useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
+    const futureDate = new Date();
+    futureDate.setDate(now.getDate() + UPCOMING_DAYS);
+    futureDate.setHours(23, 59, 59, 999); // End of day
+
+    return events
+      .filter(event => {
+        // Filter by status - accept 'upcoming', 'ongoing', or 'published' (for backward compatibility)
+        const validStatuses = ['upcoming', 'ongoing', 'published'];
+        if (!validStatuses.includes(event.status)) {
+          return false;
+        }
+
+        // Filter by date - only show events within next 30 days
+        const eventDate = parseEventDate(event);
+        if (!eventDate) return false;
+
+        // Reset to start of day for comparison
+        const eventStartDate = new Date(eventDate);
+        eventStartDate.setHours(0, 0, 0, 0);
+
+        // Include events that are today or in the future, but within 30 days
+        // Also include ongoing events (started but not ended)
+        const endDate = event.end_date ? new Date(event.end_date) : null;
+        if (endDate) {
+          endDate.setHours(23, 59, 59, 999);
+        }
+        const isOngoing = endDate && now >= eventStartDate && now <= endDate;
+        const isUpcoming = eventStartDate >= now && eventStartDate <= futureDate;
+
+        return isUpcoming || isOngoing;
+      })
+      .sort((a, b) => {
+        // Sort by date (earliest first)
+        const dateA = parseEventDate(a);
+        const dateB = parseEventDate(b);
+        if (!dateA || !dateB) return 0;
+        return dateA.getTime() - dateB.getTime();
+      })
+      .slice(0, 4); // Show only first 4 events
+  }, [events]);
 
   return (
     <>
@@ -42,8 +101,14 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
           </motion.div>
 
           {/* Events Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-            {events.filter(e => e.status === 'upcoming').slice(0, 4).map((event, index) => (
+          {upcomingEvents.length === 0 ? (
+            <div className="text-center py-12 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
+              <p className="text-white/60 text-lg">No upcoming events in the next {UPCOMING_DAYS} days</p>
+              <p className="text-white/40 text-sm mt-2">Check back soon for new events!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+              {upcomingEvents.map((event, index) => (
               <motion.div
                 key={event.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -161,8 +226,9 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
                   </div>
                 </div>
               </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
