@@ -1,6 +1,7 @@
 /* @refresh reset */
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { supabaseClient } from '../supabase/client';
+import { useAuth } from './AuthContext';
 import type { Json, Tables, TablesInsert, TablesUpdate } from '../supabase/types';
 import { DUMMY_EVENTS, DUMMY_EVENT_ARTISTS, DUMMY_TEAM_MEMBERS, DUMMY_PARTNERS, DUMMY_GALLERY_ITEMS } from '../data/dummyData';
 import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
@@ -13,6 +14,7 @@ import type {
   GalleryImage as GalleryImageDto,
   SiteSettings as SiteSettingsDto,
 } from '@/types';
+import type { Database } from '../supabase/types';
 
 export type Event = LandingEvent;
 export type TeamMember = TeamMemberDto;
@@ -21,6 +23,70 @@ export type GalleryImage = GalleryImageDto;
 export type HeroContent = HeroContentDto;
 export type AboutContent = AboutContentDto;
 export type SiteSettings = SiteSettingsDto;
+
+// Admin section types (manually defined until types are regenerated)
+export type AdminSection = {
+  id: string;
+  slug: string;
+  label: string;
+  icon: string;
+  category: string;
+  order_index: number;
+  enabled: boolean;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+};
+
+export type SectionContent = {
+  id: string;
+  section_id: string;
+  payload: any;
+  version: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+};
+
+export type RolePermission = {
+  id: string;
+  role: string;
+  section_slug: string;
+  can_view: boolean;
+  can_edit: boolean;
+  can_publish: boolean;
+  can_delete: boolean;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+};
+
+export type UserPermission = {
+  id: string;
+  profile_id: string;
+  section_slug: string;
+  can_view: boolean | null;
+  can_edit: boolean | null;
+  can_publish: boolean | null;
+  can_delete: boolean | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+};
+
+// Admin permission types
+export type SectionPermissions = {
+  canView: boolean;
+  canEdit: boolean;
+  canPublish: boolean;
+  canDelete: boolean;
+};
 
 const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> | null => {
   if (!value || typeof value === 'string') return null;
@@ -139,7 +205,7 @@ const fetchEvents = async (): Promise<LandingEvent[]> => {
   try {
 // Use the public_events_view for querying
     const { data, error } = await supabaseClient
-      .from('public_events')
+      .from('public_events_view')
       .select('*')
       .order('start_date', { ascending: true });
 
@@ -408,6 +474,13 @@ interface ContentContextType {
   saveHeroContent: (content: HeroContent) => Promise<void>;
   saveAboutContent: (content: AboutContent) => Promise<void>;
   saveSiteSettings: (settings: SiteSettings) => Promise<void>;
+  // Admin sections
+  adminSections: AdminSection[];
+  sectionContent: Record<string, SectionContent>;
+  adminSectionsLoading: boolean;
+  getSectionContent: (sectionSlug: string) => SectionContent | null;
+  getSectionPermissions: (sectionSlug: string) => SectionPermissions;
+  updateSectionContent: (sectionSlug: string, content: any) => Promise<void>;
   // Dummy data control
   useDummyData: boolean;
   setUseDummyData: (use: boolean) => void;
@@ -468,6 +541,9 @@ export const ContentProvider: React.FC<{
   children: ReactNode;
   useDummyData?: boolean;
 }> = ({ children, useDummyData: initialUseDummyData = false }) => {
+  // Get user authentication state
+  const { user, role } = useAuth();
+
   // Initialize with empty arrays - data will be fetched on mount
   const [events, setEvents] = useState<Event[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -479,6 +555,11 @@ export const ContentProvider: React.FC<{
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [useDummyData, setUseDummyData] = useState(initialUseDummyData);
+
+  // Admin sections state
+  const [adminSections, setAdminSections] = useState<AdminSection[]>([]);
+  const [sectionContent, setSectionContent] = useState<Record<string, SectionContent>>({});
+  const [adminSectionsLoading, setAdminSectionsLoading] = useState(true);
 
   // Fetch data from new Supabase schema on mount or when dummy data flag changes
   useEffect(() => {
@@ -617,6 +698,169 @@ export const ContentProvider: React.FC<{
 
     loadData();
   }, [useDummyData]);
+
+  // Load admin sections and section content
+  useEffect(() => {
+    const loadAdminSections = async () => {
+      try {
+        setAdminSectionsLoading(true);
+
+        // Fetch admin sections for the current user
+        const { data: sections, error: sectionsError } = await supabaseClient
+          .rpc('get_admin_sections_for_user', { user_id: user?.id });
+
+        if (sectionsError) {
+          console.error('Error fetching admin sections:', sectionsError);
+          // Fallback to hardcoded sections if RPC fails
+          setAdminSections([
+            {
+              id: 'home-id',
+              slug: 'home',
+              label: 'Dashboard',
+              icon: 'LayoutDashboard',
+              category: 'main',
+              order_index: 1,
+              enabled: true,
+              description: 'Overview dashboard with statistics and recent activity',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: null,
+              updated_by: null
+            },
+            {
+              id: 'hero-id',
+              slug: 'hero',
+              label: 'Hero Section',
+              icon: 'Sparkles',
+              category: 'content',
+              order_index: 2,
+              enabled: true,
+              description: 'Landing page hero section with title, subtitle, and call-to-action',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: null,
+              updated_by: null
+            },
+            {
+              id: 'about-id',
+              slug: 'about',
+              label: 'About Us',
+              icon: 'Info',
+              category: 'content',
+              order_index: 3,
+              enabled: true,
+              description: 'About page content including story and features',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: null,
+              updated_by: null
+            },
+            {
+              id: 'events-id',
+              slug: 'events',
+              label: 'Events',
+              icon: 'Calendar',
+              category: 'content',
+              order_index: 4,
+              enabled: true,
+              description: 'Manage events, categories, and event details',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: null,
+              updated_by: null
+            },
+            {
+              id: 'team-id',
+              slug: 'team',
+              label: 'Team',
+              icon: 'Users',
+              category: 'content',
+              order_index: 5,
+              enabled: true,
+              description: 'Team members and their information',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: null,
+              updated_by: null
+            },
+            {
+              id: 'gallery-id',
+              slug: 'gallery',
+              label: 'Gallery',
+              icon: 'Image',
+              category: 'content',
+              order_index: 6,
+              enabled: true,
+              description: 'Image gallery items and management',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: null,
+              updated_by: null
+            },
+            {
+              id: 'partners-id',
+              slug: 'partners',
+              label: 'Partners',
+              icon: 'Handshake',
+              category: 'content',
+              order_index: 7,
+              enabled: true,
+              description: 'Partner organizations and collaborations',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: null,
+              updated_by: null
+            },
+            {
+              id: 'settings-id',
+              slug: 'settings',
+              label: 'Settings',
+              icon: 'Settings',
+              category: 'management',
+              order_index: 8,
+              enabled: true,
+              description: 'Site-wide settings and configuration',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_by: null,
+              updated_by: null
+            }
+          ]);
+        } else {
+          setAdminSections(sections || []);
+        }
+
+        // Fetch section content for all sections
+        const contentMap: Record<string, SectionContent> = {};
+
+        // For sections with dynamic content (home), fetch from section_content table
+        const sectionsWithContent = ['home', 'events', 'team', 'gallery', 'partners', 'settings'];
+
+        for (const sectionSlug of sectionsWithContent) {
+          try {
+            const { data: content, error: contentError } = await supabaseClient
+              .rpc('get_section_content', { section_slug: sectionSlug, user_id: user?.id });
+
+            if (!contentError && content && content.length > 0) {
+              contentMap[sectionSlug] = content[0];
+            }
+          } catch (err) {
+            console.warn(`Failed to fetch content for section ${sectionSlug}:`, err);
+          }
+        }
+
+        setSectionContent(contentMap);
+
+      } catch (error) {
+        console.error('Error loading admin sections:', error);
+        // Keep admin sections as fallback data
+      } finally {
+        setAdminSectionsLoading(false);
+      }
+    };
+
+    loadAdminSections();
+  }, []);
 
   // =============================================
   // MUTATION FUNCTIONS
@@ -1101,30 +1345,55 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
+      console.log('🔄 Starting saveHeroContent with data:', content);
+
+      // Check authentication using AuthContext
+      if (!user) {
+        console.error('❌ No authenticated user');
+        throw new Error('User not authenticated');
+      }
+
+      console.log('✅ Authenticated user:', user.id, user.email);
+
+      // Check user role from AuthContext
+      if (role !== 'admin') {
+        console.error('❌ Insufficient permissions. User role:', role);
+        throw new Error(`Insufficient permissions. User role: ${role}`);
+      }
+
+      console.log('✅ User has admin role:', role);
+
+      const saveData = {
+        id: '00000000-0000-0000-0000-000000000001', // Fixed ID for singleton
+        title: content.title,
+        subtitle: content.subtitle,
+        description: content.description,
+        stats: content.stats,
+        cta_text: content.ctaText,
+        cta_link: content.ctaLink,
+        updated_at: new Date().toISOString()
+        // updated_by will be set automatically by trigger
+      };
+
+      console.log('📤 Saving data:', saveData);
+
       const { error } = await supabaseClient
         .from('hero_content')
-        .upsert({
-          id: '00000000-0000-0000-0000-000000000001', // Fixed ID for singleton
-          title: content.title,
-          subtitle: content.subtitle,
-          description: content.description,
-          stats: content.stats,
-          cta_text: content.ctaText,
-          cta_link: content.ctaLink,
-          updated_at: new Date().toISOString()
-        });
+        .upsert(saveData);
 
       if (error) {
-        console.error('Error saving hero content:', error);
+        console.error('❌ Database error:', error);
         setError(`Failed to save hero content: ${error.message}`);
         throw error;
       }
 
+      console.log('✅ Save successful');
+
       // Optimistically update local state
       setHero(content);
     } catch (err) {
-      console.error('Error in saveHeroContent:', err);
-      setError('Failed to save hero content');
+      console.error('❌ Error in saveHeroContent:', err);
+      setError(`Failed to save hero content: ${err instanceof Error ? err.message : 'Unknown error'}`);
       throw err;
     }
   };
@@ -1133,29 +1402,54 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
+      console.log('🔄 Starting saveAboutContent with data:', content);
+
+      // Check authentication using AuthContext
+      if (!user) {
+        console.error('❌ No authenticated user');
+        throw new Error('User not authenticated');
+      }
+
+      console.log('✅ Authenticated user:', user.id, user.email);
+
+      // Check user role from AuthContext
+      if (role !== 'admin') {
+        console.error('❌ Insufficient permissions. User role:', role);
+        throw new Error(`Insufficient permissions. User role: ${role}`);
+      }
+
+      console.log('✅ User has admin role:', role);
+
+      const saveData = {
+        id: '00000000-0000-0000-0000-000000000002', // Fixed ID for singleton
+        title: content.title,
+        subtitle: content.subtitle,
+        founded_year: content.foundedYear,
+        story: content.story,
+        features: content.features,
+        updated_at: new Date().toISOString()
+        // updated_by will be set automatically by trigger
+      };
+
+      console.log('📤 Saving data:', saveData);
+
       const { error } = await supabaseClient
         .from('about_content')
-        .upsert({
-          id: '00000000-0000-0000-0000-000000000002', // Fixed ID for singleton
-          title: content.title,
-          subtitle: content.subtitle,
-          founded_year: content.foundedYear,
-          story: content.story,
-          features: content.features,
-          updated_at: new Date().toISOString()
-        });
+        .upsert(saveData);
 
       if (error) {
-        console.error('Error saving about content:', error);
+        console.error('❌ Database error:', error);
         setError(`Failed to save about content: ${error.message}`);
         throw error;
       }
 
+      console.log('✅ Save successful');
+
       // Optimistically update local state
       setAbout(content);
     } catch (err) {
-      console.error('Error in saveAboutContent:', err);
-      setError('Failed to save about content');
+      console.error('❌ Error in saveAboutContent:', err);
+      setError(`Failed to save about content: ${err instanceof Error ? err.message : 'Unknown error'}`);
       throw err;
     }
   };
@@ -1164,31 +1458,105 @@ export const ContentProvider: React.FC<{
     try {
       setError(null);
 
+      console.log('🔄 Starting saveSiteSettings with data:', settings);
+
+      // Check authentication using AuthContext
+      if (!user) {
+        console.error('❌ No authenticated user');
+        throw new Error('User not authenticated');
+      }
+
+      console.log('✅ Authenticated user:', user.id, user.email);
+
+      // Check user role from AuthContext
+      if (role !== 'admin') {
+        console.error('❌ Insufficient permissions. User role:', role);
+        throw new Error(`Insufficient permissions. User role: ${role}`);
+      }
+
+      console.log('✅ User has admin role:', role);
+
+      const saveData = {
+        id: '00000000-0000-0000-0000-000000000003', // Fixed ID for singleton
+        site_name: settings.siteName,
+        site_description: settings.siteDescription,
+        tagline: settings.tagline,
+        email: settings.email,
+        phone: settings.phone,
+        address: settings.address,
+        social_media: settings.socialMedia,
+        updated_at: new Date().toISOString()
+        // updated_by will be set automatically by trigger
+      };
+
+      console.log('📤 Saving data:', saveData);
+
       const { error } = await supabaseClient
         .from('site_settings')
-        .upsert({
-          id: '00000000-0000-0000-0000-000000000003', // Fixed ID for singleton
-          site_name: settings.siteName,
-          site_description: settings.siteDescription,
-          tagline: settings.tagline,
-          email: settings.email,
-          phone: settings.phone,
-          address: settings.address,
-          social_media: settings.socialMedia,
-          updated_at: new Date().toISOString()
-        });
+        .upsert(saveData);
 
       if (error) {
-        console.error('Error saving site settings:', error);
+        console.error('❌ Database error:', error);
         setError(`Failed to save site settings: ${error.message}`);
         throw error;
       }
 
+      console.log('✅ Save successful');
+
       // Optimistically update local state
       setSettings(settings);
     } catch (err) {
-      console.error('Error in saveSiteSettings:', err);
-      setError('Failed to save site settings');
+      console.error('❌ Error in saveSiteSettings:', err);
+      setError(`Failed to save site settings: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      throw err;
+    }
+  };
+
+  // Admin section helper functions
+  const getSectionContent = (sectionSlug: string): SectionContent | null => {
+    return sectionContent[sectionSlug] || null;
+  };
+
+  const getSectionPermissions = (sectionSlug: string): SectionPermissions => {
+    // For now, return full permissions for all users (will be enhanced with RBAC later)
+    // TODO: Implement actual RBAC checking based on user role and permissions
+    return {
+      canView: true,
+      canEdit: true,
+      canPublish: true,
+      canDelete: true,
+    };
+  };
+
+  const updateSectionContent = async (sectionSlug: string, content: any): Promise<void> => {
+    try {
+      setError(null);
+
+      const { data, error } = await supabaseClient
+        .rpc('update_section_content', {
+          section_slug: sectionSlug,
+          new_payload: content
+        });
+
+      if (error) {
+        console.error('Error updating section content:', error);
+        setError(`Failed to update section content: ${error.message}`);
+        throw error;
+      }
+
+      // Optimistically update local state
+      setSectionContent(prev => ({
+        ...prev,
+        [sectionSlug]: {
+          ...prev[sectionSlug],
+          payload: content,
+          updated_at: new Date().toISOString()
+        }
+      }));
+
+    } catch (err) {
+      console.error('Error in updateSectionContent:', err);
+      setError('Failed to update section content');
       throw err;
     }
   };
@@ -1234,6 +1602,13 @@ export const ContentProvider: React.FC<{
     saveHeroContent,
     saveAboutContent,
     saveSiteSettings,
+    // Admin sections
+    adminSections,
+    sectionContent,
+    adminSectionsLoading,
+    getSectionContent,
+    getSectionPermissions,
+    updateSectionContent,
   };
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;

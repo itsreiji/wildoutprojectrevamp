@@ -7,13 +7,16 @@ import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
 import { AllEventsPage } from './components/AllEventsPage';
 import { LoginPage } from './components/auth/LoginPage';
+import { RegisterPage } from './components/auth/RegisterPage';
 import { AdminGuard } from './components/admin/AdminGuard';
 import { Toaster } from './components/ui/sonner';
 import TestComponents from './components/ui/test-components';
 
 function App() {
   const isDevelopment = import.meta.env.DEV;
-  const useDummyDataDefault = isDevelopment;
+  // Use Supabase data by default, even in development
+  // Set VITE_USE_DUMMY_DATA=true in .env to use dummy data for testing
+  const useDummyDataDefault = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
   const adminBasePath = import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin';
 
   const AdminRoute: React.FC = () => (
@@ -25,6 +28,8 @@ function App() {
   const routes = {
     '/': LandingPage,
     '/events': AllEventsPage,
+    '/register': RegisterPage,
+    '/login': LoginPage,
     '/admin/login': LoginPage, // Keep legacy /admin/login for backward compatibility
     [`${adminBasePath}/login`]: LoginPage, // New admin login path
     [`${adminBasePath}/*`]: AdminRoute,

@@ -58,6 +58,7 @@ CREATE TABLE public.audit_log (
     new_data jsonb,
     user_id uuid REFERENCES auth.users(id),
     user_role text,
+    session_id text, -- Track session for enhanced audit trail
     ip_address inet,
     user_agent text,
     created_at timestamptz DEFAULT now()
@@ -106,7 +107,8 @@ BEGIN
         old_data,
         new_data,
         user_id,
-        user_role
+        user_role,
+        session_id
     ) VALUES (
         TG_TABLE_NAME,
         COALESCE(NEW.id, OLD.id),
@@ -114,7 +116,8 @@ BEGIN
         old_row,
         new_row,
         current_user_id,
-        current_user_role
+        current_user_role,
+        current_setting('request.jwt.claims', true)::jsonb ->> 'session_id'
     );
 
     RETURN COALESCE(NEW, OLD);
@@ -222,13 +225,150 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Add session_id column to audit_log for enhanced tracking
+ALTER TABLE public.audit_log ADD COLUMN IF NOT EXISTS session_id text;
+CREATE INDEX IF NOT EXISTS idx_audit_log_session_id ON public.audit_log(session_id) WHERE session_id IS NOT NULL;
+
+-- Session Management
+CREATE TABLE IF NOT EXISTS public.user_sessions (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    session_token text NOT NULL UNIQUE,
+    ip_address inet,
+    user_agent text,
+    device_info jsonb DEFAULT '{}',
+    created_at timestamptz DEFAULT now(),
+    last_activity timestamptz DEFAULT now(),
+    expires_at timestamptz,
+    is_active boolean DEFAULT true
+);
+
+-- Create indexes for session performance
+CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON public.user_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON public.user_sessions(session_token);
+CREATE INDEX IF NOT EXISTS idx_user_sessions_active ON public.user_sessions(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_user_sessions_expires ON public.user_sessions(expires_at);
+
+-- Enable RLS for sessions
+ALTER TABLE public.user_sessions ENABLE ROW LEVEL SECURITY;
+
+-- Session RLS Policies
+CREATE POLICY "Users can view their own sessions" ON public.user_sessions
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can manage their own sessions" ON public.user_sessions
+    FOR ALL USING (auth.uid() = user_id);
+
+CREATE POLICY "Admins can view all sessions" ON public.user_sessions
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles
+            WHERE id = auth.uid() AND role = 'admin'
+        )
+    );
+
+-- Session Management Functions
+CREATE OR REPLACE FUNCTION public.create_user_session(
+    session_token text,
+    expiry_hours integer DEFAULT 24
+)
+RETURNS uuid AS $$
+DECLARE
+    session_id uuid;
+    current_user_id uuid;
+BEGIN
+    current_user_id := auth.uid();
+    IF current_user_id IS NULL THEN
+        RAISE EXCEPTION 'User must be authenticated';
+    END IF;
+
+    INSERT INTO public.user_sessions (
+        user_id,
+        session_token,
+        expires_at,
+        ip_address,
+        user_agent
+    ) VALUES (
+        current_user_id,
+        session_token,
+        now() + interval '1 hour' * expiry_hours,
+        inet_client_addr(),
+        current_setting('request.headers', true)::jsonb ->> 'user-agent'
+    )
+    RETURNING id INTO session_id;
+
+    RETURN session_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.validate_user_session(session_token_param text)
+RETURNS boolean AS $$
+DECLARE
+    session_exists boolean := false;
+BEGIN
+    SELECT EXISTS(
+        SELECT 1 FROM public.user_sessions
+        WHERE session_token = session_token_param
+        AND is_active = true
+        AND expires_at > now()
+    ) INTO session_exists;
+
+    IF session_exists THEN
+        UPDATE public.user_sessions
+        SET last_activity = now()
+        WHERE session_token = session_token_param;
+    END IF;
+
+    RETURN session_exists;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.invalidate_user_session(session_token_param text)
+RETURNS boolean AS $$
+BEGIN
+    UPDATE public.user_sessions
+    SET is_active = false, expires_at = now()
+    WHERE session_token = session_token_param
+    AND user_id = auth.uid();
+
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.admin_force_logout_user(target_user_id uuid)
+RETURNS integer AS $$
+DECLARE
+    sessions_affected integer;
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM public.profiles
+        WHERE id = auth.uid() AND role = 'admin'
+    ) THEN
+        RAISE EXCEPTION 'Only administrators can force logout users';
+    END IF;
+
+    UPDATE public.user_sessions
+    SET is_active = false, expires_at = now()
+    WHERE user_id = target_user_id AND is_active = true;
+
+    GET DIAGNOSTICS sessions_affected = ROW_COUNT;
+    RETURN sessions_affected;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Comments for documentation
 COMMENT ON TABLE public.profiles IS 'User profiles with role-based access control';
-COMMENT ON TABLE public.audit_log IS 'Comprehensive audit trail for all data modifications';
+COMMENT ON TABLE public.audit_log IS 'Comprehensive audit trail for all data modifications with session tracking';
+COMMENT ON TABLE public.user_sessions IS 'Active user sessions for authentication tracking';
+COMMENT ON COLUMN public.audit_log.session_id IS 'Session identifier for tracking user sessions across operations';
+COMMENT ON FUNCTION create_user_session IS 'Creates a new session record when user logs in';
+COMMENT ON FUNCTION validate_user_session IS 'Validates if a session token is active and updates last activity';
+COMMENT ON FUNCTION invalidate_user_session IS 'Invalidates a user session (logout)';
+COMMENT ON FUNCTION admin_force_logout_user IS 'Admin function to force logout all sessions for a user';
 
 COMMENT ON FUNCTION update_user_claims IS 'Updates JWT claims when user role changes';
 COMMENT ON FUNCTION handle_updated_at IS 'Generic trigger function for updating timestamps';
-COMMENT ON FUNCTION audit_trigger_function IS 'Generic audit logging trigger function';
+COMMENT ON FUNCTION audit_trigger_function IS 'Generic audit logging trigger function with session tracking';
 COMMENT ON FUNCTION get_my_claim IS 'Helper function to access JWT claims';
 COMMENT ON FUNCTION get_my_role IS 'Get current user role from JWT claims';
 COMMENT ON FUNCTION is_admin IS 'Check if current user is admin';

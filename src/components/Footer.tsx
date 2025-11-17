@@ -41,7 +41,7 @@ export const Footer = React.memo(() => {
     { icon: Youtube, href: settings.socialMedia.youtube, label: 'Youtube' },
   ];
   return (
-    <footer className="relative pt-20 pb-8 px-4">
+    <footer className="relative pt-20 pb-8 px-4 bg-black/80 backdrop-blur-xl">
       <div className="container mx-auto max-w-7xl">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
@@ -64,19 +64,19 @@ export const Footer = React.memo(() => {
               <div className="space-y-3 text-sm text-white">
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a href={`mailto:${settings.email}`} className="hover:text-[#E93370] transition-colors">
+                  <a href={`mailto:${settings.email}`} className="text-white hover:text-[#E93370] transition-colors">
                     {settings.email}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="hover:text-[#E93370] transition-colors">
+                  <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="text-white hover:text-[#E93370] transition-colors">
                     {settings.phone}
                   </a>
                 </div>
                 <div className="flex items-start">
                   <MapPin className="h-4 w-4 mr-2 mt-0.5 text-[#E93370] flex-shrink-0" />
-                  <span>{settings.address}</span>
+                  <span className="text-white">{settings.address}</span>
                 </div>
               </div>
             </motion.div>
@@ -91,7 +91,7 @@ export const Footer = React.memo(() => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <h4 className="text-white mb-4 capitalize">
+              <h4 className="text-white mb-4 capitalize font-semibold">
                 {category}
               </h4>
               <ul className="space-y-2">
@@ -130,7 +130,7 @@ export const Footer = React.memo(() => {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#E93370]/50 transition-colors"
+                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/70 focus:outline-none focus:border-[#E93370]/50 transition-colors"
                 />
                 <button className="px-8 py-3 rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white transition-colors duration-300 whitespace-nowrap">
                   Subscribe
@@ -150,9 +150,22 @@ export const Footer = React.memo(() => {
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             {/* Copyright */}
-            <p className="text-white text-sm">
-              © {new Date().getFullYear()} {settings.siteName}. All rights reserved.
-            </p>
+            <div className="flex flex-col items-center md:items-start gap-2">
+              <p className="text-white text-sm">
+                © {new Date().getFullYear()} {settings.siteName}. All rights reserved.
+              </p>
+              <p className="text-white text-sm">
+                Made by{' '}
+                <a
+                  href="https://instagram.com/itsreiji"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-[#E93370] border border-[#E93370]/60 bg-[#E93370]/15 hover:bg-[#E93370]/25 hover:border-[#E93370] hover:text-white px-2 py-0.5 rounded transition-all duration-300"
+                >
+                  EJI
+                </a>
+              </p>
+            </div>
 
             {/* Social Links */}
             <div className="flex items-center gap-4">
@@ -176,11 +189,11 @@ export const Footer = React.memo(() => {
               <a href="#" className="hover:text-[#E93370] transition-colors">
                 Privacy
               </a>
-              <span>•</span>
+              <span className="text-white/70">•</span>
               <a href="#" className="hover:text-[#E93370] transition-colors">
                 Terms
               </a>
-              <span>•</span>
+              <span className="text-white/70">•</span>
               <a href="#" className="hover:text-[#E93370] transition-colors">
                 Cookies
               </a>

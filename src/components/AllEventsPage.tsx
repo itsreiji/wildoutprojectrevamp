@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import type { Event } from '@/types';
+import { motion } from 'motion/react';
+import type { Event } from '@/contexts/ContentContext';
 import { Button } from './ui/button';
 import {
   Card,
@@ -17,6 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import { Badge } from './ui/badge';
+import { ImageWithFallback } from './figma/ImageWithFallback';
+import { EventDetailModal } from './EventDetailModal';
+import { Background3D } from './Background3D';
+import { Navigation } from './Navigation';
+import { Footer } from './Footer';
 import { useContent } from '@/contexts/ContentContext';
 
 const ITEMS_PER_PAGE = 8;
@@ -95,6 +102,47 @@ const formatArtistList = (event: Event) => {
     .join(', ');
 };
 
+const formatEventDate = (event: Event): string => {
+  const dateValue = event.start_date || event.date;
+  if (!dateValue) return 'Date TBD';
+
+  try {
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) return 'Date TBD';
+
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return 'Date TBD';
+  }
+};
+
+const formatEventTime = (event: Event): string => {
+  if (event.time) return event.time;
+
+  // Try to extract time from start_date if available
+  const dateValue = event.start_date || event.date;
+  if (dateValue) {
+    try {
+      const date = new Date(dateValue);
+      if (!Number.isNaN(date.getTime())) {
+        return date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        });
+      }
+    } catch {
+      // Fall through to default
+    }
+  }
+
+  return 'Time TBD';
+};
+
 export const AllEventsPage = () => {
   const { events, loading, error } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
@@ -102,6 +150,7 @@ export const AllEventsPage = () => {
   const [dateFilter, setDateFilter] = useState<DateFilterOption>('all');
   const [sortOption, setSortOption] = useState<SortOption>('date-newest');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   const referenceDate = useMemo(() => new Date(), [events, loading]);
 
@@ -213,38 +262,50 @@ export const AllEventsPage = () => {
   const rangeEnd = Math.min(sortedEvents.length, startIndex + ITEMS_PER_PAGE);
 
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-12 text-white">
-      <section className="mx-auto flex max-w-6xl flex-col gap-10">
-        <header className="space-y-3">
-          <p className="text-sm uppercase tracking-[0.4em] text-slate-400">
-            WildOut! Events
-          </p>
-          <h1 className="text-4xl font-semibold leading-tight text-white sm:text-5xl">
-            Browse Every Upcoming WildOut! Experience
+    <div className="dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+      <Background3D />
+      <Navigation />
+
+      <main className="relative z-10 mx-auto flex max-w-7xl flex-col gap-y-12 px-4 py-12 md:gap-y-16 lg:px-8">
+        <motion.header
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="space-y-3 text-center mb-8 pt-8 md:pt-12"
+        >
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight">
+            <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
+              Browse Every Upcoming WildOut! Experience
+            </span>
           </h1>
-          <p className="text-base text-slate-300">
+          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto">
             Search, filter, sort, and page through the entire WildOut calendar powered by the shared
             Content Context.
           </p>
-        </header>
+        </motion.header>
 
-        <div className="flex flex-col gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-col gap-6 mb-8"
+        >
           <div className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <Input
               type="search"
               placeholder="Search by title, description, artist, venue..."
-              className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-white placeholder:text-slate-500"
+              className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl px-6 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
               value={searchQuery}
               onChange={event => setSearchQuery(event.target.value)}
             />
 
             <div className="flex items-center gap-3">
               <Select value={sortOption} onValueChange={value => setSortOption(value as SortOption)}>
-                <SelectTrigger className="min-w-[200px] border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/50">
+                <SelectTrigger className="min-w-[200px] border border-white/10 bg-white/5 backdrop-blur-xl px-3 py-2 text-sm text-white placeholder:text-white/50 rounded-2xl">
                   <span className="text-sm text-white/70">Sort</span>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="w-full rounded-2xl border border-white/10 bg-slate-900/80 text-white">
+                <SelectContent className="w-full rounded-2xl border border-white/10 bg-black/80 backdrop-blur-xl text-white">
                   {SORT_OPTIONS.map(option => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -262,10 +323,10 @@ export const AllEventsPage = () => {
                 type="button"
                 onClick={() => setDateFilter(filter.value)}
                 aria-pressed={dateFilter === filter.value}
-                className={`rounded-full px-4 py-1 text-sm font-semibold transition ${
+                className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-300 ${
                   dateFilter === filter.value
-                    ? 'bg-white text-slate-900'
-                    : 'bg-white/5 text-white/70 hover:bg-white/10'
+                    ? 'bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20'
+                    : 'bg-white/5 backdrop-blur-xl border border-white/10 text-white/70 hover:bg-white/10 hover:text-white hover:border-white/20'
                 }`}
               >
                 {filter.label}
@@ -280,96 +341,127 @@ export const AllEventsPage = () => {
                 type="button"
                 onClick={() => setCategoryFilter(category)}
                 aria-pressed={categoryFilter === category}
-                className={`rounded-full px-4 py-1 text-sm font-semibold transition ${
+                className={`rounded-full px-4 py-1.5 text-sm font-semibold transition-all duration-300 ${
                   categoryFilter === category
-                    ? 'bg-white text-slate-900'
-                    : 'bg-white/5 text-white/70 hover:bg-white/10'
+                    ? 'bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20'
+                    : 'bg-white/5 backdrop-blur-xl border border-white/10 text-white/70 hover:bg-white/10 hover:text-white hover:border-white/20'
                 }`}
               >
                 {category === 'all' ? 'All Categories' : category}
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {loading && (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-center text-white/70">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 text-center text-white/70 shadow-2xl"
+          >
             Loading events from Supabase...
-          </div>
+          </motion.div>
         )}
 
         {error && !loading && (
-          <div className="rounded-3xl border border-rose-500 bg-rose-500/10 p-6 text-sm text-rose-200">
-            {`Unable to load events: ${error}`}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-3xl border border-red-500/60 bg-red-500/10 backdrop-blur-xl p-6 text-sm text-red-100 shadow-xl"
+          >
+            <p className="font-semibold text-base text-red-100">Unable to load events</p>
+            <p className="mt-1 text-[13px] text-red-200">{error}</p>
+          </motion.div>
         )}
 
         {!loading && !error && (
           <>
             {sortedEvents.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/20 bg-white/5 p-10 text-center text-white/70">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-3xl border border-dashed border-white/20 bg-white/5 backdrop-blur-xl p-10 text-center text-white/70 shadow-2xl"
+              >
                 No upcoming events match those filters right now. Try relaxing the search
                 criteria or removing a filter.
-              </div>
+              </motion.div>
             ) : (
               <>
                 <div className="grid gap-6 md:grid-cols-2">
-                  {paginatedEvents.map(event => (
-                    <Card
+                  {paginatedEvents.map((event, index) => (
+                    <motion.div
                       key={event.id}
-                      className="overflow-hidden border border-white/5 bg-slate-900/50"
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
                     >
-                      {event.image ? (
-                        <div className="relative h-44 w-full overflow-hidden">
-                          <img
-                            src={event.image}
-                            alt={`${event.title} banner`}
-                            className="h-full w-full object-cover transition duration-300 hover:scale-[1.02]"
-                          />
-                          <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white/80">
-                            {event.category || 'Event'}
+                      <Card
+                        className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl hover:border-[#E93370]/50 transition-all duration-500 shadow-2xl cursor-pointer"
+                        onClick={() => setSelectedEvent(event)}
+                      >
+                        {event.image ? (
+                          <div className="relative h-64 w-full overflow-hidden">
+                            <ImageWithFallback
+                              src={event.image}
+                              alt={`${event.title} banner`}
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                            <Badge className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0">
+                              {event.category || 'Event'}
+                            </Badge>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="flex h-44 items-center justify-center bg-white/5 text-sm text-white/60">
-                          Image coming soon
-                        </div>
-                      )}
-
-                      <CardHeader className="space-y-1 border-b border-white/5">
-                        <CardTitle className="text-xl font-semibold text-white">
-                          {event.title}
-                        </CardTitle>
-                        <CardDescription className="text-sm text-slate-300">
-                          {event.date} · {event.time}
-                        </CardDescription>
-                      </CardHeader>
-
-                      <CardContent className="space-y-3">
-                        {event.description && (
-                          <p className="text-sm text-slate-200">{event.description}</p>
+                        ) : (
+                          <div className="flex h-64 items-center justify-center bg-white/5 text-sm text-white/60">
+                            Image coming soon
+                          </div>
                         )}
-                        <p className="text-sm text-slate-400">
-                          <span className="font-semibold text-white">Venue:</span> {event.venue}
-                        </p>
-                        <p className="text-sm text-slate-400">
-                          <span className="font-semibold text-white">Artists:</span> {formatArtistList(event)}
-                        </p>
-                      </CardContent>
 
-                      <CardFooter className="justify-between text-xs text-slate-400">
-                        <span>{event.location || event.venue || 'Venue TBD'}</span>
-                        <span>{event.time || 'Time TBD'}</span>
-                      </CardFooter>
-                    </Card>
+                        <CardHeader className="space-y-2 border-b border-white/10 p-6">
+                          <CardTitle className="text-xl md:text-2xl font-semibold text-white group-hover:text-[#E93370] transition-colors duration-300">
+                            {event.title}
+                          </CardTitle>
+                          <CardDescription className="text-sm text-white/60">
+                            {formatEventDate(event)} · {formatEventTime(event)}
+                          </CardDescription>
+                        </CardHeader>
+
+                        <CardContent className="space-y-3 p-6">
+                          {event.description && (
+                            <p className="text-sm text-white/70 line-clamp-2">{event.description}</p>
+                          )}
+                          <div className="space-y-2">
+                            {event.venue && (
+                              <p className="text-sm text-white/60">
+                                <span className="font-semibold text-white">Venue:</span> {event.venue}
+                              </p>
+                            )}
+                            {event.artists && event.artists.length > 0 && (
+                              <p className="text-sm text-white/60">
+                                <span className="font-semibold text-white">Artists:</span> {formatArtistList(event)}
+                              </p>
+                            )}
+                          </div>
+                        </CardContent>
+
+                        <CardFooter className="justify-between text-xs text-white/50 p-6 border-t border-white/10">
+                          <span>{event.location || event.venue || 'Venue TBD'}</span>
+                          <span>{formatEventTime(event)}</span>
+                        </CardFooter>
+                      </Card>
+                    </motion.div>
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-slate-300">
-                  <p>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl px-6 py-4 text-sm text-white/70 shadow-xl mt-12"
+                >
+                  <p className="flex items-center">
                     Showing {rangeStart}–{rangeEnd} of {sortedEvents.length} events
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <Button
                       variant="outline"
                       size="sm"
@@ -377,6 +469,7 @@ export const AllEventsPage = () => {
                       onClick={() =>
                         setCurrentPage(prev => Math.max(prev - 1, 1))
                       }
+                      className="border-white/10 bg-white/5 backdrop-blur-xl text-white hover:bg-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
                     >
                       Previous
                     </Button>
@@ -387,16 +480,26 @@ export const AllEventsPage = () => {
                       onClick={() =>
                         setCurrentPage(prev => Math.min(prev + 1, totalPages))
                       }
+                      className="border-white/10 bg-white/5 backdrop-blur-xl text-white hover:bg-white/10 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
                     >
                       Next
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               </>
             )}
           </>
         )}
-      </section>
-    </main>
+      </main>
+
+      <Footer />
+
+      {/* Event Detail Modal */}
+      <EventDetailModal
+        event={selectedEvent}
+        isOpen={!!selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+      />
+    </div>
   );
 };

@@ -1,8 +1,20 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { supabaseClient } from '../supabase/client';
 import type { Session, User, AuthError } from '@supabase/auth-js';
 
 type AuthRole = 'admin' | 'editor' | 'user' | 'anonymous';
+
+// Cache for user profile data to avoid repeated database calls
+interface CachedProfile {
+  id: string;
+  role: AuthRole;
+  email: string;
+  lastUpdated: number;
+  ttl: number; // Time to live in milliseconds
+}
+
+const PROFILE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const profileCache = new Map<string, CachedProfile>();
 
 const getRoleFromUser = (user: User | null): AuthRole => {
   const claimRole =
@@ -16,15 +28,66 @@ const getRoleFromUser = (user: User | null): AuthRole => {
   return user ? 'user' : 'anonymous';
 };
 
+// Enhanced role fetching with caching
+const getUserRoleWithCache = async (userId: string): Promise<AuthRole> => {
+  // Check cache first
+  const cached = profileCache.get(userId);
+  if (cached && Date.now() - cached.lastUpdated < cached.ttl) {
+    return cached.role;
+  }
+
+  try {
+    // Fetch fresh data from profiles table
+    const { data: profile, error } = await supabaseClient
+      .from('profiles')
+      .select('role')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.warn('Failed to fetch user profile:', error);
+      // Fallback to user metadata
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      const fallbackRole = getRoleFromUser(user);
+      return fallbackRole;
+    }
+
+    const role = (profile?.role as AuthRole) || 'user';
+
+    // Cache the result
+    profileCache.set(userId, {
+      id: userId,
+      role,
+      email: profile.email || '',
+      lastUpdated: Date.now(),
+      ttl: PROFILE_CACHE_TTL,
+    });
+
+    return role;
+  } catch (error) {
+    console.error('Error fetching user role:', error);
+    // Fallback to user metadata
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    return getRoleFromUser(user);
+  }
+};
+
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
+  sessionId: string | null;
   role: AuthRole;
   loading: boolean;
   error: string | null;
+  isAuthenticated: boolean;
+  lastActivity: number;
   signInWithEmail: (email: string, password: string) => Promise<AuthError | null>;
+  signUpWithEmail: (email: string, password: string) => Promise<AuthError | null>;
   sendMagicLink: (email: string) => Promise<AuthError | null>;
   signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
+  clearCache: () => void;
+  validateSession: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -32,31 +95,262 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [role, setRole] = useState<AuthRole>('anonymous');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastActivity, setLastActivity] = useState<number>(Date.now());
 
-  const updateSessionState = (incomingSession: Session | null) => {
+  // Memoized authentication state
+  const isAuthenticated = useMemo(() => !!user && !!session, [user, session]);
+
+  // Synchronous session state update for immediate UI updates
+  const updateSessionStateSync = useCallback((incomingSession: Session | null) => {
     const incomingUser = incomingSession?.user ?? null;
     setSession(incomingSession);
     setUser(incomingUser);
-    setRole(getRoleFromUser(incomingUser));
-  };
+    
+    // Only update sessionId if we have a valid session and token
+    // Don't overwrite with null if we already have a valid sessionId
+    if (incomingSession?.access_token) {
+      setSessionId(incomingSession.access_token);
+    } else if (!incomingSession) {
+      // Only clear sessionId if session is explicitly null
+      setSessionId(null);
+    }
+    
+    setLastActivity(Date.now());
+
+    // For synchronous updates, set role to anonymous initially
+    // This will be updated asynchronously to the correct role
+    if (incomingUser) {
+      // Start with 'user' role, will be updated to correct role asynchronously
+      setRole('user');
+    } else {
+      setRole('anonymous');
+    }
+  }, []);
+
+  // Enhanced session state update with role caching and session ID tracking
+  const updateSessionState = useCallback(async (incomingSession: Session | null) => {
+    const incomingUser = incomingSession?.user ?? null;
+
+    // First do the synchronous update
+    updateSessionStateSync(incomingSession);
+
+    // Then do async role fetching if user is authenticated
+    if (incomingUser) {
+      try {
+        const userRole = await getUserRoleWithCache(incomingUser.id);
+        setRole(userRole);
+        console.log('✅ User role updated:', userRole);
+      } catch (roleError) {
+        console.warn('Failed to fetch user role, keeping existing role:', roleError);
+        // Keep the role that was set synchronously
+      }
+    }
+  }, [updateSessionStateSync]);
+
+  // Clear cache utility
+  const clearCache = useCallback(() => {
+    profileCache.clear();
+  }, []);
+
+  // Session validation function for cross-page consistency using database sessions
+  const validateSession = useCallback(async (): Promise<boolean> => {
+    try {
+      console.log('🔍 Validating session...');
+
+      if (!session || !user) {
+        console.log('❌ No active session to validate');
+        return false;
+      }
+
+      // First check if session is expired locally
+      if (session.expires_at && session.expires_at * 1000 < Date.now()) {
+        console.log('❌ Session expired locally, attempting refresh...');
+        // Try to refresh the session before invalidating
+        try {
+          const { data: refreshData, error: refreshError } = await supabaseClient.auth.refreshSession();
+          if (refreshError || !refreshData.session) {
+            console.log('❌ Session refresh failed');
+            updateSessionStateSync(null);
+            return false;
+          }
+          // Update with refreshed session
+          await updateSessionState(refreshData.session);
+          return true;
+        } catch (refreshErr) {
+          console.error('❌ Session refresh error:', refreshErr);
+          updateSessionStateSync(null);
+          return false;
+        }
+      }
+
+      // Validate session with Supabase auth
+      const { data, error } = await supabaseClient.auth.getSession();
+
+      if (error) {
+        console.error('❌ Session validation error:', error);
+        updateSessionStateSync(null);
+        return false;
+      }
+
+      if (!data.session) {
+        console.log('❌ No valid session returned from Supabase');
+        updateSessionStateSync(null);
+        return false;
+      }
+
+      // Use current session's access_token for validation
+      const currentToken = data.session.access_token;
+
+      // Validate session in database (non-blocking)
+      try {
+        const { data: isValidSession, error: sessionError } = await supabaseClient.rpc('validate_user_session', {
+          session_token_param: currentToken
+        });
+
+        if (sessionError) {
+          console.warn('⚠️ Database session validation error:', sessionError);
+          // Continue with Supabase validation if database check fails
+        } else if (!isValidSession) {
+          console.log('❌ Session invalidated in database');
+          updateSessionStateSync(null);
+          return false;
+        } else {
+          console.log('✅ Session validated in database');
+        }
+      } catch (dbError) {
+        console.warn('⚠️ Database session check failed:', dbError);
+        // Continue with Supabase validation - don't fail if DB check fails
+      }
+
+      // Ensure session ID consistency across pages
+      // Update if token changed (e.g., after refresh)
+      if (currentToken !== sessionId) {
+        console.log('🔄 Session token updated, refreshing state');
+        await updateSessionState(data.session);
+      }
+
+      console.log('✅ Session validation complete');
+      return true;
+    } catch (validationError) {
+      console.error('❌ Session validation failed:', validationError);
+      updateSessionStateSync(null);
+      return false;
+    }
+  }, [session, user, sessionId, updateSessionStateSync, updateSessionState]);
+
+  // Session refresh function
+  const refreshSession = useCallback(async () => {
+    try {
+      setError(null);
+      const { data, error } = await supabaseClient.auth.refreshSession();
+
+      if (error) {
+        console.warn('Session refresh failed:', error);
+        setError('Failed to refresh session');
+        return;
+      }
+
+      if (data.session) {
+        await updateSessionState(data.session);
+      }
+    } catch (refreshError) {
+      console.error('Session refresh error:', refreshError);
+      setError('Session refresh failed');
+    }
+  }, [updateSessionState]);
+
+  // Activity tracking for session management
+  useEffect(() => {
+    const updateActivity = () => setLastActivity(Date.now());
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+
+    events.forEach(event => {
+      document.addEventListener(event, updateActivity, { passive: true });
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, updateActivity);
+      });
+    };
+  }, []);
+
+  // Simplified session refresh - only refresh when actually needed
+  useEffect(() => {
+    if (!isAuthenticated || !session?.expires_at) return;
+
+    const checkSessionExpiry = () => {
+      if (!session?.expires_at) return;
+      const expiresAt = session.expires_at * 1000;
+      const timeUntilExpiry = expiresAt - Date.now();
+
+      // Only refresh if expiring within 2 minutes
+      if (timeUntilExpiry < 2 * 60 * 1000) {
+        console.log('Session expiring soon, refreshing...');
+        refreshSession();
+      }
+    };
+
+    const interval = setInterval(checkSessionExpiry, 60 * 1000); // Check every minute
+    return () => clearInterval(interval);
+  }, [isAuthenticated, session, refreshSession]);
+
+  // Page visibility change handler for session updates
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Simple session check without complex validation
+        supabaseClient.auth.getSession().then(({ data, error }: { data: { session: Session | null }, error: any }) => {
+          if (!error && data.session && data.session.access_token !== sessionId) {
+            console.log('🔄 Session updated on page visibility change');
+            updateSessionStateSync(data.session);
+          }
+        }).catch((err: any) => {
+          console.warn('Failed to check session on visibility change:', err);
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [sessionId, updateSessionStateSync]);
 
   useEffect(() => {
     let isMounted = true;
 
     const init = async () => {
       try {
+        console.log('🔄 Initializing auth state...');
         const {
           data: { session: initialSession },
+          error: sessionError,
         } = await supabaseClient.auth.getSession();
 
-        if (!isMounted) return;
-
-        updateSessionState(initialSession);
+        if (sessionError) {
+          console.warn('Session retrieval error:', sessionError);
+          if (isMounted) {
+            setError('Unable to read authentication state');
+          }
+        } else if (isMounted) {
+          updateSessionStateSync(initialSession);
+          // If there's a session, also do async role fetching
+          if (initialSession?.user) {
+            getUserRoleWithCache(initialSession.user.id).then(userRole => {
+              if (isMounted) {
+                setRole(userRole);
+              }
+            }).catch(roleError => {
+              console.warn('Failed to fetch initial user role:', roleError);
+            });
+          }
+          console.log('✅ Auth state initialized');
+        }
       } catch (getSessionError) {
-        console.error('Auth initialization failed', getSessionError);
+        console.error('Auth initialization failed:', getSessionError);
         if (isMounted) {
           setError('Unable to read authentication state');
         }
@@ -69,8 +363,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const {
       data: { subscription },
-    } = supabaseClient.auth.onAuthStateChange((_event: string, nextSession: Session | null) => {
-      updateSessionState(nextSession);
+    } = supabaseClient.auth.onAuthStateChange((event: string, nextSession: Session | null) => {
+      console.log('🔄 Auth state change:', event, nextSession ? 'authenticated' : 'unauthenticated');
+
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('✅ Session token refreshed');
+        // When token refreshes, update the session record in database
+        if (nextSession?.access_token) {
+          // Try to validate/update the session in database
+          supabaseClient.rpc('validate_user_session', {
+            session_token_param: nextSession.access_token
+          }).catch(err => {
+            console.warn('⚠️ Failed to update session on token refresh:', err);
+            // If validation fails, try to create a new session record
+            supabaseClient.rpc('create_user_session', {
+              session_token: nextSession.access_token,
+              expiry_hours: 24
+            }).catch(createErr => {
+              // Ignore duplicate key errors (session already exists)
+              if (!createErr.message?.includes('duplicate') && !createErr.message?.includes('unique')) {
+                console.warn('⚠️ Failed to create session on token refresh:', createErr);
+              }
+            });
+          });
+        }
+      } else if (event === 'SIGNED_OUT') {
+        console.log('👋 User signed out');
+        clearCache(); // Clear profile cache on sign out
+      }
+
+      // Update session state synchronously for immediate UI response
+      updateSessionStateSync(nextSession);
+
+      // Handle role updates for authenticated sessions
+      if (nextSession?.user && event !== 'SIGNED_OUT') {
+        getUserRoleWithCache(nextSession.user.id).then(userRole => {
+          if (isMounted) {
+            setRole(userRole);
+          }
+        }).catch(roleError => {
+          console.warn('Failed to update role on auth change:', roleError);
+        });
+      }
     });
 
     init();
@@ -79,75 +413,244 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isMounted = false;
       subscription.unsubscribe();
     };
+  }, [updateSessionStateSync, clearCache]);
+
+  const signInWithEmail = useCallback(async (email: string, password: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('🔄 Signing in user...');
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error('❌ Sign in error:', error);
+        setError(error.message);
+        setLoading(false);
+        return error;
+      }
+
+      console.log('✅ Sign in successful');
+
+      // Get the correct role from database and update session state
+      let finalRole: AuthRole = 'user'; // Default fallback
+      try {
+        const userRole = await getUserRoleWithCache(data.user.id);
+        finalRole = userRole;
+        console.log('✅ User role fetched from database:', userRole);
+      } catch (roleError) {
+        console.warn('⚠️ Failed to fetch user role, using default:', roleError);
+      }
+
+      // Create session record in database with retry logic
+      if (data.session?.access_token) {
+        let retries = 3;
+        let sessionCreated = false;
+        
+        while (retries > 0 && !sessionCreated) {
+          try {
+            const { error: sessionError } = await supabaseClient.rpc('create_user_session', {
+              session_token: data.session.access_token,
+              expiry_hours: 24
+            });
+            
+            if (sessionError) {
+              // If it's a duplicate key error, try to update existing session instead
+              if (sessionError.message?.includes('duplicate') || sessionError.message?.includes('unique')) {
+                console.log('🔄 Session already exists, validating instead...');
+                // Validate the existing session
+                await supabaseClient.rpc('validate_user_session', {
+                  session_token_param: data.session.access_token
+                });
+                sessionCreated = true;
+              } else {
+                throw sessionError;
+              }
+            } else {
+              console.log('✅ Session record created in database');
+              sessionCreated = true;
+            }
+          } catch (sessionError: any) {
+            retries--;
+            if (retries === 0) {
+              console.warn('⚠️ Failed to create session record after retries:', sessionError);
+              // Continue with auth even if session creation fails
+            } else {
+              console.log(`🔄 Retrying session creation (${retries} attempts left)...`);
+              // Wait a bit before retrying
+              await new Promise(resolve => setTimeout(resolve, 500));
+            }
+          }
+        }
+      }
+
+      // Update session state with correct role
+      updateSessionStateSync(data.session);
+      setRole(finalRole); // Set the correct role immediately
+
+      setLoading(false);
+      return null;
+    } catch (signInError) {
+      console.error('❌ Unexpected sign in error:', signInError);
+      setError('An unexpected error occurred during sign in');
+      setLoading(false);
+      return { message: 'An unexpected error occurred during sign in' } as AuthError;
+    }
+  }, [updateSessionStateSync]);
+
+  const signUpWithEmail = useCallback(async (email: string, password: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('🔄 Signing up user...');
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            role: 'user', // Default role for new users
+          }
+        }
+      });
+
+      if (error) {
+        console.error('❌ Sign up error:', error);
+        setError(error.message);
+        setLoading(false);
+        return error;
+      }
+
+      console.log('✅ Sign up successful');
+
+      // For email confirmation flow, user might not be immediately signed in
+      if (data.user && data.session) {
+        await updateSessionState(data.session);
+      }
+      setLoading(false);
+      return null;
+    } catch (signUpError) {
+      console.error('❌ Unexpected sign up error:', signUpError);
+      setError('An unexpected error occurred during sign up');
+      setLoading(false);
+      return { message: 'An unexpected error occurred during sign up' } as AuthError;
+    }
+  }, [updateSessionState]);
+
+  const sendMagicLink = useCallback(async (email: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('🔄 Sending magic link...');
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo:
+            typeof window !== 'undefined'
+              ? `${window.location.origin}${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`
+              : `${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`,
+        },
+      });
+
+      if (error) {
+        console.error('❌ Magic link error:', error);
+        setError(error.message);
+        setLoading(false);
+        return error;
+      }
+
+      console.log('✅ Magic link sent');
+      setLoading(false);
+      return null;
+    } catch (magicLinkError) {
+      console.error('❌ Unexpected magic link error:', magicLinkError);
+      setError('An unexpected error occurred sending magic link');
+      setLoading(false);
+      return { message: 'An unexpected error occurred sending magic link' } as AuthError;
+    }
   }, []);
 
-  const signInWithEmail = async (email: string, password: string) => {
+  const signOut = useCallback(async () => {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      console.log('🔄 Signing out user...');
 
-    if (error) {
-      setError(error.message);
+      // Invalidate session in database first
+      if (sessionId) {
+        try {
+          await supabaseClient.rpc('invalidate_user_session', {
+            session_token_param: sessionId
+          });
+          console.log('✅ Session invalidated in database');
+        } catch (sessionError) {
+          console.warn('⚠️ Failed to invalidate session in database:', sessionError);
+          // Continue with auth sign out even if session invalidation fails
+        }
+      }
+
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        console.warn('Sign out warning:', error);
+        // Continue with local cleanup even if server sign out fails
+      }
+
+      clearCache(); // Clear profile cache on sign out
+      await updateSessionState(null);
+      console.log('✅ Sign out successful');
+    } catch (signOutError) {
+      console.error('❌ Sign out error:', signOutError);
+      setError('An error occurred during sign out');
+    } finally {
       setLoading(false);
-      return error;
     }
-
-    updateSessionState(data.session ?? null);
-    setLoading(false);
-    return null;
-  };
-
-  const sendMagicLink = async (email: string) => {
-    setLoading(true);
-    setError(null);
-
-    const { error } = await supabaseClient.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo:
-          typeof window !== 'undefined'
-            ? `${window.location.origin}${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`
-            : `${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`,
-      },
-    });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return error;
-    }
-
-    setLoading(false);
-    return null;
-  };
-
-  const signOut = async () => {
-    setLoading(true);
-    await supabaseClient.auth.signOut();
-    updateSessionState(null);
-    setLoading(false);
-  };
+  }, [updateSessionState, clearCache, sessionId]);
 
   return (
     <AuthContext.Provider
       value={{
         user,
         session,
+        sessionId,
         role,
         loading,
         error,
+        isAuthenticated,
+        lastActivity,
         signInWithEmail,
+        signUpWithEmail,
         sendMagicLink,
         signOut,
+        refreshSession,
+        clearCache,
+        validateSession,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Custom hook for easy session validation in components
+export const useSessionValidation = () => {
+  const { validateSession, sessionId, isAuthenticated } = useAuth();
+
+  const validateCurrentSession = useCallback(async () => {
+    if (!isAuthenticated) return false;
+    return await validateSession();
+  }, [validateSession, isAuthenticated]);
+
+  return {
+    validateCurrentSession,
+    sessionId,
+    isAuthenticated,
+  };
 };
 
 export const useAuth = () => {

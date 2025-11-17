@@ -7,16 +7,16 @@ import { useRouter } from './router';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 const NAV_ITEMS = [
-  { id: 'home', label: 'Home', href: '#' },
-  { id: 'events', label: 'Events', href: '#events' },
-  { id: 'about', label: 'About', href: '#about' },
-  { id: 'team', label: 'Team', href: '#team' },
-  { id: 'gallery', label: 'Gallery', href: '#gallery' },
-  { id: 'partners', label: 'Partners', href: '#partners' },
+  { id: 'home', label: 'Home', href: '/', hash: '#' },
+  { id: 'events', label: 'Events', href: '/events', hash: '#events' },
+  { id: 'about', label: 'About', href: '/', hash: '#about' },
+  { id: 'team', label: 'Team', href: '/', hash: '#team' },
+  { id: 'gallery', label: 'Gallery', href: '/', hash: '#gallery' },
+  { id: 'partners', label: 'Partners', href: '/', hash: '#partners' },
 ];
 
 const NavigationComponent = () => {
-  const { getAdminPath } = useRouter();
+  const { getAdminPath, currentPath, navigate } = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -29,14 +29,34 @@ const NavigationComponent = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (href: string) => {
+  const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
     setIsMobileMenuOpen(false);
-    if (href === '#') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // If we're on the landing page, use hash navigation
+    if (currentPath === '/') {
+      if (item.hash === '#') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const element = document.querySelector(item.hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
     } else {
-      const element = document.querySelector(href);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // If we're on a different page, navigate to the route
+      if (item.href === '/') {
+        navigate('/');
+        // Wait a bit for page to load, then scroll to section if hash exists
+        setTimeout(() => {
+          if (item.hash && item.hash !== '#') {
+            const element = document.querySelector(item.hash);
+            if (element) {
+              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        }, 100);
+      } else {
+        navigate(item.href);
       }
     }
   };
@@ -56,21 +76,22 @@ const NavigationComponent = () => {
         <div className="container mx-auto max-w-7xl px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <motion.button
-              onClick={() => scrollToSection('#')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="cursor-pointer h-10 md:h-12"
-            >
-              <img src={logo} alt="WildOut!" className="h-full w-auto object-contain" />
-            </motion.button>
+            <Link to="/">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="cursor-pointer h-10 md:h-12"
+              >
+                <img src={logo} alt="WildOut!" className="h-full w-auto object-contain" />
+              </motion.div>
+            </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-1">
               {NAV_ITEMS.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => scrollToSection(item.href)}
+                  onClick={() => handleNavClick(item)}
                   className="px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300"
                 >
                   {item.label}
@@ -142,7 +163,7 @@ const NavigationComponent = () => {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        onClick={() => scrollToSection(item.href)}
+                        onClick={() => handleNavClick(item)}
                         className="w-full text-left px-4 py-3 text-lg text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300"
                       >
                         {item.label}

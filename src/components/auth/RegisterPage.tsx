@@ -4,19 +4,21 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Background3D } from '../Background3D';
 
 const copy = {
-  title: 'Admin access',
-  subtitle: 'Sign in with your WildOut! administrator account to manage landing page content.',
+  title: 'Create account',
+  subtitle: 'Join WildOut! and connect with Indonesia\'s creative community.',
   passwordLabel: 'Password',
+  confirmPasswordLabel: 'Confirm Password',
   emailLabel: 'Email address',
-  submit: 'Sign in',
-  magicLink: 'Send magic link',
+  submit: 'Create account',
+  signIn: 'Already have an account? Sign in',
 };
 
-export const LoginPage: React.FC = () => {
-  const { signInWithEmail, sendMagicLink, role, loading } = useAuth();
+export const RegisterPage: React.FC = () => {
+  const { signUpWithEmail, signInWithEmail, role, loading } = useAuth();
   const { navigate } = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
@@ -33,32 +35,32 @@ export const LoginPage: React.FC = () => {
     setFormError(null);
     setInfoMessage(null);
 
-    if (!email || !password) {
-      setFormError('Please provide both email and password.');
+    if (!email || !password || !confirmPassword) {
+      setFormError('Please fill in all fields.');
       return;
     }
 
-    const error = await signInWithEmail(email.trim(), password);
+    if (password !== confirmPassword) {
+      setFormError('Passwords do not match.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setFormError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    const error = await signUpWithEmail(email.trim(), password);
     if (error) {
       setFormError(error.message);
       return;
     }
 
-    setInfoMessage('Signed in successfully. Redirecting to admin dashboard…');
+    setInfoMessage('Account created successfully! Please check your email to verify your account, then sign in.');
   };
 
-  const handleMagicLink = async () => {
-    if (!email) {
-      setFormError('Enter your email to receive a magic link.');
-      return;
-    }
-    setFormError(null);
-    const error = await sendMagicLink(email.trim());
-    if (error) {
-      setFormError(error.message);
-      return;
-    }
-    setInfoMessage('Magic link sent! Please check your inbox and follow the instructions.');
+  const handleSignIn = () => {
+    navigate('/login');
   };
 
   return (
@@ -87,6 +89,7 @@ export const LoginPage: React.FC = () => {
               autoComplete="email"
               className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
               placeholder="you@wildout.id"
+              required
             />
           </div>
 
@@ -98,9 +101,27 @@ export const LoginPage: React.FC = () => {
               type="password"
               value={password}
               onChange={event => setPassword(event.target.value)}
-              autoComplete="current-password"
+              autoComplete="new-password"
               className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
               placeholder="••••••••"
+              required
+              minLength={6}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-white/90">
+              {copy.confirmPasswordLabel}
+            </label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={event => setConfirmPassword(event.target.value)}
+              autoComplete="new-password"
+              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
+              placeholder="••••••••"
+              required
+              minLength={6}
             />
           </div>
 
@@ -125,7 +146,7 @@ export const LoginPage: React.FC = () => {
             disabled={loading}
             className="w-full rounded-2xl bg-[#E93370] hover:bg-[#E93370]/90 text-white px-6 py-4 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:cursor-wait disabled:opacity-60 backdrop-blur-xl"
           >
-            {loading ? 'Working…' : copy.submit}
+            {loading ? 'Creating account…' : copy.submit}
           </button>
         </form>
 
@@ -140,58 +161,18 @@ export const LoginPage: React.FC = () => {
 
         <button
           type="button"
-          onClick={handleMagicLink}
-          disabled={loading}
-          className="w-full rounded-2xl border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] text-white px-6 py-4 text-sm font-medium transition-all duration-300 disabled:cursor-wait disabled:opacity-60 backdrop-blur-xl"
+          onClick={handleSignIn}
+          className="w-full rounded-2xl border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] text-white px-6 py-4 text-sm font-medium transition-all duration-300 backdrop-blur-xl"
         >
-          {loading ? 'Sending…' : copy.magicLink}
+          {copy.signIn}
         </button>
-
-        {/* Resources Section */}
-        <div className="pt-8 border-t border-white/10">
-          <p className="text-center text-xs font-medium text-white/60 mb-4">Resources</p>
-          <div className="flex flex-col items-center space-y-3">
-            <div className="flex justify-center space-x-6">
-              <button
-                type="button"
-                onClick={() => window.open('/terms-of-service.pdf', '_blank')}
-                className="text-xs text-white/60 hover:text-white/80 transition-colors duration-300"
-              >
-                Terms of Service
-              </button>
-              <button
-                type="button"
-                onClick={() => window.open('/privacy-policy.pdf', '_blank')}
-                className="text-xs text-white/60 hover:text-white/80 transition-colors duration-300"
-              >
-                Privacy Policy
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                // Download admin resources/documentation
-                const link = document.createElement('a');
-                link.href = '/admin-resources.zip'; // Placeholder - can be updated to actual asset
-                link.download = 'wildout-admin-resources.zip';
-                link.click();
-              }}
-              className="text-xs text-[#E93370] hover:text-[#E93370]/80 font-medium transition-colors duration-300 flex items-center space-x-1"
-            >
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              <span>Download Admin Resources</span>
-            </button>
-          </div>
-        </div>
 
         <div className="pt-6 text-center">
           <p className="text-xs font-light text-white/40 tracking-wider">
-            WildOut! Admin Portal
+            WildOut! Community
           </p>
           <p className="text-[10px] text-white/30 mt-1 tracking-[0.2em] uppercase">
-            Secure Access Only
+            Join the Creative Revolution
           </p>
         </div>
         </div>
@@ -199,4 +180,3 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
-

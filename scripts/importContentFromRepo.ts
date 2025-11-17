@@ -13,7 +13,7 @@
  * - With Supabase CLI: npx supabase db reset (will run all migrations including this import)
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@jsr/supabase__supabase-js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -115,6 +115,7 @@ async function importHeroContent(heroData: any): Promise<void> {
       cta_text: heroData.ctaText,
       cta_link: heroData.ctaLink,
       updated_at: new Date().toISOString()
+      // Note: updated_by not set during import since we don't have authenticated user
     });
 
   if (error) {
@@ -140,6 +141,7 @@ async function importAboutContent(aboutData: any): Promise<void> {
       story: aboutData.story,
       features: aboutData.features,
       updated_at: new Date().toISOString()
+      // Note: updated_by not set during import since we don't have authenticated user
     });
 
   if (error) {
@@ -167,6 +169,7 @@ async function importSiteSettings(settingsData: any): Promise<void> {
       address: settingsData.address,
       social_media: settingsData.socialMedia,
       updated_at: new Date().toISOString()
+      // Note: updated_by not set during import since we don't have authenticated user
     });
 
   if (error) {
@@ -180,17 +183,261 @@ async function importSiteSettings(settingsData: any): Promise<void> {
  * Check if tables are empty (first run)
  */
 async function checkIfEmpty(): Promise<boolean> {
-  const [heroResult, aboutResult, settingsResult] = await Promise.all([
+  const [heroResult, aboutResult, settingsResult, sectionsResult] = await Promise.all([
     supabase.from('hero_content').select('id').limit(1),
     supabase.from('about_content').select('id').limit(1),
-    supabase.from('site_settings').select('id').limit(1)
+    supabase.from('site_settings').select('id').limit(1),
+    supabase.from('admin_sections').select('id').limit(1)
   ]);
 
   const hasHero = heroResult.data && heroResult.data.length > 0;
   const hasAbout = aboutResult.data && aboutResult.data.length > 0;
   const hasSettings = settingsResult.data && settingsResult.data.length > 0;
+  const hasSections = sectionsResult.data && sectionsResult.data.length > 0;
 
-  return !hasHero && !hasAbout && !hasSettings;
+  return !hasHero && !hasAbout && !hasSettings && !hasSections;
+}
+
+/**
+ * Seed admin sections and permissions
+ */
+async function seedAdminSections(): Promise<void> {
+  console.log('🔧 Seeding admin sections and permissions...');
+
+  // Admin sections data (mirroring DashboardLayout NAVIGATION_ITEMS)
+  const adminSections = [
+    {
+      slug: 'home',
+      label: 'Dashboard',
+      icon: 'LayoutDashboard',
+      category: 'main',
+      order_index: 1,
+      description: 'Overview dashboard with statistics and recent activity'
+    },
+    {
+      slug: 'hero',
+      label: 'Hero Section',
+      icon: 'Sparkles',
+      category: 'content',
+      order_index: 2,
+      description: 'Landing page hero section with title, subtitle, and call-to-action'
+    },
+    {
+      slug: 'about',
+      label: 'About Us',
+      icon: 'Info',
+      category: 'content',
+      order_index: 3,
+      description: 'About page content including story and features'
+    },
+    {
+      slug: 'events',
+      label: 'Events',
+      icon: 'Calendar',
+      category: 'content',
+      order_index: 4,
+      description: 'Manage events, categories, and event details'
+    },
+    {
+      slug: 'team',
+      label: 'Team',
+      icon: 'Users',
+      category: 'content',
+      order_index: 5,
+      description: 'Team members and their information'
+    },
+    {
+      slug: 'gallery',
+      label: 'Gallery',
+      icon: 'Image',
+      category: 'content',
+      order_index: 6,
+      description: 'Image gallery items and management'
+    },
+    {
+      slug: 'partners',
+      label: 'Partners',
+      icon: 'Handshake',
+      category: 'content',
+      order_index: 7,
+      description: 'Partner organizations and collaborations'
+    },
+    {
+      slug: 'settings',
+      label: 'Settings',
+      icon: 'Settings',
+      category: 'management',
+      order_index: 8,
+      description: 'Site-wide settings and configuration'
+    }
+  ];
+
+  // Insert admin sections
+  for (const section of adminSections) {
+    const { error } = await supabase
+      .from('admin_sections')
+      .upsert(section, { onConflict: 'slug' });
+
+    if (error) {
+      console.error(`❌ Error seeding admin section ${section.slug}:`, error);
+    }
+  }
+
+  // Role permissions data
+  const rolePermissions = [
+    // Admin - full access
+    { role: 'admin', section_slug: 'home', can_view: true, can_edit: true, can_publish: true, can_delete: true },
+    { role: 'admin', section_slug: 'hero', can_view: true, can_edit: true, can_publish: true, can_delete: true },
+    { role: 'admin', section_slug: 'about', can_view: true, can_edit: true, can_publish: true, can_delete: true },
+    { role: 'admin', section_slug: 'events', can_view: true, can_edit: true, can_publish: true, can_delete: true },
+    { role: 'admin', section_slug: 'team', can_view: true, can_edit: true, can_publish: true, can_delete: true },
+    { role: 'admin', section_slug: 'gallery', can_view: true, can_edit: true, can_publish: true, can_delete: true },
+    { role: 'admin', section_slug: 'partners', can_view: true, can_edit: true, can_publish: true, can_delete: true },
+    { role: 'admin', section_slug: 'settings', can_view: true, can_edit: true, can_publish: true, can_delete: true },
+
+    // Editor - content editing access
+    { role: 'editor', section_slug: 'home', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+    { role: 'editor', section_slug: 'hero', can_view: true, can_edit: true, can_publish: true, can_delete: false },
+    { role: 'editor', section_slug: 'about', can_view: true, can_edit: true, can_publish: true, can_delete: false },
+    { role: 'editor', section_slug: 'events', can_view: true, can_edit: true, can_publish: true, can_delete: false },
+    { role: 'editor', section_slug: 'team', can_view: true, can_edit: true, can_publish: true, can_delete: false },
+    { role: 'editor', section_slug: 'gallery', can_view: true, can_edit: true, can_publish: true, can_delete: false },
+    { role: 'editor', section_slug: 'partners', can_view: true, can_edit: true, can_publish: true, can_delete: false },
+    { role: 'editor', section_slug: 'settings', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+
+    // Viewer - read-only access
+    { role: 'viewer', section_slug: 'home', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+    { role: 'viewer', section_slug: 'hero', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+    { role: 'viewer', section_slug: 'about', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+    { role: 'viewer', section_slug: 'events', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+    { role: 'viewer', section_slug: 'team', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+    { role: 'viewer', section_slug: 'gallery', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+    { role: 'viewer', section_slug: 'partners', can_view: true, can_edit: false, can_publish: false, can_delete: false },
+    { role: 'viewer', section_slug: 'settings', can_view: false, can_edit: false, can_publish: false, can_delete: false }
+  ];
+
+  // Insert role permissions
+  for (const permission of rolePermissions) {
+    const { error } = await supabase
+      .from('role_permissions')
+      .upsert(permission, { onConflict: 'role,section_slug' });
+
+    if (error) {
+      console.error(`❌ Error seeding role permission ${permission.role}-${permission.section_slug}:`, error);
+    }
+  }
+
+  // Seed section content with current dashboard data
+  const sectionContent = [
+    {
+      section_slug: 'home',
+      payload: {
+        stats: {
+          totalEvents: 0,
+          upcomingEvents: 0,
+          ongoingEvents: 0,
+          completedEvents: 0,
+          totalTeamMembers: 0,
+          activeTeamMembers: 0,
+          totalGalleryImages: 0,
+          totalPartners: 0,
+          activePartners: 0,
+          totalAttendees: 0,
+          avgAttendanceRate: 0
+        },
+        recentActivity: [],
+        charts: {
+          monthlyTrendData: [
+            { month: 'Jan', events: 12, attendees: 450 },
+            { month: 'Feb', events: 15, attendees: 580 },
+            { month: 'Mar', events: 18, attendees: 720 },
+            { month: 'Apr', events: 22, attendees: 890 },
+            { month: 'May', events: 25, attendees: 1050 },
+            { month: 'Jun', events: 20, attendees: 820 }
+          ]
+        }
+      }
+    },
+    {
+      section_slug: 'events',
+      payload: {
+        eventCategories: ['music', 'sports', 'arts', 'food', 'community', 'other'],
+        eventStatuses: ['draft', 'published', 'cancelled', 'archived'],
+        defaultCapacity: 100,
+        maxFileSize: 5242880,
+        allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp']
+      }
+    },
+    {
+      section_slug: 'team',
+      payload: {
+        memberStatuses: ['active', 'inactive'],
+        maxBioLength: 500,
+        maxFileSize: 2097152,
+        allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        socialPlatforms: ['linkedin', 'twitter', 'instagram', 'facebook']
+      }
+    },
+    {
+      section_slug: 'gallery',
+      payload: {
+        categories: ['event', 'partner', 'team', 'general'],
+        statuses: ['published', 'draft', 'archived'],
+        maxFileSize: 10485760,
+        allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        thumbnailSizes: [150, 300, 600],
+        compressionQuality: 0.8
+      }
+    },
+    {
+      section_slug: 'partners',
+      payload: {
+        categories: ['venue', 'promoter', 'artist', 'sponsor', 'other'],
+        statuses: ['active', 'inactive', 'pending'],
+        maxFileSize: 2097152,
+        allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        socialPlatforms: ['website', 'email', 'phone', 'facebook', 'twitter', 'instagram', 'linkedin']
+      }
+    },
+    {
+      section_slug: 'settings',
+      payload: {
+        socialPlatforms: ['facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'tiktok'],
+        contactFields: ['email', 'phone', 'address'],
+        validationRules: {
+          email: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$',
+          phone: '^[+]?[\\d\\s\\-\\(\\)]{10,}$'
+        }
+      }
+    }
+  ];
+
+  // Insert section content
+  for (const content of sectionContent) {
+    // Get section ID
+    const { data: section } = await supabase
+      .from('admin_sections')
+      .select('id')
+      .eq('slug', content.section_slug)
+      .single();
+
+    if (section) {
+      const { error } = await supabase
+        .from('section_content')
+        .upsert({
+          section_id: section.id,
+          payload: content.payload,
+          version: 1,
+          is_active: true
+        }, { onConflict: 'section_id,version' });
+
+      if (error) {
+        console.error(`❌ Error seeding content for ${content.section_slug}:`, error);
+      }
+    }
+  }
+
+  console.log('✅ Admin sections and permissions seeded');
 }
 
 /**
@@ -221,7 +468,8 @@ async function importContent(): Promise<void> {
     await Promise.all([
       importHeroContent(hero),
       importAboutContent(about),
-      importSiteSettings(settings)
+      importSiteSettings(settings),
+      seedAdminSections()
     ]);
 
     console.log('\n🎉 Content import completed successfully!');
@@ -229,6 +477,7 @@ async function importContent(): Promise<void> {
     console.log('   - Hero content: imported');
     console.log('   - About content: imported');
     console.log('   - Site settings: imported');
+    console.log('   - Admin sections & permissions: seeded');
     console.log('\n💡 The admin dashboard should now show the imported content.');
 
   } catch (error) {

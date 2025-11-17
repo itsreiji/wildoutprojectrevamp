@@ -18,26 +18,21 @@ import { Button } from '../ui/button';
 import { useRouter } from '../router';
 import { Link } from '../router/Link';
 import { cn } from '../ui/utils';
+import { useContent } from '../../contexts/ContentContext';
+import { useAuth } from '../../contexts/AuthContext';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const NAVIGATION_ITEMS = [
-  { id: 'home', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'hero', label: 'Hero Section', icon: Sparkles },
-  { id: 'about', label: 'About Us', icon: Info },
-  { id: 'events', label: 'Events', icon: Calendar },
-  { id: 'team', label: 'Team', icon: Users },
-  { id: 'gallery', label: 'Gallery', icon: Image },
-  { id: 'partners', label: 'Partners', icon: Handshake },
-  { id: 'settings', label: 'Settings', icon: Settings },
-];
+// Navigation items are now loaded from Supabase via useContent
 
 export const DashboardLayout = React.memo(
   ({ children }: DashboardLayoutProps) => {
-    const { getCurrentSubPath } = useRouter();
+    const { getCurrentSubPath, navigate, getAdminPath } = useRouter();
+    const { adminSections, getSectionPermissions } = useContent();
+    const { signOut } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [viewportWidth, setViewportWidth] = useState<number>(
       typeof window !== 'undefined' ? window.innerWidth : 0
@@ -65,6 +60,15 @@ export const DashboardLayout = React.memo(
 
     // Derive current page from URL path
     const currentPage = getCurrentSubPath() || 'home';
+
+    const handleLogout = async () => {
+      try {
+        await signOut();
+        navigate(getAdminPath('login'));
+      } catch (error) {
+        console.error('Logout failed:', error);
+      }
+    };
 
     return (
       <div
@@ -120,33 +124,47 @@ export const DashboardLayout = React.memo(
 
             {/* Navigation */}
             <nav className="flex-1 space-y-2 overflow-y-auto px-3 py-4">
-              {NAVIGATION_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const isActive = currentPage === item.id;
+              {adminSections
+                .filter((section) => getSectionPermissions(section.slug).canView)
+                .sort((a, b) => a.order_index - b.order_index)
+                .map((section) => {
+                  // Map icon names to components
+                  const iconMap: Record<string, any> = {
+                    LayoutDashboard,
+                    Sparkles,
+                    Info,
+                    Calendar,
+                    Users,
+                    Image,
+                    Handshake,
+                    Settings,
+                  };
+                  const Icon = iconMap[section.icon] || LayoutDashboard;
+                  const isActive = currentPage === section.slug;
 
-                return (
-                  <Link
-                    key={item.id}
-                    to={`/admin/${item.id}`}
-                    aria-label={item.label}
-                    className={cn(
-                      'group flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors duration-200',
-                      isActive
-                        ? 'bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20'
-                        : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white',
-                      showLabels ? 'justify-start' : 'justify-center'
-                    )}
-                    onClick={() => {
-                      if (isMobile) {
-                        setSidebarOpen(false);
-                      }
-                    }}
-                  >
-                    <Icon aria-hidden className="h-5 w-5 flex-shrink-0" />
-                    {showLabels && <span className="truncate">{item.label}</span>}
-                  </Link>
-                );
-              })}
+                  return (
+                    <Link
+                      key={section.id}
+                      to={getAdminPath(section.slug)}
+                      aria-label={section.label}
+                      className={cn(
+                        'group flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors duration-200',
+                        isActive
+                          ? 'bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20'
+                          : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white',
+                        showLabels ? 'justify-start' : 'justify-center'
+                      )}
+                      onClick={() => {
+                        if (isMobile) {
+                          setSidebarOpen(false);
+                        }
+                      }}
+                    >
+                      <Icon aria-hidden className="h-5 w-5 flex-shrink-0" />
+                      {showLabels && <span className="truncate">{section.label}</span>}
+                    </Link>
+                  );
+                })}
             </nav>
 
             {/* Footer Actions */}
@@ -169,6 +187,7 @@ export const DashboardLayout = React.memo(
               </Link>
               <Button
                 variant="outline"
+                onClick={handleLogout}
                 className={cn(
                   'w-full border-[#E93370]/50 text-[#E93370] hover:bg-[#E93370]/10',
                   showLabels ? 'justify-start' : 'justify-center'

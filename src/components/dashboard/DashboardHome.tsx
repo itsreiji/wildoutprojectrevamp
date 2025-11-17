@@ -18,9 +18,9 @@ import { useContent } from '../../contexts/ContentContext';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 export const DashboardHome = React.memo(() => {
-  const { events, team, gallery, partners, hero } = useContent();
+  const { events, team, gallery, partners, hero, getSectionContent } = useContent();
 
-  // Calculate statistics
+  // Calculate statistics from current data, but sync with Supabase section content
   const stats = useMemo(() => {
     const upcomingEvents = events.filter((e) => e.status === 'upcoming').length;
     const ongoingEvents = events.filter((e) => e.status === 'ongoing').length;
@@ -29,7 +29,7 @@ export const DashboardHome = React.memo(() => {
     const totalCapacity = events.reduce((sum, e) => sum + (e.capacity ?? 0), 0);
     const avgAttendanceRate = totalCapacity > 0 ? (totalAttendees / totalCapacity) * 100 : 0;
 
-    return {
+    const currentStats = {
       totalEvents: events.length,
       upcomingEvents,
       ongoingEvents,
@@ -42,7 +42,15 @@ export const DashboardHome = React.memo(() => {
       totalAttendees,
       avgAttendanceRate: Math.round(avgAttendanceRate),
     };
-  }, [events, team, gallery, partners]);
+
+    // If we have section content from Supabase, use it to override stats
+    const homeContent = getSectionContent('home');
+    if (homeContent?.payload?.stats) {
+      return { ...currentStats, ...homeContent.payload.stats };
+    }
+
+    return currentStats;
+  }, [events, team, gallery, partners, getSectionContent]);
 
   // Event status distribution data
   const eventStatusData = [
@@ -62,8 +70,9 @@ export const DashboardHome = React.memo(() => {
     return Object.entries(categories).map(([name, value]) => ({ name, value }));
   }, [events]);
 
-  // Monthly events trend (mock data - in production, would be based on actual dates)
-  const monthlyTrendData = [
+  // Monthly events trend from Supabase section content
+  const homeSectionContent = getSectionContent('home');
+  const monthlyTrendData = homeSectionContent?.payload?.charts?.monthlyTrendData || [
     { month: 'Jan', events: 12, attendees: 450 },
     { month: 'Feb', events: 15, attendees: 580 },
     { month: 'Mar', events: 18, attendees: 720 },
