@@ -4,6 +4,13 @@ globs: .cursor/rules/*.mdc
 alwaysApply: true
 ---
 
+- **Model Rule:**
+  ---
+  Model: openrouter/sherlock-think-alpha
+  Reasoning: high  
+  System Prompt: "Think step-by-step before coding"
+  ---
+
 - **Required Rule Structure:**
   ```markdown
   ---
