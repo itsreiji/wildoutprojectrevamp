@@ -5,13 +5,13 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
-import type { Event } from '../contexts/ContentContext';
+import type { LandingEvent as AppEvent, EventArtist } from '@/types/content';
 import { useRouter } from './router';
 
 // Number of days ahead to show upcoming events (30 days)
 const UPCOMING_DAYS = 30;
 
-const parseEventDate = (event: Event): Date | null => {
+const parseEventDate = (event: AppEvent): Date | null => {
   const dateValue = event.start_date || event.date;
   if (!dateValue) return null;
   try {
@@ -24,7 +24,7 @@ const parseEventDate = (event: Event): Date | null => {
 
 export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
   const { navigate } = useRouter();
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<AppEvent | null>(null);
 
   // Filter and sort upcoming events (within next 30 days)
   const upcomingEvents = useMemo(() => {
@@ -197,7 +197,7 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
                       <div className="flex items-center space-x-2">
                         <Music className="h-4 w-4 text-[#E93370]" />
                         <div className="flex -space-x-2">
-                          {event.artists.slice(0, 3).map((artist, idx) => (
+                          {event.artists.slice(0, 3).map((artist: EventArtist, idx: number) => (
                             <div
                               key={idx}
                               className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
@@ -243,7 +243,7 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
 });
 
 export type EventsSectionProps = {
-  events: Event[];
+  events: AppEvent[];
 };
 
 EventsSection.displayName = 'EventsSection';

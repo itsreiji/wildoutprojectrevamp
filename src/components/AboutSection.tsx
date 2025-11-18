@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, Zap, Users, Sparkles } from 'lucide-react';
-import type { AboutContent } from '../contexts/ContentContext';
+import type { AboutContent, Feature } from '@/types/content';
 
 const ICON_MAP: Record<number, any> = {
   0: Heart,
@@ -11,6 +11,16 @@ const ICON_MAP: Record<number, any> = {
 };
 
 export const AboutSection = React.memo(({ about }: AboutSectionProps) => {
+  if (!about) {
+    return (
+      <section id="about" className="relative py-20 px-4">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center text-white text-lg">Loading about content...</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="about" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -32,9 +42,9 @@ export const AboutSection = React.memo(({ about }: AboutSectionProps) => {
           </p>
         </motion.div>
 
-        {/* Features Grid */}
+        {/* Features Grid - SAFE */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {about.features.map((feature, index) => {
+          {(about.features ?? []).map((feature: Feature, index: number) => {
             const Icon = ICON_MAP[index % 4] || Heart;
             return (
               <motion.div
@@ -67,7 +77,7 @@ export const AboutSection = React.memo(({ about }: AboutSectionProps) => {
           })}
         </div>
 
-        {/* Story Section */}
+        {/* Story Section - SAFE */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -85,7 +95,7 @@ export const AboutSection = React.memo(({ about }: AboutSectionProps) => {
                 Our Story
               </h3>
               <div className="space-y-4 text-white/70 leading-relaxed">
-                {about.story.map((paragraph, index) => (
+                {(about.story ?? []).map((paragraph: string, index: number) => (
                   <p key={index}>{paragraph}</p>
                 ))}
               </div>
@@ -93,7 +103,7 @@ export const AboutSection = React.memo(({ about }: AboutSectionProps) => {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
                 <div>
-                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{about.foundedYear}</div>
+                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{about.foundedYear ?? '2020'}</div>
                   <div className="text-sm text-white/60">Founded</div>
                 </div>
                 <div>
@@ -118,7 +128,7 @@ export const AboutSection = React.memo(({ about }: AboutSectionProps) => {
 });
 
 export type AboutSectionProps = {
-  about: AboutContent;
+  about: AboutContent | undefined;
 };
 
 AboutSection.displayName = 'AboutSection';

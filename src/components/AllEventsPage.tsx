@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import type { Event } from '@/contexts/ContentContext';
+import type { LandingEvent } from '@/types/content';
 import { Button } from './ui/button';
 import {
   Card,
@@ -56,7 +56,7 @@ const addDays = (date: Date, days: number) => {
   return value;
 };
 
-const parseEventDate = (event: Event): Date | null => {
+const parseEventDate = (event: LandingEvent): Date | null => {
   const value = event.start_date || event.date;
   if (!value) {
     return null;
@@ -93,16 +93,16 @@ const matchesDateFilter = (
   return target >= referenceStart && target <= rangeEnd;
 };
 
-const formatArtistList = (event: Event) => {
+const formatArtistList = (event: LandingEvent): string => {
   if (!event.artists || event.artists.length === 0) {
     return 'Artist lineup coming soon';
   }
   return event.artists
-    .map(artist => `${artist.name}${artist.role ? ` · ${artist.role}` : ''}`)
+    .map((artist) => `${artist.name}${artist.role ? ` · ${artist.role}` : ''}`)
     .join(', ');
 };
 
-const formatEventDate = (event: Event): string => {
+const formatEventDate = (event: LandingEvent): string => {
   const dateValue = event.start_date || event.date;
   if (!dateValue) return 'Date TBD';
 
@@ -120,7 +120,7 @@ const formatEventDate = (event: Event): string => {
   }
 };
 
-const formatEventTime = (event: Event): string => {
+const formatEventTime = (event: LandingEvent): string => {
   if (event.time) return event.time;
 
   // Try to extract time from start_date if available
@@ -150,12 +150,12 @@ export const AllEventsPage = () => {
   const [dateFilter, setDateFilter] = useState<DateFilterOption>('all');
   const [sortOption, setSortOption] = useState<SortOption>('date-newest');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<LandingEvent | null>(null);
 
   const referenceDate = useMemo(() => new Date(), [events, loading]);
 
   const upcomingEvents = useMemo(() => {
-    return events.filter(event => {
+    return events.filter((event: LandingEvent): boolean => {
       if (event.status === 'completed') {
         return false;
       }
@@ -171,7 +171,7 @@ export const AllEventsPage = () => {
     const normalized = Array.from(
       new Set(
         upcomingEvents
-          .map(event => event.category)
+          .map((event: LandingEvent) => event.category)
           .filter((category): category is string => Boolean(category && category.trim()))
           .map(category => category.trim())
       )
@@ -187,7 +187,7 @@ export const AllEventsPage = () => {
 
   const filteredEvents = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    return upcomingEvents.filter(event => {
+    return upcomingEvents.filter((event: LandingEvent): boolean => {
       const matchesCategory =
         categoryFilter === 'all' ||
         (event.category?.trim().toLowerCase() === categoryFilter.toLowerCase());
@@ -226,7 +226,7 @@ export const AllEventsPage = () => {
 
   const sortedEvents = useMemo(() => {
     const sorted = [...filteredEvents];
-    sorted.sort((a, b) => {
+    sorted.sort((a: LandingEvent, b: LandingEvent): number => {
       const dateA = parseEventDate(a)?.getTime() ?? 0;
       const dateB = parseEventDate(b)?.getTime() ?? 0;
 
@@ -335,7 +335,7 @@ export const AllEventsPage = () => {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {categories.map(category => (
+            {categories.map((category: string) => (
               <button
                 key={category}
                 type="button"
@@ -388,7 +388,7 @@ export const AllEventsPage = () => {
             ) : (
               <>
                 <div className="grid gap-6 md:grid-cols-2">
-                  {paginatedEvents.map((event, index) => (
+                  {paginatedEvents.map((event: LandingEvent, index: number) => (
                     <motion.div
                       key={event.id}
                       initial={{ opacity: 0, y: 30 }}

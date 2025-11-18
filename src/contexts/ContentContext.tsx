@@ -3,95 +3,28 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { supabaseClient } from '../supabase/client';
 import { useAuth } from './AuthContext';
 import type { AuthRole } from './AuthContext';
-import type { Json, Tables, TablesInsert, TablesUpdate } from '../supabase/types';
-import { DUMMY_EVENTS, DUMMY_EVENT_ARTISTS, DUMMY_TEAM_MEMBERS, DUMMY_PARTNERS, DUMMY_GALLERY_ITEMS } from '../data/dummyData';
+import type { Json, TablesInsert, TablesUpdate } from '../supabase/types';
+import { DUMMY_EVENTS, DUMMY_TEAM_MEMBERS, DUMMY_PARTNERS, DUMMY_GALLERY_ITEMS } from '../data/dummyData';
 import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
 import type {
-  Event as LandingEvent,
-  TeamMember as TeamMemberDto,
-  Partner as PartnerDto,
-  HeroContent as HeroContentDto,
-  AboutContent as AboutContentDto,
-  GalleryImage as GalleryImageDto,
-  SiteSettings as SiteSettingsDto,
-} from '@/types';
-import type { Database } from '../supabase/types';
+  TeamMember,
+  Partner,
+  HeroContent,
+  AboutContent,
+  GalleryImage,
+  SiteSettings,
+  PublicEventsViewRow,
+  ContentContextType,
+  AdminSection,
+  SectionContent,
+  SectionPermissions,
+  LandingEvent,
+  EventArtist
+} from '@/types/content';
 
-export type Event = LandingEvent;
-export type TeamMember = TeamMemberDto;
-export type Partner = PartnerDto;
-export type GalleryImage = GalleryImageDto;
-export type HeroContent = HeroContentDto;
-export type AboutContent = AboutContentDto;
-export type SiteSettings = SiteSettingsDto;
-
-// Admin section types (manually defined until types are regenerated)
-export type AdminSection = {
-  id: string;
-  slug: string;
-  label: string;
-  icon: string;
-  category: string;
-  order_index: number;
-  enabled: boolean;
-  description: string | null;
-  created_at: string;
-  updated_at: string;
-  created_by: string | null;
-  updated_by: string | null;
-};
-
-export type SectionContent = {
-  id: string;
-  section_id: string;
-  payload: any;
-  version: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  created_by: string | null;
-  updated_by: string | null;
-};
-
-export type RolePermission = {
-  id: string;
-  role: string;
-  section_slug: string;
-  can_view: boolean;
-  can_edit: boolean;
-  can_publish: boolean;
-  can_delete: boolean;
-  created_at: string;
-  updated_at: string;
-  created_by: string | null;
-  updated_by: string | null;
-};
-
-export type UserPermission = {
-  id: string;
-  profile_id: string;
-  section_slug: string;
-  can_view: boolean | null;
-  can_edit: boolean | null;
-  can_publish: boolean | null;
-  can_delete: boolean | null;
-  created_at: string;
-  updated_at: string;
-  created_by: string | null;
-  updated_by: string | null;
-};
-
-// Admin permission types
-export type SectionPermissions = {
-  canView: boolean;
-  canEdit: boolean;
-  canPublish: boolean;
-  canDelete: boolean;
-};
-
-const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> | null => {
-  if (!value || typeof value === 'string') return null;
-  if (Array.isArray(value)) return null;
+const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> => {
+  if (!value || typeof value === 'string') return {};
+  if (Array.isArray(value)) return {};
   return Object.entries(value as Record<string, Json | undefined>).reduce<Record<string, string | null>>(
     (acc, [key, entry]) => {
       if (typeof entry === 'string') {
@@ -115,325 +48,50 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
   return undefined;
 };
 
-// =============================================
-// DATA FETCHING FUNCTIONS (New Supabase Schema)
-// =============================================
+interface DummyEvent {
+  id: string;
+  title: string;
+  description?: string;
+  start_date: string;
+  end_date?: string;
+  location?: string;
+  category?: string;
+  capacity?: number;
+  attendees?: number;
+  price?: string;
+  price_range?: string;
+  ticket_url?: string;
+  partner_name?: string;
+  partner_logo_url?: string;
+  metadata?: Record<string, unknown>;
+  status?: string;
+  image?: string;
+}
 
-// Content fetching functions for site-wide content
-const fetchHeroContent = async (): Promise<HeroContent> => {
-  try {
-    const { data, error } = await supabaseClient.rpc('get_hero_content');
-
-    if (error) {
-      console.error('Error fetching hero content:', error);
-      return INITIAL_HERO;
-    }
-
-    if (data) {
-      return {
-        title: data.title,
-        subtitle: data.subtitle,
-        description: data.description,
-        stats: data.stats as HeroContent['stats'],
-        ctaText: data.cta_text,
-        ctaLink: data.cta_link,
-      };
-    }
-
-    return INITIAL_HERO;
-  } catch (error) {
-    console.error('Error in fetchHeroContent:', error);
-    return INITIAL_HERO;
+const normalizeMetadata = (metadata: Json | null | undefined): Record<string, unknown> => {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    return {};
   }
+  return metadata as Record<string, unknown>;
 };
 
-const fetchAboutContent = async (): Promise<AboutContent> => {
-  try {
-    const { data, error } = await supabaseClient.rpc('get_about_content');
-
-    if (error) {
-      console.error('Error fetching about content:', error);
-      return INITIAL_ABOUT;
-    }
-
-    if (data) {
-      return {
-        title: data.title,
-        subtitle: data.subtitle,
-        foundedYear: data.founded_year,
-        story: data.story,
-        features: data.features as AboutContent['features'],
-      };
-    }
-
-    return INITIAL_ABOUT;
-  } catch (error) {
-    console.error('Error in fetchAboutContent:', error);
-    return INITIAL_ABOUT;
-  }
-};
-
-const fetchSiteSettings = async (): Promise<SiteSettings> => {
-  try {
-    const { data, error } = await supabaseClient.rpc('get_site_settings');
-
-    if (error) {
-      console.error('Error fetching site settings:', error);
-      return INITIAL_SETTINGS;
-    }
-
-    if (data) {
-      return {
-        siteName: data.site_name,
-        siteDescription: data.site_description,
-        tagline: data.tagline,
-        email: data.email,
-        phone: data.phone,
-        address: data.address,
-        socialMedia: data.social_media as SiteSettings['socialMedia'],
-      };
-    }
-
-    return INITIAL_SETTINGS;
-  } catch (error) {
-    console.error('Error in fetchSiteSettings:', error);
-    return INITIAL_SETTINGS;
-  }
-};
-
-// Events fetching with new schema
-const fetchEvents = async (): Promise<LandingEvent[]> => {
-  try {
-// Use the public_events_view for querying
-    const { data, error } = await supabaseClient
-      .from('public_events_view')
-      .select('*')
-      .order('start_date', { ascending: true });
-
-    if (error) {
-      console.error('Error fetching events:', error);
-      return [];
-    }
-
-    const rows = (data || []) as PublicEventsViewRow[];
-    const now = new Date();
-
-    return rows.map(event => {
-      // Convert 'published' status to 'upcoming' or 'ongoing' based on dates
-      let eventStatus: LandingEvent['status'] = 'upcoming';
-      if (event.status === 'published') {
-        const startDate = new Date(event.start_date);
-        const endDate = new Date(event.end_date);
-        if (now >= startDate && now <= endDate) {
-          eventStatus = 'ongoing';
-        } else if (now < startDate) {
-          eventStatus = 'upcoming';
-        } else {
-          eventStatus = 'completed';
-        }
-      } else {
-        eventStatus = (event.status as LandingEvent['status']) || 'upcoming';
-      }
-
-      return {
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      date: event.start_date.split('T')[0], // Extract date part
-      time: `${new Date(event.start_date).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })} - ${new Date(event.end_date).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })}`,
-      venue: event.location || 'TBD',
-      venueAddress: event.location || '',
-      image: event.image || event.banner_image || '',
-      category: event.category || null,
-      status: eventStatus,
-      capacity: event.max_attendees || undefined,
-      attendees: event.attendees,
-      price: event.price ? `${event.currency} ${event.price}` : event.price,
-      price_range: event.price ? `${event.currency} ${event.price}` : event.price_range,
-      ticket_url: event.ticket_url,
-      artists: event.artists || [],
-      gallery: event.gallery || [],
-      highlights: event.highlights || [],
-      start_date: event.start_date,
-      end_date: event.end_date,
-      location: event.location,
-      partner_name: event.partner_name,
-      partner_logo_url: event.partner_logo_url,
-      partner_website_url: event.partner_website_url,
-      };
-    }) as LandingEvent[];
-  } catch (error) {
-    console.error('Error in fetchEvents:', error);
-    return [];
-  }
-};
-
-// Team members fetching
-const fetchTeamMembers = async (): Promise<TeamMemberDto[]> => {
-  try {
-    const { data, error } = await supabaseClient
-      .from('team_members')
-      .select('*')
-      .eq('status', 'active')
-      .order('display_order')
-      .order('name');
-
-    if (error) {
-      console.error('Error fetching team members:', error);
-      return [];
-    }
-
-    return (data || []) as TeamMemberDto[];
-  } catch (error) {
-    console.error('Error in fetchTeamMembers:', error);
-    return [];
-  }
-};
-
-// Partners fetching
-const fetchPartners = async (): Promise<PartnerDto[]> => {
-  try {
-    const { data, error } = await supabaseClient
-      .from('partners')
-      .select('*')
-      .eq('status', 'active')
-      .order('name');
-
-    if (error) {
-      console.error('Error fetching partners:', error);
-      return [];
-    }
-
-    return (data || []) as PartnerDto[];
-  } catch (error) {
-    console.error('Error in fetchPartners:', error);
-    return [];
-  }
-};
-
-// Gallery fetching
-const fetchGallery = async (): Promise<GalleryImageDto[]> => {
-  try {
-    const { data, error } = await supabaseClient
-      .from('gallery_items')
-      .select('*')
-      .eq('status', 'published')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching gallery:', error);
-      return [];
-    }
-
-    return (data || []) as GalleryImageDto[];
-  } catch (error) {
-    console.error('Error in fetchGallery:', error);
-    return [];
-  }
-};
-
-// =============================================
-// LEGACY DATA (For Backward Compatibility During Migration)
-// =============================================
-
-
-
-
-// Placeholder for legacy data structure until full migration
-const INITIAL_EVENTS: LandingEvent[] = [
-  {
-    id: 'initial-event-1',
-    title: 'Bass Rebellion: Underground Series',
-    description: "Dive deep into underground bass music with Indonesia's finest dubstep, drum & bass, and trap artists.",
-    date: '2025-12-01',
-    time: '22:00 - 05:00',
-    venue: 'The Bunker',
-    venueAddress: 'Jl. Kemang Raya, Jakarta Selatan',
-    image: 'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?auto=format&fit=crop&w=1200&q=80',
-    category: 'Club Night',
-    capacity: 1500,
-    attendees: 1200,
-    price: 'IDR 150K',
-    price_range: 'IDR 150K',
-    ticket_url: null,
-    status: 'upcoming',
-    artists: [
-      { name: 'Bass Monkey', role: 'Headliner', image: 'https://images.unsplash.com/photo-1761637955469-ee3c0dfdfb34?w=400' },
-    ],
-    gallery: [],
-    highlights: ['Underground warehouse venue', 'Heavy bass sound system'],
-    start_date: '2025-12-01T22:00:00Z',
-    end_date: '2025-12-02T05:00:00Z',
-    location: 'The Bunker',
-    partner_name: 'WildOut!',
-    partner_logo_url: null,
-    partner_website_url: 'https://wildout.id',
-  },
-];
-
-const INITIAL_PARTNERS: PartnerDto[] = [
-  {
-    id: 'partner-1',
-    name: 'Spotify',
-    category: 'Music',
-    status: 'active',
-    website_url: 'https://spotify.com',
-    description: 'Streaming partner',
-    featured: true,
-    social_links: { instagram: 'https://instagram.com/spotify' },
-  },
-];
-
-const INITIAL_GALLERY: GalleryImageDto[] = [
-  {
-    id: 'gallery-1',
-    url: 'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800',
-    caption: 'Neon Nights Festival',
-    uploadDate: '2025-10-28',
-    event: 'Neon Nights',
-  },
-];
-
-const INITIAL_TEAM: TeamMemberDto[] = [
-  {
-    id: 'team-1',
-    name: 'Sarah Chen',
-    role: 'CEO & Founder',
-    title: 'Founder & CEO',
-    email: 'sarah@wildout.id',
-    phone: '+62 812 3456 7890',
-    bio: 'Visionary leader with 10+ years in nightlife and entertainment.',
-    photoUrl: 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400',
-    status: 'active',
-    social_links: { instagram: 'https://instagram.com/sarah' },
-  },
-];
-
-const INITIAL_HERO: HeroContentDto = {
+// Initial data aligned with new types
+const INITIAL_EVENTS: LandingEvent[] = [];
+const INITIAL_PARTNERS: Partner[] = [];
+const INITIAL_GALLERY: GalleryImage[] = [];
+const INITIAL_TEAM: TeamMember[] = [];
+const INITIAL_HERO: HeroContent = {
   title: 'WildOut!',
   subtitle: 'Media Digital Nightlife & Event Multi-Platform',
   description: "Indonesia's premier creative community connecting artists, events, and experiences.",
-  stats: {
-    events: '500+',
-    members: '50K+',
-    partners: '100+',
-  },
-  ctaText: 'Explore Events',
-  ctaLink: '/events',
+  stats: { events: '500+', members: '50K+', partners: '100+' },
 };
-
-const INITIAL_ABOUT: AboutContentDto = {
+const INITIAL_ABOUT: AboutContent = {
   title: 'About WildOut!',
   subtitle: "Indonesia's leading creative community platform, connecting artists, events, and experiences since 2020.",
   foundedYear: '2020',
   story: [
-    'Founded in 2020, WildOut! celebrates Indonesia�s creative culture.',
+    'Founded in 2020, WildOut! celebrates Indonesia’s creative culture.',
     'We host community-driven events that bring artists, venues, and sponsors together.',
   ],
   features: [
@@ -441,10 +99,8 @@ const INITIAL_ABOUT: AboutContentDto = {
     { title: 'Unforgettable Experiences', description: 'Every event is crafted to be memorable.' },
   ],
 };
-
-const INITIAL_SETTINGS: SiteSettingsDto = {
+const INITIAL_SETTINGS: SiteSettings = {
   siteName: 'WildOut!',
-  siteDescription: 'Media Digital Nightlife & Event Multi-Platform',
   tagline: "Indonesia's premier creative community platform",
   email: 'contact@wildout.id',
   phone: '+62 21 1234 567',
@@ -457,194 +113,293 @@ const INITIAL_SETTINGS: SiteSettingsDto = {
   },
 };
 
-// Context
-interface ContentContextType {
-  events: Event[];
-  partners: Partner[];
-  gallery: GalleryImage[];
-  team: TeamMember[];
-  hero: HeroContent;
-  about: AboutContent;
-  settings: SiteSettings;
-  loading?: boolean;
-  error?: string | null;
-  updateEvents: (events: Event[]) => void;
-  updatePartners: (partners: Partner[]) => void;
-  updateGallery: (gallery: GalleryImage[]) => void;
-  updateTeam: (team: TeamMember[]) => void;
-  updateHero: (hero: HeroContent) => void;
-  updateAbout: (about: AboutContent) => void;
-  updateSettings: (settings: SiteSettings) => void;
-  // Event mutations
-  addEvent: (event: TablesInsert<'events'>) => Promise<Event>;
-  updateEvent: (id: string, updates: TablesUpdate<'events'>) => Promise<Event>;
-  deleteEvent: (id: string) => Promise<void>;
-  // Team member mutations
-  addTeamMember: (member: TablesInsert<'team_members'>) => Promise<TeamMember>;
-  updateTeamMember: (id: string, updates: TablesUpdate<'team_members'>, oldAvatarUrl?: string | null) => Promise<TeamMember>;
-  deleteTeamMember: (id: string) => Promise<void>;
-  // Partner mutations
-  addPartner: (partner: TablesInsert<'partners'>) => Promise<Partner>;
-  updatePartner: (id: string, updates: TablesUpdate<'partners'>, oldLogoUrl?: string | null) => Promise<Partner>;
-  deletePartner: (id: string) => Promise<void>;
-  // Gallery mutations
-  addGalleryImage: (item: TablesInsert<'gallery_items'>) => Promise<GalleryImage>;
-  updateGalleryImage: (id: string, updates: TablesUpdate<'gallery_items'>) => Promise<GalleryImage>;
-  deleteGalleryImage: (id: string) => Promise<void>;
-  // Content mutations
-  saveHeroContent: (content: HeroContent) => Promise<void>;
-  saveAboutContent: (content: AboutContent) => Promise<void>;
-  saveSiteSettings: (settings: SiteSettings) => Promise<void>;
-  // Admin sections
-  adminSections: AdminSection[];
-  sectionContent: Record<string, SectionContent>;
-  adminSectionsLoading: boolean;
-  getSectionContent: (sectionSlug: string) => SectionContent | null;
-  getSectionPermissions: (sectionSlug: string) => SectionPermissions;
-  updateSectionContent: (sectionSlug: string, content: any) => Promise<void>;
-  // Dummy data control
-  useDummyData: boolean;
-  setUseDummyData: (use: boolean) => void;
-}
-
-type EventMetadata = Json extends infer T
-  ? T extends object
-    ? {
-        highlights?: string[];
-        gallery?: string[];
-        featured_image?: string;
-      } & Record<string, Json | undefined>
-    : { highlights?: string[]; gallery?: string[]; featured_image?: string }
-  : never;
-
-const normalizeMetadata = (value: Json | null | undefined): EventMetadata => {
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    return value as EventMetadata;
+// Fetch functions using content.ts types
+const fetchHeroContent = async (): Promise<HeroContent> => {
+  try {
+    const { data, error } = await supabaseClient.rpc('get_hero_content');
+    if (error) {
+      console.error('Error fetching hero content:', error);
+      return INITIAL_HERO;
+    }
+    const result = data?.[0];
+    if (result) {
+      return {
+        title: result.title ?? INITIAL_HERO.title,
+        subtitle: result.subtitle ?? INITIAL_HERO.subtitle,
+        description: result.description ?? INITIAL_HERO.description,
+        stats: typeof result.stats === 'string' ? JSON.parse(result.stats) ?? INITIAL_HERO.stats : (result.stats ?? INITIAL_HERO.stats),
+        ctaText: result.cta_text ?? INITIAL_HERO.ctaText,
+        ctaLink: result.cta_link ?? INITIAL_HERO.ctaLink,
+      };
+    }
+    return INITIAL_HERO;
+  } catch (error) {
+    console.error('Error in fetchHeroContent:', error);
+    return INITIAL_HERO;
   }
-  return {};
 };
 
-type DummyEvent = (typeof DUMMY_EVENTS)[number] & {
-  attendees?: number | null;
-  price?: string | null;
-  partner_logo_url?: string | null;
-  partner_website_url?: string | null;
+const fetchAboutContent = async (): Promise<AboutContent> => {
+  try {
+    const { data, error } = await supabaseClient.rpc('get_about_content');
+    if (error) {
+      console.error('Error fetching about content:', error);
+      return INITIAL_ABOUT;
+    }
+    const result = data?.[0];
+    if (result) {
+      return {
+        title: result.title ?? INITIAL_ABOUT.title,
+        subtitle: result.subtitle ?? INITIAL_ABOUT.subtitle,
+        foundedYear: result.founded_year ?? INITIAL_ABOUT.foundedYear,
+        story: ensureStringArray(result.story) ?? INITIAL_ABOUT.story,
+        features: typeof result.features === 'string' ? JSON.parse(result.features) ?? INITIAL_ABOUT.features : (result.features ?? INITIAL_ABOUT.features),
+      };
+    }
+    return INITIAL_ABOUT;
+  } catch (error) {
+    console.error('Error in fetchAboutContent:', error);
+    return INITIAL_ABOUT;
+  }
 };
 
- type PublicEventsViewRow = {
-  id: string;
-  title: string;
-  description: string | null;
-  start_date: string;
-  end_date: string;
-  location: string | null;
-  image?: string | null;
-  banner_image?: string | null;
-  category?: string | null;
-  status?: string;
-  max_attendees?: number | null;
-  attendees?: number | null;
-  price?: number | null;
-  currency?: string | null;
-  price_range?: string | null;
-  ticket_url?: string | null;
-  artists?: unknown[];
-  gallery?: string[];
-  highlights?: string[];
-  partner_name?: string | null;
-  partner_logo_url?: string | null;
-  partner_website_url?: string | null;
+const fetchSiteSettings = async (): Promise<SiteSettings> => {
+  try {
+    const { data, error } = await supabaseClient.rpc('get_site_settings');
+    if (error) {
+      console.error('Error fetching site settings:', error);
+      return INITIAL_SETTINGS;
+    }
+    const result = data?.[0];
+    if (result) {
+      return {
+        siteName: result.site_name ?? INITIAL_SETTINGS.siteName,
+        siteDescription: result.site_description ?? INITIAL_SETTINGS.siteDescription,
+        tagline: result.tagline ?? INITIAL_SETTINGS.tagline,
+        email: result.email ?? INITIAL_SETTINGS.email,
+        phone: result.phone ?? INITIAL_SETTINGS.phone,
+        address: result.address ?? INITIAL_SETTINGS.address,
+        socialMedia: normalizeSocialLinks(result.social_media) as Record<string, string>,
+      };
+    }
+    return INITIAL_SETTINGS;
+  } catch (error) {
+    console.error('Error in fetchSiteSettings:', error);
+    return INITIAL_SETTINGS;
+  }
 };
 
+const fetchEvents = async (): Promise<LandingEvent[]> => {
+  try {
+    const { data, error } = await supabaseClient
+      .from('public_events_view')
+      .select('*')
+      .order('start_date', { ascending: true });
+    if (error) {
+      console.error('Error fetching events:', error);
+      return [];
+    }
+    return (data || []).map((row: any): LandingEvent => ({
+      id: row.id ?? '',
+      title: row.title ?? '',
+      description: row.description ?? null,
+      date: row.date ?? row.start_date ?? '',
+      time: row.time ?? '',
+      venue: row.venue ?? row.location ?? '',
+      venueAddress: row.venue_address ?? '',
+      image: row.image ?? row.featured_image ?? '',
+      category: row.category ?? null,
+      status: (row.status as LandingEvent['status']) ?? 'upcoming',
+      end_date: row.end_date ?? '',
+      capacity: row.capacity || row.max_attendees || undefined,
+      attendees: row.attendees || null,
+      price: row.price ? `${row.currency || 'IDR'} ${row.price}` : null,
+      price_range: row.price_range || null,
+      ticket_url: row.ticket_url || null,
+      artists: row.artists.map((name: string): EventArtist => ({ name, role: undefined, image: undefined })),
+      gallery: row.gallery || [],
+      highlights: row.highlights || [],
+      start_date: row.start_date,
+      location: row.location || null,
+      partner_name: row.partner_name || null,
+      partner_logo_url: row.partner_logo_url || null,
+      partner_website_url: row.partner_website_url || null,
+      metadata: row.metadata ?? {},
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    })) as LandingEvent[];
+  } catch (error) {
+    console.error('Error in fetchEvents:', error);
+    return [];
+  }
+};
+
+const fetchTeamMembers = async (): Promise<TeamMember[]> => {
+  try {
+    const { data, error } = await supabaseClient
+      .from('team_members')
+      .select('*')
+      .eq('status', 'active')
+      .order('display_order')
+      .order('name');
+    if (error) {
+      console.error('Error fetching team members:', error);
+      return INITIAL_TEAM;
+    }
+    return (data || []).map((row: any): TeamMember => ({
+      id: row.id,
+      name: row.name || '',
+      title: row.title || row.role || undefined,
+      bio: row.bio || undefined,
+      photoUrl: row.avatar_url || undefined,
+      email: row.email || undefined,
+      status: row.status as 'active' | 'inactive' | undefined || undefined,
+      social_links: normalizeSocialLinks(row.social_links),
+      display_order: row.display_order || undefined,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }));
+  } catch (error) {
+    console.error('Error in fetchTeamMembers:', error);
+    return INITIAL_TEAM;
+  }
+};
+
+const fetchPartners = async (): Promise<Partner[]> => {
+  try {
+    const { data, error } = await supabaseClient
+      .from('partners')
+      .select('*')
+      .eq('status', 'active')
+      .order('name');
+    if (error) {
+      console.error('Error fetching partners:', error);
+      return INITIAL_PARTNERS;
+    }
+    return (data || []).map((row: any): Partner => ({
+      id: row.id,
+      name: row.name || '',
+      description: row.description || undefined,
+      logo_url: row.logo_url || undefined,
+      website_url: row.website_url || undefined,
+      category: row.category || undefined,
+      status: row.status as 'active' | 'inactive' | undefined || undefined,
+      featured: row.featured || undefined,
+      contact_email: row.contact_email || undefined,
+      contact_phone: row.contact_phone || undefined,
+      social_links: normalizeSocialLinks(row.social_links),
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }));
+  } catch (error) {
+    console.error('Error in fetchPartners:', error);
+    return INITIAL_PARTNERS;
+  }
+};
+
+const fetchGallery = async (): Promise<GalleryImage[]> => {
+  try {
+    const { data, error } = await supabaseClient
+      .from('gallery_items')
+      .select('*')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('Error fetching gallery:', error);
+      return INITIAL_GALLERY;
+    }
+    return (data || []).map((row: any): GalleryImage => ({
+      id: row.id,
+      title: row.title || undefined,
+      description: row.description || undefined,
+      url: row.image_url || undefined,
+      image_urls: row.image_urls ? JSON.parse(row.image_urls) as string[] : undefined,
+      category: row.category || undefined,
+      status: row.status || undefined,
+      tags: row.tags || undefined,
+      caption: row.title || undefined,
+      uploadDate: row.created_at || undefined,
+      event: row.event_title || undefined,
+      created_at: row.created_at || undefined,
+      updated_at: row.updated_at || undefined,
+    }));
+  } catch (error) {
+    console.error('Error in fetchGallery:', error);
+    return INITIAL_GALLERY;
+  }
+};
+
+// ContentContext
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
-export const ContentProvider: React.FC<{
-  children: ReactNode;
-  useDummyData?: boolean;
-}> = ({ children, useDummyData: initialUseDummyData = false }) => {
-  // Get user authentication state
-  // Note: ContentProvider must be inside AuthProvider
-  let user = null;
-  let role: AuthRole = 'anonymous';
-  try {
-    const authContext = useAuth();
-    user = authContext.user;
-    role = authContext.role;
-  } catch (error) {
-    // If AuthProvider is not available, continue with defaults
-    // This should not happen in normal operation, but ensures Provider still renders
-    console.warn('ContentProvider: AuthProvider not available, using defaults');
-  }
+// ContentProvider
+export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boolean }> = ({ 
+  children, 
+  useDummyData: initialUseDummyData = false 
+}) => {
+  const authContext = useAuth();
+  const user = authContext.user;
+  const role: AuthRole = authContext.role;
 
-  // Initialize with empty arrays - data will be fetched on mount
-  const [events, setEvents] = useState<Event[]>([]);
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [gallery, setGallery] = useState<GalleryImage[]>([]);
-  const [team, setTeam] = useState<TeamMember[]>([]);
+  // ALL useState FIRST with content.ts types
+  const [events, setEvents] = useState<LandingEvent[]>(INITIAL_EVENTS);
+  const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
+  const [gallery, setGallery] = useState<GalleryImage[]>(INITIAL_GALLERY);
+  const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
   const [hero, setHero] = useState<HeroContent>(INITIAL_HERO);
   const [about, setAbout] = useState<AboutContent>(INITIAL_ABOUT);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [useDummyData, setUseDummyData] = useState(initialUseDummyData);
-
-  // Admin sections state
   const [adminSections, setAdminSections] = useState<AdminSection[]>([]);
   const [sectionContent, setSectionContent] = useState<Record<string, SectionContent>>({});
   const [adminSectionsLoading, setAdminSectionsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [useDummyData, setUseDummyData] = useState<boolean>(initialUseDummyData);
 
-  // Fetch data from new Supabase schema on mount or when dummy data flag changes
+  // NOW useEffects and functions (useDummyData in scope)
+  // useEffect loadData (keep existing, but ensure useDummyData reference is correct)
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
         setError(null);
-
         if (useDummyData) {
           // Use dummy data for development/testing
           console.log('🔧 Using dummy data for development');
 
           // Transform dummy events to match Event type
-          const dummyEvents: Event[] = DUMMY_EVENTS.map((event) => {
-            const enrichedEvent = event as DummyEvent;
-          const metadata = normalizeMetadata(enrichedEvent.metadata);
-            const highlights = ensureStringArray(metadata.highlights);
-            const galleryImages = ensureStringArray(metadata.gallery);
-
+          const dummyEvents: LandingEvent[] = DUMMY_EVENTS.map((event: any) => {
+            const metadata = normalizeMetadata(event.metadata);
+            const highlights = ensureStringArray(metadata.highlights as Json) ?? [];
+            const galleryImages = ensureStringArray(metadata.gallery as Json) ?? [];
             return {
-              id: event.id || `event-${Date.now()}-${Math.random()}`,
-              title: event.title,
+              id: event.id ?? `dummy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              title: event.title ?? '',
               description: event.description ?? null,
-              date: event.start_date.split('T')[0],
-              time: `${new Date(event.start_date).toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit'
-              })} - ${new Date(event.end_date).toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit'
-              })}`,
-              venue: event.location || 'TBD',
-              venueAddress: event.location || '',
-              image: metadata.featured_image || '',
+              date: event.start_date ? event.start_date.split('T')[0] : '',
+              time: event.start_date ? new Date(event.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
+              venue: event.location ?? '',
+              venueAddress: event.location ?? '',
+              image: (metadata.image as string) ?? '',
               category: event.category ?? null,
-              status: (event.status as Event['status']) || 'upcoming',
-              capacity: event.capacity ?? null,
-              attendees: enrichedEvent.attendees ?? null,
-              price: enrichedEvent.price ?? enrichedEvent.price_range ?? null,
-              price_range: enrichedEvent.price_range ?? null,
+              status: (event.status as LandingEvent['status']) ?? 'upcoming',
+              end_date: event.end_date ?? '',
+              capacity: event.capacity ?? undefined,
+              attendees: null,
+              price: null,
+              price_range: event.price_range ?? null,
               ticket_url: event.ticket_url ?? null,
               artists: [],
               gallery: galleryImages,
               highlights,
-              start_date: event.start_date,
-              end_date: event.end_date,
+              start_date: event.start_date ?? '',
               location: event.location ?? null,
               partner_name: event.partner_name ?? null,
-              partner_logo_url: enrichedEvent.partner_logo_url ?? null,
-              partner_website_url: enrichedEvent.partner_website_url ?? null,
+              partner_logo_url: null,
+              partner_website_url: null,
               metadata,
-              created_at: event.start_date,
-              updated_at: event.end_date,
+              created_at: event.created_at ?? event.start_date ?? new Date().toISOString(),
+              updated_at: event.updated_at ?? event.end_date ?? new Date().toISOString(),
             };
           });
 
@@ -693,24 +448,54 @@ export const ContentProvider: React.FC<{
 
         } else {
           // Fetch all data concurrently from Supabase
-          const [eventsData, partnersData, galleryData, teamData, heroData, aboutData, settingsData] = await Promise.all([
-            fetchEvents(),
-            fetchPartners(),
-            fetchGallery(),
-            fetchTeamMembers(),
-            fetchHeroContent(),
-            fetchAboutContent(),
-            fetchSiteSettings(),
-          ]);
-
-          // Update state with fetched data
+          try {
+            const eventsData = await fetchEvents();
           setEvents(eventsData);
+          } catch (e) {
+            console.error('Events fetch failed:', e);
+          }
+
+          try {
+            const partnersData = await fetchPartners();
           setPartners(partnersData);
+          } catch (e) {
+            console.error('Partners fetch failed:', e);
+          }
+
+          try {
+            const galleryData = await fetchGallery();
           setGallery(galleryData);
+          } catch (e) {
+            console.error('Gallery fetch failed:', e);
+          }
+
+          try {
+            const teamData = await fetchTeamMembers();
           setTeam(teamData);
+          } catch (e) {
+            console.error('Team fetch failed:', e);
+          }
+
+          try {
+            const heroData = await fetchHeroContent();
           setHero(heroData);
+          } catch (e) {
+            console.error('Hero fetch failed:', e);
+          }
+
+          try {
+            const aboutData = await fetchAboutContent();
           setAbout(aboutData);
+          } catch (e) {
+            console.error('About fetch failed:', e);
+          }
+
+          try {
+            const settingsData = await fetchSiteSettings();
           setSettings(settingsData);
+          } catch (e) {
+            console.error('Settings fetch failed:', e);
+          }
         }
 
       } catch (err) {
@@ -729,7 +514,7 @@ export const ContentProvider: React.FC<{
     };
 
     loadData();
-  }, [useDummyData]);
+  }, [useDummyData]);  // Safe reference
 
   // Load admin sections and section content
   useEffect(() => {
@@ -894,12 +679,8 @@ export const ContentProvider: React.FC<{
     loadAdminSections();
   }, []);
 
-  // =============================================
-  // MUTATION FUNCTIONS
-  // =============================================
-
-  // Event Mutations
-  const addEvent = async (event: TablesInsert<'events'>): Promise<Event> => {
+  // ALL mutations as const functions inside component
+  const addEvent = async (event: TablesInsert<'events'>): Promise<LandingEvent> => {
     try {
       setError(null);
 
@@ -916,29 +697,30 @@ export const ContentProvider: React.FC<{
       }
 
       if (data) {
-        // Transform the database response to match Event type
-        const newEvent: Event = {
+        const newEvent: LandingEvent = {
           ...data,
           date: data.start_date.split('T')[0],
-          time: `${new Date(data.start_date).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-          })} - ${new Date(data.end_date).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-          })}`,
+          time: `${new Date(data.start_date || '').toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${new Date(data.end_date || data.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
           venue: data.location || 'TBD',
           venueAddress: data.location || '',
-          category: data.category,
-          status: data.status,
-          capacity: data.capacity || undefined,
-          price: data.price_range || 'TBD',
+          category: data.category || null,
+          status: data.status as 'upcoming' | 'ongoing' | 'completed',
+          capacity: data.capacity || data.max_attendees || undefined,
+          price: data.price ? `${data.currency || 'IDR'} ${data.price}` : null,
+          price_range: data.price_range || null,
+          ticket_url: data.ticket_url || null,
+          artists: [], // Placeholder, will be fetched from DUMMY_EVENT_ARTISTS
+          gallery: [], // Placeholder, will be fetched from DUMMY_GALLERY_ITEMS
+          highlights: [], // Placeholder, will be fetched from DUMMY_EVENTS
           start_date: data.start_date,
-          end_date: data.end_date,
-          location: data.location,
-          partner_name: data.partner_name,
-          ticket_url: data.ticket_url,
-          price_range: data.price_range,
+          end_date: data.end_date || undefined,
+          location: data.location || null,
+          partner_name: data.partner_name || null,
+          partner_logo_url: null, // Placeholder, will be fetched from DUMMY_PARTNERS
+          partner_website_url: null, // Placeholder, will be fetched from DUMMY_PARTNERS
+          metadata: {}, // Placeholder, will be fetched from DUMMY_EVENTS
+          created_at: data.start_date,
+          updated_at: data.end_date || undefined,
         };
 
         // Optimistically update local state
@@ -955,7 +737,7 @@ export const ContentProvider: React.FC<{
     }
   };
 
-  const updateEvent = async (id: string, updates: TablesUpdate<'events'>): Promise<Event> => {
+  const updateEvent = async (id: string, updates: TablesUpdate<'events'>): Promise<LandingEvent> => {
     try {
       setError(null);
 
@@ -973,29 +755,30 @@ export const ContentProvider: React.FC<{
       }
 
       if (data) {
-        // Transform the database response to match Event type
-        const updatedEvent: Event = {
+        const updatedEvent: LandingEvent = {
           ...data,
           date: data.start_date.split('T')[0],
-          time: `${new Date(data.start_date).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-          })} - ${new Date(data.end_date).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-          })}`,
+          time: `${new Date(data.start_date || '').toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${new Date(data.end_date || data.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
           venue: data.location || 'TBD',
           venueAddress: data.location || '',
-          category: data.category,
-          status: data.status,
-          capacity: data.capacity || undefined,
-          price: data.price_range || 'TBD',
+          category: data.category || null,
+          status: data.status as 'upcoming' | 'ongoing' | 'completed',
+          capacity: data.capacity || data.max_attendees || undefined,
+          price: data.price ? `${data.currency || 'IDR'} ${data.price}` : null,
+          price_range: data.price_range || null,
+          ticket_url: data.ticket_url || null,
+          artists: [], // Placeholder, will be fetched from DUMMY_EVENT_ARTISTS
+          gallery: [], // Placeholder, will be fetched from DUMMY_GALLERY_ITEMS
+          highlights: [], // Placeholder, will be fetched from DUMMY_EVENTS
           start_date: data.start_date,
-          end_date: data.end_date,
-          location: data.location,
-          partner_name: data.partner_name,
-          ticket_url: data.ticket_url,
-          price_range: data.price_range,
+          end_date: data.end_date || undefined,
+          location: data.location || null,
+          partner_name: data.partner_name || null,
+          partner_logo_url: null, // Placeholder, will be fetched from DUMMY_PARTNERS
+          partner_website_url: null, // Placeholder, will be fetched from DUMMY_PARTNERS
+          metadata: {}, // Placeholder, will be fetched from DUMMY_EVENTS
+          created_at: data.start_date,
+          updated_at: data.end_date || undefined,
         };
 
         // Optimistically update local state
@@ -1643,14 +1426,11 @@ export const ContentProvider: React.FC<{
     updateSectionContent,
   };
 
-  // Ensure Provider always renders children, even if there are initialization errors
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;
 };
 
 export const useContent = () => {
   const context = useContext(ContentContext);
-  if (context === undefined) {
-    throw new Error('useContent must be used within a ContentProvider');
-  }
+  if (!context) throw new Error('useContent must be within ContentProvider');
   return context;
 };

@@ -2,9 +2,16 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Calendar, Users } from 'lucide-react';
 import { Button } from './ui/button';
-import type { HeroContent } from '../contexts/ContentContext';
+import type { HeroContent } from '@/types/content';
 
 export const HeroSection = React.memo(({ hero }: HeroSectionProps) => {
+  if (!hero) {
+    return (
+      <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
+        <div className="text-white text-lg">Loading hero content...</div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
@@ -87,7 +94,7 @@ export const HeroSection = React.memo(({ hero }: HeroSectionProps) => {
             </Button>
           </motion.div>
 
-          {/* Stats */}
+          {/* Stats - SAFE ACCESS */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -95,15 +102,15 @@ export const HeroSection = React.memo(({ hero }: HeroSectionProps) => {
             className="grid grid-cols-3 gap-8 pt-12 w-full max-w-3xl"
           >
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.events}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero?.stats?.events ?? '0+'}</div>
               <div className="text-sm md:text-base text-white/60">Events</div>
             </div>
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.members}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero?.stats?.members ?? '0+'}</div>
               <div className="text-sm md:text-base text-white/60">Members</div>
             </div>
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.partners}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero?.stats?.partners ?? '0+'}</div>
               <div className="text-sm md:text-base text-white/60">Partners</div>
             </div>
           </motion.div>
@@ -141,7 +148,7 @@ export const HeroSection = React.memo(({ hero }: HeroSectionProps) => {
 });
 
 export type HeroSectionProps = {
-  hero: HeroContent;
+  hero: HeroContent | undefined;
 };
 
 HeroSection.displayName = 'HeroSection';

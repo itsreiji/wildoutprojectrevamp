@@ -30,11 +30,12 @@ import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
-import { useContent, Event } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import { DashboardEventForm, EventFormValues } from './DashboardEventForm';
 import { supabaseClient } from '@/supabase/client';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
+import type { LandingEvent } from '@/types/content';
 
 /**
  * DashboardEvents component for managing event CRUD operations
@@ -44,7 +45,7 @@ export const DashboardEvents = React.memo(() => {
     const { events = [], addEvent, updateEvent, deleteEvent, loading, error } = useContent();
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+    const [editingEvent, setEditingEvent] = useState<LandingEvent | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [deletingEventId, setDeletingEventId] = useState<string | null>(null);
@@ -58,7 +59,7 @@ export const DashboardEvents = React.memo(() => {
             .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics
     };
 
-    const filteredEvents = (events || []).filter((event: Event) => {
+    const filteredEvents = (events || []).filter((event: LandingEvent) => {
         const query = normalizeText(searchQuery);
         const title = normalizeText(event?.title || '');
         const category = normalizeText(event?.category || '');
@@ -70,7 +71,7 @@ export const DashboardEvents = React.memo(() => {
         setIsDialogOpen(true);
     };
 
-    const handleEdit = (event: Event) => {
+    const handleEdit = (event: LandingEvent) => {
         setEditingEvent(event);
         setIsDialogOpen(true);
     };
@@ -292,7 +293,7 @@ export const DashboardEvents = React.memo(() => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredEvents.map((event: Event) => (
+                        {filteredEvents.map((event: LandingEvent) => (
                             <TableRow
                                 key={event.id}
                                 className="border-white/10 hover:bg-white/5 transition-colors"

@@ -37,7 +37,7 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { TeamMember } from '../../contexts/ContentContext';
+import type { TeamMember } from '@/types/content';
 
 const teamFormSchema = z.object({
   name: z.string().min(1, 'Team member name is required'),

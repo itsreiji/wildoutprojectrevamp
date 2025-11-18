@@ -16,6 +16,8 @@ import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
 import { useContent } from '../../contexts/ContentContext';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import type { LandingEvent } from '@/types/content';
+// All event accesses use LandingEvent props
 
 export const DashboardHome = React.memo(() => {
   const { events, team, gallery, partners, hero, getSectionContent } = useContent();
@@ -45,8 +47,9 @@ export const DashboardHome = React.memo(() => {
 
     // If we have section content from Supabase, use it to override stats
     const homeContent = getSectionContent('home');
-    if (homeContent?.payload?.stats) {
-      return { ...currentStats, ...homeContent.payload.stats };
+    if (homeContent?.payload && typeof homeContent.payload === 'object' && 'stats' in homeContent.payload && homeContent.payload.stats) {
+      const supabaseStats = homeContent.payload.stats as Record<string, any>;
+      return { ...currentStats, ...supabaseStats };
     }
 
     return currentStats;
@@ -72,13 +75,8 @@ export const DashboardHome = React.memo(() => {
 
   // Monthly events trend from Supabase section content
   const homeSectionContent = getSectionContent('home');
-  const monthlyTrendData = homeSectionContent?.payload?.charts?.monthlyTrendData || [
-    { month: 'Jan', events: 12, attendees: 450 },
-    { month: 'Feb', events: 15, attendees: 580 },
-    { month: 'Mar', events: 18, attendees: 720 },
-    { month: 'Apr', events: 22, attendees: 890 },
-    { month: 'May', events: 25, attendees: 1050 },
-    { month: 'Jun', events: 20, attendees: 820 },
+  const monthlyTrendData = ((homeSectionContent?.payload as any)?.charts as any)?.monthlyTrendData || [
+    // default
   ];
 
   // Recent activity

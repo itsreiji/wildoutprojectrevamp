@@ -36,7 +36,7 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { Partner } from '../../contexts/ContentContext';
+import type { Partner } from '@/types/content';
 
 const partnerFormSchema = z.object({
   name: z.string().min(1, 'Partner name is required'),

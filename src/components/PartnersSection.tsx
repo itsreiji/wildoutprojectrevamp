@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Sparkles } from 'lucide-react';
-import type { Partner } from '../contexts/ContentContext';
+import type { Partner } from '@/types/content';
 
 export const PartnersSection = React.memo(({ partners }: PartnersSectionProps) => {
   const activePartners = partners.filter(p => p.status === 'active');

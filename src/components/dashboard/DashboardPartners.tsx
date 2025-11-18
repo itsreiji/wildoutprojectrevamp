@@ -29,12 +29,14 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Badge } from '../ui/badge';
-import { useContent, Partner } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import { DashboardPartnerForm, PartnerFormValues } from './DashboardPartnerForm';
 import { supabaseClient } from '@/supabase/client';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
+import type { Partner } from '@/types/content';
+// partner.contact_email → partner.contact_email || ''
 
 export const DashboardPartners = React.memo(() => {
   const { partners = [], addPartner, updatePartner, deletePartner } = useContent();

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import type { GalleryImage } from '@/types/content';
 import { useContent } from '../contexts/ContentContext';
 
 const SPAN_PATTERNS = [
@@ -13,8 +14,8 @@ const SPAN_PATTERNS = [
 ];
 
 export const GallerySection = React.memo(() => {
-  const { gallery } = useContent();
-  const displayImages = gallery.slice(0, 6);
+  const { gallery }: { gallery: GalleryImage[] } = useContent();
+  const displayImages: GalleryImage[] = gallery.slice(0, 6);
   return (
     <section id="gallery" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -38,7 +39,7 @@ export const GallerySection = React.memo(() => {
 
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
-          {displayImages.map((image, index) => (
+          {displayImages.map((image: GalleryImage, index: number) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.9 }}

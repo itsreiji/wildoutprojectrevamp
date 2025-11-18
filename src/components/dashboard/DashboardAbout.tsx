@@ -8,6 +8,7 @@ import { Textarea } from '../ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
+import type { Feature } from '@/types/content';
 
 export const DashboardAbout = React.memo(() => {
   const { about, saveAboutContent } = useContent();
@@ -156,7 +157,7 @@ export const DashboardAbout = React.memo(() => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {formData.story.map((paragraph, index) => (
+            {formData.story.map((paragraph: string, index: number) => (
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor={`story-${index}`}>Paragraph {index + 1}</Label>
@@ -208,7 +209,7 @@ export const DashboardAbout = React.memo(() => {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            {formData.features.map((feature, index) => (
+            {formData.features.map((feature: Feature, index: number) => (
               <div key={index} className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-white/90">Feature {index + 1}</h4>

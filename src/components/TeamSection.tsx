@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Mail, Phone } from 'lucide-react';
+import { Mail, Instagram } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import type { TeamMember } from '../contexts/ContentContext';
+import type { TeamMember } from '@/types/content';
 
 export const TeamSection = React.memo(({ team }: TeamSectionProps) => {
   const activeTeam = team.filter(member => member.status === 'active');
@@ -29,65 +29,73 @@ export const TeamSection = React.memo(({ team }: TeamSectionProps) => {
         </motion.div>
 
         {/* Team Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {activeTeam.map((member, index) => (
-            <motion.div
-              key={member.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              className="group"
-            >
-              <div className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 h-full">
-                {/* Photo */}
-                <div className="relative h-72 overflow-hidden">
-                  <ImageWithFallback
-                    src={member.photoUrl || 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400'}
-                    alt={member.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
-
-                  {/* Info Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-xl text-white mb-1">{member.name}</h3>
-                    <p className="text-sm text-[#E93370] mb-3">{member.role}</p>
+        {activeTeam.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {activeTeam.map((member, index) => (
+              <motion.div
+                key={member.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                className="group"
+              >
+                <div className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 h-full">
+                  {/* Photo */}
+                  <div className="relative h-72 overflow-hidden">
+                    <ImageWithFallback
+                      src={member.photoUrl || 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400'}
+                      alt={member.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
+                    
+                    {/* Info Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-xl text-white mb-1">{member.name}</h3>
+                      <p className="text-sm text-[#E93370] mb-3">{member.title || member.role}</p>
+                    </div>
                   </div>
-                </div>
 
-                {/* Bio & Contact */}
-                <div className="p-6 space-y-4">
-                  <p className="text-sm text-white/70 line-clamp-2">{member.bio}</p>
-
-                  <div className="space-y-2">
-                    {member.email && (
-                      <a
-                        href={`mailto:${member.email}`}
-                        className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors group"
-                      >
-                        <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="truncate">{member.email}</span>
-                      </a>
-                    )}
-                    {member.phone && (
-                      <a
-                        href={`tel:${member.phone}`}
-                        className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors"
-                      >
-                        <Phone className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span>{member.phone}</span>
-                      </a>
-                    )}
+                  {/* Bio & Contact */}
+                  <div className="p-6 space-y-4">
+                    <p className="text-sm text-white/70 line-clamp-2">{member.bio}</p>
+                    
+                    <div className="space-y-2">
+                      {member.email && (
+                        <a
+                          href={`mailto:${member.email}`}
+                          className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors group"
+                        >
+                          <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
+                          <span className="truncate">{member.email}</span>
+                        </a>
+                      )}
+                      {member.social_links?.instagram && (
+                        <a
+                          href={`https://instagram.com/${member.social_links.instagram.replace(/^@/, '')}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors"
+                        >
+                          <Instagram className="h-4 w-4 mr-2 text-[#E93370]" />
+                          <span>{member.social_links.instagram}</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Hover Effect */}
-                <div className="absolute inset-0 border-2 border-[#E93370] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none" />
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                  {/* Hover Effect */}
+                  <div className="absolute inset-0 border-2 border-[#E93370] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-white/60 text-lg">No team members available at the moment.</p>
+          </div>
+        )}
 
         {/* CTA */}
         <motion.div

@@ -4,7 +4,13 @@ import { X, Calendar, MapPin, Clock, Users, Music, Ticket, Share2, Heart, Extern
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import type { Event } from '../contexts/ContentContext';
+import type { Event } from '@/types/content';
+
+interface EventArtist {
+  name: string;
+  role?: string;
+  image?: string;  // Make optional to match types/content
+}
 
 interface EventDetailModalProps {
   event: Event | null;
@@ -153,7 +159,7 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {event.artists.map(
-                            (artist: { name: string; role: string; image: string }, index: number) => (
+                            (artist: EventArtist, index: number) => (
                             <div
                               key={index}
                               className="flex items-center space-x-4 p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
@@ -167,7 +173,7 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                               </div>
                               <div>
                                 <div className="text-white">{artist.name}</div>
-                                <div className="text-sm text-[#E93370]">{artist.role}</div>
+                                <div className="text-sm text-[#E93370]">{artist.role ?? ''}</div>
                               </div>
                             </div>
                           ))}

@@ -16,11 +16,11 @@ export const LandingPage = React.memo(() => {
   const showContent = !loading && !hasError;
 
   return (
-    <div className="dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <div className="dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden flex flex-col">
       <Background3D />
       <Navigation />
 
-      <main className="relative z-10 mx-auto flex max-w-7xl flex-col gap-y-12 px-4 py-12 md:gap-y-16 lg:px-8">
+      <main className="relative z-10 mx-auto flex max-w-7xl flex-col gap-y-12 px-4 py-12 md:gap-y-16 lg:px-8 flex-1">
         {loading && (
           <div className="min-h-[60vh] flex items-center justify-center rounded-3xl border border-white/10 bg-white/5 p-8 text-lg font-medium text-white/80 shadow-2xl backdrop-blur-xl">
             Loading landing page content...

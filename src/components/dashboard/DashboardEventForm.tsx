@@ -48,7 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { Event } from '../../contexts/ContentContext';
+import type { Event } from '@/types/content';
 
 const eventFormSchema = z.object({
   title: z.string().min(1, 'Event title is required'),

@@ -37,7 +37,7 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { GalleryImage } from '../../contexts/ContentContext';
+import type { GalleryImage } from '@/types/content';
 import { X } from 'lucide-react';
 
 const galleryFormSchema = z.object({

@@ -2,6 +2,11 @@
 -- Description: Core database schema with 3NF normalization and strategic denormalization
 -- Created: 2025-11-07
 
+DROP TABLE IF EXISTS public.gallery_items CASCADE;
+DROP TABLE IF EXISTS public.team_members CASCADE;
+DROP TABLE IF EXISTS public.partners CASCADE;
+DROP TABLE IF EXISTS public.events CASCADE;
+
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
@@ -22,7 +27,7 @@ CREATE TABLE public.events (
     country text DEFAULT 'USA',
     latitude numeric,
     longitude numeric,
-    category text NOT NULL CHECK (category IN ('music', 'sports', 'arts', 'food', 'community', 'other')),
+    category text NOT NULL CHECK (category IN ('music', 'sports', 'arts', 'food', 'community', 'other', 'festival', 'concert', 'exhibition', 'club', 'conference')),
     status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'cancelled', 'archived')),
     max_attendees integer,
     current_attendees integer DEFAULT 0,
@@ -77,7 +82,7 @@ CREATE TABLE public.partners (
     country text DEFAULT 'USA',
     latitude numeric,
     longitude numeric,
-    category text NOT NULL CHECK (category IN ('venue', 'promoter', 'artist', 'sponsor', 'other')),
+    category text NOT NULL CHECK (category IN ('venue', 'promoter', 'artist', 'sponsor', 'other', 'music', 'beverage', 'lifestyle', 'technology')),
     status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'pending')),
     social_links jsonb DEFAULT '{}',
     metadata jsonb DEFAULT '{}',
@@ -109,9 +114,9 @@ CREATE TABLE public.gallery_items (
     description text,
     image_url text NOT NULL,
     thumbnail_url text,
-    event_id uuid REFERENCES public.events(id) ON DELETE CASCADE,
-    partner_id uuid REFERENCES public.partners(id) ON DELETE CASCADE,
-    category text NOT NULL DEFAULT 'general' CHECK (category IN ('event', 'partner', 'team', 'general')),
+    event_id uuid,
+    partner_id uuid,
+    category text NOT NULL DEFAULT 'general' CHECK (category IN ('event', 'partner', 'team', 'general', 'partnership')),
     status text NOT NULL DEFAULT 'published' CHECK (status IN ('published', 'draft', 'archived')),
     display_order integer DEFAULT 0,
     metadata jsonb DEFAULT '{}',
@@ -120,57 +125,81 @@ CREATE TABLE public.gallery_items (
 
     -- Ensure at least one relationship exists
     CONSTRAINT gallery_item_relationship_check CHECK (
-        event_id IS NOT NULL OR partner_id IS NOT NULL
+        event_id IS NOT NULL OR partner_id IS NOT NULL OR category = 'general'
     )
 );
 
 -- Foreign key constraints
-ALTER TABLE public.events
-ADD CONSTRAINT fk_events_partner
-FOREIGN KEY (partner_id) REFERENCES public.partners(id) ON DELETE SET NULL;
+-- Foreign keys with DO block for IF NOT EXISTS
+DO $$ 
+BEGIN
+    BEGIN
+        ALTER TABLE public.events ADD CONSTRAINT fk_events_partner FOREIGN KEY (partner_id) REFERENCES public.partners(id) ON DELETE SET NULL;
+    EXCEPTION WHEN duplicate_object THEN 
+        RAISE NOTICE 'Constraint fk_events_partner already exists';
+    END;
+END $$;
+
+DO $$ 
+BEGIN
+    BEGIN
+        ALTER TABLE public.gallery_items ADD CONSTRAINT fk_gallery_event FOREIGN KEY (event_id) REFERENCES public.events(id) ON DELETE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN 
+        RAISE NOTICE 'Constraint fk_gallery_event already exists';
+    END;
+END $$;
+
+DO $$ 
+BEGIN
+    BEGIN
+        ALTER TABLE public.gallery_items ADD CONSTRAINT fk_gallery_partner FOREIGN KEY (partner_id) REFERENCES public.partners(id) ON DELETE CASCADE;
+    EXCEPTION WHEN duplicate_object THEN 
+        RAISE NOTICE 'Constraint fk_gallery_partner already exists';
+    END;
+END $$;
 
 -- Advanced Indexing Strategy
 
 -- Foreign key indexes (mandatory for performance)
-CREATE INDEX idx_events_partner_id ON public.events(partner_id);
-CREATE INDEX idx_gallery_items_event_id ON public.gallery_items(event_id);
-CREATE INDEX idx_gallery_items_partner_id ON public.gallery_items(partner_id);
+CREATE INDEX IF NOT EXISTS idx_events_partner_id ON public.events(partner_id);
+CREATE INDEX IF NOT EXISTS idx_gallery_items_event_id ON public.gallery_items(event_id);
+CREATE INDEX IF NOT EXISTS idx_gallery_items_partner_id ON public.gallery_items(partner_id);
 
 -- WHERE clause optimization indexes
-CREATE INDEX idx_events_category ON public.events(category);
-CREATE INDEX idx_events_status ON public.events(status) WHERE status = 'published';
-CREATE INDEX idx_events_start_date ON public.events(start_date DESC);
-CREATE INDEX idx_events_end_date ON public.events(end_date) WHERE end_date IS NOT NULL;
-CREATE INDEX idx_events_is_virtual ON public.events(is_virtual) WHERE is_virtual = true;
-CREATE INDEX idx_events_price ON public.events(price) WHERE price > 0;
+CREATE INDEX IF NOT EXISTS idx_events_category ON public.events(category);
+CREATE INDEX IF NOT EXISTS idx_events_status ON public.events(status) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_events_start_date ON public.events(start_date DESC);
+CREATE INDEX IF NOT EXISTS idx_events_end_date ON public.events(end_date) WHERE end_date IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_events_is_virtual ON public.events(is_virtual) WHERE is_virtual = true;
+CREATE INDEX IF NOT EXISTS idx_events_price ON public.events(price) WHERE price > 0;
 
-CREATE INDEX idx_partners_category ON public.partners(category);
-CREATE INDEX idx_partners_status ON public.partners(status) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_partners_category ON public.partners(category);
+CREATE INDEX IF NOT EXISTS idx_partners_status ON public.partners(status) WHERE status = 'active';
 
-CREATE INDEX idx_team_members_status ON public.team_members(status) WHERE status = 'active';
-CREATE INDEX idx_team_members_display_order ON public.team_members(display_order);
+CREATE INDEX IF NOT EXISTS idx_team_members_status ON public.team_members(status) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_team_members_display_order ON public.team_members(display_order);
 
-CREATE INDEX idx_gallery_items_category ON public.gallery_items(category);
-CREATE INDEX idx_gallery_items_status ON public.gallery_items(status) WHERE status = 'published';
+CREATE INDEX IF NOT EXISTS idx_gallery_items_category ON public.gallery_items(category);
+CREATE INDEX IF NOT EXISTS idx_gallery_items_status ON public.gallery_items(status) WHERE status = 'published';
 
 -- Full-text search with pg_trgm
-CREATE INDEX idx_events_search ON public.events USING gin (
+CREATE INDEX IF NOT EXISTS idx_events_search ON public.events USING gin (
     (title || ' ' || COALESCE(description, '') || ' ' || COALESCE(short_description, ''))
     gin_trgm_ops
 );
 
 -- Composite indexes for common queries
-CREATE INDEX idx_events_category_status_date ON public.events(category, status, start_date DESC);
-CREATE INDEX idx_events_location ON public.events(city, state) WHERE city IS NOT NULL AND state IS NOT NULL;
-CREATE INDEX idx_events_price_category ON public.events(price, category) WHERE price > 0;
+CREATE INDEX IF NOT EXISTS idx_events_category_status_date ON public.events(category, status, start_date DESC);
+CREATE INDEX IF NOT EXISTS idx_events_location ON public.events(city, state) WHERE city IS NOT NULL AND state IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_events_price_category ON public.events(price, category) WHERE price > 0;
 
 -- Partial indexes for active data
-CREATE INDEX idx_partners_active_location ON public.partners(city, state) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_partners_active_location ON public.partners(city, state) WHERE status = 'active';
 
 -- JSONB indexes for metadata queries
-CREATE INDEX idx_events_social_links ON public.events USING gin(social_links);
-CREATE INDEX idx_events_tags ON public.events USING gin(tags);
-CREATE INDEX idx_partners_metadata ON public.partners USING gin(metadata);
+CREATE INDEX IF NOT EXISTS idx_events_social_links ON public.events USING gin(social_links);
+CREATE INDEX IF NOT EXISTS idx_events_tags ON public.events USING gin(tags);
+CREATE INDEX IF NOT EXISTS idx_partners_metadata ON public.partners USING gin(metadata);
 
 -- Database Views and Functions
 
@@ -335,8 +364,8 @@ GROUP BY DATE_TRUNC('month', start_date), category
 ORDER BY month DESC, category;
 
 -- Create index on materialized view
-CREATE INDEX idx_monthly_event_stats_month ON monthly_event_stats(month DESC);
-CREATE INDEX idx_monthly_event_stats_category ON monthly_event_stats(category);
+CREATE INDEX IF NOT EXISTS idx_monthly_event_stats_month ON monthly_event_stats(month DESC);
+CREATE INDEX IF NOT EXISTS idx_monthly_event_stats_category ON monthly_event_stats(category);
 
 -- Function to refresh materialized view
 CREATE OR REPLACE FUNCTION refresh_monthly_event_stats()
@@ -359,3 +388,36 @@ COMMENT ON VIEW event_statistics IS 'Monthly statistics for events by category';
 COMMENT ON FUNCTION get_events_near_location IS 'Find events within radius of coordinates using Haversine formula';
 COMMENT ON FUNCTION update_event_attendance IS 'Safely increment/decrement event attendance with capacity checks';
 COMMENT ON FUNCTION refresh_monthly_event_stats IS 'Refresh materialized view for monthly event statistics';
+
+-- Add to partners table category CHECK
+-- Find the CREATE TABLE public.partners and update CHECK clause to: CHECK (category IN ('venue', 'promoter', 'artist', 'sponsor', 'other', 'music', 'beverage', 'lifestyle', 'technology'))
+
+-- For events, ensure 'club' is allowed or change in seed
+
+-- Add VIEW public_events_view after views section
+CREATE OR REPLACE VIEW public.public_events_view AS
+SELECT 
+  id,
+  title,
+  description,
+  short_description,
+  start_date,
+  end_date,
+  location,
+  image_url as image,
+  category,
+  status,
+  max_attendees as capacity,
+  current_attendees as attendees,
+  price,
+  currency,
+  price as price_range, -- map price to price_range string
+  website_url as ticket_url,
+  '{}'::text[] as artists, -- placeholder
+  gallery_images_urls as gallery,
+  '{}'::text[] as highlights, -- from metadata later
+  partner_name,
+  partner_logo_url
+FROM public.events
+WHERE status = 'published'
+ORDER BY start_date ASC;
