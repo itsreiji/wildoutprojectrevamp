@@ -1,5 +1,5 @@
 ---
-description: Strict rule requiring use of supabase-wildout-project MCP server for all database and storage operations
+description: Strict rule requiring use of supabase-wildout MCP server for all database and storage operations
 globs: **/*
 alwaysApply: true
 ---
@@ -8,11 +8,11 @@ alwaysApply: true
 
 ## Core Requirement
 
-**MANDATORY**: For ANY database, storage, or Supabase-related operations, you MUST use the MCP server `supabase-wildout-project`. This is a strict requirement with no exceptions.
+**MANDATORY**: For ANY database, storage, or Supabase-related operations, you MUST use the MCP server `supabase-wildout`. This is a strict requirement with no exceptions.
 
-## When to Use `supabase-wildout-project` MCP Server
+## When to Use `supabase-wildout` MCP Server
 
-Use the `supabase-wildout-project` MCP server for:
+Use the `supabase-wildout` MCP server for:
 
 - **Database Operations:**
   - Listing tables (`list_tables`)
@@ -35,13 +35,13 @@ Use the `supabase-wildout-project` MCP server for:
 
 ## Server Identification
 
-The correct MCP server identifier is: **`supabase-wildout-project`**
+The correct MCP server identifier is: **`supabase-wildout`**
 
 **✅ DO:**
-- Use `mcp_supabase-wildout-project_*` tools for all database/storage operations
-- Use `mcp_supabase-wildout-project_list_tables` instead of generic `mcp_supabase_list_tables`
-- Use `mcp_supabase-wildout-project_execute_sql` instead of generic `mcp_supabase_execute_sql`
-- Use `mcp_supabase-wildout-project_apply_migration` instead of generic `mcp_supabase_apply_migration`
+- Use `mcp_supabase-wildout_*` tools for all database/storage operations
+- Use `mcp_supabase-wildout_list_tables` instead of generic `mcp_supabase_list_tables`
+- Use `mcp_supabase-wildout_execute_sql` instead of generic `mcp_supabase_execute_sql`
+- Use `mcp_supabase-wildout_apply_migration` instead of generic `mcp_supabase_apply_migration`
 
 **❌ DON'T:**
 - Never use the generic `supabase` MCP server for this project
@@ -53,20 +53,20 @@ The correct MCP server identifier is: **`supabase-wildout-project`**
 
 All tools from this server follow the pattern:
 ```
-mcp_supabase-wildout-project_<tool_name>
+mcp_supabase-wildout_<tool_name>
 ```
 
 Examples:
-- `mcp_supabase-wildout-project_list_tables`
-- `mcp_supabase-wildout-project_execute_sql`
-- `mcp_supabase-wildout-project_apply_migration`
-- `mcp_supabase-wildout-project_get_logs`
+- `mcp_supabase-wildout_list_tables`
+- `mcp_supabase-wildout_execute_sql`
+- `mcp_supabase-wildout_apply_migration`
+- `mcp_supabase-wildout_get_logs`
 
 ## Verification
 
 Before executing any database or storage operation:
 
-1. **Check the tool name**: Ensure it starts with `mcp_supabase-wildout-project_`
+1. **Check the tool name**: Ensure it starts with `mcp_supabase-wildout_`
 2. **Verify server**: Confirm you're using the project-specific server, not the generic one
 3. **No exceptions**: This rule applies to ALL database/storage operations in this project
 
@@ -74,8 +74,8 @@ Before executing any database or storage operation:
 
 This project uses the Supabase project reference: `qhimllczaejftnuymrsr`
 
-All database operations MUST target this specific project via the `supabase-wildout-project` MCP server to ensure data consistency and proper project isolation.
+All database operations MUST target this specific project via the `supabase-wildout` MCP server to ensure data consistency and proper project isolation.
 
 ---
 
-**REMINDER**: This is a STRICT rule. There are no exceptions. Always use `supabase-wildout-project` MCP server for database and storage operations.
+**REMINDER**: This is a STRICT rule. There are no exceptions. Always use `supabase-wildout` MCP server for database and storage operations.

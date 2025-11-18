@@ -199,26 +199,110 @@ const fetchEvents = async (): Promise<LandingEvent[]> => {
       console.error('Error fetching events:', error);
       return [];
     }
-    return (data || []).map((row: any): LandingEvent => ({
+    return (data || []).map((row: any): LandingEvent => {
+      // Map database status to LandingEvent status
+      let status: LandingEvent['status'] = 'upcoming';
+      if (row.status === 'published') {
+        // Check if event is ongoing or upcoming based on dates
+        const now = new Date();
+        const startDate = row.start_date ? new Date(row.start_date) : null;
+        const endDate = row.end_date ? new Date(row.end_date) : null;
+        if (startDate && endDate && now >= startDate && now <= endDate) {
+          status = 'ongoing';
+        } else if (endDate && now > endDate) {
+          status = 'completed';
+        } else {
+          status = 'upcoming';
+        }
+      } else if (row.status === 'ongoing') {
+        status = 'ongoing';
+      } else if (row.status === 'completed' || row.status === 'cancelled' || row.status === 'archived') {
+        status = 'completed';
+      }
+      
+      return {
       id: row.id ?? '',
       title: row.title ?? '',
       description: row.description ?? null,
       date: row.date ?? row.start_date ?? '',
       time: row.time ?? '',
       venue: row.venue ?? row.location ?? '',
-      venueAddress: row.venue_address ?? '',
-      image: row.image ?? row.featured_image ?? '',
+      venueAddress: row.venue_address ?? row.address ?? '',
+      image: row.image ?? row.image_url ?? row.featured_image ?? '',
       category: row.category ?? null,
-      status: (row.status as LandingEvent['status']) ?? 'upcoming',
+      status,
       end_date: row.end_date ?? '',
       capacity: row.capacity || row.max_attendees || undefined,
-      attendees: row.attendees || null,
-      price: row.price ? `${row.currency || 'IDR'} ${row.price}` : null,
-      price_range: row.price_range || null,
+      attendees: row.attendees || row.current_attendees || null,
+      price: (() => {
+        // Use price_range from metadata if available, otherwise construct from price/currency
+        const metadata = row.metadata || {};
+        if (metadata.price_range) {
+          return metadata.price_range;
+        }
+        if (row.price) {
+          return `${row.currency || 'IDR'} ${row.price}`;
+        }
+        return null;
+      })(),
+      price_range: (() => {
+        // Extract price_range from metadata if available
+        const metadata = row.metadata || {};
+        if (metadata.price_range) {
+          return metadata.price_range;
+        }
+        return row.price_range || null;
+      })(),
       ticket_url: row.ticket_url || null,
-      artists: row.artists.map((name: string): EventArtist => ({ name, role: undefined, image: undefined })),
-      gallery: row.gallery || [],
-      highlights: row.highlights || [],
+      artists: (() => {
+        // Extract artists from metadata if available
+        const metadata = row.metadata || {};
+        if (metadata.artists && Array.isArray(metadata.artists)) {
+          return metadata.artists.map((artist: any): EventArtist => ({
+            name: artist.name || artist || '',
+            role: artist.role || undefined,
+            image: artist.image || undefined,
+          }));
+        }
+        // Fallback to row.artists if it's an array of strings
+        if (row.artists && Array.isArray(row.artists)) {
+          return row.artists.map((name: string): EventArtist => ({ 
+            name: typeof name === 'string' ? name : '', 
+            role: undefined, 
+            image: undefined 
+          }));
+        }
+        return [];
+      })(),
+      gallery: (() => {
+        // Extract gallery images from gallery_images_urls if available
+        if (row.gallery_images_urls) {
+          try {
+            // If it's already an array, use it directly
+            if (Array.isArray(row.gallery_images_urls)) {
+              return row.gallery_images_urls;
+            }
+            // If it's a JSON string, parse it
+            if (typeof row.gallery_images_urls === 'string') {
+              return JSON.parse(row.gallery_images_urls);
+            }
+            // If it's a JSONB object, it might already be parsed
+            return row.gallery_images_urls;
+          } catch (e) {
+            console.error('Error parsing gallery_images_urls:', e);
+          }
+        }
+        // Fallback to row.gallery if available
+        return row.gallery || [];
+      })(),
+      highlights: (() => {
+        // Extract highlights from metadata if available
+        const metadata = row.metadata || {};
+        if (metadata.highlights && Array.isArray(metadata.highlights)) {
+          return metadata.highlights;
+        }
+        return row.highlights || [];
+      })(),
       start_date: row.start_date,
       location: row.location || null,
       partner_name: row.partner_name || null,
@@ -227,7 +311,8 @@ const fetchEvents = async (): Promise<LandingEvent[]> => {
       metadata: row.metadata ?? {},
       created_at: row.created_at,
       updated_at: row.updated_at,
-    })) as LandingEvent[];
+    };
+    }) as LandingEvent[];
   } catch (error) {
     console.error('Error in fetchEvents:', error);
     return [];

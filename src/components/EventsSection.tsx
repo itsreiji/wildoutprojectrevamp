@@ -1,75 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, MapPin, Clock, Users, Music, Ticket, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
-import type { LandingEvent as AppEvent, EventArtist } from '@/types/content';
-import { useRouter } from './router';
+import { useContent, Event } from '../contexts/ContentContext';
+import { useRouter } from './Router';
 
-// Number of days ahead to show upcoming events (30 days)
-const UPCOMING_DAYS = 30;
-
-const parseEventDate = (event: AppEvent): Date | null => {
-  const dateValue = event.start_date || event.date;
-  if (!dateValue) return null;
-  try {
-    const parsed = new Date(dateValue);
-    return Number.isNaN(parsed.getTime()) ? null : parsed;
-  } catch {
-    return null;
-  }
-};
-
-export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
-  const { navigate } = useRouter();
-  const [selectedEvent, setSelectedEvent] = useState<AppEvent | null>(null);
-
-  // Filter and sort upcoming events (within next 30 days)
-  const upcomingEvents = useMemo(() => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
-    const futureDate = new Date();
-    futureDate.setDate(now.getDate() + UPCOMING_DAYS);
-    futureDate.setHours(23, 59, 59, 999); // End of day
-
-    return events
-      .filter(event => {
-        // Filter by status - accept 'upcoming', 'ongoing', or 'published' (for backward compatibility)
-        const validStatuses = ['upcoming', 'ongoing', 'published'];
-        if (!validStatuses.includes(event.status)) {
-          return false;
-        }
-
-        // Filter by date - only show events within next 30 days
-        const eventDate = parseEventDate(event);
-        if (!eventDate) return false;
-
-        // Reset to start of day for comparison
-        const eventStartDate = new Date(eventDate);
-        eventStartDate.setHours(0, 0, 0, 0);
-
-        // Include events that are today or in the future, but within 30 days
-        // Also include ongoing events (started but not ended)
-        const endDate = event.end_date ? new Date(event.end_date) : null;
-        if (endDate) {
-          endDate.setHours(23, 59, 59, 999);
-        }
-        const isOngoing = endDate && now >= eventStartDate && now <= endDate;
-        const isUpcoming = eventStartDate >= now && eventStartDate <= futureDate;
-
-        return isUpcoming || isOngoing;
-      })
-      .sort((a, b) => {
-        // Sort by date (earliest first)
-        const dateA = parseEventDate(a);
-        const dateB = parseEventDate(b);
-        if (!dateA || !dateB) return 0;
-        return dateA.getTime() - dateB.getTime();
-      })
-      .slice(0, 4); // Show only first 4 events
-  }, [events]);
+export const EventsSection = React.memo(() => {
+  const { events } = useContent();
+  const { navigateTo } = useRouter();
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   return (
     <>
@@ -92,7 +34,7 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
               Discover the hottest events in Indonesia's creative scene
             </p>
             <Button
-              onClick={() => navigate('/events')}
+              onClick={() => navigateTo('events')}
               className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
             >
               View All Events
@@ -101,14 +43,8 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
           </motion.div>
 
           {/* Events Grid */}
-          {upcomingEvents.length === 0 ? (
-            <div className="text-center py-12 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
-              <p className="text-white/60 text-lg">No upcoming events in the next {UPCOMING_DAYS} days</p>
-              <p className="text-white/40 text-sm mt-2">Check back soon for new events!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-              {upcomingEvents.map((event, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {events.filter(e => e.status === 'upcoming').slice(0, 4).map((event, index) => (
               <motion.div
                 key={event.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -121,24 +57,22 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
                   {/* Event Image */}
                   <div className="relative h-64 overflow-hidden">
                     <ImageWithFallback
-                      src={event.image || ''}
+                      src={event.image}
                       alt={event.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-
+                    
                     {/* Category Badge */}
                     <Badge className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0">
                       {event.category}
                     </Badge>
 
                     {/* Capacity Indicator */}
-                    {(event.attendees !== undefined || event.capacity !== null) && (
-                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90">
-                        <Users className="inline h-4 w-4 mr-1" />
-                        {event.attendees || 0}/{event.capacity || 'N/A'}
-                      </div>
-                    )}
+                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90">
+                      <Users className="inline h-4 w-4 mr-1" />
+                      {event.attendees}/{event.capacity}
+                    </div>
                   </div>
 
                   {/* Event Info */}
@@ -152,69 +86,52 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
                     </p>
 
                     <div className="space-y-2">
-                      {(event.date || event.start_date) && (
-                        <div className="flex items-center text-white/70">
-                          <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span className="text-sm">
-                            {event.date
-                              ? new Date(event.date).toLocaleDateString('en-US', {
-                                  weekday: 'long',
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                })
-                              : new Date(event.start_date).toLocaleDateString('en-US', {
-                                  weekday: 'long',
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                })}
-                          </span>
-                        </div>
-                      )}
-                      {event.time && (
-                        <div className="flex items-center text-white/70">
-                          <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span className="text-sm">{event.time}</span>
-                        </div>
-                      )}
-                      {(event.venue || event.location) && (
-                        <div className="flex items-center text-white/70">
-                          <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span className="text-sm">{event.venue || event.location || 'TBD'}</span>
-                        </div>
-                      )}
-                      {(event.price || event.price_range) && (
-                        <div className="flex items-center text-white/70">
-                          <Ticket className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span className="text-sm">{event.price || event.price_range || 'TBD'}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center text-white/70">
+                        <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
+                        <span className="text-sm">
+                          {new Date(event.date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex items-center text-white/70">
+                        <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
+                        <span className="text-sm">{event.time}</span>
+                      </div>
+                      <div className="flex items-center text-white/70">
+                        <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
+                        <span className="text-sm">{event.venue}</span>
+                      </div>
+                      <div className="flex items-center text-white/70">
+                        <Ticket className="h-4 w-4 mr-2 text-[#E93370]" />
+                        <span className="text-sm">{event.price}</span>
+                      </div>
                     </div>
 
                     {/* Artists Preview */}
-                    {event.artists && event.artists.length > 0 && (
-                      <div className="flex items-center space-x-2">
-                        <Music className="h-4 w-4 text-[#E93370]" />
-                        <div className="flex -space-x-2">
-                          {event.artists.slice(0, 3).map((artist: EventArtist, idx: number) => (
-                            <div
-                              key={idx}
-                              className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
-                            >
-                              <ImageWithFallback
-                                src={artist.image}
-                                alt={artist.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                        <span className="text-sm text-white/60">
-                          {event.artists.length} {event.artists.length === 1 ? 'Artist' : 'Artists'}
-                        </span>
+                    <div className="flex items-center space-x-2">
+                      <Music className="h-4 w-4 text-[#E93370]" />
+                      <div className="flex -space-x-2">
+                        {event.artists.slice(0, 3).map((artist, idx) => (
+                          <div
+                            key={idx}
+                            className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
+                          >
+                            <ImageWithFallback
+                              src={artist.image}
+                              alt={artist.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ))}
                       </div>
-                    )}
+                      <span className="text-sm text-white/60">
+                        {event.artists.length} {event.artists.length === 1 ? 'Artist' : 'Artists'}
+                      </span>
+                    </div>
 
                     {/* CTA Button */}
                     <Button
@@ -226,9 +143,8 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
                   </div>
                 </div>
               </motion.div>
-              ))}
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -241,9 +157,5 @@ export const EventsSection = React.memo(({ events }: EventsSectionProps) => {
     </>
   );
 });
-
-export type EventsSectionProps = {
-  events: AppEvent[];
-};
 
 EventsSection.displayName = 'EventsSection';

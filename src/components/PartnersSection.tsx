@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Sparkles } from 'lucide-react';
-import type { Partner } from '@/types/content';
+import { useContent } from '../contexts/ContentContext';
 
-export const PartnersSection = React.memo(({ partners }: PartnersSectionProps) => {
+export const PartnersSection = React.memo(() => {
+  const { partners } = useContent();
   const activePartners = partners.filter(p => p.status === 'active');
   return (
     <section id="partners" className="relative py-20 px-4">
@@ -91,9 +92,5 @@ export const PartnersSection = React.memo(({ partners }: PartnersSectionProps) =
     </section>
   );
 });
-
-export type PartnersSectionProps = {
-  partners: Partner[];
-};
 
 PartnersSection.displayName = 'PartnersSection';
