@@ -8,7 +8,7 @@ import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: '/', hash: '#' },
-  { id: 'events', label: 'Events', href: '/events', hash: '#events' },
+  { id: 'events', label: 'Events', href: '/events' },
   { id: 'about', label: 'About', href: '/', hash: '#about' },
   { id: 'team', label: 'Team', href: '/', hash: '#team' },
   { id: 'gallery', label: 'Gallery', href: '/', hash: '#gallery' },
@@ -32,8 +32,8 @@ const NavigationComponent = () => {
   const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
     setIsMobileMenuOpen(false);
 
-    // If we're on the landing page, use hash navigation
-    if (currentPath === '/') {
+    // If has hash and on landing, do hash scroll; otherwise navigate to href
+    if (item.hash && currentPath === '/') {
       if (item.hash === '#') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
@@ -43,20 +43,15 @@ const NavigationComponent = () => {
         }
       }
     } else {
-      // If we're on a different page, navigate to the route
-      if (item.href === '/') {
-        navigate('/');
-        // Wait a bit for page to load, then scroll to section if hash exists
+      // Navigate to route, scroll to hash if on landing after nav
+      navigate(item.href);
+      if (item.href === '/' && item.hash && item.hash !== '#') {
         setTimeout(() => {
-          if (item.hash && item.hash !== '#') {
-            const element = document.querySelector(item.hash);
-            if (element) {
-              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+          const element = document.querySelector(item.hash);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }, 100);
-      } else {
-        navigate(item.href);
       }
     }
   };

@@ -7,11 +7,11 @@ import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useContent, Event } from '../contexts/ContentContext';
-import { useRouter } from './Router';
+import { useRouter } from './router';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 export const AllEventsPage = React.memo(() => {
-  const { navigateTo } = useRouter();
+  const { navigate } = useRouter();
   const { events } = useContent();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,7 +43,7 @@ export const AllEventsPage = React.memo(() => {
                 </div>
               </div>
               <Button
-                onClick={() => navigateTo('landing')}
+                onClick={() => navigate('/')}
                 variant="outline"
                 className="border-white/10 text-white/70 hover:bg-white/5 rounded-xl"
               >

@@ -6,11 +6,11 @@ import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useContent, Event } from '../contexts/ContentContext';
-import { useRouter } from './Router';
+import { useRouter } from './router';
 
 export const EventsSection = React.memo(() => {
   const { events } = useContent();
-  const { navigateTo } = useRouter();
+  const { navigate } = useRouter();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   return (
@@ -34,7 +34,7 @@ export const EventsSection = React.memo(() => {
               Discover the hottest events in Indonesia's creative scene
             </p>
             <Button
-              onClick={() => navigateTo('events')}
+              onClick={() => navigate('/events')}
               className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
             >
               View All Events
