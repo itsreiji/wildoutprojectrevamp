@@ -29,7 +29,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Badge } from '../ui/badge';
-import { useContent } from '../../contexts/ContentContext';
+import { usePartners } from '../../contexts/PartnersContext';
 import { toast } from 'sonner';
 import { DashboardPartnerForm, PartnerFormValues } from './DashboardPartnerForm';
 import { supabaseClient } from '@/supabase/client';
@@ -39,7 +39,7 @@ import type { Partner } from '@/types/content';
 // partner.contact_email → partner.contact_email || ''
 
 export const DashboardPartners = React.memo(() => {
-  const { partners = [], addPartner, updatePartner, deletePartner } = useContent();
+  const { partners = [], addPartner, updatePartner, deletePartner } = usePartners();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);

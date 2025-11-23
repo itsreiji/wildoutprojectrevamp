@@ -30,7 +30,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
-import { useContent } from '../../contexts/ContentContext';
+import { useStaticContent } from '../../contexts/StaticContentContext';
 import { toast } from 'sonner';
 import { DashboardGalleryForm, GalleryFormValues } from './DashboardGalleryForm';
 import { supabaseClient } from '@/supabase/client';
@@ -38,7 +38,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import type { GalleryImage } from '@/types/content';
 
 export const DashboardGallery = React.memo(() => {
-  const { gallery = [], addGalleryImage, updateGalleryImage, deleteGalleryImage } = useContent();
+  const { gallery = [], addGalleryImage, updateGalleryImage, deleteGalleryImage } = useStaticContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingGallery, setEditingGallery] = useState<GalleryImage | null>(null);

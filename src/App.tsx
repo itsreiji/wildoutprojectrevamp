@@ -2,6 +2,10 @@ import React from 'react';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from './contexts/AuthContext';
 import { ContentProvider } from './contexts/ContentContext';
+import { EventsProvider } from './contexts/EventsContext';
+import { PartnersProvider } from './contexts/PartnersContext';
+import { TeamProvider } from './contexts/TeamContext';
+import { StaticContentProvider } from './contexts/StaticContentContext';
 import { Router, RouterProvider } from './components/router';
 import { LandingPage } from './components/LandingPage';
 import { Dashboard } from './components/Dashboard';
@@ -41,10 +45,18 @@ function App() {
     <ThemeProvider defaultTheme="system" attribute="class">
       <AuthProvider>
         <ContentProvider useDummyData={useDummyDataDefault}>
-          <RouterProvider>
-            <Router routes={routes} />
-          </RouterProvider>
-          <Toaster />
+          <EventsProvider useDummyData={useDummyDataDefault}>
+            <PartnersProvider useDummyData={useDummyDataDefault}>
+              <TeamProvider useDummyData={useDummyDataDefault}>
+                <StaticContentProvider useDummyData={useDummyDataDefault}>
+                  <RouterProvider>
+                    <Router routes={routes} />
+                  </RouterProvider>
+                  <Toaster />
+                </StaticContentProvider>
+              </TeamProvider>
+            </PartnersProvider>
+          </EventsProvider>
         </ContentProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -8,7 +8,7 @@ import { Textarea } from '../ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Separator } from '../ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useContent } from '../../contexts/ContentContext';
+import { useStaticContent } from '../../contexts/StaticContentContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabaseClient } from '../../supabase/client';
 import { toast } from 'sonner';
@@ -23,7 +23,7 @@ interface UserProfile {
 }
 
 export const DashboardSettings = React.memo(() => {
-  const { settings, saveSiteSettings } = useContent();
+  const { settings, saveSiteSettings } = useStaticContent();
   const { role: currentUserRole } = useAuth();
   const [formData, setFormData] = useState(settings);
   const [isSaving, setIsSaving] = useState(false);

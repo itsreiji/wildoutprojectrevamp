@@ -18,7 +18,7 @@ import { Button } from '../ui/button';
 import { useRouter } from '../router';
 import { Link } from '../router/Link';
 import { cn } from '../ui/utils';
-import { useContent } from '../../contexts/ContentContext';
+import { useStaticContent } from '../../contexts/StaticContentContext';
 import { useAuth } from '../../contexts/AuthContext';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
@@ -31,7 +31,7 @@ interface DashboardLayoutProps {
 export const DashboardLayout = React.memo(
   ({ children }: DashboardLayoutProps) => {
     const { getCurrentSubPath, navigate, getAdminPath } = useRouter();
-    const { adminSections, getSectionPermissions } = useContent();
+    const { adminSections, getSectionPermissions } = useStaticContent();
     const { signOut } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [viewportWidth, setViewportWidth] = useState<number>(

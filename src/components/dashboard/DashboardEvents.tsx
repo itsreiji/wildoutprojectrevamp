@@ -30,7 +30,7 @@ import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
-import { useContent } from '../../contexts/ContentContext';
+import { useEvents } from '../../contexts/EventsContext';
 import { toast } from 'sonner';
 import { DashboardEventForm, EventFormValues } from './DashboardEventForm';
 import { supabaseClient } from '@/supabase/client';
@@ -42,7 +42,7 @@ import type { LandingEvent } from '@/types/content';
  * Integrates with ContentContext mutation functions (addEvent, updateEvent, deleteEvent)
  */
 export const DashboardEvents = React.memo(() => {
-    const { events = [], addEvent, updateEvent, deleteEvent, loading, error } = useContent();
+    const { events = [], addEvent, updateEvent, deleteEvent, loading, error } = useEvents();
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<LandingEvent | null>(null);

@@ -29,7 +29,7 @@ import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
-import { useContent } from '../../contexts/ContentContext';
+import { useTeam } from '../../contexts/TeamContext';
 import { toast } from 'sonner';
 import { DashboardTeamForm, TeamFormValues } from './DashboardTeamForm';
 import { supabaseClient } from '@/supabase/client';
@@ -38,7 +38,7 @@ import type { TeamMember } from '@/types/content';
 // member.avatar_url → member.photoUrl || member.avatar_url
 
 export const DashboardTeam = React.memo(() => {
-  const { team = [], addTeamMember, updateTeamMember, deleteTeamMember } = useContent();
+  const { team = [], addTeamMember, updateTeamMember, deleteTeamMember } = useTeam();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);

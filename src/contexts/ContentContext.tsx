@@ -4,7 +4,7 @@ import { supabaseClient } from '../supabase/client';
 import { useAuth } from './AuthContext';
 import type { AuthRole } from './AuthContext';
 import type { Json, TablesInsert, TablesUpdate } from '../supabase/types';
-import { DUMMY_EVENTS, DUMMY_TEAM_MEMBERS, DUMMY_PARTNERS, DUMMY_GALLERY_ITEMS } from '../data/dummyData';
+import { dummyDataService } from '../services/dummyDataService';
 import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
 import type {
   TeamMember,
@@ -46,33 +46,6 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
     return value.filter((item): item is string => typeof item === 'string');
   }
   return undefined;
-};
-
-interface DummyEvent {
-  id: string;
-  title: string;
-  description?: string;
-  start_date: string;
-  end_date?: string;
-  location?: string;
-  category?: string;
-  capacity?: number;
-  attendees?: number;
-  price?: string;
-  price_range?: string;
-  ticket_url?: string;
-  partner_name?: string;
-  partner_logo_url?: string;
-  metadata?: Record<string, unknown>;
-  status?: string;
-  image?: string;
-}
-
-const normalizeMetadata = (metadata: Json | null | undefined): Record<string, unknown> => {
-  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
-    return {};
-  }
-  return metadata as Record<string, unknown>;
 };
 
 // Initial data aligned with new types
@@ -452,84 +425,10 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
           // Use dummy data for development/testing
           console.log('🔧 Using dummy data for development');
 
-          // Transform dummy events to match Event type
-          const dummyEvents: LandingEvent[] = DUMMY_EVENTS.map((event: any) => {
-            const metadata = normalizeMetadata(event.metadata);
-            const highlights = ensureStringArray(metadata.highlights as Json) ?? [];
-            const galleryImages = ensureStringArray(metadata.gallery as Json) ?? [];
-            return {
-              id: event.id ?? `dummy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              title: event.title ?? '',
-              description: event.description ?? null,
-              date: event.start_date ? event.start_date.split('T')[0] : '',
-              time: event.start_date ? new Date(event.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
-              venue: event.location ?? '',
-              venueAddress: event.location ?? '',
-              image: (metadata.image as string) ?? '',
-              category: event.category ?? null,
-              status: (event.status as LandingEvent['status']) ?? 'upcoming',
-              end_date: event.end_date ?? '',
-              capacity: event.capacity ?? undefined,
-              attendees: null,
-              price: null,
-              price_range: event.price_range ?? null,
-              ticket_url: event.ticket_url ?? null,
-              artists: [],
-              gallery: galleryImages,
-              highlights,
-              start_date: event.start_date ?? '',
-              location: event.location ?? null,
-              partner_name: event.partner_name ?? null,
-              partner_logo_url: null,
-              partner_website_url: null,
-              metadata,
-              created_at: event.created_at ?? event.start_date ?? new Date().toISOString(),
-              updated_at: event.updated_at ?? event.end_date ?? new Date().toISOString(),
-            };
-          });
-
-          // Set dummy data
-          setEvents(dummyEvents);
-          setPartners(
-            DUMMY_PARTNERS.map(p => ({
-              ...p,
-              id: p.id || `partner-${Date.now()}-${Math.random()}`,
-              category: null,
-              website_url: p.website_url ?? null,
-              status: (p.status as 'active' | 'inactive') || 'active',
-              social_links: normalizeSocialLinks(p.social_links),
-            }))
-          );
-
-          setGallery(
-            DUMMY_GALLERY_ITEMS.map(g => {
-              const imageUrls = ensureStringArray(g.image_urls) ?? [];
-              return {
-                id: g.id || `gallery-${Date.now()}-${Math.random()}`,
-                title: g.title,
-                description: g.description ?? null,
-                category: g.category ?? null,
-                status: g.status ?? 'published',
-                tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
-                image_urls: imageUrls,
-                url: imageUrls[0] || '',
-                created_at: g.created_at ?? new Date().toISOString(),
-                updated_at: g.updated_at ?? new Date().toISOString(),
-              };
-            })
-          );
-
-          setTeam(
-            DUMMY_TEAM_MEMBERS.map(t => ({
-              ...t,
-              id: t.id || `team-${Date.now()}-${Math.random()}`,
-              role: null,
-              phone: null,
-              photoUrl: null,
-              social_links: normalizeSocialLinks(t.social_links),
-              status: (t.status as 'active' | 'inactive') || 'active',
-            }))
-          );
+          setEvents(dummyDataService.getEvents());
+          setPartners(dummyDataService.getPartners());
+          setGallery(dummyDataService.getGallery());
+          setTeam(dummyDataService.getTeam());
 
         } else {
           // Fetch all data concurrently from Supabase

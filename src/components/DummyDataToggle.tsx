@@ -1,5 +1,8 @@
 import React from 'react';
-import { useContent } from '../contexts/ContentContext';
+import { useEvents } from '../contexts/EventsContext';
+import { usePartners } from '../contexts/PartnersContext';
+import { useTeam } from '../contexts/TeamContext';
+import { useStaticContent } from '../contexts/StaticContentContext';
 import { Button } from './ui/button';
 import { Switch } from './ui/switch';
 import { Label } from './ui/label';
@@ -11,7 +14,11 @@ import { Database, TestTube } from 'lucide-react';
  * Useful for development and testing to see how the app looks with data
  */
 export const DummyDataToggle: React.FC = () => {
-  const { useDummyData, setUseDummyData, loading, events, partners, team, gallery } = useContent();
+  const { useDummyData, setUseDummyData, loading: eventsLoading, events } = useEvents();
+  const { partners } = usePartners();
+  const { team } = useTeam();
+  const { gallery } = useStaticContent();
+  const loading = eventsLoading; // Simplified loading state
 
   const handleToggle = (checked: boolean) => {
     setUseDummyData(checked);

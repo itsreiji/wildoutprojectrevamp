@@ -14,13 +14,19 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
-import { useContent } from '../../contexts/ContentContext';
+import { useEvents } from '../../contexts/EventsContext';
+import { useTeam } from '../../contexts/TeamContext';
+import { usePartners } from '../../contexts/PartnersContext';
+import { useStaticContent } from '../../contexts/StaticContentContext';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import type { LandingEvent } from '@/types/content';
 // All event accesses use LandingEvent props
 
 export const DashboardHome = React.memo(() => {
-  const { events, team, gallery, partners, hero, getSectionContent } = useContent();
+  const { events } = useEvents();
+  const { team } = useTeam();
+  const { partners } = usePartners();
+  const { gallery, hero, getSectionContent } = useStaticContent();
 
   // Calculate statistics from current data, but sync with Supabase section content
   const stats = useMemo(() => {
