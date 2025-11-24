@@ -1015,9 +1015,9 @@
       {
         "id": 12,
         "title": "Implement Public Content Synchronization and Unified Admin Interface",
-        "description": "Create a new unified admin interface at /sadmin to manage all public-facing singleton content (e.g., Hero, About, site settings). Implement the backend synchronization, including database schema updates and ContentContext mutations, to persist these changes in Supabase.",
-        "details": "This task will be guided by a new OpenSpec proposal: 'update-public-admin-content-sync'.\n\n1.  **Database Schema:** Create a new migration file in the Supabase project (established in Task #11) to define tables for singleton content. A table named `public_content` with columns like `section` (e.g., 'hero', 'about') and `data` (JSONB) is recommended to store unstructured content. This will centralize content previously managed in separate modules (Task #8) or hardcoded.\n\n2.  **Router Configuration:** Modify the router setup in `src/components/router/index.tsx` (from Task #5) to include a new, admin-protected route for `/sadmin`. This will render a new `SAdminPage` component.\n\n3.  **Unified Admin UI:** Create `src/components/dashboard/SAdminPage.tsx`. This component will serve as the new centralized UI for editing all general site content. It should use the `useContent` hook to get the current data and provide forms built with reusable components from the UI library (Task #3) to edit it. The form's `onSubmit` handler will call new mutation functions on the `ContentContext`.\n\n4.  **State Management:** Enhance `ContentContext` (`src/contexts/ContentContext.tsx`, from Task #4) by adding state for the new `public_content`. Implement new async mutation functions like `updatePublicContent(section, data)` that call the Supabase client to `upsert` records in the new table. These functions must update the context's state to ensure the UI reflects the changes.\n\n5.  **Data Seeding Script:** Create a standalone script (e.g., `scripts/seed-public-content.ts`) to read the current hardcoded or disparate content from the application and insert it into the new Supabase tables. This ensures a non-destructive migration of existing content to the new system.",
-        "testStrategy": "1.  **Schema and Seeding:** Apply the new database migration locally and run the seeding script. Use a database client to connect to Supabase and verify that the `public_content` table is created and populated with the correct initial data.\n2.  **Admin UI CRUD Test:** Log in as an admin, navigate to `/sadmin`, and confirm the form fields are pre-populated. Modify a piece of content (e.g., the 'About Us' text), save the form, and verify the change persists after a page refresh. Check the `public_content` table in Supabase to confirm the `data` JSONB was updated correctly.\n3.  **Public UI Verification:** After saving a change in the admin UI, navigate to the public-facing page that displays that content (e.g., the `LandingPage.tsx` from Task #9). Verify that the updated content is displayed correctly, confirming the end-to-end data flow through `ContentContext`.\n4.  **Routing and Authorization:** Attempt to access `/sadmin` while logged out and as a non-admin user. Confirm that access is denied and the user is redirected or shown an appropriate error message, validating the route protection.",
+        "description": "Create a new unified admin interface at /sadmin to manage all public-facing singleton content (e.g., Hero, About, site settings). Implement the backend synchronization, including database schema updates and ContentContext mutations, to persist these changes in Supabase. This task is broken down into subtasks, starting with the OpenSpec proposal, followed by database migration, UI implementation, and final integration.",
+        "details": "This epic involves several stages, now broken into subtasks. The process starts with the creation and validation of the 'update-public-admin-content-sync' OpenSpec proposal (12.1). The subsequent steps include creating a Supabase database migration for a new `public_content` table (12.2), seeding it with initial data (12.3), building the admin route and UI shell at `/sadmin` (12.4), enhancing `ContentContext` with update mutations (12.5), implementing the content editing form (12.6), and finally integrating this new dynamic content into the public-facing pages (12.7).",
+        "testStrategy": "Testing will be conducted per-subtask. Key integration tests include: 1. Verifying the `/sadmin` route is protected and renders the form with data from Supabase. 2. Performing a full CRUD cycle: update content in the admin UI, confirm the update in the Supabase `public_content` table, and verify the change is reflected on the corresponding public page (e.g., `LandingPage.tsx`). 3. Confirming the data seeding script correctly populates the database from legacy hardcoded values.",
         "status": "in-progress",
         "dependencies": [
           11,
@@ -1027,7 +1027,84 @@
           4
         ],
         "priority": "medium",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1201,
+            "title": "Create and Validate OpenSpec Proposal for Public Content Sync",
+            "description": "Document the full implementation plan for the unified admin interface and public content synchronization in an OpenSpec proposal. This includes database schema, API endpoints, component design, and state management changes.",
+            "dependencies": [],
+            "details": "The proposal, named 'update-public-admin-content-sync', outlines the creation of a `public_content` table in Supabase, a new `/sadmin` route and `SAdminPage` component, and necessary updates to `ContentContext`. The proposal has been reviewed and validated, serving as the blueprint for subsequent implementation subtasks.",
+            "status": "completed",
+            "testStrategy": "Validation was performed by team review, ensuring the proposal covered all technical requirements, aligned with existing architecture (Tasks #4, #5, #6), and provided a clear path for implementation."
+          },
+          {
+            "id": 1202,
+            "title": "Implement Supabase Database Migration for `public_content` Table",
+            "description": "Create and apply a new Supabase database migration to define the `public_content` table for storing singleton site content.",
+            "dependencies": [
+              1201
+            ],
+            "details": "Following the 'update-public-admin-content-sync' proposal, create a new migration file within the `supabase/migrations/` directory. The SQL script will define a table named `public_content` with a primary key `section` of type `TEXT` and a `data` column of type `JSONB`. This table will centralize singleton content like 'hero', 'about', and site settings.",
+            "status": "pending",
+            "testStrategy": "After creating the migration file, run `supabase db reset` to apply it to the local development database. Connect to the database using a client and execute `SELECT * FROM public_content;` to verify the table exists with the correct schema (`section`, `data`). Ensure the primary key constraint on `section` is active."
+          },
+          {
+            "id": 1203,
+            "title": "Create Data Seeding Script for Initial Public Content",
+            "description": "Develop a script to populate the new `public_content` table with existing hardcoded content from various parts of the application.",
+            "dependencies": [
+              1202
+            ],
+            "details": "Create a TypeScript script at `scripts/seed-public-content.ts`. This script will initialize the Supabase client, read existing content (e.g., from component constants or mock data files), and use the client's `.upsert()` method to insert this data into the `public_content` table. This ensures no content is lost during the migration.",
+            "status": "pending",
+            "testStrategy": "Execute the script against a fresh, migrated local database (`pnpm run seed:public-content`). After execution, query the `public_content` table to confirm that rows for 'hero', 'about', etc., have been created and their `data` fields contain the expected JSON structure and values."
+          },
+          {
+            "id": 1204,
+            "title": "Implement Admin Route and SAdminPage UI Shell",
+            "description": "Configure the application router to include the new `/sadmin` route and create the basic structure for the `SAdminPage` component.",
+            "dependencies": [
+              1201
+            ],
+            "details": "Modify the router configuration in `src/components/router/index.tsx` to add a new route `/sadmin` under the admin-only layout. Create the corresponding page component file at `src/components/dashboard/SAdminPage.tsx`. This component will initially render a placeholder layout using the existing `Dashboard` components (from Task #6) to ensure visual consistency.",
+            "status": "pending",
+            "testStrategy": "Log in as an admin and navigate to `/sadmin`. Verify the `SAdminPage` component renders within the dashboard layout. Log out or log in as a non-admin user and attempt to access `/sadmin` directly. Confirm that the routing guards redirect the user appropriately."
+          },
+          {
+            "id": 1205,
+            "title": "Enhance ContentContext for Public Content Management",
+            "description": "Update the `ContentContext` to fetch, store, and update data from the `public_content` table.",
+            "dependencies": [
+              1202
+            ],
+            "details": "In `src/contexts/ContentContext.tsx`, extend the context's state to include a `publicContent` object. Modify the initial data fetcher to also query the `public_content` table. Implement a new mutation function, `updatePublicContent({ section, data })`, that calls Supabase's `.from('public_content').upsert({ section, data })`. This function must update the context's state optimistically or upon success to ensure the UI is reactive.",
+            "status": "pending",
+            "testStrategy": "Use unit tests or a temporary component to test the `updatePublicContent` function. Mock the Supabase client to verify that `upsert` is called with the correct parameters. Check that the context's `publicContent` state is correctly updated after the mocked call resolves."
+          },
+          {
+            "id": 1206,
+            "title": "Build Content Editing Form in SAdminPage",
+            "description": "Implement the full-featured editing interface within `SAdminPage.tsx` allowing admins to modify and save public content.",
+            "dependencies": [
+              1204,
+              1205
+            ],
+            "details": "Expand `src/components/dashboard/SAdminPage.tsx`. Use the `useContent()` hook to get the `publicContent` data. Build a form using reusable UI components (Task #3) that binds to this data. The form's submission handler should call the `updatePublicContent` mutation from the context. The form should be designed to handle various data structures stored in the `data` JSONB field.",
+            "status": "pending",
+            "testStrategy": "In the running application, navigate to `/sadmin`. Verify the form fields are populated with the correct data from the context. Edit a value, click save, and confirm an API request is made. After a page refresh, the changes should persist, verifying the complete data flow from UI to database and back."
+          },
+          {
+            "id": 1207,
+            "title": "Integrate Public Content into Public-Facing Pages",
+            "description": "Refactor public-facing components to consume content from the `ContentContext` instead of using hardcoded values.",
+            "dependencies": [
+              1205
+            ],
+            "details": "Identify all public-facing components that display singleton content (e.g., `src/components/landing/Hero.tsx` from Task #9). Replace any hardcoded text or static imports with data from the `useContent()` hook (e.g., `const { publicContent } = useContent(); return <h1>{publicContent.hero.title}</h1>`). This makes the public site fully manageable from the admin panel.",
+            "status": "pending",
+            "testStrategy": "Navigate to public pages like the homepage. Verify the content displayed matches what's in the database. Go to `/sadmin`, change a piece of content (e.g., the hero title), save it, and then reload the public page to confirm the change is reflected."
+          }
+        ]
       }
     ],
     "metadata": {
@@ -1040,7 +1117,7 @@
       ],
       "created": "2025-11-07T06:02:41.440Z",
       "description": "Tasks for master context",
-      "updated": "2025-11-24T11:19:51.515Z"
+      "updated": "2025-11-15T03:22:21.482Z"
     }
   }
 }

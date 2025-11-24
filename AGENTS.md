@@ -103,8 +103,10 @@ graph TD
 *   **DO** use `openspec` for any architectural changes or new features.
 *   **DO** use `codebase_search` before asking for context.
 *   **DO** implement RLS policies for every new table.
+*   **DO** ALWAYS use MCP server **"supabase"** for ALL database (DB) and storage operations via MCP Supabase tools (mcp_supabase-dg-ocr).
 
 ### Don'ts
 *   **DON'T** modify `AGENTS.md` or `openspec` files directly without a proposal.
 *   **DON'T** use `any` type unless absolutely necessary and documented.
 *   **DON'T** hardcode secrets; use environment variables.
+*   **DON'T** run local Supabase commands (`supabase start`, `db reset`, `db pull`, etc.) unless EXPLICITLY instructed by user.

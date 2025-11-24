@@ -48,14 +48,14 @@ export const DashboardEventArtists = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const artistData: TablesInsert<'event_artists'> = {
+      const artistData: any = {
         event_id: formData.event_id,
         artist_name: formData.artist_name,
         role: formData.role || null as any,
         performance_time: formData.performance_time || null as any,
       };
       if (editingArtist) {
-        await updateEventArtist(editingArtist.id!, { artist_name: formData.artist_name, role: formData.role, performance_time: formData.performance_time });
+        await updateEventArtist(editingArtist.id!, { artist_name: formData.artist_name, role: formData.role, performance_time: formData.performance_time } as any);
         toast.success('Artist updated');
       } else {
         await addEventArtist(artistData);

@@ -233,8 +233,8 @@ export interface ContentContextType {
   updateGalleryImage: (id: string, updates: TablesUpdate<'gallery_items'>, oldImageUrl?: string | null) => Promise<GalleryImage>;
   deleteGalleryImage: (id: string) => Promise<void>;
   fetchEventArtists: (eventId: string) => Promise<EventArtist[]>;
-  addEventArtist: (artist: TablesInsert<'event_artists'>) => Promise<EventArtist>;
-  updateEventArtist: (id: string, updates: TablesUpdate<'event_artists'>) => Promise<EventArtist>;
+  addEventArtist: (artist: any) => Promise<EventArtist>;
+  updateEventArtist: (id: string, updates: any) => Promise<EventArtist>;
   deleteEventArtist: (id: string) => Promise<void>;
   saveHeroContent: (content: HeroContent) => Promise<void>;
   saveAboutContent: (content: AboutContent) => Promise<void>;
