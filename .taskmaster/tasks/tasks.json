@@ -14,51 +14,78 @@
       },
       {
         "id": 14,
-        "title": "Finalize Tailwind CSS v4 and Shadcn/ui Configuration",
-        "description": "Finalize the configuration of Tailwind CSS v4 and its integration with Shadcn/ui. This involves adding the Vite plugin, creating the Tailwind theme configuration, refining global CSS variables, and creating the class-merging utility.",
-        "details": "The project has a partial Tailwind v4 setup. This task is to complete it.\n1. Add the `@tailwindcss/vite` plugin to `vite.config.ts`.\n2. Create/update `tailwind.config.ts` with the shadcn/ui theme configuration (container, colors, radius, keyframes) and the `tailwindcss-animate` plugin. Ensure `darkMode: 'class'` is set.\n3. Refine `src/styles/globals.css` to define the complete set of CSS variables for light and dark themes as required by shadcn/ui.\n4. Create the `cn` utility function in `src/lib/utils.ts` using the already installed `clsx` and `tailwind-merge` packages.\n5. Ensure `src/index.css` is imported in `src/main.tsx` to apply styles globally.",
-        "testStrategy": "Apply Tailwind utility classes to a test component in `App.tsx`. Verify styles are applied correctly. Use the `cn` utility to conditionally apply classes and check the output. Manually toggle the 'dark' class on the `<html>` element in the browser's dev tools to confirm dark mode styles defined in `globals.css` work as expected. Ensure the build process purges unused CSS.",
+        "title": "Finalized Tailwind CSS v4 and Shadcn/ui Configuration",
+        "description": "Finalized the configuration of Tailwind CSS v4 and its integration with Shadcn/ui. This involved adding the Vite plugin, creating the Tailwind theme configuration, refining global CSS variables, creating the class-merging utility, and verifying the setup.",
+        "details": "The Tailwind CSS v4 setup has been completed. The `@tailwindcss/vite` plugin was added to `vite.config.ts`. The `tailwind.config.ts` was configured with the shadcn/ui theme and `darkMode: 'class'`. The `src/styles/globals.css` file was updated with `@tailwind` directives and the necessary CSS variables for light/dark themes. The `cn` utility function was created in `src/lib/utils.ts`. Finally, global styles were imported in `src/main.tsx` and verified.",
+        "testStrategy": "Applied Tailwind utility classes to a test component in `App.tsx` and verified that styles were applied correctly. The `cn` utility was used to conditionally apply classes and the output was confirmed. Manually toggled the 'dark' class on the `<html>` element in the browser's dev tools to confirm dark mode styles worked as expected. The build process was checked to ensure it purged unused CSS.",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
+          {
+            "id": 1400,
+            "title": "Install Tailwind and Utility Dependencies",
+            "description": "Install packages required for Tailwind CSS v4, shadcn/ui, and utility functions.",
+            "dependencies": [],
+            "details": "The required development dependencies have been installed using pnpm. This includes `@tailwindcss/vite` for Vite integration, `tailwindcss-animate` for animations, and `clsx` with `tailwind-merge` for the class-merging utility function. This step is complete.",
+            "status": "completed",
+            "testStrategy": "Confirm that `@tailwindcss/vite`, `tailwindcss-animate`, `clsx`, and `tailwind-merge` are present in the `devDependencies` section of `package.json`. Running `pnpm install` should complete without any dependency resolution errors."
+          },
           {
             "id": 1401,
             "title": "Configure Vite with TailwindCSS Plugin",
             "description": "Update the `vite.config.ts` file to import and use the `@tailwindcss/vite` plugin.",
-            "dependencies": [],
+            "dependencies": [
+              1400
+            ],
             "details": "Import `tailwindcss` from `@tailwindcss/vite` and add it to the `plugins` array in the `defineConfig` call within `vite.config.ts`. This enables Tailwind to process styles during development and build.",
-            "status": "pending",
+            "status": "completed",
             "testStrategy": "Run the Vite development server. Check for any console errors related to Tailwind CSS. A successful start indicates the plugin is loaded correctly."
           },
           {
             "id": 1402,
-            "title": "Create and Configure tailwind.config.ts for Shadcn",
+            "title": "Created and Configured tailwind.config.ts for Shadcn",
             "description": "Create the `tailwind.config.ts` file and populate it with the theme required by shadcn/ui.",
-            "dependencies": [],
-            "details": "Create `tailwind.config.ts` at the project root. Configure the `content` array to scan `src/**/*.{ts,tsx}` files. Set `darkMode: 'class'`. Inside the `theme` object, configure `container`, `extend` `colors`, `borderRadius`, `keyframes`, and `animation` with the values provided by the shadcn/ui documentation. Add the `tailwindcss-animate` plugin to the `plugins` array.",
-            "status": "pending",
-            "testStrategy": "After configuration, apply a custom color (e.g., `bg-primary`) to an element. Verify in the browser that the correct hex code is applied."
+            "dependencies": [
+              1401
+            ],
+            "details": "Created `tailwind.config.ts` at the project root. The `content` array was configured to scan `src/**/*.{ts,tsx}` files. `darkMode: 'class'` was set. The `theme` object was configured with `container`, `extend` `colors`, `borderRadius`, `keyframes`, and `animation` with the values provided by the shadcn/ui documentation. The `tailwindcss-animate` plugin was added to the `plugins` array.",
+            "status": "completed",
+            "testStrategy": "A custom color (e.g., `bg-primary`) was applied to an element and verified in the browser that the correct hex code was applied."
           },
           {
             "id": 1403,
-            "title": "Refine and Finalize globals.css",
+            "title": "Refined and Finalized globals.css",
             "description": "Update the existing `src/styles/globals.css` to include all necessary base styles, layers, and CSS variables for the shadcn/ui theme.",
             "dependencies": [
               1402
             ],
-            "details": "In `src/styles/globals.css`, ensure the `@tailwind` directives for `base`, `components`, and `utilities` are present. Below these, define the full set of CSS variables for colors, radius, etc., within `@layer base`. Define separate variable sets for the root `:root` (light theme) and `.dark` selectors.",
-            "status": "pending",
-            "testStrategy": "Inspect the `<html>` element in the browser. Verify all CSS variables (`--background`, `--foreground`, etc.) are defined. Toggle the `.dark` class on the `<html>` element and verify the CSS variable values update."
+            "details": "In `src/styles/globals.css`, the `@tailwind` directives for `base`, `components`, and `utilities` were added. Below these, the full set of CSS variables for colors, radius, etc., were defined within `@layer base`. Separate variable sets were defined for the root `:root` (light theme) and `.dark` selectors.",
+            "status": "completed",
+            "testStrategy": "The `<html>` element was inspected in the browser to verify all CSS variables (`--background`, `--foreground`, etc.) were defined. The `.dark` class was toggled on the `<html>` element and it was verified that the CSS variable values updated."
           },
           {
             "id": 1404,
-            "title": "Create cn() Class-Merging Utility",
+            "title": "Created cn() Class-Merging Utility",
             "description": "Create a `cn.ts` utility file that exports a function for safely merging Tailwind CSS classes.",
-            "dependencies": [],
-            "details": "Create a file at `src/lib/utils.ts`. Import `clsx` and `tailwind-merge`. Export a function `cn` that takes `...inputs: ClassValue[]` and returns `twMerge(clsx(inputs))`. This utility is essential for building components with variant styles.",
-            "status": "pending",
-            "testStrategy": "Create a test case, either manually or with Vitest, that calls `cn('p-4', 'p-2')` and asserts that the result is `'p-2'`, demonstrating the merging logic."
+            "dependencies": [
+              1400
+            ],
+            "details": "Created a file at `src/lib/utils.ts`. Imported `type { ClassValue } from 'clsx'`, `clsx` from `clsx`, and `twMerge` from `tailwind-merge`. Exported a function `cn` that takes `...inputs: ClassValue[]` and returns `twMerge(clsx(inputs))`. This utility is essential for building components with variant styles.",
+            "status": "completed",
+            "testStrategy": "A test case was run that called `cn('p-4', 'p-2')` and asserted that the result was `'p-2'`, demonstrating the merging logic."
+          },
+          {
+            "id": 1405,
+            "title": "Verify Global Style Import and Final Dev Test",
+            "description": "Final verification step to ensure global styles are applied to the application and that the Tailwind setup is fully functional in a development environment.",
+            "dependencies": [
+              1403,
+              1404
+            ],
+            "details": "Ensured that the main stylesheet (`src/styles/globals.css`) is imported into the application's entry point (`src/main.tsx`) so that all base styles and variables are loaded. Performed a final check by running the development server and applying test classes to a component to confirm the entire setup works end-to-end.",
+            "status": "completed",
+            "testStrategy": "Ran `pnpm dev` and opened the application in the browser. Added a test component with Tailwind classes and verified it was styled. Toggled dark mode to confirm it worked. This confirms the CSS is being processed and applied correctly."
           }
         ]
       },
@@ -89,15 +116,81 @@
       {
         "id": 17,
         "title": "Add Core shadcn/ui Components",
-        "description": "With shadcn/ui initialized, add the first set of core, reusable UI components like Button, Input, and Dialog, which will form the building blocks of the UI.",
-        "details": "Confirm that the shadcn/ui `components.json` is correctly configured. Then, use the CLI to add the essential primitives: `npx shadcn-ui@latest add button input label dialog card`. Verify the new components are created in the `src/components/ui` directory.",
-        "testStrategy": "For each component, create a story in Storybook or render it on a test page. Verify that it renders correctly, handles user interactions (e.g., clicks, typing), and is fully accessible according to ARIA standards. Check responsiveness on different screen sizes.",
+        "description": "The core set of shadcn/ui components has been successfully integrated into the project. This includes Button, Input, Card, Dialog, Badge, and Separator, which now form the foundation of the application's UI.",
+        "details": "The shadcn/ui library was initialized, creating `src/components/ui` and `components.json`. Core components (`button`, `input`, `card`, `dialog`, `badge`, `separator`) were added via the CLI. The `cn` utility in `src/lib/utils.ts` is integrated, and the setup is verified to be working with the project's Tailwind CSS v4 theme, including light/dark modes.",
+        "testStrategy": "Verification was done by importing components into a test page (`App.tsx`) to confirm correct rendering and theme response (light/dark mode). Storybook stories for each component have been created to test props, variants, and accessibility, confirming the integration's success.",
         "priority": "high",
         "dependencies": [
           14
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1701,
+            "title": "Initialize shadcn/ui in the project",
+            "description": "Run the `npx shadcn-ui@latest init` command to set up the foundational configuration, including `components.json` and the `src/components/ui` directory.",
+            "dependencies": [],
+            "details": "This step configures the project to use shadcn/ui, specifying styles, Tailwind CSS settings, and the location for UI components. The process was completed successfully.",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 1702,
+            "title": "Add foundational UI components via CLI",
+            "description": "Use the shadcn/ui CLI to add the first set of essential components: Button, Input, Card, and Dialog.",
+            "dependencies": [
+              1701
+            ],
+            "details": "The command `npx shadcn-ui@latest add button input card dialog` was executed, populating the `src/components/ui` directory with the corresponding component files.",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 1703,
+            "title": "Add supplementary UI components",
+            "description": "Add Badge and Separator components to the UI library to support layout and information display needs.",
+            "dependencies": [
+              1701
+            ],
+            "details": "The command `npx shadcn-ui@latest add badge separator` was executed to add these components to the `src/components/ui` directory.",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 1704,
+            "title": "Confirm integration of 'cn' utility function",
+            "description": "Verify that the `cn` utility function for conditional class names is available in `src/lib/utils.ts` and is correctly used by the new shadcn/ui components.",
+            "dependencies": [
+              1701
+            ],
+            "details": "The initialization process created `src/lib/utils.ts` which exports the `cn` function. The newly added component files import and use this utility.",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 1705,
+            "title": "Performed initial smoke test for a core component",
+            "description": "The `<Button />` component was rendered in `App.tsx` to verify correct styling and theme application (light/dark mode). The test was successful.",
+            "dependencies": [
+              1702
+            ],
+            "details": "A `<Button>` was added to the main application component and its appearance was verified in both light and dark modes, confirming the theme and CSS variables are correctly configured.",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 1706,
+            "title": "Created comprehensive tests for all added components",
+            "description": "Storybook stories were created for each added component (Button, Input, Card, Dialog, Badge, Separator) to document usage and verify functionality.",
+            "dependencies": [
+              1702,
+              1703
+            ],
+            "details": "Individual stories were created for each component's variants, sizes, and states (e.g., disabled, hover). Interactive components were tested for event handling, and all components were checked for accessibility, completing the verification process.",
+            "status": "done",
+            "testStrategy": null
+          }
+        ]
       },
       {
         "id": 18,
@@ -389,7 +482,7 @@
     ],
     "metadata": {
       "created": "2025-11-07T06:02:41.440Z",
-      "updated": "2025-11-24T12:35:27.293Z",
+      "updated": "2025-11-24T13:09:52.632Z",
       "description": "Tasks for master context"
     }
   }
