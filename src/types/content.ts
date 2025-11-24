@@ -230,7 +230,7 @@ export interface ContentContextType {
   updatePartner: (id: string, updates: TablesUpdate<'partners'>, oldLogoUrl?: string | null) => Promise<Partner>;
   deletePartner: (id: string) => Promise<void>;
   addGalleryImage: (item: TablesInsert<'gallery_items'>) => Promise<GalleryImage>;
-  updateGalleryImage: (id: string, updates: TablesUpdate<'gallery_items'>, oldImageUrls?: string[] | null) => Promise<GalleryImage>;
+  updateGalleryImage: (id: string, updates: TablesUpdate<'gallery_items'>, oldImageUrl?: string | null) => Promise<GalleryImage>;
   deleteGalleryImage: (id: string) => Promise<void>;
   fetchEventArtists: (eventId: string) => Promise<EventArtist[]>;
   addEventArtist: (artist: TablesInsert<'event_artists'>) => Promise<EventArtist>;

@@ -390,6 +390,28 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
   }
 };
 
+/* Event Artists Mutations */
+// Stub implementations until event_artists table/functions ready
+const fetchEventArtists = async (eventId: string): Promise<EventArtist[]> => {
+  console.warn('fetchEventArtists stub: event_artists table pending');
+  return [];
+};
+
+const addEventArtist = async (artist: any): Promise<EventArtist> => {
+  console.warn('addEventArtist stub');
+  throw new Error('Event artists pending migration');
+};
+
+const updateEventArtist = async (id: string, updates: any): Promise<EventArtist> => {
+  console.warn('updateEventArtist stub');
+  throw new Error('Event artists pending migration');
+};
+
+const deleteEventArtist = async (id: string): Promise<void> => {
+  console.warn('deleteEventArtist stub');
+  throw new Error('Event artists pending migration');
+};
+
 // ContentContext
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
@@ -1152,8 +1174,8 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
       }
 
       // Clean up old image if a new one was provided (gallery_items uses image_url singular)
-      if (oldImageUrls && updates.image_url && oldImageUrls !== updates.image_url) {
-        await cleanupGalleryAsset([oldImageUrls]);
+      if (oldImageUrl && 'image_url' in updates && oldImageUrl !== (updates as any).image_url) {
+        await cleanupGalleryAsset([oldImageUrl]);
       }
 
       if (data) {
@@ -1473,6 +1495,12 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
     addGalleryImage,
     updateGalleryImage,
     deleteGalleryImage,
+
+    // Event Artists mutations
+    fetchEventArtists,
+    addEventArtist,
+    updateEventArtist,
+    deleteEventArtist,
 
     // Content mutations
     saveHeroContent,

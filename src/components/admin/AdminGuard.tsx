@@ -41,6 +41,22 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
     checkSession();
   }, [loading, isAuthenticated, user, validateSession]);
 
+  // Add useEffect for redirects
+  useEffect(() => {
+    if (loading || isValidating || sessionValid === null) return;
+
+    if (sessionValid === false || !isAuthenticated || !user) {
+      navigate(`${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`);
+      return;
+    }
+
+    if (role === 'anonymous') return;
+
+    if (role !== 'admin') {
+      // Could navigate here too, but show denied page for now
+    }
+  }, [loading, isValidating, sessionValid, isAuthenticated, user, role, navigate]);
+
   // Debug logging
   console.log('🔐 AdminGuard check:', { loading, isValidating, sessionValid, role, user: user?.email, isAuthenticated });
 
@@ -56,11 +72,9 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
     );
   }
 
-  // If session validation failed or not authenticated, redirect to login
+  // If session validation failed or not authenticated, return null or loading instead of navigate
   if (sessionValid === false || !isAuthenticated || !user) {
-    console.log('🚫 Not authenticated or session invalid, redirecting to login');
-    navigate(`${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`);
-    return null;
+    return null; // useEffect handles redirect
   }
 
   // If authenticated but role is still being loaded, wait a bit more
