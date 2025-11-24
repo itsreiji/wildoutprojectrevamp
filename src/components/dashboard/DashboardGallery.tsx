@@ -198,6 +198,7 @@ export const DashboardGallery = React.memo(() => {
         title: values.title,
         description: values.description || null,
         category: values.category ?? undefined,
+        event_id: values.event_id || null,
         tags: values.tags ?? [],
         image_urls: imageUrls.length > 0 ? imageUrls : (editingGallery?.image_urls || []),
       };

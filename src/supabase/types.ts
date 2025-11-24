@@ -161,6 +161,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          event_id: string | null
           image_urls: Json
           status: string
           tags: string[]
@@ -171,6 +172,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          event_id?: string | null
           id?: string
           image_urls?: Json
           status?: string
@@ -182,6 +184,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          event_id?: string | null
           id?: string
           image_urls?: Json
           status?: string
@@ -189,7 +192,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "gallery_items_event_id_fkey",
+            columns: ["event_id"],
+            isOneToOne: false,
+            referencedRelation: "events",
+            referencedColumns: ["id"]
+          }
+        ]
       }
       partners: {
         Row: {
@@ -203,6 +214,7 @@ export type Database = {
           name: string
           social_links: Json
           status: string
+          sponsorship_level: 'bronze' | 'silver' | 'gold' | 'platinum';
           updated_at: string
           website_url: string | null
         }
@@ -217,6 +229,7 @@ export type Database = {
           name: string
           social_links?: Json
           status?: string
+          sponsorship_level?: 'bronze' | 'silver' | 'gold' | 'platinum';
           updated_at?: string
           website_url?: string | null
         }
@@ -231,6 +244,7 @@ export type Database = {
           name?: string
           social_links?: Json
           status?: string
+          sponsorship_level?: 'bronze' | 'silver' | 'gold' | 'platinum';
           updated_at?: string
           website_url?: string | null
         }
@@ -330,6 +344,7 @@ export type Database = {
           name: string
           social_links: Json
           status: string
+          sponsorship_level: 'bronze' | 'silver' | 'gold' | 'platinum';
           updated_at: string
           website_url: string | null
         }

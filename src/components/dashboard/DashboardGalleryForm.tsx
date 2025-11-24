@@ -37,6 +37,14 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
+import { useContent } from '@/contexts/ContentContext';
 import type { GalleryImage } from '@/types/content';
 import { X } from 'lucide-react';
 
@@ -44,6 +52,7 @@ const galleryFormSchema = z.object({
   title: z.string().min(1, 'Gallery title is required'),
   description: z.string().optional().nullable(),
   category: z.string().optional().nullable(),
+  event_id: z.string().uuid().optional().nullable(),
   tags: z.array(z.string()).default([]),
   image_files: z.array(z.any()).default([]),
 });
@@ -60,6 +69,7 @@ interface DashboardGalleryFormProps {
 export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, onCancel }: DashboardGalleryFormProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const { events } = useContent();
 
   const getDefaultValues = (): GalleryFormValues => {
     if (!defaultValues) {
@@ -76,6 +86,7 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
       title: defaultValues.title || '',
       description: defaultValues.description || '',
       category: defaultValues.category || '',
+      event_id: defaultValues.event_id || undefined,
       tags: Array.isArray(defaultValues.tags) ? defaultValues.tags : [],
       image_files: [],
     };
@@ -176,6 +187,33 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
               <FormLabel>Category</FormLabel>
               <FormControl>
                 <Input placeholder="e.g., Events, Performances, Behind-the-Scenes" {...field} value={field.value || ''} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Event Link Field */}
+        <FormField
+          control={form.control}
+          name="event_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Link to Event (optional)</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} value={field.value || undefined}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an event..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No event</SelectItem>
+                    {events.map((event) => (
+                      <SelectItem key={event.id} value={event.id}>
+                        {event.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

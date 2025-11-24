@@ -359,7 +359,10 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
   try {
     const { data, error } = await supabaseClient
       .from('gallery_items')
-      .select('*')
+      .select(`
+        *,
+        events:title
+      `)
       .eq('status', 'published')
       .order('created_at', { ascending: false });
     if (error) {
@@ -377,7 +380,7 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
       tags: row.tags || undefined,
       caption: row.title || undefined,
       uploadDate: row.created_at || undefined,
-      event: row.event_title || undefined,
+      event: row.events?.title || undefined,
       created_at: row.created_at || undefined,
       updated_at: row.updated_at || undefined,
     }));

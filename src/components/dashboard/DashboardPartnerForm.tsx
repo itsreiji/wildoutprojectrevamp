@@ -35,11 +35,19 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 import { Textarea } from '../ui/textarea';
 import type { Partner } from '@/types/content';
 
 const partnerFormSchema = z.object({
   name: z.string().min(1, 'Partner name is required'),
+  sponsorship_level: z.enum(['bronze', 'silver', 'gold', 'platinum'] as const).default('bronze'),
   website_url: z.string().url('Website URL must be a valid URL').optional().nullable(),
   description: z.string().optional().nullable(),
   contact_email: z.string().email('Contact email must be valid').optional().nullable(),
@@ -63,6 +71,7 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
     if (!defaultValues) {
       return {
         name: '',
+        sponsorship_level: 'bronze',
         website_url: '',
         description: '',
         contact_email: '',
@@ -74,6 +83,7 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
 
     return {
       name: defaultValues.name || '',
+      sponsorship_level: (defaultValues as any).sponsorship_level || 'bronze',
       website_url: defaultValues.website_url || '',
       description: defaultValues.description || '',
       contact_email: defaultValues.contact_email || '',
@@ -106,6 +116,32 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
               <FormControl>
                 <Input placeholder="e.g., Red Bull, Spotify" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Sponsorship Level Field */}
+        <FormField
+          control={form.control}
+          name="sponsorship_level"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Sponsorship Level *</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tier" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="bronze">Bronze</SelectItem>
+                  <SelectItem value="silver">Silver</SelectItem>
+                  <SelectItem value="gold">Gold</SelectItem>
+                  <SelectItem value="platinum">Platinum</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>Tier determines visibility and placement priority</FormDescription>
               <FormMessage />
             </FormItem>
           )}

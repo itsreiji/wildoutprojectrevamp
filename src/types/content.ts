@@ -42,6 +42,7 @@ export interface GalleryImage {
   tags?: string[];
   caption?: string;
   uploadDate?: string;
+  event_id?: string | null;
   event?: string;
   created_at?: string;
   updated_at?: string;

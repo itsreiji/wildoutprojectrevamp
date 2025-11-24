@@ -5,6 +5,7 @@ export interface Partner {
   website?: string | null;
   website_url?: string | null;
   status?: 'active' | 'inactive';
+  sponsorship_level?: 'bronze' | 'silver' | 'gold' | 'platinum';
   description?: string | null;
   logo_url?: string | null;
   contact_email?: string | null;
