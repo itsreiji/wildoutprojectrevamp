@@ -24,7 +24,7 @@ export const GallerySection = React.memo(() => {
   const [selectedEventId, setSelectedEventId] = useState<string>('');
 
   const filteredGallery = useMemo(() => {
-    if (!selectedEventId) return gallery;
+    if (selectedEventId === 'all') return gallery;
     return gallery.filter((item) => item.event_id === selectedEventId);
   }, [gallery, selectedEventId]);
 
@@ -57,7 +57,7 @@ export const GallerySection = React.memo(() => {
               <SelectValue placeholder="Filter by event (optional)" />
             </SelectTrigger>
             <SelectContent className="bg-black/95 border-white/10 text-white">
-              <SelectItem value="">All Events</SelectItem>
+              <SelectItem value="all">All Events</SelectItem>
               {events.map((event) => (
                 <SelectItem key={event.id} value={event.id}>
                   {event.title}

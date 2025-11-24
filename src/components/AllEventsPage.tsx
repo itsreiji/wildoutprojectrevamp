@@ -6,7 +6,8 @@ import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
-import { useContent, Event } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContext';
+import type { LandingEvent as Event } from '@/types/content';
 import { useRouter } from './router';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
@@ -21,7 +22,7 @@ export const AllEventsPage = React.memo(() => {
 
   const filteredEvents = events.filter(event => {
     const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchQuery.toLowerCase());
+                         (event.description ?? '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = filterCategory === 'all' || event.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -68,7 +69,7 @@ export const AllEventsPage = React.memo(() => {
                 {categories.map(category => (
                   <Button
                     key={category}
-                    onClick={() => setFilterCategory(category)}
+                    onClick={() => setFilterCategory(category ?? 'all')}
                     variant={filterCategory === category ? 'default' : 'outline'}
                     className={`rounded-xl whitespace-nowrap ${
                       filterCategory === category
@@ -169,7 +170,7 @@ export const AllEventsPage = React.memo(() => {
                       <div className="w-full bg-white/10 rounded-full h-1.5">
                         <div
                           className="bg-[#E93370] h-1.5 rounded-full transition-all duration-500"
-                          style={{ width: `${Math.min((event.attendees / event.capacity) * 100, 100)}%` }}
+                          style={{ width: `${Math.min(((event.attendees ?? 0) / (event.capacity ?? 1)) * 100, 100)}%` }}
                         />
                       </div>
                     </div>

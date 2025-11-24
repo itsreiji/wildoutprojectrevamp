@@ -206,7 +206,7 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
                     <SelectValue placeholder="Select an event..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No event</SelectItem>
+                    <SelectItem value="none">No event</SelectItem>
                     {events.map((event) => (
                       <SelectItem key={event.id} value={event.id}>
                         {event.title}

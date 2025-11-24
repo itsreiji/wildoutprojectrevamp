@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Crown } from 'lucide-react';
 import { Badge } from './ui/badge';

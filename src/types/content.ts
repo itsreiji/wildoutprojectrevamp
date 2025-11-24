@@ -1,6 +1,8 @@
 // Use GENERATED Supabase types
 import type { Json, TablesInsert, TablesUpdate } from '../supabase/types';
 
+export type { TablesInsert, TablesUpdate };
+
 export interface HeroStats {
   events: string;
   members: string;
@@ -52,6 +54,9 @@ export interface EventArtist {
   name: string;
   role?: string;
   image?: string;
+  id?: string;
+  event_id?: string;
+  performance_time?: string | null;
 }
 
 // RENAMED: LandingEvent to avoid DOM Event clash
@@ -227,6 +232,10 @@ export interface ContentContextType {
   addGalleryImage: (item: TablesInsert<'gallery_items'>) => Promise<GalleryImage>;
   updateGalleryImage: (id: string, updates: TablesUpdate<'gallery_items'>, oldImageUrls?: string[] | null) => Promise<GalleryImage>;
   deleteGalleryImage: (id: string) => Promise<void>;
+  fetchEventArtists: (eventId: string) => Promise<EventArtist[]>;
+  addEventArtist: (artist: TablesInsert<'event_artists'>) => Promise<EventArtist>;
+  updateEventArtist: (id: string, updates: TablesUpdate<'event_artists'>) => Promise<EventArtist>;
+  deleteEventArtist: (id: string) => Promise<void>;
   saveHeroContent: (content: HeroContent) => Promise<void>;
   saveAboutContent: (content: AboutContent) => Promise<void>;
   saveSiteSettings: (settings: SiteSettings) => Promise<void>;

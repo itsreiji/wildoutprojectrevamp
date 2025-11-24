@@ -114,7 +114,7 @@ export const DashboardAuditLog = () => {
               <SelectValue placeholder="All tables" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All tables</SelectItem>
+              <SelectItem value="all">All tables</SelectItem>
               {TABLES.map(table => <SelectItem key={table} value={table}>{table}</SelectItem>)}
             </SelectContent>
           </Select>
@@ -123,7 +123,7 @@ export const DashboardAuditLog = () => {
               <SelectValue placeholder="All actions" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All actions</SelectItem>
+              <SelectItem value="all">All actions</SelectItem>
               {ACTIONS.map(action => <SelectItem key={action} value={action}>{action}</SelectItem>)}
             </SelectContent>
           </Select>

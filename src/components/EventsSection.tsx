@@ -5,7 +5,8 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
-import { useContent, Event } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContext';
+import type { LandingEvent as Event } from '@/types/content';
 import { useRouter } from './router';
 
 export const EventsSection = React.memo(() => {

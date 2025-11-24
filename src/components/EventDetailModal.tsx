@@ -4,7 +4,7 @@ import { X, Calendar, MapPin, Clock, Users, Music, Ticket, Share2, Heart, Extern
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Event } from './EventsSection';
+import type { LandingEvent as Event } from '@/types/content';
 
 interface EventDetailModalProps {
   event: Event | null;
@@ -121,7 +121,7 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                     <div>
                       <h3 className="text-2xl text-white mb-3">Event Highlights</h3>
                       <ul className="space-y-2">
-                        {event.highlights.map((highlight, index) => (
+                        {event.highlights?.map((highlight: string, index: number) => (
                           <li key={index} className="flex items-start text-white/70">
                             <div className="w-2 h-2 bg-[#E93370] rounded-full mt-2 mr-3 flex-shrink-0" />
                             {highlight}
@@ -137,7 +137,7 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                         Artist Lineup
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {event.artists.map((artist, index) => (
+                        {event.artists.map((artist: any, index: number) => (
                           <div
                             key={index}
                             className="flex items-center space-x-4 p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
@@ -159,11 +159,11 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                     </div>
 
                     {/* Gallery */}
-                    {event.gallery.length > 0 && (
+                    {event.gallery && event.gallery.length > 0 && (
                       <div>
                         <h3 className="text-2xl text-white mb-4">Event Gallery</h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          {event.gallery.map((image, index) => (
+                          {event.gallery?.map((image: string, index: number) => (
                             <div
                               key={index}
                               className="aspect-square rounded-2xl overflow-hidden border border-white/10"

@@ -666,6 +666,76 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
     loadAdminSections();
   }, []);
 
+  // Realtime subscriptions (after admin sections useEffect)
+  useEffect(() => {
+    if (useDummyData) return; // No realtime for dummy
+
+    const channels = [
+      supabaseClient.channel('events-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload: any) => {
+          switch (payload.eventType) {
+            case 'INSERT':
+              setEvents(prev => [...prev, payload.new]);
+              break;
+            case 'UPDATE':
+              setEvents(prev => prev.map(e => e.id === payload.new.id ? payload.new : e));
+              break;
+            case 'DELETE':
+              setEvents(prev => prev.filter(e => e.id !== payload.old.id));
+              break;
+          }
+        }),
+      supabaseClient.channel('partners-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'partners' }, (payload: any) => {
+          switch (payload.eventType) {
+            case 'INSERT':
+              setPartners(prev => [...prev, payload.new]);
+              break;
+            case 'UPDATE':
+              setPartners(prev => prev.map(p => p.id === payload.new.id ? payload.new : p));
+              break;
+            case 'DELETE':
+              setPartners(prev => prev.filter(p => p.id !== payload.old.id));
+              break;
+          }
+        }),
+      supabaseClient.channel('team-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'team_members' }, (payload: any) => {
+          switch (payload.eventType) {
+            case 'INSERT':
+              setTeam(prev => [...prev, payload.new]);
+              break;
+            case 'UPDATE':
+              setTeam(prev => prev.map(t => t.id === payload.new.id ? payload.new : t));
+              break;
+            case 'DELETE':
+              setTeam(prev => prev.filter(t => t.id !== payload.old.id));
+              break;
+          }
+        }),
+      supabaseClient.channel('gallery-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'gallery_items' }, (payload: any) => {
+          switch (payload.eventType) {
+            case 'INSERT':
+              setGallery(prev => [...prev, payload.new]);
+              break;
+            case 'UPDATE':
+              setGallery(prev => prev.map(g => g.id === payload.new.id ? payload.new : g));
+              break;
+            case 'DELETE':
+              setGallery(prev => prev.filter(g => g.id !== payload.old.id));
+              break;
+          }
+        })
+    ];
+
+    channels.forEach(ch => ch.subscribe());
+
+    return () => {
+      channels.forEach(ch => supabaseClient.removeChannel(ch));
+    };
+  }, [useDummyData]);
+
   // ALL mutations as const functions inside component
   const addEvent = async (event: TablesInsert<'events'>): Promise<LandingEvent> => {
     try {
@@ -1064,7 +1134,7 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
     }
   };
 
-  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>, oldImageUrls?: string[] | null): Promise<GalleryImage> => {
+  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>, oldImageUrl?: string | null): Promise<GalleryImage> => {
     try {
       setError(null);
 
@@ -1081,15 +1151,9 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
         throw error;
       }
 
-      // Clean up old images if a new ones were provided
-      if (oldImageUrls && updates.image_urls) {
-        const oldUrls = Array.isArray(oldImageUrls) ? oldImageUrls : [];
-        const newUrls = Array.isArray(updates.image_urls) ? updates.image_urls : [];
-        // Only clean up URLs that are not in the new list
-        const urlsToCleanup = oldUrls.filter((url: string) => !newUrls.includes(url));
-        if (urlsToCleanup.length > 0) {
-          await cleanupGalleryAsset(urlsToCleanup);
-        }
+      // Clean up old image if a new one was provided (gallery_items uses image_url singular)
+      if (oldImageUrls && updates.image_url && oldImageUrls !== updates.image_url) {
+        await cleanupGalleryAsset([oldImageUrls]);
       }
 
       if (data) {
@@ -1141,6 +1205,15 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
       throw err;
     }
   };
+
+  // Event Artists Mutations (after deleteGalleryImage)
+// TODO: event_artists table/functions pending migration. Comment out for now.
+  /*
+  const fetchEventArtists = async (eventId: string): Promise<EventArtist[]> => { ... };
+  const addEventArtist = async (artist: TablesInsert<'event_artists'>): Promise<EventArtist> => { ... };
+  const updateEventArtist = async (id: string, updates: TablesUpdate<'event_artists'>): Promise<EventArtist> => { ... };
+  const deleteEventArtist = async (id: string): Promise<void> => { ... };
+  */
 
   // Content Mutations
   const saveHeroContent = async (content: HeroContent): Promise<void> => {
@@ -1400,6 +1473,7 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
     addGalleryImage,
     updateGalleryImage,
     deleteGalleryImage,
+
     // Content mutations
     saveHeroContent,
     saveAboutContent,
