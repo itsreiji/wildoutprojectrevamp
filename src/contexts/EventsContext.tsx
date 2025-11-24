@@ -5,6 +5,7 @@ import type { TablesInsert, TablesUpdate } from '../supabase/types';
 import { dummyDataService } from '../services/dummyDataService';
 import { cleanupEventAssets } from '../utils/storageHelpers';
 import type { LandingEvent } from '@/types/content';
+import type { EventArtist, AdminEventArtist } from '../types/events';
 
 interface EventsContextType {
   events: LandingEvent[];

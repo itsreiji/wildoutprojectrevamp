@@ -1,7 +1,15 @@
 export interface EventArtist {
   name: string;
+  role?: string;
+  image?: string;
+}
+
+export interface AdminEventArtist {
+  id: string;
+  artist_name: string;
   role: string;
-  image: string;
+  performance_time: string | null;
+  created_at: string;
 }
 
 export interface Event {

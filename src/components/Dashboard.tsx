@@ -8,6 +8,8 @@ import { DashboardTeam } from './dashboard/DashboardTeam';
 import { DashboardGallery } from './dashboard/DashboardGallery';
 import { DashboardPartners } from './dashboard/DashboardPartners';
 import { DashboardSettings } from './dashboard/DashboardSettings';
+import { DashboardAuditLog } from './dashboard/DashboardAuditLog';
+import { AuditProvider } from '../contexts/AuditContext';
 import { useRouter } from './router';
 
 export const Dashboard = React.memo(() => {
@@ -34,15 +36,19 @@ export const Dashboard = React.memo(() => {
         return <DashboardPartners />;
       case 'settings':
         return <DashboardSettings />;
+      case 'audit':
+        return <DashboardAuditLog />;
       default:
         return <DashboardHome />;
     }
   };
 
   return (
-    <DashboardLayout>
-      {renderPage()}
-    </DashboardLayout>
+    <AuditProvider>
+      <DashboardLayout>
+        {renderPage()}
+      </DashboardLayout>
+    </AuditProvider>
   );
 });
 
