@@ -2,18 +2,81 @@
   "master": {
     "tasks": [
       {
-        "id": 13,
+        "id": "13",
         "title": "Setup Foundational TypeScript Types",
         "description": "Define all global TypeScript types for domain entities like Event, Team Member, Partner, etc., to ensure type safety across the application. These will serve as the single source of truth for data structures.",
         "details": "Create type definition files under `src/types/`. Define interfaces for `Event`, `TeamMember`, `Partner`, `GalleryItem`, `HeroContent`, and `SiteSettings` as specified in the PRD's data models. A key step is to generate types from the Supabase schema to ensure alignment. Use the Supabase CLI: `npx supabase gen types typescript --project-id <YOUR_PROJECT_ID> > src/supabase/types.ts`. Then, import these generated types into your main type definition files to build upon them.",
         "testStrategy": "Validate by running the TypeScript compiler (`npx tsc --noEmit`) across the project. Success is defined as zero type errors. Also, verify that IDE IntelliSense correctly provides autocompletion for all defined types when used in other files.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Generate TypeScript Types from Supabase Schema",
+            "description": "Use the Supabase CLI to automatically generate TypeScript type definitions based on the current database schema. This will create the foundational types for the entire application, serving as the single source of truth for database structures.",
+            "dependencies": [],
+            "details": "Execute the command `npx supabase gen types typescript --project-id <YOUR_PROJECT_ID> > src/supabase/types.ts`. Replace `<YOUR_PROJECT_ID>` with the actual project ID from the Supabase dashboard. Ensure the `src/supabase/` directory is created if it does not exist. This generated file is critical for all subsequent type definitions.\n<info added on 2025-11-24T14:25:34.906Z>\n```json\n\"Verify the existing `src/supabase/types.ts` file. Inspect the generated `Database` type, specifically the `Row` types for tables like `events` and `gallery_items`. Confirm they align with the PRD schema: `image_url` should be a string, `category` a required non-nullable string, and date fields should be nullable. If the types are incorrect, regenerate the file using the `npx supabase gen types...` command. Once the types are confirmed to be correct, run `pnpm type-check` to ensure there are no errors. This validates the foundational types before they are extended in other files under `src/types/`.\"\n```\n</info added on 2025-11-24T14:25:34.906Z>",
+            "status": "done",
+            "testStrategy": "Verify that the file `src/supabase/types.ts` is created and contains TypeScript interfaces corresponding to the database tables. Check for a `Database` interface and `Tables` helper type within the file.",
+            "updatedAt": "2025-11-24T14:25:38.718Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Define Event and GalleryItem TypeScript Types",
+            "description": "Create a new type definition file for events and gallery items, importing and building upon the auto-generated Supabase types to establish clear, application-specific data structures.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a new file at `src/types/events.ts`. Import the `Tables` helper type from `src/supabase/types.ts`. Define and export the `Event` and `GalleryItem` interfaces by mapping them to their corresponding Supabase tables (e.g., `export type Event = Tables<'events'>;`).",
+            "status": "pending",
+            "testStrategy": "Ensure the `src/types/events.ts` file is created and correctly exports the `Event` and `GalleryItem` types without any TypeScript errors. IDE IntelliSense should recognize these types.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Define TeamMember and Partner TypeScript Types",
+            "description": "Establish the TypeScript interfaces for team members and partners/sponsors. These types will be derived from the generated Supabase types to ensure consistency with the database schema.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a file at `src/types/organization.ts`. Import the `Tables` helper from `src/supabase/types.ts`. Define and export the `TeamMember` and `Partner` types by referencing their respective database tables (e.g., `export type TeamMember = Tables<'team_members'>;`).",
+            "status": "pending",
+            "testStrategy": "Confirm that `src/types/organization.ts` exists and properly exports the `TeamMember` and `Partner` types. Verify that these types correctly reflect the columns from the Supabase tables.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Define HeroContent and SiteSettings TypeScript Types",
+            "description": "Create TypeScript interfaces for managing site-wide content, such as the hero section and general site settings, ensuring they are correctly typed based on the Supabase schema.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a new file at `src/types/content.ts`. Import the `Tables` utility from the generated `src/supabase/types.ts` file. Define and export interfaces for `HeroContent` and `SiteSettings` that map directly to their corresponding database tables.",
+            "status": "pending",
+            "testStrategy": "Check for the creation of `src/types/content.ts`. Validate that the `HeroContent` and `SiteSettings` types are exported and correctly typed according to the generated base types.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Consolidate Types and Run Validation",
+            "description": "Create a central index file for all new type definitions to simplify imports across the application. Finally, run the TypeScript compiler to validate the entire type setup and ensure project-wide type safety.",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Create an `index.ts` file in the `src/types/` directory. Re-export all types from `events.ts`, `organization.ts`, and `content.ts` using `export * from './<filename>';`. After consolidation, execute `npx tsc --noEmit` in the terminal to perform a static type check of the entire project.",
+            "status": "pending",
+            "testStrategy": "The command `npx tsc --noEmit` must complete without any errors. Additionally, verify that importing a type (e.g., `Event`) from `~/types` in another component works as expected with full IntelliSense support.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-11-24T14:25:38.718Z"
       },
       {
-        "id": 14,
+        "id": "14",
         "title": "Finalized Tailwind CSS v4 and Shadcn/ui Configuration",
         "description": "Finalized the configuration of Tailwind CSS v4 and its integration with Shadcn/ui. This involved adding the Vite plugin, creating the Tailwind theme configuration, refining global CSS variables, creating the class-merging utility, and verifying the setup.",
         "details": "The Tailwind CSS v4 setup has been completed. The `@tailwindcss/vite` plugin was added to `vite.config.ts`. The `tailwind.config.ts` was configured with the shadcn/ui theme and `darkMode: 'class'`. The `src/styles/globals.css` file was updated with `@tailwind` directives and the necessary CSS variables for light/dark themes. The `cn` utility function was created in `src/lib/utils.ts`. Finally, global styles were imported in `src/main.tsx` and verified.",
@@ -29,7 +92,8 @@
             "dependencies": [],
             "details": "The required development dependencies have been installed using pnpm. This includes `@tailwindcss/vite` for Vite integration, `tailwindcss-animate` for animations, and `clsx` with `tailwind-merge` for the class-merging utility function. This step is complete.",
             "status": "completed",
-            "testStrategy": "Confirm that `@tailwindcss/vite`, `tailwindcss-animate`, `clsx`, and `tailwind-merge` are present in the `devDependencies` section of `package.json`. Running `pnpm install` should complete without any dependency resolution errors."
+            "testStrategy": "Confirm that `@tailwindcss/vite`, `tailwindcss-animate`, `clsx`, and `tailwind-merge` are present in the `devDependencies` section of `package.json`. Running `pnpm install` should complete without any dependency resolution errors.",
+            "parentId": "undefined"
           },
           {
             "id": 1401,
@@ -40,7 +104,8 @@
             ],
             "details": "Import `tailwindcss` from `@tailwindcss/vite` and add it to the `plugins` array in the `defineConfig` call within `vite.config.ts`. This enables Tailwind to process styles during development and build.",
             "status": "completed",
-            "testStrategy": "Run the Vite development server. Check for any console errors related to Tailwind CSS. A successful start indicates the plugin is loaded correctly."
+            "testStrategy": "Run the Vite development server. Check for any console errors related to Tailwind CSS. A successful start indicates the plugin is loaded correctly.",
+            "parentId": "undefined"
           },
           {
             "id": 1402,
@@ -51,7 +116,8 @@
             ],
             "details": "Created `tailwind.config.ts` at the project root. The `content` array was configured to scan `src/**/*.{ts,tsx}` files. `darkMode: 'class'` was set. The `theme` object was configured with `container`, `extend` `colors`, `borderRadius`, `keyframes`, and `animation` with the values provided by the shadcn/ui documentation. The `tailwindcss-animate` plugin was added to the `plugins` array.",
             "status": "completed",
-            "testStrategy": "A custom color (e.g., `bg-primary`) was applied to an element and verified in the browser that the correct hex code was applied."
+            "testStrategy": "A custom color (e.g., `bg-primary`) was applied to an element and verified in the browser that the correct hex code was applied.",
+            "parentId": "undefined"
           },
           {
             "id": 1403,
@@ -62,7 +128,8 @@
             ],
             "details": "In `src/styles/globals.css`, the `@tailwind` directives for `base`, `components`, and `utilities` were added. Below these, the full set of CSS variables for colors, radius, etc., were defined within `@layer base`. Separate variable sets were defined for the root `:root` (light theme) and `.dark` selectors.",
             "status": "completed",
-            "testStrategy": "The `<html>` element was inspected in the browser to verify all CSS variables (`--background`, `--foreground`, etc.) were defined. The `.dark` class was toggled on the `<html>` element and it was verified that the CSS variable values updated."
+            "testStrategy": "The `<html>` element was inspected in the browser to verify all CSS variables (`--background`, `--foreground`, etc.) were defined. The `.dark` class was toggled on the `<html>` element and it was verified that the CSS variable values updated.",
+            "parentId": "undefined"
           },
           {
             "id": 1404,
@@ -73,7 +140,8 @@
             ],
             "details": "Created a file at `src/lib/utils.ts`. Imported `type { ClassValue } from 'clsx'`, `clsx` from `clsx`, and `twMerge` from `tailwind-merge`. Exported a function `cn` that takes `...inputs: ClassValue[]` and returns `twMerge(clsx(inputs))`. This utility is essential for building components with variant styles.",
             "status": "completed",
-            "testStrategy": "A test case was run that called `cn('p-4', 'p-2')` and asserted that the result was `'p-2'`, demonstrating the merging logic."
+            "testStrategy": "A test case was run that called `cn('p-4', 'p-2')` and asserted that the result was `'p-2'`, demonstrating the merging logic.",
+            "parentId": "undefined"
           },
           {
             "id": 1405,
@@ -85,43 +153,44 @@
             ],
             "details": "Ensured that the main stylesheet (`src/styles/globals.css`) is imported into the application's entry point (`src/main.tsx`) so that all base styles and variables are loaded. Performed a final check by running the development server and applying test classes to a component to confirm the entire setup works end-to-end.",
             "status": "completed",
-            "testStrategy": "Ran `pnpm dev` and opened the application in the browser. Added a test component with Tailwind classes and verified it was styled. Toggled dark mode to confirm it worked. This confirms the CSS is being processed and applied correctly."
+            "testStrategy": "Ran `pnpm dev` and opened the application in the browser. Added a test component with Tailwind classes and verified it was styled. Toggled dark mode to confirm it worked. This confirms the CSS is being processed and applied correctly.",
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 15,
-        "title": "Initialize Supabase Client Configuration",
-        "description": "Set up and configure the Supabase JavaScript client to enable communication with the Supabase backend for database operations, authentication, and storage.",
-        "details": "Install the Supabase client library: `npm install @supabase/supabase-js`. Create a file at `src/supabase/client.ts`. Initialize the client using `createClient` from `@supabase/supabase-js`. Store your Supabase URL and anon key in `.env.local` as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` and access them via `import.meta.env`. Export a single, memoized instance of the client.",
-        "testStrategy": "Write a small test script or a temporary component that attempts to fetch a simple list (e.g., `supabase.from('some_table').select('*')`). A successful connection without authentication or RLS errors confirms the setup is correct. Ensure environment variables are not exposed in the client-side bundle.",
+        "id": "15",
+        "title": "Fix Supabase Migration Desync and Regenerate DB Types",
+        "description": "Resolve the database migration desynchronization issue to enable pulling the latest schema, then generate up-to-date TypeScript types to ensure type safety and fix widespread type-check errors.",
+        "details": "The current type-check failures are caused by stale types. First, fix the Supabase migration desync. This may require `supabase db reset` if local changes are disposable, or more careful manual alignment of migration files. Once `supabase db pull` works, run `npx supabase gen types typescript --project-id <your-project-id> > src/types/supabase.ts` to regenerate the types. This is the critical unblocking step for the rest of the frontend development. The client itself should be set up in `src/supabase/client.ts` using environment variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.",
+        "testStrategy": "First, confirm that `npx supabase db pull` runs without errors. After generating types, inspect `src/types/supabase.ts`. Verify that the `Event` type has `image_url: string | null` (not `image_urls`), a non-nullable `category: string`, and that date fields are correctly typed as nullable (`string | null`). A simple test script that imports these types and attempts to fetch data should now pass type-checking.",
         "priority": "high",
         "dependencies": [
-          13
+          "13"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 16,
-        "title": "Create Core Utility Functions Module",
-        "description": "Develop a set of common, reusable utility functions for tasks like date formatting, string manipulation, and input validation, to be used throughout the application.",
-        "details": "Create files under `src/utils/`, such as `formatting.ts` and `validation.ts`. For `formatting.ts`, add functions like `formatDate(date)` and `formatCurrency(amount)`. For `validation.ts`, create functions like `isValidEmail(email)`. The `cn` utility for class names is handled in the Tailwind setup task (Task 14).",
-        "testStrategy": "Implement unit tests for each utility function using a framework like Vitest. Test for expected outputs with valid inputs, and test edge cases like null, undefined, or malformed inputs to ensure they are handled gracefully without crashing.",
+        "id": "16",
+        "title": "Create Core Utilities and Schema-Compliant Dummy Data",
+        "description": "Develop a set of common, reusable utility functions and create a mock data module that strictly conforms to the newly generated Supabase types to resolve existing type errors and support component development.",
+        "details": "Create files under `src/utils/`, such as `formatting.ts` for functions like `formatDate(date)` (which must handle null inputs) and `validation.ts` for `isValidEmail(email)`. Crucially, create a `src/lib/dummyData.ts` file. This module must export mock data arrays (e.g., `dummyEvents`) that use the newly generated Supabase types from Task 15. This data must correctly provide a string for `image_url`, a required `category`, nullable dates, a boolean `featured` field for events, and use the `social_links` structure for site settings. This will fix the 45 TypeScript errors related to dummy data.",
+        "testStrategy": "Implement unit tests for each utility function using Vitest. For the dummy data, write a Vitest test that imports the mock data arrays and the corresponding Supabase types from `src/types/supabase.ts`. The test should simply check if the mock data is assignable to the type (e.g., `const events: Tables<'events'>[] = dummyEvents;`) to confirm schema compliance without TypeScript errors.",
         "priority": "high",
         "dependencies": [],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 17,
+        "id": "17",
         "title": "Add Core shadcn/ui Components",
         "description": "The core set of shadcn/ui components has been successfully integrated into the project. This includes Button, Input, Card, Dialog, Badge, and Separator, which now form the foundation of the application's UI.",
         "details": "The shadcn/ui library was initialized, creating `src/components/ui` and `components.json`. Core components (`button`, `input`, `card`, `dialog`, `badge`, `separator`) were added via the CLI. The `cn` utility in `src/lib/utils.ts` is integrated, and the setup is verified to be working with the project's Tailwind CSS v4 theme, including light/dark modes.",
         "testStrategy": "Verification was done by importing components into a test page (`App.tsx`) to confirm correct rendering and theme response (light/dark mode). Storybook stories for each component have been created to test props, variants, and accessibility, confirming the integration's success.",
         "priority": "high",
         "dependencies": [
-          14
+          "14"
         ],
         "status": "done",
         "subtasks": [
@@ -132,7 +201,8 @@
             "dependencies": [],
             "details": "This step configures the project to use shadcn/ui, specifying styles, Tailwind CSS settings, and the location for UI components. The process was completed successfully.",
             "status": "done",
-            "testStrategy": null
+            "testStrategy": null,
+            "parentId": "undefined"
           },
           {
             "id": 1702,
@@ -143,7 +213,8 @@
             ],
             "details": "The command `npx shadcn-ui@latest add button input card dialog` was executed, populating the `src/components/ui` directory with the corresponding component files.",
             "status": "done",
-            "testStrategy": null
+            "testStrategy": null,
+            "parentId": "undefined"
           },
           {
             "id": 1703,
@@ -154,7 +225,8 @@
             ],
             "details": "The command `npx shadcn-ui@latest add badge separator` was executed to add these components to the `src/components/ui` directory.",
             "status": "done",
-            "testStrategy": null
+            "testStrategy": null,
+            "parentId": "undefined"
           },
           {
             "id": 1704,
@@ -165,7 +237,8 @@
             ],
             "details": "The initialization process created `src/lib/utils.ts` which exports the `cn` function. The newly added component files import and use this utility.",
             "status": "done",
-            "testStrategy": null
+            "testStrategy": null,
+            "parentId": "undefined"
           },
           {
             "id": 1705,
@@ -176,7 +249,8 @@
             ],
             "details": "A `<Button>` was added to the main application component and its appearance was verified in both light and dark modes, confirming the theme and CSS variables are correctly configured.",
             "status": "done",
-            "testStrategy": null
+            "testStrategy": null,
+            "parentId": "undefined"
           },
           {
             "id": 1706,
@@ -188,39 +262,40 @@
             ],
             "details": "Individual stories were created for each component's variants, sizes, and states (e.g., disabled, hover). Interactive components were tested for event handling, and all components were checked for accessibility, completing the verification process.",
             "status": "done",
-            "testStrategy": null
+            "testStrategy": null,
+            "parentId": "undefined"
           }
         ]
       },
       {
-        "id": 18,
+        "id": "18",
         "title": "Implement Toast Notifications with Sonner",
         "description": "Integrate the Sonner library to provide non-blocking toast notifications for user feedback on actions like success, error, or information.",
         "details": "Install the library: `npm install sonner`. Add the `<Toaster />` component to the root of your application layout (`App.tsx` or `DashboardLayout.tsx`). Use the `toast()` function exported from `sonner` to trigger notifications from anywhere in the app, for example: `toast.success('Event created successfully!')`.",
         "testStrategy": "Create temporary buttons in the UI to trigger different types of toasts (success, error, info, promise). Verify that they appear correctly, are styled as expected, and disappear automatically or can be dismissed by the user.",
         "priority": "medium",
         "dependencies": [
-          17
+          "17"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 19,
-        "title": "Implement Form Management with React Hook Form",
-        "description": "Integrate React Hook Form and create reusable form components for handling complex form state, validation, and submission efficiently.",
-        "details": "Install dependencies: `npm install react-hook-form @hookform/resolvers zod`. Create a generic `<Form />` component using `shadcn/ui`'s form components which are built on `react-hook-form`. Use `zod` to define validation schemas that align with your TypeScript types. Use the `@hookform/resolvers/zod` adapter to connect Zod schemas to your forms for real-time validation.",
-        "testStrategy": "Build a sample form with various input types (text, select, checkbox). Test the happy path: valid submission. Test validation: ensure error messages appear for invalid fields and submission is blocked. Test that the form state is reset correctly after submission.",
+        "id": "19",
+        "title": "Implement Form Management with React Hook Form and Zod",
+        "description": "Integrate React Hook Form and Zod to create reusable, type-safe form components for handling complex form state, validation, and submission efficiently.",
+        "details": "Install dependencies: `npm install react-hook-form @hookform/resolvers zod`. Create a generic `<Form />` component using `shadcn/ui`'s form components. Use `zod` to define validation schemas that align with the **newly generated** `supabase.ts` types from Task 15. These schemas must account for the corrected schema: `category` is a required string (`z.string().min(1)`), `Date` fields are nullable (`.nullable()`), and image fields expect a single string for `image_url`. Use the `@hookform/resolvers/zod` adapter to connect Zod schemas to your forms.",
+        "testStrategy": "Build a sample form based on the updated `Event` schema. Test that `category` is a required field. Test that nullable date fields pass validation when empty and correctly submit `null`. Ensure the form state correctly handles a single `image_url` string. Verify that error messages appear for invalid fields and that submission is blocked.",
         "priority": "high",
         "dependencies": [
-          13,
-          17
+          "13",
+          "17"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 20,
+        "id": "20",
         "title": "Implement Custom Client-Side Router",
         "description": "Develop a lightweight, custom client-side router using React Context and the browser's History API to manage navigation between the landing page, all-events page, and admin dashboard.",
         "details": "Create `src/components/Router.tsx`. Implement a `RouterProvider` that uses `React.createContext` to provide the current path and a `navigate` function. Use `useState` to hold the current path, initialized from `window.location.pathname`. Use a `useEffect` hook to listen to the `popstate` event to handle browser back/forward buttons. The `navigate` function should use `window.history.pushState` and update the internal state.",
@@ -231,259 +306,263 @@
         "subtasks": []
       },
       {
-        "id": 21,
+        "id": "21",
         "title": "Implement Global ContentContext for State Management",
         "description": "Create a global React Context to manage the state of all primary content entities (events, team, partners, etc.), providing a centralized place for data fetching, caching, and mutations.",
-        "details": "Create `src/contexts/ContentContext.tsx`. The context provider will manage state for `events`, `team`, `partners`, `gallery`, etc., along with their `loading` and `error` states. It will expose functions like `fetchEvents()`, `addEvent(newEvent)`, `updateEvent(id, data)`, etc. These functions will interact with the Supabase client and update the context state, acting as a simple client-side cache.",
-        "testStrategy": "Write unit tests for the context's reducer or state update logic. Create a test component that consumes the context, calls a fetch function, and verifies that the `loading` state changes correctly and the final data is populated. Mock the Supabase client to isolate the context logic.",
+        "details": "Create `src/contexts/ContentContext.tsx`. The context provider's state (`events`, `team`, `partners`) must use the TypeScript types freshly generated in Task 15 to fix the current type-check errors. This includes handling `image_url` (string), a required `category`, a `featured` boolean, and nullable dates. The context will expose functions like `fetchEvents()`, `addEvent(newEvent)`, etc., which interact with the Supabase client using correctly typed data. The initial state can be populated from the dummy data created in Task 16.",
+        "testStrategy": "Write unit tests for the context's state update logic, mocking the Supabase client. Create a test component that consumes the context, calls `fetchEvents`, and verifies the `loading` state changes and the final data structure matches the updated `Event` type. Ensure that the mock data from `dummyData.ts` can be used as the initial state without type errors.",
         "priority": "high",
         "dependencies": [
-          13,
-          15
+          "13",
+          "15"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 22,
+        "id": "22",
         "title": "Develop Custom Hooks for Business Logic",
         "description": "Create custom hooks like `useEvents` and `useRouter` to abstract away business logic and interactions with context, simplifying component code.",
-        "details": "Create files in `src/hooks/`. The `useRouter` hook will simply be `return useContext(RouterContext)`. The `useEvents` hook will consume the `ContentContext` and return the `events` state, loading/error status, and the event-specific functions (`addEvent`, `updateEvent`, etc.). This encapsulates the logic for interacting with the global state.",
-        "testStrategy": "Test the hooks within components. For `useEvents`, verify that a component using it re-renders when the event data changes in the `ContentContext`. For `useRouter`, verify it provides the correct navigation functions and current path.",
+        "details": "Create files in `src/hooks/`. The `useRouter` hook will simply be `return useContext(RouterContext)`. The `useEvents` hook will consume the `ContentContext` and return the `events` state and related functions. The data returned by this hook (e.g., the `events` array) will conform to the updated, correctly typed schema from the context. Components using this hook must be updated to reference `event.image_url` instead of `event.image_urls`.",
+        "testStrategy": "Test the hooks within components. For `useEvents`, verify a component re-renders with the correctly structured data (e.g., with `event.image_url`) when the `ContentContext` is updated. For `useRouter`, verify it provides the correct navigation functions and current path.",
         "priority": "medium",
         "dependencies": [
-          20,
-          21
+          "20",
+          "21"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 23,
+        "id": "23",
         "title": "Implement Admin Authentication Flow",
         "description": "Set up a secure authentication mechanism for the admin dashboard using Supabase Auth, including login, session management, and protected routes.",
         "details": "Utilize Supabase Auth with the email/password or magic link provider. Create a login page for the admin dashboard. On successful login, Supabase's client handles the session. Create a protected route component that checks for an active user session (`supabase.auth.getSession()`). If no session exists, it redirects to the login page. The admin dashboard will be wrapped in this protected route.",
         "testStrategy": "Manually test the auth flow. 1) Attempt to access an admin URL directly and verify redirection to the login page. 2) Log in with valid credentials and verify access is granted. 3) Log out and verify session is terminated and user is redirected. 4) Check for the `sb-` auth token in browser storage.",
         "priority": "high",
         "dependencies": [
-          15,
-          18,
-          20
+          "15",
+          "18",
+          "20"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 24,
+        "id": "24",
         "title": "Build Responsive DashboardLayout Component",
         "description": "Create the main layout for the admin dashboard, including a persistent sidebar for navigation, a header, and a main content area for dashboard pages.",
         "details": "Create `src/components/dashboard/DashboardLayout.tsx`. This component will render a sidebar with navigation links (using Lucide icons and `NavLink`-style components) to the different admin sections (Events, Team, etc.). Use CSS Grid or Flexbox to create a responsive layout that collapses the sidebar into a menu on smaller screens. The layout will render `{children}` in the main content area.",
         "testStrategy": "Wrap a sample dashboard page within the `DashboardLayout`. Verify that the layout is responsive by resizing the browser window. Test navigation by clicking sidebar links, ensuring the correct page content is loaded without the layout itself re-rendering unnecessarily.",
         "priority": "high",
         "dependencies": [
-          17,
-          20,
-          22
+          "17",
+          "20",
+          "22"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 25,
+        "id": "25",
         "title": "Implement Dashboard Home Page with Statistics",
         "description": "Develop the main landing page of the admin dashboard, displaying key overview statistics and quick links to management sections.",
-        "details": "Create `src/components/dashboard/DashboardHome.tsx`. This component will use the `useContent` hook to fetch summary data, such as the total number of upcoming events, total team members, and total partners. Display these stats using the `Card` component. Use a library like `Recharts` to add a simple bar chart showing events per month.",
-        "testStrategy": "Verify that the dashboard home page correctly displays statistics pulled from the `ContentContext`. Manually add data to the database and refresh the page to ensure the stats update accordingly. Check that the chart renders correctly with sample data.",
+        "details": "Create `src/components/dashboard/DashboardHome.tsx`. This component will use the `useContent` hook to fetch summary data. Queries and data processing for statistics (e.g., events per `category`) must account for the updated and synced database schema, specifically using the required `category` field. Display these stats using the `Card` component. Use a library like `Recharts` to add a simple bar chart showing events per month.",
+        "testStrategy": "Verify that the dashboard home page correctly displays statistics pulled from the `ContentContext`. Manually add data that uses the new schema (e.g., events with different categories) and refresh the page to ensure the stats update accordingly. Check that the chart renders correctly.",
         "priority": "medium",
         "dependencies": [
-          21,
-          22,
-          24
+          "21",
+          "22",
+          "24"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 26,
+        "id": "26",
         "title": "Build Dashboard Event List Page",
         "description": "Create the UI for listing all events in the admin dashboard, with features for sorting, filtering, and pagination.",
-        "details": "Create `src/components/dashboard/DashboardEvents.tsx`. Use the `useEvents` hook to get the list of events. Render the events in a `Table` component from `shadcn/ui`. Add controls (Input, Select) for filtering by status or searching by title. Implement client-side or server-side pagination to handle a large number of events.",
-        "testStrategy": "Populate the database with a variety of events (different statuses, dates). Verify the table displays all events correctly. Test the search and filter functionality to ensure the list updates as expected. Test pagination by navigating between pages.",
+        "details": "Create `src/components/dashboard/DashboardEvents.tsx`. Use the `useEvents` hook to get the list of events. Render the events in a `Table` component from `shadcn/ui`, ensuring the table columns match the updated `Event` type (e.g., a column for `category` and a toggle for `featured`). Add controls for filtering by status or searching by title. Implement client-side or server-side pagination.",
+        "testStrategy": "Populate the database with a variety of events conforming to the new schema. Verify the table displays all data correctly, including the new required `category` field and the `featured` status. Test the search and filter functionality. Test pagination by navigating between pages.",
         "priority": "medium",
         "dependencies": [
-          22,
-          24
+          "22",
+          "24"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 27,
+        "id": "27",
         "title": "Build Event Create/Edit Form and Logic",
         "description": "Implement the form for creating and editing events, including all metadata fields, validation, and submission logic to persist the data via Supabase.",
-        "details": "Create `src/components/dashboard/DashboardEventsNew.tsx`. Use `react-hook-form` and a `zod` schema for validation. The form should include fields for all properties in the `Event` type, using `shadcn/ui` components like `Input`, `Textarea`, and `ReactDayPicker` for dates. The `onSubmit` handler will call the `addEvent` or `updateEvent` function from the `ContentContext` and show a success/error toast.",
-        "testStrategy": "Happy path: Create a new event, fill all fields, submit, and verify it appears in the event list (Task 26) and the database. Edit an existing event and verify changes are saved. Error path: Try to submit the form with invalid data and verify that validation errors are displayed and submission is blocked.",
+        "details": "Create `src/components/dashboard/DashboardEventsNew.tsx`. Use `react-hook-form` and a `zod` schema that strictly validates against the latest DB schema from Task 15. The form must have a required input for `category`, a boolean switch for `featured`, and handle a single file upload for the `image_url` string field. Date fields like `date` should use a `ReactDayPicker` that can handle and submit `null` values. The `onSubmit` handler will call `addEvent` or `updateEvent` with the correctly typed data.",
+        "testStrategy": "Happy path: Create an event, fill all fields including the required `category`, submit, and verify it appears in the list with the correct `image_url`. Error path: Try submitting without a `category` and verify validation errors. Test creating an event with a null date to ensure it's handled correctly. Test the `featured` toggle.",
         "priority": "high",
         "dependencies": [
-          18,
-          19,
-          21,
-          26
+          "18",
+          "19",
+          "21",
+          "26"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 28,
+        "id": "28",
         "title": "Implement Image Upload to Supabase Storage",
         "description": "Develop the functionality for uploading images (e.g., event featured image, team member photos) to Supabase Storage and linking the URL to the corresponding database record.",
-        "details": "Integrate an image upload component into the relevant forms (e.g., Event form). Use an `<input type='file' />`. On file selection, use a library like `browser-image-compression` to resize and compress the image client-side. Then, use `supabase.storage.from('images').upload(filePath, file)` to upload it. Once the upload is complete, retrieve the public URL using `supabase.storage.from('images').getPublicUrl(filePath)` and save this URL in the appropriate database field.",
-        "testStrategy": "In the event creation form, upload an image. Verify the image appears in your Supabase Storage bucket. Verify the event record in the database contains the correct public URL for the image. Check that the image loads correctly on the public-facing pages.",
+        "details": "Integrate an image upload component into the relevant forms. On file selection, compress the image client-side with `browser-image-compression`. Use `supabase.storage.from('images').upload(filePath, file)`. Once complete, retrieve the public URL and save this single string URL to the `image_url` field in the database, explicitly *not* `image_urls`.",
+        "testStrategy": "In the event creation form, upload an image. Verify the file appears in the Supabase Storage bucket. Verify the event record in the database contains the correct public URL in the `image_url` text field. Check that the image loads correctly on public-facing pages.",
         "priority": "medium",
         "dependencies": [
-          15,
-          27
+          "15",
+          "27"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 29,
+        "id": "29",
         "title": "Build Team Member Management Page",
         "description": "Create the admin interface for CRUD operations on team members, including their name, role, bio, and photo.",
-        "details": "Create `src/components/dashboard/DashboardTeam.tsx`. This will be similar in structure to the event management page. It will list existing team members and have a button to open a Dialog/Modal containing the form for adding/editing a member. The form will use `react-hook-form` and include an image uploader (reusing logic from Task 28).",
-        "testStrategy": "Perform full CRUD tests: Create a new team member and verify they appear in the list. Update their details and photo, and confirm the changes. Delete the team member and ensure they are removed from the list and the database.",
+        "details": "Create `src/components/dashboard/DashboardTeam.tsx`. This will list existing team members and use a Dialog/Modal for the add/edit form. The form will use `react-hook-form` and its schema must align with the updated `Team` type from Supabase, including using a single `image_url` field for the member's photo, reusing the logic from Task 28.",
+        "testStrategy": "Perform full CRUD tests: Create a new team member and verify their photo URL is stored in `image_url`. Update their details and photo, and confirm the changes. Delete the team member and ensure they are removed from the list and the database.",
         "priority": "medium",
         "dependencies": [
-          24,
-          27,
-          28
+          "24",
+          "27",
+          "28"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 30,
+        "id": "30",
         "title": "Build Partner/Sponsor Management Page",
         "description": "Implement the admin interface for managing partners and sponsors, including their name, category, logo, and website URL.",
-        "details": "Create `src/components/dashboard/DashboardPartners.tsx`. Follow the same pattern as Team Management (Task 29). It will feature a list of partners and a form (in a modal) for CRUD operations. The form will include fields for partner details and a logo uploader.",
-        "testStrategy": "Perform full CRUD tests for partners. Verify that creating, updating, and deleting partners works correctly and that the data is accurately reflected in the database. Ensure partner logos can be uploaded and displayed.",
+        "details": "Create `src/components/dashboard/DashboardPartners.tsx`. Follow the pattern from Task 29. The form for CRUD operations will be in a modal and must conform to the updated `Partner` schema, including uploading a logo to a single `image_url` field.",
+        "testStrategy": "Perform full CRUD tests for partners. Verify that creating, updating, and deleting partners works correctly. Ensure partner logos are uploaded to a single `image_url` field and displayed correctly.",
         "priority": "medium",
         "dependencies": [
-          24,
-          27,
-          28
+          "24",
+          "27",
+          "28"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 31,
+        "id": "31",
         "title": "Build Landing Page Content Management (Hero & About)",
         "description": "Create admin interfaces for managing the content of the landing page's Hero and About sections.",
-        "details": "Create `DashboardHero.tsx` and `DashboardAbout.tsx`. These will be simple forms that fetch the current content from the `ContentContext`. The forms will allow admins to update fields like the hero title, subtitle, featured event ID (using a select dropdown of events), and the about section text. On save, the `updateHeroContent` function in the context is called.",
-        "testStrategy": "Load the admin pages and verify they are pre-populated with the current content. Make a change (e.g., update the hero title), save it, and then load the public-facing landing page to confirm the change is immediately visible.",
+        "details": "Create `DashboardHero.tsx` and `DashboardAbout.tsx`. These forms will fetch current content from `ContentContext` to allow admins to update hero title, subtitle, and about section text. For the featured event, the UI to manage this should be a toggle switch for the new `featured: boolean` field on the event edit page (Task 27) or event list page (Task 26), not a separate dropdown here.",
+        "testStrategy": "Load the admin pages and verify they are pre-populated. Make a change, save it, and load the public landing page to confirm the change is visible. Test the `featured` event logic: toggle an event as featured on the event management page and verify it appears correctly in the hero section of the public site.",
         "priority": "medium",
         "dependencies": [
-          24,
-          27
+          "24",
+          "27"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 32,
+        "id": "32",
         "title": "Build Site Settings Management Page",
         "description": "Develop the admin page for managing global site settings, such as contact information and social media links.",
-        "details": "Create `src/components/dashboard/DashboardSettings.tsx`. This will be a single form that loads the global `site_settings` object from the `ContentContext`. It will allow admins to edit the contact email, phone number, and social media URLs. On save, it updates the single settings record in the database.",
-        "testStrategy": "Change a social media link in the settings form and save. Navigate to the public site's footer and verify that the link has been updated. This confirms the end-to-end flow from admin input to public display.",
+        "details": "Create `src/components/dashboard/DashboardSettings.tsx`. This form will load the `site_settings` object from `ContentContext`. It must include fields to edit the new `social_links` property (likely a JSON or array type), in addition to contact email and phone number. On save, it updates the single settings record in the database.",
+        "testStrategy": "Change a social media link in the settings form and save. Navigate to the public site's footer and verify the link has been updated. Add, edit, and remove social links to confirm the functionality works as expected.",
         "priority": "medium",
         "dependencies": [
-          24,
-          27
+          "24",
+          "27"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 33,
+        "id": "33",
         "title": "Build and Compose the Public Landing Page",
         "description": "Assemble the main public-facing landing page by composing various sections like Hero, Featured Events, Team, and Partners, pulling all data from the ContentContext.",
-        "details": "Create `src/components/LandingPage.tsx`. This component will be the main entry point for the public site. It will use the `useContent` hook to access all necessary data. It will then render individual section components (e.g., `<HeroSection />`, `<FeaturedEventsSection />`, `<TeamSection />`, `<PartnersSection />`, `<Footer />`), passing the relevant data down as props.",
-        "testStrategy": "Load the landing page and verify that all sections are rendered with the correct data from the CMS. Ensure the page is fully responsive and visually matches the Figma designs. Check that all links (e.g., to social media) are correct.",
+        "details": "Create `src/components/LandingPage.tsx`. This component will use the `useContent` hook to access all data. It will render section components (e.g., `<HeroSection />`, `<TeamSection />`). The Hero section should display the event where `featured` is true. All components must pass down data that conforms to the new schema (e.g., team/partner images will be read from `item.image_url`). The `<Footer />` component must correctly render the list of `social_links` from site settings.",
+        "testStrategy": "Load the landing page and verify all sections render with data matching the updated schema. Check that images load from `image_url` fields. Ensure the footer displays the `social_links` correctly. Check that the correct featured event is shown. Confirm the page is responsive and visually matches designs.",
         "priority": "high",
         "dependencies": [
-          21,
-          22,
-          29,
-          30,
-          31,
-          32
+          "21",
+          "22",
+          "29",
+          "30",
+          "31",
+          "32"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 34,
+        "id": "34",
         "title": "Build 'All Events' Page with Filtering and Search",
         "description": "Create a dedicated page for users to browse, search, and filter all available events, with support for pagination.",
-        "details": "Create `src/components/AllEventsPage.tsx`. The page will fetch all 'upcoming' events from the `ContentContext`. Implement UI controls (`Input`, `Select`, `Checkbox`) for filtering by category, date range, and a text-based search. The filtering logic can be implemented client-side for now. Render the filtered results as a grid of `EventCard` components. Add a pagination component to navigate through a large list.",
-        "testStrategy": "With a large set of test events, verify that the initial list loads. Test each filter individually and in combination to ensure the event list updates correctly. Test the search functionality. Test the pagination to make sure you can navigate through all results.",
+        "details": "Create `src/components/AllEventsPage.tsx`. Fetch all 'upcoming' events from `ContentContext`. Implement UI controls for filtering, including a `Select` or `Checkbox` group for the new required `category` field. The client-side filtering logic must be updated to work with the new schema. Render results as a grid of `EventCard` components, ensuring they source the event image from `event.image_url`.",
+        "testStrategy": "With test events using different categories, verify that filtering by category works correctly. Test all filters individually and in combination. Ensure `EventCard`s display the correct image from the `image_url` field. Test pagination.",
         "priority": "medium",
         "dependencies": [
-          22,
-          33
+          "22",
+          "33"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 35,
+        "id": "35",
         "title": "Implement Event Detail View/Modal",
         "description": "Create a detailed view for a single event, showing all information including the gallery, artist lineup, and venue details. This can be a modal or a separate page.",
-        "details": "When a user clicks on an `EventCard` (from Task 33 or 34), open a `Dialog` modal. The modal will receive the `eventId` as a prop. It will then fetch the full event details from the `ContentContext`. The view will display all event fields, including a carousel (`Embla Carousel`) for the image gallery and a list of associated artists.",
-        "testStrategy": "Click on various event cards from the landing page and the 'All Events' page. Verify that the correct event's details are loaded and displayed in the modal. Check that the image gallery is functional. Ensure the modal can be closed properly.",
+        "details": "When a user clicks an `EventCard`, open a `Dialog` modal with the `eventId`. The modal will fetch full event details from `ContentContext`, which conform to the new schema. The view must display the main featured image from the `image_url` field. The old `image_urls` gallery field is now gone; if a gallery is still required, this feature needs re-scoping (e.g., using a new JSONb field or a linked table).",
+        "testStrategy": "Click on various event cards. Verify the modal displays the correct event details, including the main image from `event.image_url`. Confirm that no errors occur due to the missing gallery data structure. Ensure the modal can be closed properly.",
         "priority": "medium",
         "dependencies": [
-          33,
-          34
+          "33",
+          "34"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 36,
+        "id": "36",
         "title": "Implement Client-Side Caching Strategy",
         "description": "Optimize performance by enhancing the ContentContext to act as a more robust client-side cache, reducing redundant API calls to Supabase.",
-        "details": "Refine the `ContentContext`. When a fetch function (e.g., `fetchEvents`) is called, first check if the data already exists in the context's state and is not stale. If it is, return the cached data. If not, fetch from Supabase and update the state. The mutation functions (`addEvent`, `updateEvent`) must invalidate the cache by either refetching the data or intelligently updating the local state.",
-        "testStrategy": "Using browser dev tools, monitor network requests. Navigate between pages that use the same data (e.g., from landing page to all events page). Verify that the data is fetched only once initially, and subsequent navigations use the cached data from the context, resulting in no new network requests for that data.",
+        "details": "Refine the `ContentContext`. When a fetch function is called, it should check for existing, non-stale data. This logic must handle the updated data structures as defined by the newly-generated types (e.g., `Event` with `image_url`, `featured` flag). Mutation functions (`addEvent`, `updateEvent`) must invalidate the cache by either refetching or intelligently updating the local state, ensuring the local update correctly matches the new schema.",
+        "testStrategy": "Using browser dev tools, monitor network requests. Navigate between pages using the same data. Verify data is fetched only once, and subsequent navigations use cached data. After a mutation (e.g., editing an event), verify the cache is updated and the UI reflects the new, correctly-structured data without a full page reload.",
         "priority": "low",
         "dependencies": [
-          21
+          "21"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 37,
+        "id": "37",
         "title": "Setup E2E Testing for Critical User Journeys",
         "description": "Establish an end-to-end testing suite using a framework like Playwright or Cypress to automate testing of critical user paths, such as admin event creation and public event discovery.",
-        "details": "Install Playwright: `npm init playwright@latest`. Create test files in the `tests` directory. Write scripts for the following scenarios: 1) Admin logs in, creates a new event, and saves it. 2) A public user visits the site, sees the new event on the landing page, navigates to the all-events page, filters for it, and opens its detail view. Configure the tests to run against a seeded test database.",
-        "testStrategy": "Run the E2E test suite via the command line (`npx playwright test`). The tests should pass consistently in a headless browser. Integrate this command into a CI/CD pipeline (e.g., GitHub Actions) to run automatically on every push or pull request to the main branch, preventing regressions.",
+        "details": "Install Playwright: `npm init playwright@latest`. Create test files in the `tests` directory. Update scripts to match the new UI flows: 1) Admin logs in, creates an event, filling the required `category` field and using the single `image_url` upload. 2) A public user visits the site, sees the new event, navigates to the all-events page, and filters by the new `category`. Configure tests to run against a seeded test database that conforms to the new schema.",
+        "testStrategy": "Run the E2E test suite via `npx playwright test`. The tests must pass consistently, accounting for the updated form fields and data structures. Integrate this command into a CI/CD pipeline to run on every push or pull request to prevent regressions.",
         "priority": "low",
         "dependencies": [
-          23,
-          27,
-          35
+          "23",
+          "27",
+          "35"
         ],
         "status": "pending",
         "subtasks": []
       }
     ],
     "metadata": {
-      "created": "2025-11-07T06:02:41.440Z",
-      "updated": "2025-11-24T13:09:52.632Z",
-      "description": "Tasks for master context"
+      "version": "1.0.0",
+      "lastModified": "2025-11-24T14:25:38.720Z",
+      "taskCount": 25,
+      "completedCount": 2,
+      "tags": [
+        "master"
+      ]
     }
   }
 }

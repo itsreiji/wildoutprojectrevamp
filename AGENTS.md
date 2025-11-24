@@ -35,6 +35,10 @@ WildOut! is a media digital nightlife and event multi-platform connecting artist
 *   **State Management**: React Context (migrating to TanStack Query).
 *   **Routing**: Custom Router (migrating to React Router or TanStack Router recommended).
 
+## Mockup Design Reference
+*   Always Follow Git Coomit ID b62b3e27dca9ccd6dd8fd58bdd6745b618e9d3f9 for reference mockup. STRICT RULE TO FOLLOW. 
+*   shadcnui llm.txt [text](https://ui.shadcn.com/llms.txt)
+
 ## Entity-Relationship Diagram (ERD)
 
 ```mermaid
@@ -103,10 +107,10 @@ graph TD
 *   **DO** use `openspec` for any architectural changes or new features.
 *   **DO** use `codebase_search` before asking for context.
 *   **DO** implement RLS policies for every new table.
-*   **DO** ALWAYS use MCP server **"supabase"** for ALL database (DB) and storage operations via MCP Supabase tools (mcp_supabase-dg-ocr).
+*   **DO** ALWAYS use MCP server **"supabase"** for ALL database (DB) and storage operations via MCP Supabase tools (mcp_supabase-dg-ocr). STRICT RULE MUST FOLLOW.
 
 ### Don'ts
 *   **DON'T** modify `AGENTS.md` or `openspec` files directly without a proposal.
 *   **DON'T** use `any` type unless absolutely necessary and documented.
 *   **DON'T** hardcode secrets; use environment variables.
-*   **DON'T** run local Supabase commands (`supabase start`, `db reset`, `db pull`, etc.) unless EXPLICITLY instructed by user.
+*   **DON'T** run local Supabase commands (`supabase start`, `db reset`, `db pull`, etc.) unless EXPLICITLY instructed by user. STRICT RULE MUST FOLLOW.

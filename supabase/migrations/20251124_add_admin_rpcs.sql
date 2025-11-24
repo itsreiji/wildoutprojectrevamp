@@ -13,7 +13,7 @@ DECLARE
 BEGIN
   SELECT array_agg(row_to_json(s)::jsonb) INTO sections
   FROM admin_sections s
-  WHERE s.enabled = true
+  WHERE s."enabled" = true
     AND (is_admin OR 
          (is_editor AND s.category IN ('main', 'content', 'management')) OR
          is_admin); -- Fixed: admins always get all, editors get main/content/management
