@@ -288,7 +288,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
       try {
         setAdminSectionsLoading(true);
         const { data: sections, error: sectionsError } = await supabaseClient
-          .rpc('get_admin_sections_for_user', { user_id: user?.id });
+          .rpc('get_admin_sections_for_user', { p_user_id: user?.id });
 
         if (sectionsError) {
           console.error('Error fetching admin sections:', sectionsError);
@@ -417,7 +417,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         for (const sectionSlug of sectionsWithContent) {
           try {
             const { data: content, error: contentError } = await supabaseClient
-              .rpc('get_section_content', { section_slug: sectionSlug, user_id: user?.id });
+              .rpc('get_section_content', { section_slug: sectionSlug, p_user_id: user?.id });
 
             if (!contentError && content && content.length > 0) {
               contentMap[sectionSlug] = content[0];

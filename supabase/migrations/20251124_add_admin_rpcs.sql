@@ -2,7 +2,7 @@
 -- Per Task 12 Public Content Sync
 
 -- get_admin_sections_for_user: return sections user can access based on role_permissions/user_permissions
-CREATE OR REPLACE FUNCTION public.get_admin_sections_for_user(user_id uuid DEFAULT null)
+CREATE OR REPLACE FUNCTION public.get_admin_sections_for_user(p_user_id uuid DEFAULT null)
 RETURNS jsonb[]
 LANGUAGE plpgsql SECURITY DEFINER AS $$
 DECLARE
@@ -13,10 +13,10 @@ DECLARE
 BEGIN
   SELECT array_agg(row_to_json(s)::jsonb) INTO sections
   FROM admin_sections s
-  WHERE enabled = true
+  WHERE s.enabled = true
     AND (is_admin OR 
          (is_editor AND s.category IN ('main', 'content', 'management')) OR
-         true); -- All for admin
+         is_admin); -- Fixed: admins always get all, editors get main/content/management
 
   RETURN COALESCE(sections, ARRAY[]::jsonb[]);
 END;

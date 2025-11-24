@@ -53,38 +53,45 @@ const getUserRoleWithCache = async (userId: string): Promise<AuthRole> => {
   }
 
   try {
-    // Fetch fresh data from profiles table
-    const { data: profile, error } = await supabaseClient
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .single();
-
+    // Use RPC to get profile role safely
+    const { data: profiles, error } = await supabaseClient.rpc('get_user_profile', { user_uuid: userId });
+    
     if (error) {
-      console.warn('Failed to fetch user profile:', error);
-      // Fallback to user metadata
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      const fallbackRole = getRoleFromUser(user);
-      return fallbackRole;
+      console.warn('RPC error fetching user profile:', error);
+    } else if (profiles && profiles.length > 0) {
+      const profile = profiles[0];
+      const role = (profile?.role as AuthRole) || 'user';
+
+      // Cache the result
+      profileCache.set(userId, {
+        id: userId,
+        role,
+        email: profile.email || '',
+        lastUpdated: Date.now(),
+        ttl: PROFILE_CACHE_TTL,
+      });
+
+      return role;
     }
+  } catch (rpcError) {
+    console.warn('RPC error in getUserRoleWithCache:', rpcError);
+  }
 
-    const role = (profile?.role as AuthRole) || 'user';
-
-    // Cache the result
+  // Fallback to user metadata from auth
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const fallbackRole = getRoleFromUser(user);
     profileCache.set(userId, {
       id: userId,
-      role,
-      email: profile.email || '',
+      role: fallbackRole,
+      email: user?.email || '',
       lastUpdated: Date.now(),
       ttl: PROFILE_CACHE_TTL,
     });
-
-    return role;
-  } catch (error) {
-    console.error('Error fetching user role:', error);
-    // Fallback to user metadata
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    return getRoleFromUser(user);
+    return fallbackRole;
+  } catch (fallbackError) {
+    console.error('Fallback auth.getUser failed:', fallbackError);
+    return 'user';
   }
 };
 

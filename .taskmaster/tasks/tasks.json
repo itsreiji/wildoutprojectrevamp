@@ -2,1113 +2,395 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
-        "title": "Foundation: Setup TypeScript Types and Utility Functions",
-        "description": "Successfully established the foundational TypeScript types for all data models (Event, TeamMember, Partner, etc.) and created a library of shared utility functions. This work, guided by the `foundation-types-utils` OpenSpec, provides a strongly-typed foundation for the application's data layer.",
-        "status": "done",
+        "id": 13,
+        "title": "Setup Foundational TypeScript Types",
+        "description": "Define all global TypeScript types for domain entities like Event, Team Member, Partner, etc., to ensure type safety across the application. These will serve as the single source of truth for data structures.",
+        "details": "Create type definition files under `src/types/`. Define interfaces for `Event`, `TeamMember`, `Partner`, `GalleryItem`, `HeroContent`, and `SiteSettings` as specified in the PRD's data models. A key step is to generate types from the Supabase schema to ensure alignment. Use the Supabase CLI: `npx supabase gen types typescript --project-id <YOUR_PROJECT_ID> > src/supabase/types.ts`. Then, import these generated types into your main type definition files to build upon them.",
+        "testStrategy": "Validate by running the TypeScript compiler (`npx tsc --noEmit`) across the project. Success is defined as zero type errors. Also, verify that IDE IntelliSense correctly provides autocompletion for all defined types when used in other files.",
+        "priority": "high",
         "dependencies": [],
-        "priority": "high",
-        "details": "## OpenSpec Proposal\n- **Proposal ID**: `foundation-types-utils`\n- **Status**: approved\n- **Location**: `openspec/changes/foundation-types-utils/`\n\nThe implementation followed the specifications in this proposal, and the checklist in `tasks.md` is now complete.\n\n---\n\n### Implementation Summary\n\nAll type definitions and utility functions have been implemented as specified:\n\n- **Type Definitions**: All data model interfaces are defined in `src/types/`, including `events.ts`, `team.ts`, `partners.ts`, `content.ts`, and `settings.ts`.\n\n- **Utility Functions**: Helper functions for formatting (`src/utils/formatting.ts`), validation (`src/utils/validation.ts`), and API interactions with Supabase (`src/utils/api.ts`) have been created.\n\n- **Integration**: The `ContentContext` in `src/contexts/ContentContext.tsx` has been successfully updated to import and use these new types, ensuring type-safe state management across the application.",
-        "testStrategy": "All types were confirmed to compile without errors using `tsc --noEmit`. Unit tests were written for all utility functions in `src/utils/` using Vitest, covering all specified edge cases. All tests are passing, validating the implementation against the criteria in `openspec/changes/foundation-types-utils/tasks.md`.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Review and Finalize OpenSpec Proposal",
-            "description": "Review the draft OpenSpec proposal to ensure it aligns with project goals and technical requirements before starting implementation. This step is crucial to formalize the plan.",
-            "dependencies": [],
-            "details": "Locate the proposal in `openspec/changes/foundation-types-utils/`. Review the type definitions, utility function signatures, and the implementation checklist in `tasks.md`. Provide feedback and get approval to move the proposal from `draft` to `approved` status.",
-            "status": "done",
-            "testStrategy": "Confirmation of review and approval from the project lead. The spec's status should be updated to 'approved' before subsequent tasks begin.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 2,
-            "title": "Create Directory Structure and Core Event Type Definition",
-            "description": "Establish the foundational directory structure and implement the `Event` type, which is central to the application, according to the approved specification.",
-            "dependencies": [
-              1
-            ],
-            "details": "Create the `src/types` and `src/utils` directories if they don't already exist. Then, create the file `src/types/events.ts` and implement the `Event` TypeScript interface precisely as specified in the `foundation-types-utils` OpenSpec.",
-            "status": "done",
-            "testStrategy": "Run `tsc --noEmit` to ensure the new type file compiles correctly without errors. No runtime tests are needed for this structure and type definition task.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 3,
-            "title": "Define Team Member and Partner TypeScript Interfaces",
-            "description": "Expand the application's data models by defining the TypeScript interfaces for `TeamMember` and `Partner` based on the approved OpenSpec.",
-            "dependencies": [
-              2
-            ],
-            "details": "In the `src/types` directory, create `team.ts` and `partners.ts`. Implement the `TeamMember` and `Partner` interfaces exactly as defined in the `foundation-types-utils` OpenSpec to ensure consistency with the data schema.",
-            "status": "done",
-            "testStrategy": "Verify type correctness by running `tsc --noEmit`. Ensure all defined interfaces are exported correctly from their respective modules as per the spec.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 4,
-            "title": "Define Interfaces for General Page Content and Settings",
-            "description": "Create TypeScript types for singleton content pieces and global settings, following the data models specified in the OpenSpec.",
-            "dependencies": [
-              2
-            ],
-            "details": "Create `src/types/content.ts` and `src/types/settings.ts`. Implement the `HeroContent`, `AboutContent`, `GalleryImage`, and `Settings` interfaces as detailed in the approved `foundation-types-utils` OpenSpec.",
-            "status": "done",
-            "testStrategy": "Compile the project using `tsc --noEmit` to check for any syntax or type-related errors in the newly created definition files.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 5,
-            "title": "Implement Formatting and Validation Utility Functions",
-            "description": "Create a set of reusable utility functions for common data manipulation tasks, as specified in the OpenSpec, to ensure consistency across the application.",
-            "dependencies": [
-              1
-            ],
-            "details": "In `src/utils`, create `formatting.ts` and `validation.ts`. Implement the utility functions (`formatDate`, `isValidUrl`, etc.) according to the specification in the `foundation-types-utils` OpenSpec. The spec may recommend libraries like `zod` for more complex schema validation.",
-            "status": "done",
-            "testStrategy": "Write unit tests for each utility function using Vitest. Test `formatDate` with various date objects and edge cases. For validation functions, test with both valid and invalid inputs to ensure correctness, following the checklist in `tasks.md`.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 6,
-            "title": "Create Initial API Helper Functions for Supabase",
-            "description": "Establish a centralized API layer by creating an `api.ts` file containing typed functions for interacting with the Supabase backend, as laid out in the OpenSpec.",
-            "dependencies": [
-              2,
-              3,
-              4
-            ],
-            "details": "Create `src/utils/api.ts`. Following the OpenSpec, import the newly created data model types and define async helper functions (`getEvents`, `getTeamMembers`, etc.) that will wrap Supabase calls. Ensure function signatures match the spec.",
-            "status": "done",
-            "testStrategy": "Since the Supabase client may not yet be implemented, this task can be tested by ensuring the file compiles without errors (`tsc --noEmit`) and that the function signatures correctly use the TypeScript types defined in previous tasks.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 7,
-            "title": "Conduct Final Code Review and Merge",
-            "description": "Review the completed implementation of all types and utilities to ensure it meets code quality standards and correctly follows the OpenSpec proposal before merging.",
-            "dependencies": [
-              1,
-              2,
-              3,
-              4,
-              5,
-              6
-            ],
-            "details": "Perform a thorough code review of the changes in the relevant feature branch. Check for adherence to the coding style, correctness of the TypeScript types, and the implementation of utility functions. Verify that the integration with `ContentContext.tsx` is correct. Once approved, merge the branch into main.",
-            "status": "done",
-            "testStrategy": "Approval from at least one other project lead. Successful merge of the feature branch into the main development branch without conflicts.",
-            "parentId": "undefined"
-          }
-        ],
-        "complexity": 3,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Based on the provided subtasks, generate detailed implementation steps for each. For type definitions, ensure all fields from the PRD's data models are included. For utility functions, provide code examples for date formatting, email validation, and a placeholder for an API helper function that fetches events."
+        "status": "pending",
+        "subtasks": []
       },
       {
-        "id": 2,
-        "title": "Configuration: Initialize and Configure Supabase Client",
-        "description": "The Supabase client instance has been successfully configured by refactoring hardcoded credentials into environment variables. Database types were generated from the schema, ensuring end-to-end type safety. This work was completed according to the OpenSpec proposal `supabase-client-config`.",
-        "status": "done",
-        "dependencies": [
-          "1"
-        ],
+        "id": 14,
+        "title": "Finalize Tailwind CSS v4 and Shadcn/ui Configuration",
+        "description": "Finalize the configuration of Tailwind CSS v4 and its integration with Shadcn/ui. This involves adding the Vite plugin, creating the Tailwind theme configuration, refining global CSS variables, and creating the class-merging utility.",
+        "details": "The project has a partial Tailwind v4 setup. This task is to complete it.\n1. Add the `@tailwindcss/vite` plugin to `vite.config.ts`.\n2. Create/update `tailwind.config.ts` with the shadcn/ui theme configuration (container, colors, radius, keyframes) and the `tailwindcss-animate` plugin. Ensure `darkMode: 'class'` is set.\n3. Refine `src/styles/globals.css` to define the complete set of CSS variables for light and dark themes as required by shadcn/ui.\n4. Create the `cn` utility function in `src/lib/utils.ts` using the already installed `clsx` and `tailwind-merge` packages.\n5. Ensure `src/index.css` is imported in `src/main.tsx` to apply styles globally.",
+        "testStrategy": "Apply Tailwind utility classes to a test component in `App.tsx`. Verify styles are applied correctly. Use the `cn` utility to conditionally apply classes and check the output. Manually toggle the 'dark' class on the `<html>` element in the browser's dev tools to confirm dark mode styles defined in `globals.css` work as expected. Ensure the build process purges unused CSS.",
         "priority": "high",
-        "details": "## OpenSpec Proposal\n- **Proposal ID**: `supabase-client-config`\n- **Status**: implemented\n- **Location**: `openspec/changes/supabase-client-config/`\n\nThe implementation is complete and matches the OpenSpec specification. Hardcoded credentials have been removed and replaced with a typed, singleton client that reads its configuration from Vite environment variables.\n\n### Implementation Summary\n- **Client File**: A singleton Supabase client was created in `src/supabase/client.ts` using `createClient` from `@jsr/supabase__supabase-js`.\n- **Environment Variables**: The client is configured using `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from the `.env` file, with runtime checks to ensure they are present.\n- **Type Safety**: Database types were generated via the Supabase CLI into `src/supabase/types.ts`, providing a strongly-typed `Database` interface for the client. This includes types for all 10 discovered tables (settings, partners, teams, etc.).\n- **Backward Compatibility**: The old configuration file, `src/utils/supabase/info.tsx`, was not deleted. It was updated to re-export the new client, acting as a compatibility layer to prevent breaking existing imports.\n\n```typescript\n// src/supabase/client.ts (Final Implementation)\nimport { createClient } from '@jsr/supabase__supabase-js';\nimport type { Database } from './types';\n\nconst supabaseUrl = import.meta.env.VITE_SUPABASE_URL;\nconst supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;\n\nif (!supabaseUrl || !supabaseAnonKey) {\n  throw new Error('Supabase URL and anon key are required.');\n}\n\nexport const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);\n```",
-        "testStrategy": "The new `supabaseClient` was tested by performing a basic read query (`supabaseClient.from('events').select('*').limit(1)`), which successfully connected and returned data without errors. It has been confirmed that the application builds and runs correctly with the new client. The backward-compatibility shim in `src/utils/supabase/info.tsx` ensures that older parts of the application continue to function without requiring immediate refactoring.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Install @jsr/supabase__supabase-js Dependency",
-            "description": "The official Supabase JavaScript client library from the JSR registry has been added to the project's dependencies, enabling interaction with the Supabase backend.",
-            "dependencies": [],
-            "details": "The command `npx jsr add @supabase/supabase-js` was run, successfully adding the JSR package to the project's `package.json`.",
-            "status": "done",
-            "testStrategy": "Verification confirmed that `@jsr/supabase__supabase-js` is listed in `package.json` with a `jsr:` specifier.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 2,
-            "title": "Set Up Environment Variables for Supabase Credentials",
-            "description": "A local environment file was created to securely store the Supabase project URL and anon key, replacing the previous hardcoded values.",
-            "dependencies": [],
-            "details": "A `.env.local` file was created in the project root containing `VITE_SUPABASE_URL='https://qhimllczaejftnuymrsr.supabase.co'` and `VITE_SUPABASE_ANON_KEY`. This file is correctly listed in `.gitignore`.",
-            "status": "done",
-            "testStrategy": "The environment variables were verified as accessible within the Vite application via `import.meta.env`.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 3,
-            "title": "Generate TypeScript Types from Supabase Schema",
-            "description": "TypeScript definitions were automatically generated from the live database schema using the Supabase CLI, establishing end-to-end type safety.",
-            "dependencies": [],
-            "details": "The command `supabase gen types typescript --project-id qhimllczaejftnuymrsr > src/supabase/types.ts` was executed. The generated file at `src/supabase/types.ts` now contains the `Database` interface reflecting all 10 project tables.",
-            "status": "done",
-            "testStrategy": "The generated `src/supabase/types.ts` file was inspected and confirmed to contain a comprehensive `Database` interface reflecting the current schema.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 4,
-            "title": "Create and Implement the Supabase Client Singleton",
-            "description": "The core Supabase client instance was implemented in a dedicated file, replacing the previous hardcoded configuration.",
-            "dependencies": [
-              1,
-              2,
-              3
-            ],
-            "details": "The file `src/supabase/client.ts` was created, which initializes and exports the typed `supabaseClient`. The now-obsolete `src/utils/supabase/info.tsx` file was updated to re-export the new client, ensuring backward compatibility for any existing imports.",
-            "status": "done",
-            "testStrategy": "The `src/supabase/client.ts` module compiles without TypeScript errors. The application builds and runs successfully, and IDEs provide correct type hints for the client.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 5,
-            "title": "Verify Client Connection and Remove Old Implementation",
-            "description": "The new client's connection to Supabase was confirmed as successful, and the old implementation was deprecated in favor of the new singleton.",
-            "dependencies": [
-              4
-            ],
-            "details": "A test query (`supabaseClient.from('events').select('*')`) was executed and returned data successfully. Rather than being deleted, the old file `src/utils/supabase/info.tsx` was repurposed to re-export the new client, maintaining backward compatibility.",
-            "status": "done",
-            "testStrategy": "The successful data fetch was observed in the browser's developer console. The project builds correctly, and the re-export strategy from `src/utils/supabase/info.tsx` was verified to work as intended.",
-            "parentId": "undefined"
-          }
-        ],
-        "complexity": 4,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Generate a series of shell commands and code snippets to complete the subtasks. Include commands for installing dependencies, creating and populating the `.env.local` file, running the Supabase CLI for type generation, and the full code for the `src/supabase/client.ts` file."
-      },
-      {
-        "id": 3,
-        "title": "UI Layer: Implement Core Reusable Component Library",
-        "description": "Build the set of reusable, accessible UI components as specified in the `add-ui-component-library` OpenSpec proposal. This component library will be based on shadcn/ui patterns, using Radix UI primitives and Tailwind CSS, and will include core elements like Button, Input, Dialog, Card, and Form controls.",
-        "status": "done",
-        "dependencies": [
-          "1"
-        ],
-        "priority": "high",
-        "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-ui-component-library`\n- **Status**: draft\n- **Location**: `openspec/changes/add-ui-component-library/`\n\nThis task is to implement the UI component library as defined in the associated OpenSpec proposal. The proposal contains a detailed implementation checklist and technical requirements. **The first step is to review and approve this proposal.**\n\n### Implementation Guidance\nPopulate the `src/components/ui/` directory with components as defined in the OpenSpec. Use the `shadcn/ui` CLI to bootstrap components where possible, or build them manually following the same pattern. Ensure all components are styled with Tailwind CSS, support dark mode via `next-themes`, and forward refs correctly. \n\nExample for a button:\n```tsx\n// src/components/ui/button.tsx\nimport { Slot } from '@radix-ui/react-slot';\nimport { cva, type VariantProps } from 'class-variance-authority';\nimport * as React from 'react';\n// ... implementation following shadcn/ui pattern\n```",
-        "testStrategy": "Manually test each component in a Storybook environment or a dedicated test page, following the test criteria outlined in the OpenSpec proposal. Verify responsiveness, accessibility (keyboard navigation, ARIA attributes), and visual consistency in both light and dark modes. Ensure components accept and render props correctly.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Review and Approve OpenSpec Proposal",
-            "description": "Review the draft OpenSpec proposal for the UI component library to ensure it aligns with project goals and technical requirements. This must be completed before implementation begins.",
-            "dependencies": [],
-            "details": "Locate the proposal at `openspec/changes/add-ui-component-library/`. Review the `spec.md` and `checklist.md` files. Provide feedback, suggest changes, and formally approve the proposal to unblock the implementation subtasks. Key areas for review include the component list, accessibility standards, and React Hook Form integration strategy.",
-            "status": "done",
-            "testStrategy": "N/A - This is a review task. Approval is the measure of completion.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 2,
-            "title": "Implement Reusable Input Component",
-            "description": "Create the `Input` component for text-based user input, following the shadcn/ui pattern. This component is a fundamental building block for all forms in the application.",
-            "dependencies": [
-              1
-            ],
-            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add input` to bootstrap the component file in `src/components/ui/input.tsx`. Verify that the component correctly forwards refs and accepts all standard input props. Ensure its styling is consistent with the project's Tailwind CSS theme and supports dark mode.",
-            "status": "done",
-            "testStrategy": "Manually test the component in a Storybook or a dedicated test page. Verify it renders correctly in both light and dark modes. Test its behavior with different props (e.g., `type`, `placeholder`, `disabled`).",
-            "parentId": "undefined"
-          },
-          {
-            "id": 3,
-            "title": "Implement Reusable Card Component Suite",
-            "description": "Create a set of `Card` components for displaying content in a structured container. This includes the main `Card` wrapper and sub-components like `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, and `CardFooter`.",
-            "dependencies": [
-              1
-            ],
-            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add card` to bootstrap the component files in `src/components/ui/card.tsx`. These components will be used extensively for displaying events, team members, and other content blocks on the public site and dashboard.",
-            "status": "done",
-            "testStrategy": "Manually test the `Card` by composing it with its sub-components on a test page. Verify padding, borders, and background colors are correct in light and dark modes. Ensure content passed to each section renders correctly.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 4,
-            "title": "Implement Form Components for React Hook Form Integration",
-            "description": "Implement the `Form` components which act as a wrapper around `react-hook-form` to simplify form creation and state management. This includes `Form`, `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormDescription`, and `FormMessage`.",
-            "dependencies": [
-              1,
-              2
-            ],
-            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add form` to add the necessary components. These provide the structure for building accessible forms with built-in validation messages, required for the dashboard features (Tasks 7, 8). This requires `react-hook-form` to be installed as a dependency.",
-            "status": "done",
-            "testStrategy": "Create a sample form on a test page using `react-hook-form` and the new `Form` components with an `Input`. Test that form state is managed correctly, validation errors are displayed by `FormMessage`, and labels are correctly associated with controls.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 5,
-            "title": "Implement Reusable Dialog (Modal) Component",
-            "description": "Create the `Dialog` component for displaying modal windows. This is essential for confirmation prompts (e.g., delete actions in the dashboard) and for showing detailed information without navigating away from the page.",
-            "dependencies": [
-              1
-            ],
-            "details": "Use the `shadcn/ui` CLI command `npx shadcn-ui@latest add dialog` to bootstrap the component files. This will create `Dialog`, `DialogTrigger`, `DialogContent`, and other related parts. Ensure it's accessible, can be closed with the Escape key, and the overlay works correctly.",
-            "status": "done",
-            "testStrategy": "Test the `Dialog` by creating a trigger button that opens it. Verify that the overlay covers the page, the content renders correctly, and it can be closed via a close button, the Escape key, or by clicking the overlay. Test in both light and dark modes.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 6,
-            "title": "Implement Select and Checkbox Form Control Components",
-            "description": "Add the `Select` (dropdown) and `Checkbox` components to the UI library. These are critical for building advanced forms and filtering controls, such as in the events page (Task 10) and dashboard (Tasks 7, 8).",
-            "dependencies": [
-              1,
-              4
-            ],
-            "details": "Use the `shadcn/ui` CLI to add both components: `npx shadcn-ui@latest add select` and `npx shadcn-ui@latest add checkbox`. These components are based on Radix UI primitives for accessibility. They must be integrated within the `Form` component structure.",
-            "status": "done",
-            "testStrategy": "Add `Select` and `Checkbox` controls to the test form created in subtask 4. Verify that selecting an option or checking the box correctly updates the form state via `react-hook-form`. Test keyboard navigation for both components to ensure accessibility.",
-            "parentId": "undefined"
-          }
-        ],
-        "complexity": 3,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "For each subtask (Input, Card, Form, Dialog, etc.), generate the `shadcn/ui` CLI command to add the component. Then, provide a basic usage example for each component within a React functional component to demonstrate its props and structure."
-      },
-      {
-        "id": 4,
-        "title": "State Management: Implement Global ContentContext",
-        "description": "Create the `ContentContext` to manage the global state for all content entities: events, team, partners, gallery, hero, about, and settings. This context will handle fetching data from Supabase and providing it to the application.",
-        "details": "Create `src/contexts/ContentContext.tsx`. The provider component, `ContentProvider`, will fetch all initial data from Supabase in a `useEffect` hook. The context will expose the data, loading states, and error states. It will also provide functions to mutate the data (e.g., `addEvent`, `updateTeamMember`), which will call the Supabase client and then update the local state.\n\n```tsx\n// src/contexts/ContentContext.tsx\nimport React, { createContext, useContext, useState, useEffect } from 'react';\nimport { supabaseClient } from '@/supabase/client';\n// ...\n\nconst ContentContext = createContext<any>(null);\n\nexport const ContentProvider = ({ children }) => {\n  const [events, setEvents] = useState([]);\n  // ... other states\n\n  useEffect(() => {\n    const fetchData = async () => {\n      const { data: eventsData } = await supabaseClient.from('events').select('*');\n      setEvents(eventsData || []);\n      // ... fetch other data\n    };\n    fetchData();\n  }, []);\n\n  return <ContentContext.Provider value={{ events, ... }}>{children}</ContentContext.Provider>;\n};\n\nexport const useContent = () => useContext(ContentContext);\n```\n<info added on 2025-11-07T00:45:32.526Z>\n\"\\n\\n## OpenSpec Proposal\\n- **Proposal ID**: implement-content-context-supabase\\n- **Status**: draft (pending review)\\n- **Location**: `openspec/changes/implement-content-context-supabase/`\\n\\nThe proposal, located at `proposal.md` in the directory above, covers the implementation of Supabase data fetching, loading/error states, and mutation functions for the ContentContext.\"\n</info added on 2025-11-07T00:45:32.526Z>",
-        "testStrategy": "Write integration tests for the `ContentProvider`. Mock the `supabaseClient` to return predefined data. Wrap a test component with the provider and use the `useContent` hook to assert that the correct data is available, loading states are handled, and mutation functions are called as expected.",
-        "priority": "high",
-        "dependencies": [
-          "1",
-          "2"
-        ],
-        "status": "done",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Define ContentContext Shape and Provider Boilerplate",
-            "description": "Create the file at `src/contexts/ContentContext.tsx` and define the basic structure. This includes defining the `ContentContextType` interface, creating the context with `createContext`, setting up the `ContentProvider` component, and exporting the `useContent` custom hook.",
-            "dependencies": [],
-            "details": "In `src/contexts/ContentContext.tsx`, import React and necessary types from `src/types/`. Define an interface `ContentContextType` that outlines all the data arrays (events, team, etc.), loading and error states, and the signatures for future mutation functions. Create the initial context and the `ContentProvider` that returns the `ContentContext.Provider`.",
-            "status": "done",
-            "testStrategy": "Ensure the file compiles without type errors. Create a simple test page that consumes the context with `useContent` and verifies that the initial (empty) values are provided without crashing the application.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 2,
-            "title": "Implement Initial Data Fetching from Supabase",
-            "description": "In the `ContentProvider`, implement a `useEffect` hook to fetch all initial data for events, team, partners, gallery, hero, about, and settings from the Supabase database upon component mount.",
-            "dependencies": [
-              1
-            ],
-            "details": "Import the `supabaseClient` from `src/supabase/client.ts`. Inside the `useEffect` hook, create an async function `fetchData`. Use `Promise.all` to concurrently fetch data from all required Supabase tables (e.g., `supabaseClient.from('events').select('*')`). Use `useState` hooks to store the data for each entity.",
-            "status": "done",
-            "testStrategy": "Wrap a test component with the provider. Use `useEffect` in the test component to check if the state variables (e.g., `events`, `team`) are populated with data after the initial render. Mock the `supabaseClient` to return predictable data for testing.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 3,
-            "title": "Add Loading and Error State Management",
-            "description": "Enhance the `ContentProvider` to manage and expose global loading and error states related to the initial data fetch.",
-            "dependencies": [
-              2
-            ],
-            "details": "Introduce two new states: `loading` (boolean) and `error` (string | null). Set `loading` to `true` before the `Promise.all` call begins. In a `try...catch` block, set `loading` to `false` in the `finally` block. If an error occurs during the fetch, catch it, set the `error` state with an appropriate message, and log the full error.",
-            "status": "done",
-            "testStrategy": "Test three scenarios by mocking `supabaseClient`: 1) Successful fetch: assert `loading` goes from true to false and `error` is null. 2) Failed fetch: assert `loading` goes from true to false and `error` is populated. 3) Slow fetch: verify the `loading` state is true while the promise is unresolved.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 4,
-            "title": "Implement Mutation Functions for Events Entity",
-            "description": "Add functions to the context for creating, updating, and deleting events. These functions will handle the Supabase API calls and update the local state to reflect the changes.",
-            "dependencies": [
-              1
-            ],
-            "details": "Define `addEvent`, `updateEvent`, and `deleteEvent` functions within the `ContentProvider`. Each function will take the necessary data as arguments, call the corresponding Supabase method (`.insert()`, `.update()`, `.delete()`), and handle any errors. After a successful mutation, either refetch the events list or apply an optimistic update to the `events` state using the `setEvents` setter.",
-            "status": "done",
-            "testStrategy": "In an integration test, call a mutation function like `addEvent`. Mock the `supabaseClient` to simulate a successful API call. Assert that the Supabase client method was called with the correct arguments and that the local `events` state in the context is updated accordingly.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 5,
-            "title": "Integrate ContentProvider into the Application Root",
-            "description": "Wrap the root component of the application with the `ContentProvider` to make the global state available to all child components.",
-            "dependencies": [
-              3,
-              4
-            ],
-            "details": "Locate the application's root entry point, which is likely `src/pages/_app.tsx` in a Next.js project. Import the `ContentProvider` and wrap the main `<Component {...pageProps} />` with it. This ensures that any page or component in the application can use the `useContent` hook to access global data, loading/error states, and mutation functions.",
-            "status": "done",
-            "testStrategy": "Manually navigate to several different pages of the application. On each page, use browser developer tools to inspect a component that calls `useContent`. Verify that the context provides the expected data without causing any application-wide errors. Confirm that data persists across navigation.",
-            "parentId": "undefined"
-          }
-        ],
-        "complexity": 8,
-        "recommendedSubtasks": 8,
-        "expansionPrompt": "Break down the implementation of mutation functions for each major data entity. Create separate subtasks for implementing CRUD functions (create, update, delete) for Team, Partners, and Gallery within the ContentContext, following the pattern established for Events.",
-        "updatedAt": "2025-11-07T00:53:19.749Z"
-      },
-      {
-        "id": 5,
-        "title": "Navigation: Implement Custom Client-Side Router",
-        "description": "Successfully implemented a custom, lightweight client-side router, completing the work specified in the `refactor-router-system` OpenSpec proposal. The new system uses the React Context API and the browser's History API for navigation and is built around a flexible path-based routes object pattern.",
-        "status": "done",
         "dependencies": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1401,
+            "title": "Configure Vite with TailwindCSS Plugin",
+            "description": "Update the `vite.config.ts` file to import and use the `@tailwindcss/vite` plugin.",
+            "dependencies": [],
+            "details": "Import `tailwindcss` from `@tailwindcss/vite` and add it to the `plugins` array in the `defineConfig` call within `vite.config.ts`. This enables Tailwind to process styles during development and build.",
+            "status": "pending",
+            "testStrategy": "Run the Vite development server. Check for any console errors related to Tailwind CSS. A successful start indicates the plugin is loaded correctly."
+          },
+          {
+            "id": 1402,
+            "title": "Create and Configure tailwind.config.ts for Shadcn",
+            "description": "Create the `tailwind.config.ts` file and populate it with the theme required by shadcn/ui.",
+            "dependencies": [],
+            "details": "Create `tailwind.config.ts` at the project root. Configure the `content` array to scan `src/**/*.{ts,tsx}` files. Set `darkMode: 'class'`. Inside the `theme` object, configure `container`, `extend` `colors`, `borderRadius`, `keyframes`, and `animation` with the values provided by the shadcn/ui documentation. Add the `tailwindcss-animate` plugin to the `plugins` array.",
+            "status": "pending",
+            "testStrategy": "After configuration, apply a custom color (e.g., `bg-primary`) to an element. Verify in the browser that the correct hex code is applied."
+          },
+          {
+            "id": 1403,
+            "title": "Refine and Finalize globals.css",
+            "description": "Update the existing `src/styles/globals.css` to include all necessary base styles, layers, and CSS variables for the shadcn/ui theme.",
+            "dependencies": [
+              1402
+            ],
+            "details": "In `src/styles/globals.css`, ensure the `@tailwind` directives for `base`, `components`, and `utilities` are present. Below these, define the full set of CSS variables for colors, radius, etc., within `@layer base`. Define separate variable sets for the root `:root` (light theme) and `.dark` selectors.",
+            "status": "pending",
+            "testStrategy": "Inspect the `<html>` element in the browser. Verify all CSS variables (`--background`, `--foreground`, etc.) are defined. Toggle the `.dark` class on the `<html>` element and verify the CSS variable values update."
+          },
+          {
+            "id": 1404,
+            "title": "Create cn() Class-Merging Utility",
+            "description": "Create a `cn.ts` utility file that exports a function for safely merging Tailwind CSS classes.",
+            "dependencies": [],
+            "details": "Create a file at `src/lib/utils.ts`. Import `clsx` and `tailwind-merge`. Export a function `cn` that takes `...inputs: ClassValue[]` and returns `twMerge(clsx(inputs))`. This utility is essential for building components with variant styles.",
+            "status": "pending",
+            "testStrategy": "Create a test case, either manually or with Vitest, that calls `cn('p-4', 'p-2')` and asserts that the result is `'p-2'`, demonstrating the merging logic."
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Initialize Supabase Client Configuration",
+        "description": "Set up and configure the Supabase JavaScript client to enable communication with the Supabase backend for database operations, authentication, and storage.",
+        "details": "Install the Supabase client library: `npm install @supabase/supabase-js`. Create a file at `src/supabase/client.ts`. Initialize the client using `createClient` from `@supabase/supabase-js`. Store your Supabase URL and anon key in `.env.local` as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` and access them via `import.meta.env`. Export a single, memoized instance of the client.",
+        "testStrategy": "Write a small test script or a temporary component that attempts to fetch a simple list (e.g., `supabase.from('some_table').select('*')`). A successful connection without authentication or RLS errors confirms the setup is correct. Ensure environment variables are not exposed in the client-side bundle.",
         "priority": "high",
-        "details": "## OpenSpec Proposal\n- **Proposal ID**: `refactor-router-system`\n- **Status**: approved\n- **Location**: `openspec/changes/refactor-router-system/`\n\n### Implementation Summary\nThe implementation followed the specifications in this proposal, and the checklist in `tasks.md` is now complete. The legacy page-based router was successfully replaced by the new path-based system located in `src/components/router/`.\n\nThe final implementation in `src/components/router/index.tsx` includes a `RouterProvider` that manages the application's navigation state and a `Router` component that dynamically renders page components. The system has been fully integrated into `src/App.tsx`.",
-        "testStrategy": "Manual and integration testing was completed successfully. Navigation was verified by clicking `Link` components and using browser back/forward buttons, confirming that the correct page component renders and the URL updates as expected. All criteria in the implementation checklist from `openspec/changes/refactor-router-system/tasks.md` have been met.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Created RouterContext and Initial RouterProvider Structure",
-            "description": "The file `src/components/router/index.tsx` was created, defining the `RouterContext` and the basic `RouterProvider` component, which formed the foundation of the routing system.",
-            "dependencies": [],
-            "details": "As specified in `openspec/changes/refactor-router-system/`, the file `src/components/router/index.tsx` was created. The context type was defined as `{ path: string; navigate: (to: string) => void; } | null`. The `RouterProvider` component was implemented to accept `children` and wrap them with the `RouterContext.Provider`, passing the current path state (initialized from `window.location.pathname`) and the `navigate` function.",
-            "status": "done",
-            "testStrategy": "The `RouterProvider` was confirmed to render its children without issues. React DevTools was used to inspect the context provider and verify it held the initial path value correctly.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 2,
-            "title": "Integrated Browser History API into RouterProvider",
-            "description": "The `RouterProvider` was enhanced to handle browser navigation by implementing the `navigate` function with `pushState` and adding a `popstate` event listener.",
-            "dependencies": [
-              1
-            ],
-            "details": "In `RouterProvider`, the `navigate` function was implemented to call `window.history.pushState({}, '', to)` and update the component's `path` state. A `useEffect` hook was added to register a `popstate` event listener on mount, which updates the path state, with a cleanup function to remove the listener on unmount.",
-            "status": "done",
-            "testStrategy": "The `navigate` function was tested and verified to update the URL and re-render the component. The browser's back and forward buttons were tested to ensure the `popstate` listener correctly updated the path state.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 3,
-            "title": "Built `useRouter` Hook and Page-Rendering `Router` Component",
-            "description": "A `useRouter` hook was created for context access, and a `Router` component was built that uses a routes object to render the correct page based on the current path.",
-            "dependencies": [
-              1,
-              2
-            ],
-            "details": "The `useRouter` hook was implemented to call `useContext(RouterContext)` and throw an error if used outside the provider. The `Router` component was built to implement the 'routes object pattern', accepting a `routes` prop and rendering the component for the current path or a `404` fallback.",
-            "status": "done",
-            "testStrategy": "A test page with `RouterProvider` and `Router` confirmed that changing the path rendered the correct component from a mock `routes` object.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 4,
-            "title": "Developed a Reusable `Link` Component for Navigation",
-            "description": "A reusable `Link` component was created for declarative, internal navigation that uses the router's `navigate` function to prevent full page reloads.",
-            "dependencies": [
-              3
-            ],
-            "details": "A `Link.tsx` component was created in `src/components/router/`. Its `onClick` handler was implemented to call `event.preventDefault()` and then the `navigate(to)` function obtained from the `useRouter` hook. The underlying `<a>` tag's `href` is set to the `to` prop.",
-            "status": "done",
-            "testStrategy": "Rendered `Link` components were clicked, and it was asserted that the URL changed without a page refresh and the correct component was displayed by the `Router`.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 5,
-            "title": "Integrated RouterProvider and Router into the Main App",
-            "description": "The new router system was wired up in `src/App.tsx`. The application was wrapped with `RouterProvider`, and `Router` and `Link` components were used to define routes and navigation.",
-            "dependencies": [
-              3,
-              4
-            ],
-            "details": "In `src/App.tsx`, the router system was fully integrated. The main app structure is now wrapped with `<RouterProvider>`, and a `routes` object is defined and passed to `<Router routes={...} />`. The main navigation menu was updated to use the new `Link` component.",
-            "status": "done",
-            "testStrategy": "The application was run and all defined routes were manually navigated. The URL updated correctly, the proper pages rendered, and browser back/forward buttons worked as expected.",
-            "parentId": "undefined"
-          }
+        "dependencies": [
+          13
         ],
-        "complexity": 10,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Given the extreme complexity and architectural conflict, provide two expansion paths. Path A: Detail the steps to implement the custom router as described, including code for the `RouterProvider`, `useRouter` hook, and `Link` component. Path B: Propose an alternative, framework-aligned implementation using the Next.js App Router, detailing how to create layouts and pages and use `next/link` for navigation."
+        "status": "pending",
+        "subtasks": []
       },
       {
-        "id": 6,
-        "title": "Admin UI: Build Dashboard Layout and Navigation",
-        "description": "Refactor the admin dashboard layout to integrate with the new client-side router. This involves migrating from a state-based navigation model to a URL-based system, as outlined in the `integrate-dashboard-router` OpenSpec proposal. The goal is to make the dashboard sections (Events, Team, etc.) addressable via unique URLs like `/admin/events`.",
-        "status": "done",
-        "dependencies": [
-          "3",
-          "5"
-        ],
-        "priority": "medium",
-        "details": "## OpenSpec Proposal\n- **Proposal ID**: `integrate-dashboard-router`\n- **Status**: implemented\n- **Location**: `openspec/changes/integrate-dashboard-router/`\n\n## Implementation Summary\nAll deliverables from the proposal are complete:\n- `src/components/router/index.tsx` now supports `/admin/*` nested routes and exposes helpers such as `getCurrentSubPath`.\n- `src/components/Dashboard.tsx` derives the active dashboard page from the router instead of local state.\n- `src/components/dashboard/DashboardLayout.tsx` removes the legacy `currentPage` props, updates navigation links to use `Link`, and keeps the responsive sidebar experience.\n- `src/App.tsx` registers the `/admin/*` route so deep linking, browser history, and direct navigation all work.\n\nManual testing covered sidebar navigation, direct URL entry (for example `/admin/events`), and browser back/forward navigation to confirm the new routing flow.",
-        "testStrategy": "Manually test the layout on various screen sizes to ensure responsiveness is maintained. Verify that all navigation links in the sidebar update the browser's URL and render the correct page component without a full-page refresh. Test direct navigation by manually entering URLs (e.g., `/admin/team`) into the address bar. Confirm that the previously state-based navigation has been fully removed.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Router Enhancement: Add nested route matching support",
-            "description": "Add nested route matching support to router (e.g., `/admin/*` matches `/admin/events`, `/admin/team`)",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 2,
-            "title": "Router Enhancement: Update router to extract sub-paths",
-            "description": "Update router to extract sub-paths from nested routes (e.g., `events` from `/admin/events`)",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 3,
-            "title": "Dashboard Refactoring: Remove currentPage state",
-            "description": "Remove `currentPage` state from `Dashboard.tsx`",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 4,
-            "title": "Dashboard Refactoring: Remove onNavigate callback",
-            "description": "Remove `onNavigate` callback from `Dashboard.tsx`",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 5,
-            "title": "Dashboard Refactoring: Use useRouter hook",
-            "description": "Update `Dashboard` to use `useRouter` hook to get current path",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 6,
-            "title": "Dashboard Refactoring: Extract admin sub-path from URL",
-            "description": "Extract admin sub-path from current URL (e.g., `events` from `/admin/events`)",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 7,
-            "title": "Dashboard Refactoring: Update renderPage()",
-            "description": "Update `renderPage()` to use extracted sub-path instead of state",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 8,
-            "title": "DashboardLayout Updates: Remove currentPage prop",
-            "description": "Remove `currentPage` prop from `DashboardLayoutProps` interface",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 9,
-            "title": "DashboardLayout Updates: Remove onNavigate prop",
-            "description": "Remove `onNavigate` prop from `DashboardLayoutProps` interface",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 10,
-            "title": "DashboardLayout Updates: Add useRouter hook",
-            "description": "Add `useRouter` hook to `DashboardLayout` to get current path",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 11,
-            "title": "DashboardLayout Updates: Derive active navigation item",
-            "description": "Derive active navigation item from current URL path",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 12,
-            "title": "DashboardLayout Updates: Update navigation links",
-            "description": "Update navigation links to use router's `navigate` function with full paths (e.g., `/admin/events`)",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 13,
-            "title": "DashboardLayout Updates: Update header page label",
-            "description": "Update header to display current page label based on URL path",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 14,
-            "title": "App Routing Updates: Update App.tsx routes",
-            "description": "Update `App.tsx` routes to support nested admin routes",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 15,
-            "title": "App Routing Updates: Ensure /admin default route",
-            "description": "Ensure `/admin` route still works as default (redirects to `/admin/home` or shows home)",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 16,
-            "title": "App Routing Updates: Test all admin routes",
-            "description": "Test all admin routes: `/admin`, `/admin/home`, `/admin/events`, `/admin/team`, `/admin/partners`, `/admin/gallery`, `/admin/settings`",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 17,
-            "title": "Testing: Verify browser back/forward buttons",
-            "description": "Verify browser back/forward buttons work correctly",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 18,
-            "title": "Testing: Verify direct URL navigation",
-            "description": "Verify direct URL navigation works (e.g., typing `/admin/events` in address bar)",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 19,
-            "title": "Testing: Verify navigation links update correctly",
-            "description": "Verify navigation links update URL and content correctly",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 20,
-            "title": "Testing: Verify active navigation item highlights",
-            "description": "Verify active navigation item highlights correctly based on URL",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          },
-          {
-            "id": 21,
-            "title": "Testing: Test responsive behavior",
-            "description": "Test responsive behavior (mobile sidebar toggle still works)",
-            "details": "",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 6
-          }
-        ]
-      },
-      {
-        "id": 7,
-        "title": "Feature: Implement Event Management CRUD in Dashboard",
-        "description": "Refine and harden the existing Event Management CRUD functionality to align with the accepted OpenSpec proposal. The core create, read, update, and delete flow is already implemented in `DashboardEvents.tsx` and `DashboardEventForm.tsx`. This task now focuses on production-readiness improvements, including upload validation, safer asset handling, robust error feedback, and improved UX.",
-        "status": "done",
-        "dependencies": [
-          "4",
-          "6"
-        ],
-        "priority": "medium",
-        "details": "The implementation must follow the detailed checklist in the accepted OpenSpec proposal located at `openspec/changes/implement-event-management-crud/tasks.md`. All work should modify the existing components (`DashboardEvents.tsx`, `DashboardEventForm.tsx`) and context (`ContentContext`).\n\nKey refinements include:\n- **File Uploads:** Implement client-side validation for file types/sizes and display upload progress.\n- **Asset Management:** Ensure old images in Supabase Storage are deleted and replaced when an event's image is updated.\n- **State Management:** Guarantee the event form is properly reset when closing the modal to prevent stale data.\n- **Error Handling:** Centralize error handling within `ContentContext` to provide structured error feedback to the UI.\n- **UX:** Implement an accessible confirmation dialog for delete operations.\n\n<info added on 2025-11-07T08:50:42.841Z>\nAn OpenSpec proposal for this feature has been created and is ready for review.\nProposal Location: `openspec/changes/implement-event-management-crud/`\n</info added on 2025-11-07T08:50:42.841Z>",
-        "testStrategy": "Perform targeted testing on the new refinements. 1. Test file upload validation by attempting to upload incorrect file types and sizes. 2. Verify upload progress indicators are displayed and accurate. 3. When editing an event, replace an image and confirm the old file is deleted from Supabase Storage. 4. Test the delete flow, ensuring the accessible confirmation dialog works and that all associated assets are removed from storage upon confirmation. 5. Trigger server errors (e.g., via network throttling) and verify that user-friendly error messages are displayed.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Harden Event List Interactions",
-            "description": "Improve the event list view in `DashboardEvents.tsx` by implementing proper loading, empty, and error states, and ensuring accessibility and responsiveness.",
-            "dependencies": [],
-            "details": "As outlined in `openspec/changes/implement-event-management-crud/tasks.md`, this involves: 1. Showing a loading state in `DashboardEvents.tsx` while fetching data. 2. Implementing a clear empty state message when no events exist. 3. Displaying a user-friendly error message if the data fetch fails. 4. Ensuring the event list is responsive and all interactive elements are accessible.",
-            "status": "done",
-            "testStrategy": "Verify loading indicators appear on load. Check the empty state by clearing the events table. Simulate a fetch error to test the error message. Use keyboard navigation and check responsiveness in dev tools."
-          },
-          {
-            "id": 2,
-            "title": "Refine Form Experience",
-            "description": "Enhance the usability and robustness of the `DashboardEventForm.tsx` component with improved state management and validation.",
-            "dependencies": [],
-            "details": "Based on the OpenSpec, this requires: 1. Implementing a full form reset using `react-hook-form`'s `reset()` method when the modal is closed or after submission. 2. Adding `zod` schema-based validation for real-time feedback. 3. Showing a loading spinner on the submit button during form submission to prevent double-clicks.",
-            "status": "done",
-            "testStrategy": "Open the form, enter data, close it, and reopen to confirm fields are cleared. Trigger validation errors for each field. Click submit and verify the button enters a disabled/loading state."
-          },
-          {
-            "id": 3,
-            "title": "Secure File Upload Pipeline",
-            "description": "Improve the security and user experience of file uploads for event images within the event form.",
-            "dependencies": [],
-            "details": "Following the OpenSpec, implement: 1. Client-side validation for file type and size in `DashboardEventForm.tsx`. 2. A `Progress` component to provide upload feedback. 3. Graceful error handling for upload failures in `ContentContext.tsx`. 4. Use of unique file names (e.g., UUIDs) to prevent conflicts in Supabase Storage.",
-            "status": "done",
-            "testStrategy": "Attempt to upload invalid files to verify errors. For valid files, confirm the progress bar appears. Simulate an upload failure and check for a user-friendly error message. Verify uploaded files in Supabase Storage have unique names."
-          },
-          {
-            "id": 4,
-            "title": "Strengthen Update & Context Logic",
-            "description": "Refactor the core data manipulation logic in `ContentContext.tsx` for better error handling, asset management, and state synchronization.",
-            "dependencies": [],
-            "details": "This subtask involves: 1. Refactoring `createEvent`, `updateEvent`, and `deleteEvent` in `ContentContext.tsx` to return a standard `{ data, error }` object. 2. Ensuring the logic for updating an event's image also deletes the old image file from Supabase Storage. 3. Guaranteeing the local context state syncs correctly after any CUD operation.",
-            "status": "done",
-            "testStrategy": "Simulate an API error and verify the UI handles the returned error object. Edit an event's image and confirm in Supabase Storage that the old file is deleted. Update an event and confirm the list view updates without a page refresh."
-          },
-          {
-            "id": 5,
-            "title": "Validate Deletion Flow",
-            "description": "Implement a safe and clear deletion process with user confirmation and proper cleanup.",
-            "dependencies": [],
-            "details": "As per the OpenSpec: 1. In `DashboardEvents.tsx`, implement an accessible `AlertDialog` from `shadcn/ui` to confirm the delete action. 2. Update the `deleteEvent` function in `ContentContext.tsx` to remove all associated assets (images) from Supabase Storage. 3. Use a `Toast` notification to inform the user of success or failure.",
-            "status": "done",
-            "testStrategy": "Test the confirmation dialog's 'Cancel' and 'Confirm' actions. After confirming deletion, verify the event and all its associated images are removed from the database and Supabase Storage respectively. Check for the success toast."
-          }
-        ]
-      },
-      {
-        "id": 8,
-        "title": "Feature: Implement CMS for Team, Partners, and Gallery",
-        "description": "Upgrade the existing dashboard interfaces for Team, Partners, and Gallery with full Supabase-backed CRUD functionality. This task involves evolving the placeholder components (`DashboardTeam.tsx`, etc.) to match the robust implementation pattern established in the Event Management module (Task 7). An OpenSpec proposal has been drafted and is awaiting approval before implementation can begin.",
-        "status": "done",
-        "dependencies": [
-          "7"
-        ],
-        "priority": "medium",
-        "details": "The primary goal is to enhance `src/components/dashboard/` components—`DashboardTeam.tsx`, `DashboardPartners.tsx`, and `DashboardGallery.tsx`—by connecting them to `ContentContext` for state management. New form components will handle create/update operations, including image uploads to Supabase Storage, aligning with patterns from `DashboardEvents.tsx`.\n\n**Implementation is blocked pending review and approval of the drafted OpenSpec proposal located at `openspec/changes/implement-dashboard-cms-crud/`.** This proposal has been validated with `openspec validate --strict` and contains the detailed implementation checklist that must be followed once approved.",
-        "testStrategy": "Once the OpenSpec proposal is approved, each module (Team, Partners, Gallery) will require full E2E CRUD testing. Testing will verify that creating, updating, and deleting items via the UI correctly persists data in Supabase. Special attention must be given to testing image uploads for team photos, partner logos, and gallery images, including validation and replacement of existing assets, as specified in the proposal.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Propose OpenSpec for Team, Partner, and Gallery CMS",
-            "description": "An OpenSpec proposal has been drafted and validated, outlining the plan to implement full CRUD functionality for the Team, Partner, and Gallery management sections. This document is awaiting review and approval and will serve as the technical blueprint for the subsequent implementation tasks.",
-            "dependencies": [],
-            "details": "The OpenSpec proposal has been created at `openspec/changes/implement-dashboard-cms-crud/` and successfully validated using `openspec validate --strict`. It defines the Supabase table schemas, `ContentContext.tsx` function additions, UI/UX for list/form views, and file handling specifications. It is awaiting final review and approval before implementation can begin.",
-            "status": "done",
-            "testStrategy": "The proposal has passed automated validation. The final step is a manual review by the project lead to grant approval for implementation."
-          },
-          {
-            "id": 2,
-            "title": "Implement Data Layer for Team, Partners, and Gallery in ContentContext",
-            "description": "Extend the existing `ContentContext.tsx` to manage state and CRUD operations for Team Members, Partners, and Gallery Items, based on the approved OpenSpec.",
-            "dependencies": [
-              1
-            ],
-            "details": "In `src/context/ContentContext.tsx`, add new state arrays (`teamMembers`, `partners`, `galleryItems`) and implement async functions for CRUD operations. All work must strictly adhere to the approved OpenSpec proposal at `openspec/changes/implement-dashboard-cms-crud/`, which details the function signatures and Supabase client interactions, including image handling.",
-            "status": "done",
-            "testStrategy": "Write unit tests for the new context functions using Vitest, mocking the Supabase client to verify correct API calls and state updates upon success or failure. Ensure error handling is robust."
-          },
-          {
-            "id": 3,
-            "title": "Upgrade Team Management CRUD Interface",
-            "description": "Enhance the existing `DashboardTeam.tsx` component to provide a full CRUD interface for managing team members, including photo uploads.",
-            "dependencies": [
-              2
-            ],
-            "details": "Refactor `src/components/dashboard/DashboardTeam.tsx` to fetch and display team members from `ContentContext`. Create a new `DashboardTeamForm.tsx` component using `react-hook-form` and reusable UI components. Implementation must follow the checklist in the approved OpenSpec at `openspec/changes/implement-dashboard-cms-crud/`.",
-            "status": "done",
-            "testStrategy": "Manually test the full CRUD flow. Verify that team members can be created, their details and photo edited, and that they can be deleted. Confirm all UI states (loading, error, success) are handled gracefully."
-          },
-          {
-            "id": 4,
-            "title": "Upgrade Partner Management CRUD Interface",
-            "description": "Enhance the existing `DashboardPartners.tsx` component to provide a full CRUD interface for managing partners and sponsors, including logo uploads.",
-            "dependencies": [
-              2
-            ],
-            "details": "Refactor `src/components/dashboard/DashboardPartners.tsx` to use `ContentContext` for data. Create a `DashboardPartnerForm.tsx`. The implementation must strictly follow the patterns and requirements defined in the approved OpenSpec proposal `openspec/changes/implement-dashboard-cms-crud/`.",
-            "status": "done",
-            "testStrategy": "Perform end-to-end testing of the partner management flow. Confirm that creating, updating, and deleting partners works as expected. Verify logo uploads, updates, and deletions are correctly handled in Supabase Storage."
-          },
-          {
-            "id": 5,
-            "title": "Upgrade Gallery Management CRUD Interface",
-            "description": "Enhance the `DashboardGallery.tsx` component to manage a collection of gallery images, including uploads and metadata editing.",
-            "dependencies": [
-              2
-            ],
-            "details": "Refactor `src/components/dashboard/DashboardGallery.tsx` to display a grid of images from `ContentContext`. Create `DashboardGalleryForm.tsx` for uploads and metadata editing. The entire implementation must adhere to the technical specifications outlined in the approved OpenSpec at `openspec/changes/implement-dashboard-cms-crud/`.",
-            "status": "done",
-            "testStrategy": "Test the complete lifecycle of a gallery item. Verify image uploads are successful and appear in the grid. Test editing metadata and confirm changes are saved. Ensure deleting an item removes both the database record and the corresponding image file from Supabase Storage."
-          },
-          {
-            "id": 6,
-            "title": "Update Dashboard Navigation to Include New Pages",
-            "description": "Integrate the Team, Partner, and Gallery management pages into the main dashboard navigation sidebar to ensure they are accessible.",
-            "dependencies": [
-              3,
-              4,
-              5
-            ],
-            "details": "In `src/components/dashboard/DashboardNav.tsx`, add or enable navigation links for 'Team', 'Partners', and 'Gallery'. Ensure these links correctly navigate to the corresponding views. This component has been implemented in Task 6 and should only require minor additions as specified in the OpenSpec.",
-            "status": "done",
-            "testStrategy": "Manually check the dashboard sidebar. Click each new link and confirm it renders the correct component (`DashboardTeam.tsx`, etc.). Verify the URL path updates correctly and the active navigation item is highlighted."
-          }
-        ]
-      },
-      {
-        "id": 9,
-        "title": "Public UI: Implement Public-Facing Landing Page",
-        "description": "Build the main public `LandingPage.tsx` component, which assembles various sections like Hero, Featured Events, Partners, Team, and About. All content should be dynamically fetched from the `ContentContext`.",
-        "details": "Create `src/components/LandingPage.tsx`. This component will use the `useContent` hook to get all necessary data (hero content, events, partners, team members). It will then pass this data as props to smaller, dedicated section components (e.g., `HeroSection`, `FeaturedEventsSection`). Ensure the page is fully responsive and visually matches the Figma design.\n\n```tsx\n// src/components/LandingPage.tsx\nimport { useContent } from '@/contexts/ContentContext';\n// Import section components\n\nexport const LandingPage = () => {\n  const { heroContent, events, partners, team } = useContent();\n\n  return (\n    <div>\n      <HeroSection content={heroContent} />\n      <FeaturedEventsSection events={events} />\n      <PartnersSection partners={partners} />\n      {/* ...other sections */}\n    </div>\n  );\n};\n```",
-        "testStrategy": "Verify that the landing page renders correctly with data fetched from the `ContentContext`. Manually test by updating content in the admin dashboard (e.g., change the Hero title) and confirming the landing page updates automatically (after a refresh, or in real-time if implemented).",
-        "priority": "medium",
-        "dependencies": [
-          "4",
-          "5",
-          "8"
-        ],
-        "status": "done",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create LandingPage Component Shell and Integrate into App Router",
-            "description": "Create the initial file `src/components/LandingPage.tsx` with a basic functional component structure. This component will serve as the main assembler for all landing page sections. Then, integrate it into the root page of the application.",
-            "dependencies": [],
-            "details": "Create the file at `src/components/LandingPage.tsx`. Define and export a React component named `LandingPage`. Update the root page file, likely `src/app/page.tsx`, to import and render the `<LandingPage />` component as its primary content.",
-            "status": "done",
-            "testStrategy": "Run the development server and navigate to the application's root URL. Verify that any placeholder content from the newly created `LandingPage` component is successfully rendered in the browser.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 2,
-            "title": "Integrate ContentContext and Fetch Dynamic Data",
-            "description": "In the `LandingPage.tsx` component, import and utilize the `useContent` hook from `ContentContext` to fetch all necessary data for the page sections. Destructure the data and implement basic loading/error states.",
-            "dependencies": [
-              1
-            ],
-            "details": "Import `useContent` from `src/contexts/ContentContext.tsx`. Call the hook within the `LandingPage` component to retrieve `heroContent`, `events`, `partners`, and `team`. Add logic to display a loading indicator while data is being fetched and an error message if the fetch fails.",
-            "status": "done",
-            "testStrategy": "Use React DevTools or `console.log` to inspect the values returned by the `useContent` hook. Confirm that the data structures for `heroContent`, `events`, etc., are populated correctly. Test the loading state by simulating a slow network connection.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 3,
-            "title": "Import and Render the Hero Section with Dynamic Data",
-            "description": "Import the `HeroSection` component (from Task 8) into `LandingPage.tsx`. Pass the `heroContent` object, fetched from the context in the previous step, to the `HeroSection` as a prop.",
-            "dependencies": [
-              2
-            ],
-            "details": "Add an import statement for `HeroSection` from its file path (e.g., `src/components/sections/HeroSection.tsx`). Inside the `LandingPage` return statement, render the component like `<HeroSection content={heroContent} />`. This wires up the first major visual block of the page.",
-            "status": "done",
-            "testStrategy": "Visually verify on the home page that the Hero section appears correctly with the title, description, and call-to-action button text populated from the `heroContent` data object provided by the context.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 4,
-            "title": "Assemble and Render Remaining Content Sections",
-            "description": "Import the `FeaturedEventsSection`, `PartnersSection`, and `TeamSection` components. Render them within the `LandingPage` component, passing the corresponding data (`events`, `partners`, `team`) as props to each.",
-            "dependencies": [
-              3
-            ],
-            "details": "Sequentially import and render the remaining section components below the `HeroSection`. For example: `<FeaturedEventsSection events={events} />`, `<PartnersSection partners={partners} />`, and `<TeamSection team={team} />`. Ensure each component receives the correct data prop from the `useContent` hook.",
-            "status": "done",
-            "testStrategy": "Scroll down the landing page and confirm that the Featured Events, Partners, and Team sections are all rendered in the correct order. Verify that each section is correctly populated with dynamic data, such as showing the correct event cards and partner logos.",
-            "parentId": "undefined"
-          },
-          {
-            "id": 5,
-            "title": "Implement Overall Page Layout, Spacing, and Responsiveness",
-            "description": "Wrap all the assembled sections in a main layout container. Apply Tailwind CSS utilities to establish vertical spacing between sections and ensure the entire page layout is fully responsive, matching the Figma design across all breakpoints.",
-            "dependencies": [
-              4
-            ],
-            "details": "Use a `main` or `div` element in `LandingPage.tsx` to wrap all section components. Apply a class like `flex flex-col` to the wrapper and use `gap-y-16` or a similar utility to create consistent vertical spacing. Add responsive prefixes (e.g., `md:gap-y-24`) to adjust the layout for different screen sizes.",
-            "status": "done",
-            "testStrategy": "Using browser developer tools, view the landing page at various screen widths (mobile, tablet, desktop). Confirm that all sections stack and reflow correctly without horizontal overflow or broken layouts. Check that the spacing between sections is appropriate for each viewport size.",
-            "parentId": "undefined"
-          }
-        ],
-        "complexity": 4,
-        "recommendedSubtasks": 5,
-        "expansionPrompt": "Generate the skeleton code for `LandingPage.tsx`, showing how it uses the `useContent` hook and passes data to placeholder section components (e.g., `<HeroSection />`, `<FeaturedEventsSection />`). Also, provide an example of one of the section components, showing how it receives and renders the props."
-      },
-      {
-        "id": 10,
-        "title": "Public UI: Implement All-Events Page with Filtering and Search",
-        "description": "Develop the `AllEventsPage.tsx` to display all 'upcoming' events. Implement client-side filtering (by date, category), sorting, and a search functionality.",
-        "status": "done",
-        "dependencies": [
-          "4",
-          "5",
-          "7"
-        ],
-        "priority": "medium",
-        "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\n## Implementation Details\nCreate `src/components/AllEventsPage.tsx`. Fetch the list of all events from `ContentContext`. Use local state (`useState`) to manage filter criteria (e.g., search query, selected category). Apply these filters to the event list before rendering the event cards. Implement pagination if the list is expected to be long. The search should filter events based on title, description, or artist names.\n\n```tsx\n// src/components/AllEventsPage.tsx\nconst { events } = useContent();\nconst [searchQuery, setSearchQuery] = useState('');\n\nconst filteredEvents = events.filter(event => \n  event.title.toLowerCase().includes(searchQuery.toLowerCase())\n);\n\nreturn <div>{/* Render filter controls and filteredEvents */}</div>;\n```",
-        "testStrategy": "Manually test the filtering and search functionality. Enter a search query and verify that only matching events are displayed. Use the filter controls for category and date, and confirm the list updates correctly. Check that pagination works as expected if implemented.",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create AllEventsPage Component and Fetch Events",
-            "description": "Create the basic structure for the `AllEventsPage.tsx` component. Use the `useContent` hook to fetch the list of all events and display a preliminary list of upcoming events to ensure data is being correctly retrieved.",
-            "dependencies": [],
-            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nCreate the file `src/components/AllEventsPage.tsx`. Inside the component, call `useContent()` to get the `events` array. Filter this array to show only 'upcoming' events (events with a date in the future). Map over the filtered array and render a simple placeholder for each event, like a `<div>` with the event title. Add a route for '/events' in `src/components/Router.tsx` to render this new component.",
-            "status": "done",
-            "testStrategy": "Verify that the page renders at the '/events' route and displays a list of titles for all upcoming events fetched from the context. Check the console for any errors related to data fetching."
-          },
-          {
-            "id": 2,
-            "title": "Implement Search Bar UI and Filtering Logic",
-            "description": "Add a search input field to the `AllEventsPage`. Implement the client-side logic to filter the displayed events based on a search query that matches the event title, description, or artist names.",
-            "dependencies": [
-              1
-            ],
-            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nIn `AllEventsPage.tsx`, add an `<Input />` component from `src/components/ui/input.tsx`. Create a `useState` hook for the `searchQuery`. Create a `useMemo` hook to compute the `filteredEvents` list by applying the search query to the upcoming events array. The search should be case-insensitive and check against `event.title`, `event.description`, and any associated artist fields.",
-            "status": "done",
-            "testStrategy": "Type various queries into the search bar. Confirm that the list of events updates in real-time to show only events that match the query in their title, description, or artist details. Test with empty queries and queries that yield no results."
-          },
-          {
-            "id": 3,
-            "title": "Implement Category and Date Filter Controls",
-            "description": "Add UI controls for filtering events by category and date. This will include dropdowns or button groups to allow users to narrow down the event list.",
-            "dependencies": [
-              2
-            ],
-            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nAdd a `<Select />` component from `src/components/ui/select.tsx` for category filtering. Populate it with unique categories from the events list. Add another set of controls (e.g., `<Button />` group or a date picker component) for date filtering (e.g., 'This Week', 'This Month'). Use `useState` to manage the state for these filters. Update the filtering logic to incorporate these new criteria along with the search query.",
-            "status": "done",
-            "testStrategy": "Select a category from the dropdown and verify that only events of that category are displayed. Test the date filters and confirm the list updates accordingly. Ensure that the category, date, and search filters can all be applied simultaneously and work correctly together."
-          },
-          {
-            "id": 4,
-            "title": "Implement Sorting Functionality",
-            "description": "Add a UI control, such as a dropdown, to allow users to sort the filtered list of events. Implement sorting by date (ascending/descending) and by title (A-Z).",
-            "dependencies": [
-              3
-            ],
-            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nAdd a `<Select />` component to control the sort order. Options should include 'Date (Newest First)', 'Date (Oldest First)', and 'Title (A-Z)'. Use a `useState` hook to manage the selected sort option. Apply the sorting logic to the filtered event list *after* all filters (search, category, date) have been applied but *before* pagination.",
-            "status": "done",
-            "testStrategy": "Test each sorting option. Verify that changing the sort order correctly reorganizes the currently displayed list of events without affecting the active filters."
-          },
-          {
-            "id": 5,
-            "title": "Refine Event Display with Card Component and Add Pagination",
-            "description": "Replace the simple event list display with a more polished UI using the reusable `Card` component. Implement client-side pagination to handle large numbers of events efficiently.",
-            "dependencies": [
-              4
-            ],
-            "details": "## OpenSpec Proposal\n- **Proposal ID**: `add-all-events-page`\n- **Status**: draft\n- **Proposal Path**: `openspec/changes/add-all-events-page/proposal.md`\n- **Delta Spec**: `openspec/specs/public-ui/spec.md`\n\nFor each event in the final sorted and filtered list, render a `<Card />` component from `src/components/ui/card.tsx` to display the event details (image, title, date, etc.) in a structured format. Implement pagination by using `useState` for `currentPage`. Calculate the total number of pages and use `.slice()` to display only the events for the current page. Add 'Previous' and 'Next' `<Button />` components to navigate between pages.",
-            "status": "done",
-            "testStrategy": "Verify that events are now displayed in styled cards. If there are more events than the page limit, check that pagination controls appear. Click 'Next' and 'Previous' to ensure the correct subset of events is displayed on each page. The 'Previous' button should be disabled on page 1."
-          }
-        ]
-      },
-      {
-        "id": 11,
-        "title": "Backend Foundation: Rebuild Supabase Project from Scratch",
-        "description": "Rebuild the Supabase backend from the ground up following the comprehensive OpenSpec proposal `rebuild-supabase-from-scratch`. This task establishes a production-ready backend, including an advanced database schema, robust authentication, fine-grained security policies, and scalable serverless functions, all based on 2025 best practices.",
-        "status": "done",
-        "dependencies": [
-          "1"
-        ],
+        "id": 16,
+        "title": "Create Core Utility Functions Module",
+        "description": "Develop a set of common, reusable utility functions for tasks like date formatting, string manipulation, and input validation, to be used throughout the application.",
+        "details": "Create files under `src/utils/`, such as `formatting.ts` and `validation.ts`. For `formatting.ts`, add functions like `formatDate(date)` and `formatCurrency(amount)`. For `validation.ts`, create functions like `isValidEmail(email)`. The `cn` utility for class names is handled in the Tailwind setup task (Task 14).",
+        "testStrategy": "Implement unit tests for each utility function using a framework like Vitest. Test for expected outputs with valid inputs, and test edge cases like null, undefined, or malformed inputs to ensure they are handled gracefully without crashing.",
         "priority": "high",
-        "details": "## OpenSpec Proposal\n- **Proposal ID**: `rebuild-supabase-from-scratch`\n- **Status**: approved\n- **Location**: `openspec/changes/rebuild-supabase-from-scratch/`\n\nThis task implements the full backend architecture as defined in the `rebuild-supabase-from-scratch` OpenSpec. The implementation will follow the 4-agent strategy detailed in the proposal's `tasks.md` to ensure a clear separation of concerns and expert-level execution for each component.\n\n### 1. Agent 1: Infrastructure & Database Foundation\n- **Responsibility**: Local Environment Setup, Core Schema, and Migrations.\n- Initialize the local Supabase environment and create the core database schema for entities like `events`, `team_members`, `partners`, and `gallery_items` through SQL migration files.\n\n### 2. Agent 2: Authentication & Security Layer\n- **Responsibility**: User Profile Management and Auth Triggers.\n- Create the `profiles` table to store user-specific data, an `updated_at` trigger for automatic timestamp management, and a trigger to populate the `profiles` table upon new user registration.\n\n### 3. Agent 3: Row-Level Security Implementation\n- **Responsibility**: Fine-Grained Access Control.\n- Enable RLS on all tables with a default-deny policy. Implement specific policies for public read access and more privileged access for authenticated and admin users, securing the application's data layer.\n\n### 4. Agent 4: Storage & Edge Functions\n- **Responsibility**: File Storage and Serverless Logic.\n- Configure Supabase Storage buckets (`media`, `avatars`) with appropriate security policies. Implement initial Deno-based Edge Functions for server-side logic such as handling contact form submissions.",
-        "testStrategy": "Verification will follow the 4-agent structure, ensuring each area of responsibility is thoroughly tested.\n\n1.  **Infrastructure & Database**: Execute `supabase db reset` to validate all migration files. Use a DB client to inspect the final schema, ensuring tables (`events`, `team_members`, etc.) match the spec. \n\n2.  **Authentication Layer**: Verify the `profiles` table and `updated_at` function exist. Register a new user and confirm the signup trigger correctly creates a corresponding row in the `profiles` table.\n\n3.  **Row-Level Security**: Write a dedicated test suite (e.g., using Vitest) to test RLS policies. The suite must impersonate anonymous, authenticated, and admin roles to attempt CRUD operations on all tables and assert that permissions are enforced correctly.\n\n4.  **Storage & Edge Functions**: Test file operations (upload, download, delete) on storage buckets for each user role. Test Edge Functions locally using `supabase functions serve` and write integration tests to validate their behavior.",
-        "subtasks": [
-          {
-            "id": 11,
-            "title": "Agent 1: Initialize Local Supabase Project and Link to Remote",
-            "description": "Initialize the local development environment using the Supabase CLI, link it to the remote Supabase project, and establish the basic workflow.",
-            "dependencies": [],
-            "details": "**1. Clean Slate Setup:**\n- Remove existing `supabase/` directory if present\n- Execute `supabase init` to create new local development environment\n\n**2. Project Linking:**\n- Create new project in Supabase dashboard and obtain project reference\n- Link local environment: `supabase link --project-ref <project-ref>`\n- Configure `.env` file with local and remote credentials\n\n**3. Verification:**\n- Verify connection: `supabase status` shows healthy local services\n- Confirm project linking: `supabase db remote changes` reports no changes\n- Ensure `supabase/migrations` directory is created\n\n**4. Documentation:**\n- Document the standard workflow (`supabase start`, `supabase db reset`, `supabase gen types`)\n- Create `.env.example` template for team members",
-            "status": "done",
-            "testStrategy": "Confirm `supabase status` shows all local services are active. Verify the project is linked by running a remote command like `supabase db pull`. Ensure `supabase/migrations` directory is created.",
-            "parentId": "11"
-          },
-          {
-            "id": 11,
-            "title": "Agent 1: Database Schema Migration for Core Entities (Enhanced)",
-            "description": "Create the first SQL migration file for the core data schema, including tables for events, team_members, partners, and gallery_items.",
-            "dependencies": [
-              "11.1"
-            ],
-            "details": "Create migration: `supabase migration new 01_database_schema`\n\n**1. Implement 3NF Normalized Schema:**\n- Create `events` table with UUID primary key, strategic denormalization columns\n- Create `partners`, `team_members`, `gallery_items` with proper relationships\n- Use PostgreSQL advanced types: `uuid`, `timestamptz`, `jsonb`\n\n**2. Strategic Denormalization for Performance:**\n- Add `partner_name` column in `events` table for read optimization\n- Implement triggers to keep denormalized data synchronized:\n```sql\nCREATE OR REPLACE FUNCTION update_event_partner_name() \nRETURNS TRIGGER AS $$\nBEGIN\n  UPDATE events SET partner_name = NEW.name WHERE partner_id = NEW.id;\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n\nCREATE TRIGGER on_partner_name_update\nAFTER UPDATE OF name ON partners\nFOR EACH ROW EXECUTE FUNCTION update_event_partner_name();\n```\n\n**3. Advanced Indexing Strategy:**\n```sql\n-- Foreign key indexes (mandatory)\nCREATE INDEX idx_events_partner_id ON events(partner_id);\n\n-- WHERE clause optimization\nCREATE INDEX idx_events_category ON events(category);\nCREATE INDEX idx_events_start_date ON events(start_date DESC);\nCREATE INDEX idx_events_status ON events(status) WHERE status = 'published';\n\n-- Full-text search with pg_trgm\nCREATE EXTENSION IF NOT EXISTS pg_trgm;\nCREATE INDEX idx_events_search ON events USING gin (title gin_trgm_ops, description gin_trgm_ops);\n```\n\n**4. Database Views and Functions:**\n- Create `public_events_view` for simplified public queries:\n```sql\nCREATE OR REPLACE VIEW public_events_view AS\nSELECT e.id, e.title, e.start_date, e.featured_image, \n       p.name as partner_name, p.logo_url as partner_logo\nFROM events e\nLEFT JOIN partners p ON e.partner_id = p.id\nWHERE e.status = 'published';\n```\n- Implement RPC functions for complex multi-table operations\n- Create materialized views for analytics data",
-            "status": "done",
-            "testStrategy": "Run `supabase db reset` to apply the migration. Connect to the local database and verify that all specified tables and columns have been created correctly. Check for primary keys, foreign keys, and default values.",
-            "parentId": "11"
-          },
-          {
-            "id": 11,
-            "title": "Agent 2: Auth Schema: Create `profiles` Table and `updated_at` Trigger",
-            "description": "Create a migration for the `profiles` table to store public user data and a reusable trigger function to automatically update `updated_at` timestamps.",
-            "dependencies": [
-              "11.2"
-            ],
-            "details": "Create migration: `supabase migration new 02_auth_schema`\n\n**1. Enhanced profiles table with RBAC:**\n```sql\nCREATE TABLE public.profiles (\n    id uuid REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,\n    username text UNIQUE,\n    full_name text,\n    avatar_url text,\n    role text DEFAULT 'user' CHECK (role IN ('admin', 'editor', 'user')),\n    metadata jsonb DEFAULT '{}',\n    created_at timestamptz DEFAULT now(),\n    updated_at timestamptz DEFAULT now()\n);\n```\n\n**2. Custom JWT Claims for Role-Based Access Control:**\n```sql\nCREATE OR REPLACE FUNCTION public.update_user_claims()\nRETURNS TRIGGER AS $$\nBEGIN\n  UPDATE auth.users\n  SET raw_app_meta_data = raw_app_meta_data || jsonb_build_object('role', NEW.role)\n  WHERE id = NEW.id;\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql SECURITY DEFINER;\n\nCREATE TRIGGER on_profile_role_update\nAFTER UPDATE OF role ON public.profiles\nFOR EACH ROW EXECUTE FUNCTION public.update_user_claims();\n```\n\n**3. Enhanced `updated_at` Trigger:**\n```sql\nCREATE OR REPLACE FUNCTION handle_updated_at()\nRETURNS TRIGGER AS $$\nBEGIN\n  NEW.updated_at = now();\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql;\n```\n\n**4. Audit Logging Setup:**\n```sql\nCREATE TABLE public.audit_log (\n    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,\n    table_name text NOT NULL,\n    record_id uuid NOT NULL,\n    action text NOT NULL CHECK (action IN ('INSERT', 'UPDATE', 'DELETE')),\n    old_data jsonb,\n    new_data jsonb,\n    user_id uuid REFERENCES auth.users(id),\n    created_at timestamptz DEFAULT now()\n);\n```",
-            "status": "done",
-            "testStrategy": "Run `supabase db reset`. Verify the `profiles` table exists and is linked to `auth.users`. Manually run an `UPDATE` on a test row in a table with the trigger and confirm its `updated_at` column is automatically set to the current timestamp.",
-            "parentId": "11"
-          },
-          {
-            "id": 11,
-            "title": "Agent 2: Create Trigger to Populate `profiles` Table on New User Signup",
-            "description": "Implement a database trigger that automatically creates a new entry in the `profiles` table whenever a new user signs up via Supabase Auth.",
-            "dependencies": [
-              "11.3"
-            ],
-            "details": "Create migration: `supabase migration new 03_user_signup_automation`\n\n**1. Implement automatic profile creation:**\n```sql\nCREATE OR REPLACE FUNCTION public.handle_new_user()\nRETURNS TRIGGER AS $$\nBEGIN\n  INSERT INTO public.profiles (id, full_name, avatar_url, role)\n  VALUES (\n    NEW.id,\n    COALESCE(NEW.raw_user_meta_data->>'full_name', ''),\n    COALESCE(NEW.raw_user_meta_data->>'avatar_url', ''),\n    'user'\n  );\n  RETURN NEW;\nEND;\n$$ LANGUAGE plpgsql SECURITY DEFINER;\n```\n\n**2. Create trigger for automatic execution:**\n```sql\nCREATE TRIGGER on_auth_user_created\n  AFTER INSERT ON auth.users\n  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();\n\nCREATE TRIGGER on_profile_role_update\n  AFTER UPDATE OF role ON public.profiles\n  FOR EACH ROW EXECUTE FUNCTION public.update_user_claims();\n```\n\n**3. Testing:** Verify trigger creates profiles for new signups and automatically propagates role to JWT claims.",
-            "status": "done",
-            "testStrategy": "Create a new user via the Supabase JS client or UI. Query the `profiles` table to confirm that a corresponding record was automatically created with the correct `user_id` and any available metadata.",
-            "parentId": "11"
-          },
-          {
-            "id": 11,
-            "title": "Agent 3: Row-Level Security (RLS) for Public Read Access (Enhanced)",
-            "description": "Enable Row-Level Security on all core tables and implement policies that allow public, read-only access to non-sensitive data.",
-            "dependencies": [
-              "11.2"
-            ],
-            "details": "Create migration: `supabase migration new 04_rls_public_access`\n\n**1. Default Deny Principle (Security Foundation):**\n```sql\n-- Enable RLS on all tables\nALTER TABLE public.events ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.partners ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.team_members ENABLE ROW LEVEL SECURITY;\nALTER TABLE public.gallery_items ENABLE ROW LEVEL SECURITY;\n\n-- CRITICAL: Default deny policy\nCREATE POLICY \"default_deny_all\" ON public.events FOR ALL USING (false);\nCREATE POLICY \"default_deny_all\" ON public.partners FOR ALL USING (false);\nCREATE POLICY \"default_deny_all\" ON public.team_members FOR ALL USING (false);\nCREATE POLICY \"default_deny_all\" ON public.gallery_items FOR ALL USING (false);\n```\n\n**2. Helper Functions for JWT Claims:**\n```sql\nCREATE OR REPLACE FUNCTION get_my_claim(claim TEXT) RETURNS JSONB AS $$\n  SELECT coalesce(current_setting('request.jwt.claims', true)::jsonb -> 'app_metadata' -> claim, 'null'::jsonb);\n$$ LANGUAGE sql STABLE SECURITY DEFINER;\n```\n\n**3. Public Read Access Policies:**\n```sql\n-- Public events (published only)\nCREATE POLICY \"public_read_published_events\" ON public.events\nFOR SELECT USING (status = 'published');\n\n-- Public partners (active only)\nCREATE POLICY \"public_read_active_partners\" ON public.partners\nFOR SELECT USING (status = 'active');\n\n-- Public team members\nCREATE POLICY \"public_read_team\" ON public.team_members\nFOR SELECT USING (status = 'active');\n\n-- Public gallery items\nCREATE POLICY \"public_read_gallery\" ON public.gallery_items\nFOR SELECT USING (status = 'published');\n```",
-            "status": "done",
-            "testStrategy": "Using a JS test suite (e.g., Vitest), initialize an anonymous Supabase client. Perform `select` queries on tables like `events` and `gallery_items` and assert that data is returned. Attempt `insert`, `update`, or `delete` and assert that they fail due to RLS.",
-            "parentId": "11"
-          },
-          {
-            "id": 11,
-            "title": "Agent 3: Row-Level Security (RLS) for Authenticated and Admin Users (Enhanced)",
-            "description": "Implement RLS policies that grant appropriate create, update, and delete permissions to authenticated users and elevated permissions for admin roles.",
-            "dependencies": [
-              "11.4",
-              "11.5"
-            ],
-            "details": "Create migration: `supabase migration new 05_rls_admin_authenticated`\n\n**1. Role-Based Admin Policies:**\n```sql\n-- Admin full access policies for all tables\nCREATE POLICY \"admin_full_access_events\" ON public.events\nFOR ALL USING ((get_my_claim('role') ->> 'role') = 'admin')\nWITH CHECK ((get_my_claim('role') ->> 'role') = 'admin');\n\nCREATE POLICY \"admin_full_access_partners\" ON public.partners\nFOR ALL USING ((get_my_claim('role') ->> 'role') = 'admin')\nWITH CHECK ((get_my_claim('role') ->> 'role') = 'admin');\n```\n\n**2. User Profile Management:**\n```sql\n-- Users can manage their own profiles\nCREATE POLICY \"users_update_own_profile\" ON public.profiles\nFOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);\n\n-- Users can read all profiles (for public team members)\nCREATE POLICY \"read_profiles_public\" ON public.profiles\nFOR SELECT USING (true);\n```\n\n**3. Authenticated User Basic Access:**\n```sql\n-- Authenticated users can read all published content\nCREATE POLICY \"authenticated_read_published\" ON public.events\nFOR SELECT USING (auth.role() = 'authenticated' AND status = 'published');\n```\n\n**4. Enhanced Storage Policies:**\n```sql\n-- Admin upload to public media\nCREATE POLICY \"admin_upload_public_media\" ON storage.objects\nFOR INSERT TO authenticated\nWITH CHECK (bucket_id = 'public_media' AND (get_my_claim('role') ->> 'role') = 'admin');\n\n-- User avatar management\nCREATE POLICY \"user_manage_own_avatar\" ON storage.objects\nFOR ALL TO authenticated\nUSING (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text)\nWITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);\n```",
-            "status": "done",
-            "testStrategy": "Extend the RLS test suite. Create test users with 'authenticated' and 'admin' roles. For each role, attempt CRUD operations on all tables and assert that permissions succeed or fail exactly as defined in the policies.",
-            "parentId": "11"
-          },
-          {
-            "id": 11,
-            "title": "Agent 4: Configure Storage Buckets and Edge Functions (Enhanced)",
-            "description": "Set up storage buckets for public media and private avatars, secure them with RLS policies, and implement initial serverless Edge Functions.",
-            "dependencies": [
-              "11.1",
-              "11.5"
-            ],
-            "details": "Create migration: `supabase migration new 06_storage_and_functions`\n\n**1. Optimized Storage Buckets with RLS:**\n```sql\n-- Create optimized buckets\nINSERT INTO storage.buckets (id, name, public) VALUES \n('public_media', 'public_media', true),\n('avatars', 'avatars', false),\n('admin_content', 'admin_content', false);\n```\n\n**2. Advanced Storage RLS Policies:**\n```sql\n-- Public read access to media (CDN cached)\nCREATE POLICY \"public_read_media_optimized\" ON storage.objects\nFOR SELECT USING (\n  bucket_id = 'public_media' \n  AND (storage.foldername(name))[1] IN ('events', 'partners', 'gallery')\n);\n\n-- Admin full control\nCREATE POLICY \"admin_storage_full_access\" ON storage.objects\nFOR ALL USING ((get_my_claim('role') ->> 'role') = 'admin')\nWITH CHECK ((get_my_claim('role') ->> 'role') = 'admin');\n```\n\n**3. Edge Functions for Complex Operations:**\n```bash\n# Initialize Edge Functions\nsupabase functions new admin-bulk-operations\n```\n\n**4. Production Edge Function Template:**\n```typescript\n// functions/admin-bulk-operations/index.ts\nimport { createClient } from 'https://esm.sh/@supabase/supabase-js@2'\n\nconst corsHeaders = {\n  'Access-Control-Allow-Origin': '*',\n  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',\n}\n\nDeno.serve(async (req) => {\n  if (req.method === 'OPTIONS') {\n    return new Response('ok', { headers: corsHeaders })\n  }\n\n  try {\n    // Create admin client\n    const supabaseAdmin = createClient(\n      Deno.env.get('SUPABASE_URL')!,\n      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!\n    )\n\n    const { operation, data } = await req.json()\n\n    // Bulk operations with proper validation\n    switch (operation) {\n      case 'archive_past_events':\n        const result = await supabaseAdmin\n          .from('events')\n          .update({ status: 'archived' })\n          .lt('end_date', new Date().toISOString())\n        break\n    }\n\n    return new Response(JSON.stringify({ success: true }), {\n      headers: { ...corsHeaders, 'Content-Type': 'application/json' },\n    })\n  } catch (error) {\n    return new Response(JSON.stringify({ error: error.message }), {\n      status: 400,\n      headers: { ...corsHeaders, 'Content-Type': 'application/json' },\n    })\n  }\n})\n```\n\n**5. Performance Monitoring & Security:**\n```sql\n-- Create performance monitoring view\nCREATE VIEW database_performance AS\nSELECT \n  schemaname, tablename,\n  n_tup_ins as inserts, n_tup_upd as updates, n_tup_del as deletes,\n  n_live_tup as live_tuples, n_dead_tup as dead_tuples\nFROM pg_stat_user_tables;\n```",
-            "status": "done",
-            "testStrategy": "For storage, write tests to upload/download/delete files from each bucket as an anonymous user, authenticated user, and admin, asserting that the storage RLS policies work. For functions, run `supabase functions serve` and use a tool like `curl` or a test script to invoke the `contact-form-handler` and verify the response.",
-            "parentId": "11"
-          }
-        ],
-        "complexity": 10,
-        "recommendedSubtasks": 7,
-        "expansionPrompt": "Create a detailed subtask breakdown. Create one subtask for project initialization. Create separate subtasks for each major table's SQL migration script. Dedicate a subtask to setting up the auth trigger for `profiles`. Create two separate subtasks for RLS: one for public-read policies and another for authenticated/admin write policies. Finally, create subtasks for Storage configuration and Edge Function setup.",
-        "updatedAt": "2025-11-07T05:13:55.968Z"
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
       },
       {
-        "id": 12,
-        "title": "Implemented Public Content Synchronization and Unified Admin Interface",
-        "description": "Successfully created a unified admin interface at /sadmin for managing all public-facing singleton content, as specified in a newly created and validated OpenSpec. The live interface is synchronized with the backend via Supabase RPC functions and integrated with the global `ContentContext`. The implementation is complete, and the browser console is clean on all related pages.",
-        "details": "The work was guided by a dedicated OpenSpec, which validated the architecture for the `public_content` table, Supabase RPC functions (`get_public_content`, `update_public_content`), and the integration with `ContentContext`. The `/sadmin` page is now live, providing a complete CRUD interface for singleton content. All public-facing pages have been refactored to consume this centralized state, removing legacy hardcoded data.",
-        "testStrategy": "Testing was conducted per-subtask. Key integration tests were successful: 1. The `/sadmin` route was verified to be protected and correctly renders the form with live data from Supabase. 2. A full CRUD cycle was performed: content was updated in the admin UI, confirmed in the Supabase `public_content` table, and the change was verified on corresponding public pages. 3. All console errors were resolved, ensuring a clean user experience.",
-        "status": "done",
+        "id": 17,
+        "title": "Add Core shadcn/ui Components",
+        "description": "With shadcn/ui initialized, add the first set of core, reusable UI components like Button, Input, and Dialog, which will form the building blocks of the UI.",
+        "details": "Confirm that the shadcn/ui `components.json` is correctly configured. Then, use the CLI to add the essential primitives: `npx shadcn-ui@latest add button input label dialog card`. Verify the new components are created in the `src/components/ui` directory.",
+        "testStrategy": "For each component, create a story in Storybook or render it on a test page. Verify that it renders correctly, handles user interactions (e.g., clicks, typing), and is fully accessible according to ARIA standards. Check responsiveness on different screen sizes.",
+        "priority": "high",
         "dependencies": [
-          11,
-          9,
-          8,
-          5,
-          4
+          14
         ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Implement Toast Notifications with Sonner",
+        "description": "Integrate the Sonner library to provide non-blocking toast notifications for user feedback on actions like success, error, or information.",
+        "details": "Install the library: `npm install sonner`. Add the `<Toaster />` component to the root of your application layout (`App.tsx` or `DashboardLayout.tsx`). Use the `toast()` function exported from `sonner` to trigger notifications from anywhere in the app, for example: `toast.success('Event created successfully!')`.",
+        "testStrategy": "Create temporary buttons in the UI to trigger different types of toasts (success, error, info, promise). Verify that they appear correctly, are styled as expected, and disappear automatically or can be dismissed by the user.",
         "priority": "medium",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Created Supabase RPC Functions for Public Content",
-            "description": "Created and deployed two new PostgreSQL functions in Supabase: `get_public_content` to fetch all records from the `public_content` table, and `update_public_content` to update a single record's `content` JSONB field based on its `key`.",
-            "dependencies": [],
-            "details": "In a new Supabase migration file, defined `get_public_content()` which performs `SELECT key, content FROM public_content;`. Also defined `update_public_content(p_key TEXT, p_content JSONB)` which executes `UPDATE public_content SET content = p_content WHERE key = p_key;`. Both functions were configured with appropriate security definer settings and exposed to the service_role.",
-            "status": "done",
-            "testStrategy": "The RPC functions were tested directly in the Supabase SQL Editor. `get_public_content()` was called and verified to return all seeded data. `update_public_content()` was called with a test key and new JSON data, and `get_public_content()` was called again to confirm the update was successful."
-          },
-          {
-            "id": 2,
-            "title": "Implement `publicContent` State and Fetching in ContentContext",
-            "description": "Enhance `ContentContext` to fetch and store all public content. This involves adding a new state for public content, calling the `get_public_content` RPC, updating relevant types, and exposing the new state through the context.",
-            "dependencies": [
-              1
-            ],
-            "details": "In `src/contexts/ContentContext.tsx`, add a new state: `const [publicContent, setPublicContent] = useState<PublicContent | null>(null)`. The associated type `PublicContent` should be defined in a relevant types file (e.g., `src/types/content.ts`), mapping string keys to content objects. In the main data-fetching `useEffect` hook, call `supabase.rpc('get_public_content')`. Process the result from an array of `{key, content}` into a single `PublicContent` object and set the state. Update the `ContentContextType` to include `publicContent`.",
-            "status": "completed",
-            "testStrategy": "Use React DevTools to inspect the `ContentProvider`'s state. Verify that `publicContent` is populated with the correct key-value data from the Supabase table after the initial application load. Ensure the loading state is handled correctly during the fetch. Confirm TypeScript types for `PublicContent` and `ContentContextType` are correct and don't raise compiler errors."
-          },
-          {
-            "id": 3,
-            "title": "Implement `updatePublicContent` Mutation in ContentContext",
-            "description": "Create the `updatePublicContent` mutation function within `ContentContext` to handle optimistic updates and persist changes to Supabase via the `update_public_content` RPC. This is currently being implemented.",
-            "dependencies": [
-              1,
-              2
-            ],
-            "details": "In `src/contexts/ContentContext.tsx`, implement `const updatePublicContent = async (key: string, newContent: any) => { ... }`. The function should first optimistically update the local `publicContent` state. Then, call `supabase.rpc('update_public_content', { p_key: key, p_content: newContent })`. If the RPC call fails, revert the state to its previous value and handle the error (e.g., show a toast notification). Expose this function through the context provider value.",
-            "status": "completed",
-            "testStrategy": "Create a temporary test button in a component that consumes `ContentContext` (e.g., `SAdminPage`). On click, call `updatePublicContent` with test data. Verify the UI updates immediately (optimistic update). Check the network tab to ensure the RPC call is made. Confirm the change persists in the Supabase table. Test the error case by intentionally calling with a non-existent key and ensure the state reverts."
-          },
-          {
-            "id": 4,
-            "title": "Refactored Public Pages to Use `publicContent` from Context",
-            "description": "Successfully migrated existing public-facing components (e.g., Hero, About, site settings consumers) to source their data from the new `publicContent` object in `ContentContext`, replacing legacy hardcoded data and separate fetches.",
-            "dependencies": [
-              2
-            ],
-            "details": "All relevant components were identified and refactored. Legacy data sources and hardcoded content for sections like 'hero' and 'about_us' were removed. The `useContent` hook is now used to access `publicContent` (e.g., `publicContent.hero`). Component props and types were updated to align with the new centralized data structure provided by `ContentContext`.",
-            "status": "completed",
-            "testStrategy": "Navigated to the homepage, about page, and other relevant pages, verifying that all content rendered correctly from the centralized `ContentContext`. Confirmed that no regressions were introduced and that all old data-fetching code and hardcoded values were successfully removed."
-          },
-          {
-            "id": 5,
-            "title": "Implement Admin Form UI in `SAdminPage`",
-            "description": "Implement the user interface for the `/sadmin` page. This involves creating a form with input fields for all editable public content, populated with initial data from `ContentContext`.",
-            "dependencies": [
-              2,
-              4
-            ],
-            "details": "In the `SAdminPage` component, consume `ContentContext` to get `publicContent`. Create a local state object, e.g., `const [formData, setFormData] = useState({})`, and initialize it from `publicContent` in a `useEffect` hook that runs when `publicContent` is populated. Render a form using components from `src/components/ui` (e.g., `Input`, `Textarea`) for each editable field (e.g., `hero.title`, `about_us.description`). Use controlled components, linking form inputs to the `formData` state and an `onChange` handler.",
-            "status": "completed",
-            "testStrategy": "Navigate to the `/sadmin` route. Verify that the form renders and all fields are correctly populated with the data from `publicContent`. Test editing the form fields and confirm that the component's local `formData` state updates correctly, without triggering any backend calls yet."
-          },
-          {
-            "id": 6,
-            "title": "Integrated Admin Form Submission with `updatePublicContent` Mutation",
-            "description": "The `SAdminPage` form's submission logic has been connected to the `updatePublicContent` mutation from `ContentContext`, allowing administrators to successfully save their changes.",
-            "dependencies": [
-              3,
-              5
-            ],
-            "details": "An `onSubmit` handler was implemented for the form in `SAdminPage`. Upon submission, the handler now compares the local `formData` with the original `publicContent` to detect changes. For each changed content key, it calls the `updatePublicContent` mutation from the context. UI feedback for loading (disabled submit button) and success/error states (toast notifications) was also implemented.",
-            "status": "completed",
-            "testStrategy": "Verified in the `/sadmin` UI that modifying content and clicking 'Save' correctly triggers the `update_public_content` RPC for each changed section. Confirmed loading indicators and success messages appear as expected. Verified that the updated content is reflected on the corresponding public pages. Also confirmed that saving with no changes correctly results in no RPC calls."
-          }
-        ]
+        "dependencies": [
+          17
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Implement Form Management with React Hook Form",
+        "description": "Integrate React Hook Form and create reusable form components for handling complex form state, validation, and submission efficiently.",
+        "details": "Install dependencies: `npm install react-hook-form @hookform/resolvers zod`. Create a generic `<Form />` component using `shadcn/ui`'s form components which are built on `react-hook-form`. Use `zod` to define validation schemas that align with your TypeScript types. Use the `@hookform/resolvers/zod` adapter to connect Zod schemas to your forms for real-time validation.",
+        "testStrategy": "Build a sample form with various input types (text, select, checkbox). Test the happy path: valid submission. Test validation: ensure error messages appear for invalid fields and submission is blocked. Test that the form state is reset correctly after submission.",
+        "priority": "high",
+        "dependencies": [
+          13,
+          17
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Implement Custom Client-Side Router",
+        "description": "Develop a lightweight, custom client-side router using React Context and the browser's History API to manage navigation between the landing page, all-events page, and admin dashboard.",
+        "details": "Create `src/components/Router.tsx`. Implement a `RouterProvider` that uses `React.createContext` to provide the current path and a `navigate` function. Use `useState` to hold the current path, initialized from `window.location.pathname`. Use a `useEffect` hook to listen to the `popstate` event to handle browser back/forward buttons. The `navigate` function should use `window.history.pushState` and update the internal state.",
+        "testStrategy": "Wrap the main `App.tsx` with the `RouterProvider`. Create navigation links and test that clicking them updates the URL in the browser bar and renders the correct page component without a full page reload. Test that the browser's back and forward buttons work as expected.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "Implement Global ContentContext for State Management",
+        "description": "Create a global React Context to manage the state of all primary content entities (events, team, partners, etc.), providing a centralized place for data fetching, caching, and mutations.",
+        "details": "Create `src/contexts/ContentContext.tsx`. The context provider will manage state for `events`, `team`, `partners`, `gallery`, etc., along with their `loading` and `error` states. It will expose functions like `fetchEvents()`, `addEvent(newEvent)`, `updateEvent(id, data)`, etc. These functions will interact with the Supabase client and update the context state, acting as a simple client-side cache.",
+        "testStrategy": "Write unit tests for the context's reducer or state update logic. Create a test component that consumes the context, calls a fetch function, and verifies that the `loading` state changes correctly and the final data is populated. Mock the Supabase client to isolate the context logic.",
+        "priority": "high",
+        "dependencies": [
+          13,
+          15
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "Develop Custom Hooks for Business Logic",
+        "description": "Create custom hooks like `useEvents` and `useRouter` to abstract away business logic and interactions with context, simplifying component code.",
+        "details": "Create files in `src/hooks/`. The `useRouter` hook will simply be `return useContext(RouterContext)`. The `useEvents` hook will consume the `ContentContext` and return the `events` state, loading/error status, and the event-specific functions (`addEvent`, `updateEvent`, etc.). This encapsulates the logic for interacting with the global state.",
+        "testStrategy": "Test the hooks within components. For `useEvents`, verify that a component using it re-renders when the event data changes in the `ContentContext`. For `useRouter`, verify it provides the correct navigation functions and current path.",
+        "priority": "medium",
+        "dependencies": [
+          20,
+          21
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "Implement Admin Authentication Flow",
+        "description": "Set up a secure authentication mechanism for the admin dashboard using Supabase Auth, including login, session management, and protected routes.",
+        "details": "Utilize Supabase Auth with the email/password or magic link provider. Create a login page for the admin dashboard. On successful login, Supabase's client handles the session. Create a protected route component that checks for an active user session (`supabase.auth.getSession()`). If no session exists, it redirects to the login page. The admin dashboard will be wrapped in this protected route.",
+        "testStrategy": "Manually test the auth flow. 1) Attempt to access an admin URL directly and verify redirection to the login page. 2) Log in with valid credentials and verify access is granted. 3) Log out and verify session is terminated and user is redirected. 4) Check for the `sb-` auth token in browser storage.",
+        "priority": "high",
+        "dependencies": [
+          15,
+          18,
+          20
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "Build Responsive DashboardLayout Component",
+        "description": "Create the main layout for the admin dashboard, including a persistent sidebar for navigation, a header, and a main content area for dashboard pages.",
+        "details": "Create `src/components/dashboard/DashboardLayout.tsx`. This component will render a sidebar with navigation links (using Lucide icons and `NavLink`-style components) to the different admin sections (Events, Team, etc.). Use CSS Grid or Flexbox to create a responsive layout that collapses the sidebar into a menu on smaller screens. The layout will render `{children}` in the main content area.",
+        "testStrategy": "Wrap a sample dashboard page within the `DashboardLayout`. Verify that the layout is responsive by resizing the browser window. Test navigation by clicking sidebar links, ensuring the correct page content is loaded without the layout itself re-rendering unnecessarily.",
+        "priority": "high",
+        "dependencies": [
+          17,
+          20,
+          22
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 25,
+        "title": "Implement Dashboard Home Page with Statistics",
+        "description": "Develop the main landing page of the admin dashboard, displaying key overview statistics and quick links to management sections.",
+        "details": "Create `src/components/dashboard/DashboardHome.tsx`. This component will use the `useContent` hook to fetch summary data, such as the total number of upcoming events, total team members, and total partners. Display these stats using the `Card` component. Use a library like `Recharts` to add a simple bar chart showing events per month.",
+        "testStrategy": "Verify that the dashboard home page correctly displays statistics pulled from the `ContentContext`. Manually add data to the database and refresh the page to ensure the stats update accordingly. Check that the chart renders correctly with sample data.",
+        "priority": "medium",
+        "dependencies": [
+          21,
+          22,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "Build Dashboard Event List Page",
+        "description": "Create the UI for listing all events in the admin dashboard, with features for sorting, filtering, and pagination.",
+        "details": "Create `src/components/dashboard/DashboardEvents.tsx`. Use the `useEvents` hook to get the list of events. Render the events in a `Table` component from `shadcn/ui`. Add controls (Input, Select) for filtering by status or searching by title. Implement client-side or server-side pagination to handle a large number of events.",
+        "testStrategy": "Populate the database with a variety of events (different statuses, dates). Verify the table displays all events correctly. Test the search and filter functionality to ensure the list updates as expected. Test pagination by navigating between pages.",
+        "priority": "medium",
+        "dependencies": [
+          22,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "Build Event Create/Edit Form and Logic",
+        "description": "Implement the form for creating and editing events, including all metadata fields, validation, and submission logic to persist the data via Supabase.",
+        "details": "Create `src/components/dashboard/DashboardEventsNew.tsx`. Use `react-hook-form` and a `zod` schema for validation. The form should include fields for all properties in the `Event` type, using `shadcn/ui` components like `Input`, `Textarea`, and `ReactDayPicker` for dates. The `onSubmit` handler will call the `addEvent` or `updateEvent` function from the `ContentContext` and show a success/error toast.",
+        "testStrategy": "Happy path: Create a new event, fill all fields, submit, and verify it appears in the event list (Task 26) and the database. Edit an existing event and verify changes are saved. Error path: Try to submit the form with invalid data and verify that validation errors are displayed and submission is blocked.",
+        "priority": "high",
+        "dependencies": [
+          18,
+          19,
+          21,
+          26
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 28,
+        "title": "Implement Image Upload to Supabase Storage",
+        "description": "Develop the functionality for uploading images (e.g., event featured image, team member photos) to Supabase Storage and linking the URL to the corresponding database record.",
+        "details": "Integrate an image upload component into the relevant forms (e.g., Event form). Use an `<input type='file' />`. On file selection, use a library like `browser-image-compression` to resize and compress the image client-side. Then, use `supabase.storage.from('images').upload(filePath, file)` to upload it. Once the upload is complete, retrieve the public URL using `supabase.storage.from('images').getPublicUrl(filePath)` and save this URL in the appropriate database field.",
+        "testStrategy": "In the event creation form, upload an image. Verify the image appears in your Supabase Storage bucket. Verify the event record in the database contains the correct public URL for the image. Check that the image loads correctly on the public-facing pages.",
+        "priority": "medium",
+        "dependencies": [
+          15,
+          27
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 29,
+        "title": "Build Team Member Management Page",
+        "description": "Create the admin interface for CRUD operations on team members, including their name, role, bio, and photo.",
+        "details": "Create `src/components/dashboard/DashboardTeam.tsx`. This will be similar in structure to the event management page. It will list existing team members and have a button to open a Dialog/Modal containing the form for adding/editing a member. The form will use `react-hook-form` and include an image uploader (reusing logic from Task 28).",
+        "testStrategy": "Perform full CRUD tests: Create a new team member and verify they appear in the list. Update their details and photo, and confirm the changes. Delete the team member and ensure they are removed from the list and the database.",
+        "priority": "medium",
+        "dependencies": [
+          24,
+          27,
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 30,
+        "title": "Build Partner/Sponsor Management Page",
+        "description": "Implement the admin interface for managing partners and sponsors, including their name, category, logo, and website URL.",
+        "details": "Create `src/components/dashboard/DashboardPartners.tsx`. Follow the same pattern as Team Management (Task 29). It will feature a list of partners and a form (in a modal) for CRUD operations. The form will include fields for partner details and a logo uploader.",
+        "testStrategy": "Perform full CRUD tests for partners. Verify that creating, updating, and deleting partners works correctly and that the data is accurately reflected in the database. Ensure partner logos can be uploaded and displayed.",
+        "priority": "medium",
+        "dependencies": [
+          24,
+          27,
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 31,
+        "title": "Build Landing Page Content Management (Hero & About)",
+        "description": "Create admin interfaces for managing the content of the landing page's Hero and About sections.",
+        "details": "Create `DashboardHero.tsx` and `DashboardAbout.tsx`. These will be simple forms that fetch the current content from the `ContentContext`. The forms will allow admins to update fields like the hero title, subtitle, featured event ID (using a select dropdown of events), and the about section text. On save, the `updateHeroContent` function in the context is called.",
+        "testStrategy": "Load the admin pages and verify they are pre-populated with the current content. Make a change (e.g., update the hero title), save it, and then load the public-facing landing page to confirm the change is immediately visible.",
+        "priority": "medium",
+        "dependencies": [
+          24,
+          27
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 32,
+        "title": "Build Site Settings Management Page",
+        "description": "Develop the admin page for managing global site settings, such as contact information and social media links.",
+        "details": "Create `src/components/dashboard/DashboardSettings.tsx`. This will be a single form that loads the global `site_settings` object from the `ContentContext`. It will allow admins to edit the contact email, phone number, and social media URLs. On save, it updates the single settings record in the database.",
+        "testStrategy": "Change a social media link in the settings form and save. Navigate to the public site's footer and verify that the link has been updated. This confirms the end-to-end flow from admin input to public display.",
+        "priority": "medium",
+        "dependencies": [
+          24,
+          27
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 33,
+        "title": "Build and Compose the Public Landing Page",
+        "description": "Assemble the main public-facing landing page by composing various sections like Hero, Featured Events, Team, and Partners, pulling all data from the ContentContext.",
+        "details": "Create `src/components/LandingPage.tsx`. This component will be the main entry point for the public site. It will use the `useContent` hook to access all necessary data. It will then render individual section components (e.g., `<HeroSection />`, `<FeaturedEventsSection />`, `<TeamSection />`, `<PartnersSection />`, `<Footer />`), passing the relevant data down as props.",
+        "testStrategy": "Load the landing page and verify that all sections are rendered with the correct data from the CMS. Ensure the page is fully responsive and visually matches the Figma designs. Check that all links (e.g., to social media) are correct.",
+        "priority": "high",
+        "dependencies": [
+          21,
+          22,
+          29,
+          30,
+          31,
+          32
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 34,
+        "title": "Build 'All Events' Page with Filtering and Search",
+        "description": "Create a dedicated page for users to browse, search, and filter all available events, with support for pagination.",
+        "details": "Create `src/components/AllEventsPage.tsx`. The page will fetch all 'upcoming' events from the `ContentContext`. Implement UI controls (`Input`, `Select`, `Checkbox`) for filtering by category, date range, and a text-based search. The filtering logic can be implemented client-side for now. Render the filtered results as a grid of `EventCard` components. Add a pagination component to navigate through a large list.",
+        "testStrategy": "With a large set of test events, verify that the initial list loads. Test each filter individually and in combination to ensure the event list updates correctly. Test the search functionality. Test the pagination to make sure you can navigate through all results.",
+        "priority": "medium",
+        "dependencies": [
+          22,
+          33
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 35,
+        "title": "Implement Event Detail View/Modal",
+        "description": "Create a detailed view for a single event, showing all information including the gallery, artist lineup, and venue details. This can be a modal or a separate page.",
+        "details": "When a user clicks on an `EventCard` (from Task 33 or 34), open a `Dialog` modal. The modal will receive the `eventId` as a prop. It will then fetch the full event details from the `ContentContext`. The view will display all event fields, including a carousel (`Embla Carousel`) for the image gallery and a list of associated artists.",
+        "testStrategy": "Click on various event cards from the landing page and the 'All Events' page. Verify that the correct event's details are loaded and displayed in the modal. Check that the image gallery is functional. Ensure the modal can be closed properly.",
+        "priority": "medium",
+        "dependencies": [
+          33,
+          34
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 36,
+        "title": "Implement Client-Side Caching Strategy",
+        "description": "Optimize performance by enhancing the ContentContext to act as a more robust client-side cache, reducing redundant API calls to Supabase.",
+        "details": "Refine the `ContentContext`. When a fetch function (e.g., `fetchEvents`) is called, first check if the data already exists in the context's state and is not stale. If it is, return the cached data. If not, fetch from Supabase and update the state. The mutation functions (`addEvent`, `updateEvent`) must invalidate the cache by either refetching the data or intelligently updating the local state.",
+        "testStrategy": "Using browser dev tools, monitor network requests. Navigate between pages that use the same data (e.g., from landing page to all events page). Verify that the data is fetched only once initially, and subsequent navigations use the cached data from the context, resulting in no new network requests for that data.",
+        "priority": "low",
+        "dependencies": [
+          21
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 37,
+        "title": "Setup E2E Testing for Critical User Journeys",
+        "description": "Establish an end-to-end testing suite using a framework like Playwright or Cypress to automate testing of critical user paths, such as admin event creation and public event discovery.",
+        "details": "Install Playwright: `npm init playwright@latest`. Create test files in the `tests` directory. Write scripts for the following scenarios: 1) Admin logs in, creates a new event, and saves it. 2) A public user visits the site, sees the new event on the landing page, navigates to the all-events page, filters for it, and opens its detail view. Configure the tests to run against a seeded test database.",
+        "testStrategy": "Run the E2E test suite via the command line (`npx playwright test`). The tests should pass consistently in a headless browser. Integrate this command into a CI/CD pipeline (e.g., GitHub Actions) to run automatically on every push or pull request to the main branch, preventing regressions.",
+        "priority": "low",
+        "dependencies": [
+          23,
+          27,
+          35
+        ],
+        "status": "pending",
+        "subtasks": []
       }
     ],
     "metadata": {
-      "version": "1.0.0",
-      "lastModified": "2025-11-07T05:13:55.969Z",
-      "taskCount": 11,
-      "completedCount": 4,
-      "tags": [
-        "master"
-      ],
       "created": "2025-11-07T06:02:41.440Z",
-      "description": "Tasks for master context",
-      "updated": "2025-11-15T03:22:21.482Z"
+      "updated": "2025-11-24T12:35:27.293Z",
+      "description": "Tasks for master context"
     }
   }
 }
