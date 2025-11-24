@@ -438,6 +438,7 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [useDummyData, setUseDummyData] = useState<boolean>(initialUseDummyData);
+  const [publicContent, setPublicContent] = useState<Record<string, Json>>({});
 
   // NOW useEffects and functions (useDummyData in scope)
   // useEffect loadData (keep existing, but ensure useDummyData reference is correct)
@@ -504,6 +505,19 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
           setSettings(settingsData);
           } catch (e) {
             console.error('Settings fetch failed:', e);
+          }
+
+          try {
+            const { data: pcData } = await supabaseClient.rpc('get_public_content');
+            if (pcData && Array.isArray(pcData)) {
+              const contentMap: Record<string, Json> = {};
+              pcData.forEach((item: any) => {
+                contentMap[item.section] = item.payload || item.data;
+              });
+              setPublicContent(contentMap);
+            }
+          } catch (e) {
+            console.error('Public content fetch failed:', e);
           }
         }
 
@@ -1458,6 +1472,27 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
     }
   };
 
+  const updatePublicContent = async (section: string, data: Json): Promise<void> => {
+    try {
+      setError(null);
+      if (!user || role !== 'admin') throw new Error('Admin required');
+
+      const { error } = await supabaseClient.rpc('update_public_content', { 
+        p_section_slug: section, 
+        p_new_payload: data as any 
+      });
+
+      if (error) throw error;
+
+      // Optimistic update
+      setPublicContent(prev => ({ ...prev, [section]: data }));
+    } catch (err) {
+      console.error('Error updating public content:', err);
+      setError(`Failed to update ${section}: ${(err as Error).message}`);
+      throw err;
+    }
+  };
+
   const value: ContentContextType = {
     events,
     partners,
@@ -1466,6 +1501,7 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
     hero,
     about,
     settings,
+    publicContent,
     updateEvents: setEvents,
     updatePartners: setPartners,
     updateGallery: setGallery,
@@ -1473,6 +1509,7 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
     updateHero: setHero,
     updateAbout: setAbout,
     updateSettings: setSettings,
+    updatePublicContent,
     // Add loading and error states for UI feedback
     loading,
     error,

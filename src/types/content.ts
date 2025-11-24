@@ -209,6 +209,7 @@ export interface ContentContextType {
   hero: HeroContent;
   about: AboutContent;
   settings: SiteSettings;
+  publicContent: Record<string, Json>;
   updateEvents: React.Dispatch<React.SetStateAction<LandingEvent[]>>;
   updatePartners: React.Dispatch<React.SetStateAction<Partner[]>>;
   updateGallery: React.Dispatch<React.SetStateAction<GalleryImage[]>>;
@@ -245,4 +246,5 @@ export interface ContentContextType {
   getSectionContent: (sectionSlug: string) => SectionContent | null;
   getSectionPermissions: (sectionSlug: string) => SectionPermissions;
   updateSectionContent: (sectionSlug: string, content: Json) => Promise<void>;
+  updatePublicContent: (section: string, data: Json) => Promise<void>;
 }

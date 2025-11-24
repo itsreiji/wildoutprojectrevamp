@@ -14,6 +14,7 @@ import { LoginPage } from './components/auth/LoginPage';
 import { RegisterPage } from './components/auth/RegisterPage';
 import { AdminGuard } from './components/admin/AdminGuard';
 import { Toaster } from './components/ui/sonner';
+import { SAdminPage } from './components/dashboard/SAdminPage';
 import TestComponents from './components/ui/test-components';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
     '/register': RegisterPage,
     '/login': LoginPage,
     '/admin/login': LoginPage, // Keep legacy /admin/login for backward compatibility
+    [`${adminBasePath}`]: SAdminPage,
     [`${adminBasePath}/login`]: LoginPage, // New admin login path
     [`${adminBasePath}/*`]: AdminRoute,
     '/test-ui': TestComponents,
