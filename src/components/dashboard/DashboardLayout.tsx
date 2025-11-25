@@ -103,32 +103,24 @@ export const DashboardLayout = React.memo(
           )}
           style={{ width: sidebarWidth }}
         >
-          <div className="flex h-full flex-col">
-            {/* Header */}
-            <div className="flex h-20 items-center border-b border-white/10 px-4">
-              <div className="relative flex w-full items-center justify-center">
-                <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
-                <button
-                  type="button"
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    'absolute right-0 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/60 transition-colors hover:text-white',
-                    !isMobile && 'hidden'
-                  )}
-                >
-                  <X className="h-5 w-5" />
-                  <span className="sr-only">Close navigation</span>
-                </button>
+          <div className="flex-1 flex flex-col">
+            {/* Logo Section */}
+            <div
+              className="border-b border-white/10 flex items-center px-4 py-6 flex-shrink-0"
+              style={{ justifyContent: showLabels ? 'flex-start' : 'center' }}
+            >
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#E93370] to-pink-600 flex items-center justify-center text-white font-bold flex-shrink-0">
+                W
               </div>
+              {showLabels && <span className="ml-3 font-bold text-lg truncate">WildOut</span>}
             </div>
 
-            {/* Navigation */}
-            <nav className="flex-1 space-y-2 overflow-y-auto px-3 py-4">
+            {/* Navigation Items */}
+            <nav className="flex-1 flex flex-col gap-2 p-3 overflow-y-auto">
               {adminSections
                 .filter((section) => getSectionPermissions(section.slug).canView)
                 .sort((a, b) => a.order_index - b.order_index)
                 .map((section) => {
-                  // Map icon names to components
                   const iconMap: Record<string, any> = {
                     LayoutDashboard,
                     Sparkles,
@@ -143,91 +135,86 @@ export const DashboardLayout = React.memo(
                   const isActive = currentPage === section.slug;
 
                   return (
-                    <Link
+                    <button
                       key={section.id}
-                      to={getAdminPath(section.slug)}
-                      aria-label={section.label}
-                      className={cn(
-                        'group flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition-colors duration-200',
-                        isActive
-                          ? 'bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20'
-                          : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white',
-                        showLabels ? 'justify-start' : 'justify-center'
-                      )}
                       onClick={() => {
-                        if (isMobile) {
-                          setSidebarOpen(false);
-                        }
+                        navigate(getAdminPath(section.slug));
+                        if (isMobile) setSidebarOpen(false);
                       }}
+                      className={cn(
+                        'group flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-300',
+                        showLabels ? 'justify-start' : 'justify-center',
+                        isActive
+                          ? 'bg-[#E93370]/20 text-[#E93370]'
+                          : 'text-white/70 hover:bg-white/10 hover:text-white'
+                      )}
                     >
-                      <Icon aria-hidden className="h-5 w-5 flex-shrink-0" />
-                      {showLabels && <span className="truncate">{section.label}</span>}
-                    </Link>
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                      {showLabels && <span className="truncate text-sm font-medium">{section.label}</span>}
+                    </button>
                   );
                 })}
             </nav>
 
             {/* Footer Actions */}
-            <div className="mt-auto space-y-2 border-t border-white/10 px-3 py-4">
-              <Link
-                to="/"
-                aria-label="Back to site"
+            <div className="p-3 border-t border-white/10 space-y-2 flex-shrink-0">
+              <button
+                onClick={() => navigate('/')}
                 className={cn(
-                  'inline-flex w-full items-center gap-2 rounded-xl border border-white/10 px-4 py-3 text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white',
+                  'w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-300 text-white/70 hover:bg-white/10 hover:text-white',
                   showLabels ? 'justify-start' : 'justify-center'
                 )}
-                onClick={() => {
-                  if (isMobile) {
-                    setSidebarOpen(false);
-                  }
-                }}
               >
-                <ChevronLeft className="h-4 w-4" />
-                {showLabels && <span>Back to Site</span>}
-              </Link>
-              <Button
-                variant="outline"
+                <ChevronLeft className="w-5 h-5 flex-shrink-0" />
+                {showLabels && <span className="truncate text-sm font-medium">Back to Site</span>}
+              </button>
+              <button
                 onClick={handleLogout}
                 className={cn(
-                  'w-full border-[#E93370]/50 text-[#E93370] hover:bg-[#E93370]/10',
+                  'w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-300 text-white/70 hover:bg-[#E93370]/10 hover:text-[#E93370]',
                   showLabels ? 'justify-start' : 'justify-center'
                 )}
               >
-                <LogOut className={cn('h-4 w-4', showLabels ? 'mr-2' : undefined)} />
-                {showLabels && 'Logout'}
-              </Button>
+                <LogOut className="w-5 h-5 flex-shrink-0" />
+                {showLabels && <span className="truncate text-sm font-medium">Logout</span>}
+              </button>
             </div>
           </div>
         </motion.aside>
 
         {/* Main Content */}
-        <div className="flex min-h-screen flex-1 flex-col bg-[#0a0a0a]">
+        <div className="min-h-screen flex flex-col">
           {/* Top Bar */}
-          <header className="sticky top-0 z-20 border-b border-white/10 bg-black/40 backdrop-blur-xl">
-            <div className="flex h-20 items-center justify-between px-4 lg:px-8">
+          <header className="sticky top-0 z-20 bg-black/40 backdrop-blur-xl border-b border-white/10 flex-shrink-0">
+            <div className="flex items-center justify-between px-6 py-4">
               <div className="flex items-center space-x-4">
                 <button
-                  type="button"
                   onClick={() => setSidebarOpen(true)}
-                  aria-label="Open navigation"
-                  aria-expanded={sidebarOpen}
-                  className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/70 transition-colors hover:text-white',
-                    !isMobile && 'hidden'
+                  className={cn('w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white', 
+                    isMobile ? 'flex' : 'hidden'
                   )}
                 >
                   <Menu className="h-5 w-5" />
                 </button>
+                <div>
+                  <h2 className="text-lg font-semibold">
+                    {adminSections.find((item) => item.slug === currentPage)?.label || 'Dashboard'}
+                  </h2>
+                  <p className="text-xs text-white/60">Manage your content</p>
+                </div>
               </div>
 
               <div className="flex items-center space-x-3">
-                <div className="hidden md:flex items-center space-x-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E93370]">
-                    <span className="text-sm">A</span>
+                <div className={cn(
+                  'flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10',
+                  isMobile ? 'hidden' : 'flex'
+                )}>
+                  <div className="w-8 h-8 rounded-full bg-[#E93370] flex items-center justify-center text-xs font-semibold">
+                    A
                   </div>
                   <div className="text-sm">
                     <div className="text-white">Admin User</div>
-                    <div className="text-xs text-white/60">admin@wildout.id</div>
+                    <div className="text-white/60 text-xs">admin@wildout.id</div>
                   </div>
                 </div>
               </div>
@@ -235,16 +222,7 @@ export const DashboardLayout = React.memo(
           </header>
 
           {/* Page Content */}
-          <main
-            className="flex-1 p-4 lg:overflow-y-auto lg:p-8"
-            onClick={() => {
-              if (isMobile && sidebarOpen) {
-                setSidebarOpen(false);
-              }
-            }}
-          >
-            {children}
-          </main>
+          <main className="flex-1 p-6 overflow-y-auto">{children}</main>
         </div>
       </div>
     );

@@ -1,6 +1,6 @@
 # Agents Rules
 
-agent / model rules must follow.
+*   Agent / Model rules must follow.
 
 ## Guidelines
 
@@ -137,3 +137,8 @@ graph TD
 *   **DON'T** run another `pnpm dev` when it's already running.
 *   **DON'T** run `pnpm supabase`.
 *   **DON'T** run `pnpm install -g supabase`.
+
+
+## Function or Tool Call
+
+*   **DO** use mcp server `filesystem` for `multi_replace_string_in_file`
