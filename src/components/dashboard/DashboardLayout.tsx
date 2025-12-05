@@ -32,7 +32,7 @@ export const DashboardLayout = React.memo(
   ({ children }: DashboardLayoutProps) => {
     const { getCurrentSubPath, navigate, getAdminPath } = useRouter();
     const { adminSections, getSectionPermissions } = useStaticContent();
-    const { signOut } = useAuth();
+    const { user, signOut } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [viewportWidth, setViewportWidth] = useState<number>(
       typeof window !== 'undefined' ? window.innerWidth : 0
@@ -69,6 +69,10 @@ export const DashboardLayout = React.memo(
         console.error('Logout failed:', error);
       }
     };
+
+    const displayInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
+    const displayName = user?.user_metadata?.full_name || (user?.email ? user.email.split('@')[0] : 'Admin User');
+    const displayEmail = user?.email || 'admin@wildout.id';
 
     return (
       <div
@@ -107,12 +111,13 @@ export const DashboardLayout = React.memo(
             {/* Logo Section */}
             <div
               className="border-b border-white/10 flex items-center px-4 py-6 flex-shrink-0"
-              style={{ justifyContent: showLabels ? 'flex-start' : 'center' }}
+              style={{ justifyContent: 'center' }}
             >
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#E93370] to-pink-600 flex items-center justify-center text-white font-bold flex-shrink-0">
-                W
-              </div>
-              {showLabels && <span className="ml-3 font-bold text-lg truncate">WildOut</span>}
+              <img 
+                src={logo} 
+                alt="WildOut Logo" 
+                className="w-12 h-12 rounded-lg object-contain flex-shrink-0" 
+              />
             </div>
 
             {/* Navigation Items */}
@@ -210,11 +215,11 @@ export const DashboardLayout = React.memo(
                   isMobile ? 'hidden' : 'flex'
                 )}>
                   <div className="w-8 h-8 rounded-full bg-[#E93370] flex items-center justify-center text-xs font-semibold">
-                    A
+                    {displayInitial}
                   </div>
                   <div className="text-sm">
-                    <div className="text-white">Admin User</div>
-                    <div className="text-white/60 text-xs">admin@wildout.id</div>
+                    <div className="text-white">{displayName}</div>
+                    <div className="text-white/60 text-xs">{displayEmail}</div>
                   </div>
                 </div>
               </div>

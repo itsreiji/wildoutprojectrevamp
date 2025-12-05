@@ -129,7 +129,7 @@ graph TD
 *   **DO** ALWAYS use MCP server **"supabase"** for ALL database (DB) and storage operations via MCP Supabase tools (mcp_supabase-dg-ocr). STRICT RULE MUST FOLLOW.
 
 ### Don'ts
-*   **DON'T** modify `AGENTS.md` or `openspec` files directly without a proposal.
+*   **DON'T** modify `AGENTS.md` or `task-master` files directly without a proposal.
 *   **DON'T** use `any` type unless absolutely necessary and documented.
 *   **DON'T** hardcode secrets; use environment variables.
 *   **DON'T** run local Supabase commands (`supabase start`, `db reset`, `db pull`, etc.) unless EXPLICITLY instructed by user. STRICT RULE MUST FOLLOW.

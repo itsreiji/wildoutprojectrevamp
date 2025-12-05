@@ -1,12 +1,1 @@
-{
-  "mcpServers": {
-    "filesystem": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "/Github/wildoutprojectrevamp"
-      ]
-    }
-  }
-}
+{"mcpServers":{"filesystem":{"type":"stdio","command":"npm","args":["-y","mcp-server-filesystem","/Users/eji/","."],"disabled":false,"alwaysAllow":[]}}}
