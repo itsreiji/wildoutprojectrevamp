@@ -29,6 +29,7 @@ export const isValidUrl = (url: string): boolean => {
  */
 export const isValidPhone = (phone: string): boolean => {
   // Indonesian phone number format: +62 8xx-xxxx-xxxx or 08xx-xxxx-xxxx
-  const phoneRegex = /^(\+62|62)?[ -]?8[1-9]\d{1,2}[ -]?\d{4,8}$/;
+  // Updated regex to handle spaces and dashes more flexibly
+  const phoneRegex = /^(0|\+62|62)?[ -]?8[1-9]\d{1,2}[ -]?\d{3,4}[ -]?\d{3,4}$/;
   return phoneRegex.test(phone);
 };

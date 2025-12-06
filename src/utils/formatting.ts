@@ -39,8 +39,11 @@ export const formatTime = (time: string): string => {
  * @returns Formatted currency string
  */
 export const formatCurrency = (amount: number, currency: string = 'IDR'): string => {
-  return new Intl.NumberFormat('en-US', {
+  const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
   }).format(amount);
+  
+  // Replace non-breaking space with regular space for consistency
+  return formatted.replace(/\u00A0/g, ' ');
 };
