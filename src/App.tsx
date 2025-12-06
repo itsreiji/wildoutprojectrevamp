@@ -16,6 +16,10 @@ import { AdminGuard } from './components/admin/AdminGuard';
 import { Toaster } from './components/ui/sonner';
 import TestComponents from './components/ui/test-components';
 
+function NotFoundPage() {
+  return <div className="p-8 text-center text-white">Page not found</div>;
+}
+
 function App() {
   const isDevelopment = import.meta.env.DEV;
   // Use Supabase data by default, even in development
@@ -35,11 +39,17 @@ function App() {
     '/register': RegisterPage,
     '/login': LoginPage,
     '/admin/login': LoginPage, // Keep legacy /admin/login for backward compatibility
-    [`${adminBasePath}`]: AdminRoute,
-    [`${adminBasePath}/login`]: LoginPage, // New admin login path
+    [adminBasePath]: AdminRoute,
+    [`${adminBasePath}/login`]: () => handleAdminLogin('/admin/'),
+    [`${adminBasePath}/login?redirect=:redirect`]: LoginPage,
     [`${adminBasePath}/*`]: AdminRoute,
     '/test-ui': TestComponents,
-    '/404': () => <div className="p-8 text-center text-white">Page not found</div>,
+    '/404': NotFoundPage,
+  };
+
+  const handleAdminLogin = (defaultRedirect: string) => {
+    const path = new URLSearchParams(window.location.search).get('redirect');
+    return () => <LoginPage redirectTo={path || defaultRedirect} />;
   };
 
   return (

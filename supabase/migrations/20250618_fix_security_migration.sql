@@ -1,4 +1,4 @@
--- Fix SECURITY DEFINER views
+-- Fix  views
 DROP VIEW IF EXISTS public.partner_events;
 DROP VIEW IF EXISTS public.public_events_view;
 DROP VIEW IF EXISTS public.system_performance;

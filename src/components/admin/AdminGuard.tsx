@@ -46,7 +46,7 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
     if (loading || isValidating || sessionValid === null) return;
 
     if (sessionValid === false || !isAuthenticated || !user) {
-      navigate(`${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`);
+      navigate(`${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
 

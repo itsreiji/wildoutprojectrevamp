@@ -106,6 +106,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   lastActivity: number;
   signInWithOAuth: (provider: OAuthProvider) => Promise<AuthError | null>;
+  signInWithEmailPassword: (email: string, password: string) => Promise<AuthError | null>;
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
   clearCache: () => void;
@@ -526,6 +527,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  const signInWithEmailPassword = useCallback(async (email: string, password: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log(`🔄 Signing in with email/password...`);
+
+      // Security: Check if we're in a secure context (HTTPS)
+      if (typeof window !== 'undefined' && window.location.protocol !== 'https:' && import.meta.env.VITE_APP_ENV === 'production') {
+        console.warn('⚠️ Insecure context detected. Redirecting to HTTPS...');
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          window.location.href = `https://${window.location.host}${window.location.pathname}`;
+          return null;
+        }
+      }
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        console.error(`❌ Email/password sign-in error:`, error);
+        let errorMessage = error.message;
+
+        // Handle specific error cases
+        if (error.message.includes('invalid_credentials')) {
+          errorMessage = 'Invalid email or password. Please try again.';
+        } else if (error.message.includes('user_not_found')) {
+          errorMessage = 'No account found with this email. Please check your email or create a new account.';
+        } else if (error.message.includes('too_many_requests')) {
+          errorMessage = 'Too many login attempts. Please try again later.';
+        }
+
+        setError(errorMessage);
+        setLoading(false);
+        return { message: errorMessage } as AuthError;
+      }
+
+      console.log(`✅ Email/password sign-in successful`);
+      await updateSessionState(data.session);
+      setLoading(false);
+      return null;
+    } catch (signInError) {
+      console.error(`❌ Unexpected email/password sign-in error:`, signInError);
+      setError('An unexpected error occurred during authentication');
+      setLoading(false);
+      return { message: 'An unexpected error occurred' } as AuthError;
+    }
+  }, [updateSessionState]);
+
   const signOut = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -614,6 +666,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated,
         lastActivity,
         signInWithOAuth,
+        signInWithEmailPassword,
         signOut,
         refreshSession,
         clearCache,
