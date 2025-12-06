@@ -197,7 +197,7 @@ export const DashboardEvents = React.memo(() => {
                 price_range: values.price_range || null,
                 ticket_url: values.ticket_url || null,
                 metadata: {
-                    ...(editingEvent?.metadata || {}),
+                    ...(editingEvent?.metadata && typeof editingEvent.metadata === 'object' && !Array.isArray(editingEvent.metadata) ? editingEvent.metadata : {}),
                     featured_image: featuredImageUrl,
                     gallery_images: galleryImageUrls,
                 },
@@ -301,8 +301,8 @@ export const DashboardEvents = React.memo(() => {
                                 <TableCell className="px-6 py-5">
                                     <div className="flex items-center space-x-3">
                                         <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
-                                            {(event.metadata as any)?.featured_image ? (
-                                                <img src={(event.metadata as any)?.featured_image} alt={event.title} className="w-full h-full object-cover" />
+                                            {event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata && event.metadata.featured_image ? (
+                                                <img src={String(event.metadata.featured_image)} alt={event.title || 'Event'} className="w-full h-full object-cover" />
                                             ) : (
                                                 <Calendar className="h-6 w-6 text-white/40" />
                                             )}
@@ -318,16 +318,16 @@ export const DashboardEvents = React.memo(() => {
                                         <Calendar className="h-4 w-4 text-[#E93370]" />
                                         <div>
                                             <div className="text-sm">
-                                                {new Date(event.start_date).toLocaleDateString('en-US', {
+                                                {event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
                                                     month: 'short',
                                                     day: 'numeric',
                                                     year: 'numeric',
-                                                })}
+                                                }) : 'TBD'}
                                             </div>
                                             <div className="text-xs text-white/50">
-                                                {new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                -
-                                                {new Date(event.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                {event.start_date ? new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                                                {event.start_date && event.end_date ? '-' : ''}
+                                                {event.end_date ? new Date(event.end_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                             </div>
                                         </div>
                                     </div>
@@ -335,7 +335,7 @@ export const DashboardEvents = React.memo(() => {
                                 <TableCell className="px-6 py-5 text-white/70">
                                     <div className="flex items-center space-x-2">
                                         <MapPin className="h-4 w-4 text-[#E93370]" />
-                                        <div className="text-sm">{event.location}</div>
+                                        <div className="text-sm">{event.location || 'TBD'}</div>
                                     </div>
                                 </TableCell>
                                 <TableCell className="px-6 py-5">

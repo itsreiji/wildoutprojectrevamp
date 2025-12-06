@@ -21,8 +21,8 @@ export const AllEventsPage = React.memo(() => {
   const categories = ['all', ...Array.from(new Set(events.map(e => e.category)))];
 
   const filteredEvents = events.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         (event.description ?? '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (event.title ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (event.description ?? '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = filterCategory === 'all' || event.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -71,11 +71,10 @@ export const AllEventsPage = React.memo(() => {
                     key={category}
                     onClick={() => setFilterCategory(category ?? 'all')}
                     variant={filterCategory === category ? 'default' : 'outline'}
-                    className={`rounded-xl whitespace-nowrap ${
-                      filterCategory === category
-                        ? 'bg-[#E93370] hover:bg-[#E93370]/90 text-white'
-                        : 'border-white/10 text-white/70 hover:bg-white/5'
-                    }`}
+                    className={`rounded-xl whitespace-nowrap ${filterCategory === category
+                      ? 'bg-[#E93370] hover:bg-[#E93370]/90 text-white'
+                      : 'border-white/10 text-white/70 hover:bg-white/5'
+                      }`}
                   >
                     {category === 'all' ? 'All Events' : category}
                   </Button>
@@ -94,19 +93,19 @@ export const AllEventsPage = React.memo(() => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                onClick={() => setSelectedEvent(event)}
+                onClick={() => setSelectedEvent(event as Event)}
                 className="group cursor-pointer"
               >
                 <div className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 h-full flex flex-col">
                   {/* Event Image */}
                   <div className="relative h-56 overflow-hidden">
                     <ImageWithFallback
-                      src={event.image}
-                      alt={event.title}
+                      src={event.image_url ?? ''}
+                      alt={event.title ?? ''}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-                    
+
                     {/* Category Badge */}
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-[#E93370]/90 text-white border-0 backdrop-blur-sm">
@@ -118,8 +117,8 @@ export const AllEventsPage = React.memo(() => {
                     <div className="absolute top-4 right-4">
                       <Badge className={
                         event.status === 'upcoming' ? 'bg-blue-500/90 text-white border-0' :
-                        event.status === 'ongoing' ? 'bg-green-500/90 text-white border-0' :
-                        'bg-gray-500/90 text-white border-0'
+                          event.status === 'ongoing' ? 'bg-green-500/90 text-white border-0' :
+                            'bg-gray-500/90 text-white border-0'
                       }>
                         {event.status}
                       </Badge>
@@ -131,7 +130,7 @@ export const AllEventsPage = React.memo(() => {
                     <h3 className="text-xl text-white mb-3 line-clamp-2 group-hover:text-[#E93370] transition-colors">
                       {event.title}
                     </h3>
-                    
+
                     <p className="text-white/60 text-sm mb-4 line-clamp-2 flex-1">
                       {event.description}
                     </p>
@@ -141,20 +140,20 @@ export const AllEventsPage = React.memo(() => {
                       <div className="flex items-center text-sm text-white/70">
                         <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
                         <span>
-                          {new Date(event.date).toLocaleDateString('en-US', {
+                          {event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
                             year: 'numeric',
-                          })}
+                          }) : ''}
                         </span>
                         <Clock className="h-4 w-4 ml-4 mr-2 text-[#E93370]" />
-                        <span>{event.time.split(' - ')[0]}</span>
+                        <span>{event.start_date ? new Date(event.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''}</span>
                       </div>
 
                       {/* Venue */}
                       <div className="flex items-center text-sm text-white/70">
                         <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="line-clamp-1">{event.venue}</span>
+                        <span className="line-clamp-1">{event.location ?? ''}</span>
                       </div>
 
                       {/* Attendance */}

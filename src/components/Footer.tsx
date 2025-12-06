@@ -33,7 +33,7 @@ const FOOTER_LINKS = {
 
 export const Footer = React.memo(() => {
   const { settings } = useContent();
-  
+
   if (!settings) {
     return (
       <footer className="relative pt-20 pb-8 px-4 z-20">
@@ -51,7 +51,7 @@ export const Footer = React.memo(() => {
 
   const socialLinks = socialMediaKeys
     .map(({ icon: Icon, key, label }) => {
-      const href = settings.socialMedia?.[key as keyof typeof settings.socialMedia] as string | undefined;
+      const href = settings.social_media?.[key as keyof typeof settings.social_media] as string | undefined;
       if (!href) return null;
       return { icon: Icon, href, label };
     })
@@ -71,7 +71,7 @@ export const Footer = React.memo(() => {
               transition={{ duration: 0.6 }}
             >
               <div className="mb-4">
-                <img src={logo} alt={settings.siteName ?? 'WildOut!'} className="h-12 w-auto object-contain" />
+                <img src={logo} alt={settings.site_name ?? 'WildOut!'} className="h-12 w-auto object-contain" />
               </div>
               <p className="text-white/60 mb-6 leading-relaxed">
                 {settings.tagline ?? ''}
@@ -169,7 +169,7 @@ export const Footer = React.memo(() => {
             {/* Copyright */}
             <div className="flex flex-col items-center md:items-start gap-2">
               <p className="text-white/40 text-sm">
-                © {new Date().getFullYear()} {settings.siteName ?? 'WildOut!'}. All rights reserved.
+                © {new Date().getFullYear()} {settings.site_name ?? 'WildOut!'}. All rights reserved.
               </p>
               <p className="text-white text-sm">
                 Made by{' '}

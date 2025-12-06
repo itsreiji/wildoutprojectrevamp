@@ -1,5 +1,14 @@
 # Deployment and production checklist
 
+## Production Domain
+
+**Website URL**: `https://wildoutproject.com`
+
+This domain should be configured in:
+- Supabase Dashboard → Authentication → URL Configuration
+- Your hosting provider (Vercel, etc.) for custom domain setup
+- Any third-party services that require callback URLs
+
 ## Environment variables
 
 - `VITE_SUPABASE_URL` – Supabase project endpoint (e.g., `https://qhimllczaejftnuymrsr.supabase.co`)
@@ -12,7 +21,13 @@ Set these values in Vercel (production + preview) and any other host before buil
 
 ## Supabase auth hooks
 
-- Configure Supabase auth redirect URLs to include `https://<your-domain>/login`, `https://<your-domain>/register`, and `https://<your-domain>{VITE_ADMIN_BASE_PATH}/login` (e.g., `/sadmin/login` or `/admin/login`)
+- Configure Supabase auth redirect URLs in the production Supabase dashboard to include:
+  - `https://wildoutproject.com/login`
+  - `https://wildoutproject.com/register`
+  - `https://wildoutproject.com/sadmin/login` (or `/admin/login` if using legacy path)
+  - `https://www.wildoutproject.com/login` (if using www subdomain)
+  - `https://www.wildoutproject.com/register`
+  - `https://www.wildoutproject.com/sadmin/login`
 - User registration is available at `/register` - new users automatically get 'user' role
 - Provision admin accounts with appropriate roles:
   - `admin`: Full access to all admin sections, can manage users

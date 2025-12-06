@@ -64,7 +64,7 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
       name: row.name || '',
       title: row.title || row.role || undefined,
       bio: row.bio || undefined,
-      photoUrl: row.avatar_url || undefined,
+      avatar_url: row.avatar_url || null,
       email: row.email || undefined,
       status: row.status as 'active' | 'inactive' | undefined || undefined,
       social_links: normalizeSocialLinks(row.social_links),
@@ -95,7 +95,7 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
         name: data.name || '',
         title: data.title || undefined,
         bio: data.bio || undefined,
-        photoUrl: data.avatar_url || undefined,
+        avatar_url: data.avatar_url || null,
         email: data.email || undefined,
         status: data.status as 'active' | 'inactive' | undefined || undefined,
         social_links: normalizeSocialLinks(data.social_links),
@@ -130,7 +130,7 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
         name: data.name || '',
         title: data.title || undefined,
         bio: data.bio || undefined,
-        photoUrl: data.avatar_url || undefined,
+        avatar_url: data.avatar_url || null,
         email: data.email || undefined,
         status: data.status as 'active' | 'inactive' | undefined || undefined,
         social_links: normalizeSocialLinks(data.social_links),
@@ -155,8 +155,8 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
 
       if (error) throw error;
 
-      if (memberToDelete?.photoUrl) {
-        await cleanupTeamMemberAsset(memberToDelete.photoUrl);
+      if (memberToDelete?.avatar_url) {
+        await cleanupTeamMemberAsset(memberToDelete.avatar_url);
       }
     },
     onSuccess: () => {

@@ -59,8 +59,8 @@ export const GallerySection = React.memo(() => {
             <SelectContent className="bg-black/95 border-white/10 text-white">
               <SelectItem value="all">All Events</SelectItem>
               {events.map((event) => (
-                <SelectItem key={event.id} value={event.id}>
-                  {event.title}
+                <SelectItem key={event.id} value={event.id || ''}>
+                  {event.title || 'Untitled Event'}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -80,16 +80,18 @@ export const GallerySection = React.memo(() => {
             >
               <div className="relative w-full h-full">
                 <ImageWithFallback
-                  src={image.url}
-                  alt={image.caption}
+                  src={image.image_url}
+                  alt={image.title || image.description || 'Gallery image'}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-4 left-4 right-4">
-                    <p className="text-white text-sm">{image.caption}</p>
-                    {image.event && <p className="text-white/60 text-xs mt-1">{image.event}</p>}
+                    <p className="text-white text-sm">{image.title || image.description || ''}</p>
+                    {image.event_id && events.find(e => e.id === image.event_id) && (
+                      <p className="text-white/60 text-xs mt-1">{events.find(e => e.id === image.event_id)?.title}</p>
+                    )}
                   </div>
                 </div>
 

@@ -125,10 +125,12 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
         location: row.location || null,
         partner_name: row.partner_name || null,
         partner_logo_url: row.partner_logo_url || null,
-        partner_website_url: row.partner_website_url || null,
         metadata: row.metadata ?? {},
         created_at: row.created_at,
         updated_at: row.updated_at,
+        tags: row.tags || null,
+        image_url: row.image_url || row.image || null,
+        currency: row.currency || null,
       };
     }) as LandingEvent[];
   };

@@ -103,7 +103,7 @@ export const DashboardTeam = React.memo(() => {
   const handleSubmit = async (values: TeamFormValues) => {
     setIsSubmitting(true);
     try {
-      let avatarUrl: string | undefined = (editingMember?.photoUrl || editingMember?.avatar_url) ?? undefined;
+      let avatarUrl: string | undefined = editingMember?.avatar_url ?? undefined;
       const newUploadedFiles: string[] = [];
 
       // Handle avatar upload
@@ -143,14 +143,14 @@ export const DashboardTeam = React.memo(() => {
         title: values.title,
         email: values.email,
         bio: values.bio || null,
-        photoUrl: avatarUrl || null,
+        avatar_url: avatarUrl || null,
         social_links: values.social_links || {},
       };
 
       try {
         if (editingMember?.id) {
           // Update existing member (pass old avatar_url for cleanup if media is replaced)
-          await updateTeamMember(editingMember.id, memberData, editingMember.photoUrl || editingMember.avatar_url);
+          await updateTeamMember(editingMember.id, memberData, editingMember.avatar_url);
           toast.success('Team member updated successfully!');
         } else {
           // Create new member
@@ -223,10 +223,10 @@ export const DashboardTeam = React.memo(() => {
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center space-x-3">
-                {member.photoUrl ? (
+                {member.avatar_url ? (
                   <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#E93370]/30">
                     <ImageWithFallback
-                      src={member.photoUrl}
+                      src={member.avatar_url}
                       alt={member.name}
                       className="w-full h-full object-cover"
                     />

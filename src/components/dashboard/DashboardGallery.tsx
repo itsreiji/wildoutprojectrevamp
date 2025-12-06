@@ -200,7 +200,7 @@ export const DashboardGallery = React.memo(() => {
         category: values.category ?? undefined,
         event_id: values.event_id || null,
         tags: values.tags ?? [],
-        image_urls: imageUrls.length > 0 ? imageUrls : (editingGallery?.image_urls || []),
+        image_url: imageUrls.length > 0 ? imageUrls[0] : (editingGallery?.image_url || ''),
       };
 
       try {
@@ -240,8 +240,8 @@ export const DashboardGallery = React.memo(() => {
 
   // Extract first image URL from image_urls array
   const getGalleryImage = (item: GalleryImage): string => {
-    if (Array.isArray(item.image_urls) && item.image_urls.length > 0) {
-      return item.image_urls[0] as string;
+    if (item.image_url) {
+      return item.image_url;
     }
     return '';
   };

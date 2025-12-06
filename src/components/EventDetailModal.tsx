@@ -53,8 +53,8 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
               {/* Hero Image */}
               <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
                 <ImageWithFallback
-                  src={event.image}
-                  alt={event.title}
+                  src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : undefined) || undefined}
+                  alt={event.title || 'Event'}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
@@ -71,11 +71,15 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                     <div className="flex items-center bg-black/60 backdrop-blur-xl rounded-full px-4 py-2">
                       <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
                       <span className="text-sm">
-                        {new Date(event.date).toLocaleDateString('en-US', {
+                        {event.date ? new Date(event.date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric',
-                        })}
+                        }) : event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        }) : 'TBD'}
                       </span>
                     </div>
                     <div className="flex items-center bg-black/60 backdrop-blur-xl rounded-full px-4 py-2">
@@ -121,12 +125,12 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                     <div>
                       <h3 className="text-2xl text-white mb-3">Event Highlights</h3>
                       <ul className="space-y-2">
-                        {event.highlights?.map((highlight: string, index: number) => (
+                        {Array.isArray(event.highlights) ? event.highlights.map((highlight: any, index: number) => (
                           <li key={index} className="flex items-start text-white/70">
                             <div className="w-2 h-2 bg-[#E93370] rounded-full mt-2 mr-3 flex-shrink-0" />
-                            {highlight}
+                            {String(highlight)}
                           </li>
-                        ))}
+                        )) : null}
                       </ul>
                     </div>
 
@@ -137,7 +141,7 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                         Artist Lineup
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {event.artists.map((artist: any, index: number) => (
+                        {event.artists && Array.isArray(event.artists) ? event.artists.map((artist: any, index: number) => (
                           <div
                             key={index}
                             className="flex items-center space-x-4 p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10"
@@ -154,22 +158,22 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                               <div className="text-sm text-[#E93370]">{artist.role}</div>
                             </div>
                           </div>
-                        ))}
+                        )) : null}
                       </div>
                     </div>
 
                     {/* Gallery */}
-                    {event.gallery && event.gallery.length > 0 && (
+                    {event.gallery && Array.isArray(event.gallery) && event.gallery.length > 0 && (
                       <div>
                         <h3 className="text-2xl text-white mb-4">Event Gallery</h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          {event.gallery?.map((image: string, index: number) => (
+                          {event.gallery.map((image: any, index: number) => (
                             <div
                               key={index}
                               className="aspect-square rounded-2xl overflow-hidden border border-white/10"
                             >
                               <ImageWithFallback
-                                src={image}
+                                src={String(image)}
                                 alt={`Gallery ${index + 1}`}
                                 className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                               />
@@ -218,12 +222,17 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                         <div>
                           <div className="text-white/60">Date</div>
                           <div className="text-white">
-                            {new Date(event.date).toLocaleDateString('en-US', {
+                            {event.date ? new Date(event.date).toLocaleDateString('en-US', {
                               weekday: 'long',
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',
-                            })}
+                            }) : event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            }) : 'TBD'}
                           </div>
                         </div>
                         <div>

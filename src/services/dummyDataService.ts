@@ -51,15 +51,15 @@ export const dummyDataService = {
         time: event.start_date ? new Date(event.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '',
         venue: event.location ?? '',
         venueAddress: event.location ?? '',
-        image: (metadata.image as string) ?? '',
+        image: (metadata.image as string) ?? event.image_url ?? '',
         category: event.category ?? null,
         status: (event.status as LandingEvent['status']) ?? 'upcoming',
         end_date: event.end_date ?? '',
-        capacity: event.capacity ?? undefined,
+        capacity: event.max_attendees ?? undefined,
         attendees: null,
         price: null,
-        price_range: event.price_range ?? null,
-        ticket_url: event.ticket_url ?? null,
+        price_range: (metadata.price_range as string) ?? null,
+        ticket_url: (metadata.ticket_url as string) ?? event.website_url ?? null,
         artists: [],
         gallery: galleryImages,
         highlights,
@@ -68,7 +68,10 @@ export const dummyDataService = {
         partner_name: event.partner_name ?? null,
         partner_logo_url: null,
         partner_website_url: null,
-        metadata,
+        metadata: metadata as Json,
+        tags: event.tags ?? null,
+        image_url: event.image_url ?? null,
+        currency: event.currency ?? null,
         created_at: event.created_at ?? event.start_date ?? new Date().toISOString(),
         updated_at: event.updated_at ?? event.end_date ?? new Date().toISOString(),
       };
@@ -79,25 +82,31 @@ export const dummyDataService = {
     return DUMMY_PARTNERS.map(p => ({
       ...p,
       id: p.id || `partner-${Date.now()}-${Math.random()}`,
-      category: null,
+      category: p.category ?? '',
       website_url: p.website_url ?? null,
       status: (p.status as 'active' | 'inactive') || 'active',
       social_links: normalizeSocialLinks(p.social_links),
+      featured: p.featured ?? false,
+      description: p.description ?? null,
+      logo_url: p.logo_url ?? null,
     }));
   },
 
   getGallery: (): GalleryImage[] => {
     return DUMMY_GALLERY_ITEMS.map(g => {
-      const imageUrls = ensureStringArray(g.image_urls) ?? [];
+      const metadata = normalizeMetadata(g.metadata);
+      const imageUrls = ensureStringArray(metadata.image_urls as Json) ?? [];
       return {
         id: g.id || `gallery-${Date.now()}-${Math.random()}`,
-        title: g.title,
+        title: g.title ?? '',
         description: g.description ?? null,
-        category: g.category ?? null,
+        category: g.category ?? '',
         status: g.status ?? 'published',
         tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
-        image_urls: imageUrls,
-        url: imageUrls[0] || '',
+        image_url: g.image_url ?? '',
+        display_order: g.display_order ?? null,
+        event_id: g.event_id ?? null,
+        metadata: metadata as Json,
         created_at: g.created_at ?? new Date().toISOString(),
         updated_at: g.updated_at ?? new Date().toISOString(),
       };
@@ -108,10 +117,14 @@ export const dummyDataService = {
     return DUMMY_TEAM_MEMBERS.map(t => ({
       ...t,
       id: t.id || `team-${Date.now()}-${Math.random()}`,
-      role: null,
-      phone: null,
-      photoUrl: null,
-      social_links: normalizeSocialLinks(t.social_links),
+      title: t.title ?? null,
+      bio: t.bio ?? null,
+      avatar_url: t.avatar_url ?? null,
+      email: t.email ?? null,
+      social_links: normalizeSocialLinks({
+        linkedin: t.linkedin_url,
+        twitter: t.twitter_handle
+      }),
       status: (t.status as 'active' | 'inactive') || 'active',
     }));
   }

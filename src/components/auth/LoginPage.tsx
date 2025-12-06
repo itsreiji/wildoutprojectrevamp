@@ -1,71 +1,100 @@
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from '../router';
 import { useAuth } from '../../contexts/AuthContext';
 import { Background3D } from '../Background3D';
+import { Button } from '../../components/ui/button';
+import { SiGoogle } from 'react-icons/si';
+import { Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 const copy = {
   title: 'Admin access',
   subtitle: 'Sign in with your WildOut! administrator account to manage landing page content.',
-  passwordLabel: 'Password',
-  emailLabel: 'Email address',
-  submit: 'Sign in',
-  magicLink: 'Send magic link',
+  oauthProviders: {
+    google: 'Continue with Google'
+  },
+  errorMessages: {
+    authFailed: 'Authentication failed. Please try again.',
+    unexpected: 'An unexpected error occurred. Please try again.',
+    network: 'Network error. Please check your connection and try again.',
+    popupBlocked: 'Popup blocked. Please allow popups for this site and try again.'
+  },
+  successMessages: {
+    redirecting: 'Authentication successful. Redirecting...',
+    welcomeBack: 'Welcome back!'
+  }
 };
 
 export const LoginPage: React.FC = () => {
-  const { signInWithEmail, sendMagicLink, role, loading } = useAuth();
+  const { signInWithOAuth, role, loading, isAuthenticated, error: authError } = useAuth();
   const { navigate } = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [oauthLoading, setOAuthLoading] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
-  const { getAdminPath } = useRouter();
+  // Enhanced error handling for OAuth
+  useEffect(() => {
+    if (authError) {
+      setFormError(authError);
+    }
+  }, [authError]);
 
   useEffect(() => {
-    if (role === 'admin') {
-      navigate(getAdminPath());
+    if (isAuthenticated) {
+      if (role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     }
-  }, [role, navigate, getAdminPath]);
+  }, [isAuthenticated, role, navigate]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleOAuthSignIn = async () => {
     setFormError(null);
     setInfoMessage(null);
+    setOAuthLoading(true);
 
-    if (!email || !password) {
-      setFormError('Please provide both email and password.');
-      return;
+    try {
+      // Check if popups are blocked
+      const popupCheck = window.open('', '_blank');
+      if (!popupCheck) {
+        setFormError(copy.errorMessages.popupBlocked);
+        setOAuthLoading(false);
+        return;
+      }
+      popupCheck.close();
+
+      const error = await signInWithOAuth('google');
+      if (error) {
+        // Enhanced error handling
+        if (error.message.includes('network')) {
+          setFormError(copy.errorMessages.network);
+        } else {
+          setFormError(error.message || copy.errorMessages.authFailed);
+        }
+      } else {
+        setInfoMessage(copy.successMessages.redirecting);
+      }
+    } catch (error) {
+      console.error('Google OAuth error:', error);
+      if (error instanceof Error && error.message.includes('network')) {
+        setFormError(copy.errorMessages.network);
+      } else {
+        setFormError(copy.errorMessages.unexpected);
+      }
+    } finally {
+      setOAuthLoading(false);
     }
-
-    const error = await signInWithEmail(email.trim(), password);
-    if (error) {
-      setFormError(error.message);
-      return;
-    }
-
-    setInfoMessage('Signed in successfully. Redirecting to admin dashboard…');
   };
 
-  const handleMagicLink = async () => {
-    if (!email) {
-      setFormError('Enter your email to receive a magic link.');
-      return;
-    }
-    setFormError(null);
-    const error = await sendMagicLink(email.trim());
-    if (error) {
-      setFormError(error.message);
-      return;
-    }
-    setInfoMessage('Magic link sent! Please check your inbox and follow the instructions.');
-  };
+  // Mobile responsiveness - adjust layout for smaller screens
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
   return (
-    <div className="dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <div className="login-page dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
       <Background3D />
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-sm space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
+      <div className="login-container relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
+        <div className={`login-card w-full space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl ${isMobile ? 'max-w-xs' : 'max-w-sm'}`}>
           <div className="text-center">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
               {copy.title}
@@ -75,125 +104,68 @@ export const LoginPage: React.FC = () => {
             </p>
           </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-white/90">
-              {copy.emailLabel}
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={event => setEmail(event.target.value)}
-              autoComplete="email"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
-              placeholder="you@wildout.id"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-white/90">
-              {copy.passwordLabel}
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={event => setPassword(event.target.value)}
-              autoComplete="current-password"
-              className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
-              placeholder="••••••••"
-            />
-          </div>
-
+          {/* Enhanced error display with icons */}
           {formError && (
-            <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3">
+            <div className="error-message rounded-lg border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-300 flex-shrink-0" />
               <p className="text-sm text-red-300" role="alert">
                 {formError}
               </p>
             </div>
           )}
 
+          {/* Enhanced success display with icons */}
           {infoMessage && (
-            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3">
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-300 flex-shrink-0" />
               <p className="text-sm text-emerald-300" role="status">
                 {infoMessage}
               </p>
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-2xl bg-[#E93370] hover:bg-[#E93370]/90 text-white px-6 py-4 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:cursor-wait disabled:opacity-60 backdrop-blur-xl"
-          >
-            {loading ? 'Working…' : copy.submit}
-          </button>
-        </form>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-white/10" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase tracking-wider">
-            <span className="bg-white/5 px-3 text-white/60">or</span>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleMagicLink}
-          disabled={loading}
-          className="w-full rounded-2xl border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] text-white px-6 py-4 text-sm font-medium transition-all duration-300 disabled:cursor-wait disabled:opacity-60 backdrop-blur-xl"
-        >
-          {loading ? 'Sending…' : copy.magicLink}
-        </button>
-
-        {/* Resources Section */}
-        <div className="pt-8 border-t border-white/10">
-          <p className="text-center text-xs font-medium text-white/60 mb-4">Resources</p>
-          <div className="flex flex-col items-center space-y-3">
-            <div className="flex justify-center space-x-6">
-              <button
-                type="button"
-                onClick={() => window.open('/terms-of-service.pdf', '_blank')}
-                className="text-xs text-white/60 hover:text-white/80 transition-colors duration-300"
-              >
-                Terms of Service
-              </button>
-              <button
-                type="button"
-                onClick={() => window.open('/privacy-policy.pdf', '_blank')}
-                className="text-xs text-white/60 hover:text-white/80 transition-colors duration-300"
-              >
-                Privacy Policy
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                // Download admin resources/documentation
-                const link = document.createElement('a');
-                link.href = '/admin-resources.zip'; // Placeholder - can be updated to actual asset
-                link.download = 'wildout-admin-resources.zip';
-                link.click();
-              }}
-              className="text-xs text-[#E93370] hover:text-[#E93370]/80 font-medium transition-colors duration-300 flex items-center space-x-1"
+          <div className="mt-6">
+            <Button
+              variant="outline"
+              className="google-button w-full flex items-center justify-center gap-2 border-white/10 bg-white/5 hover:bg-white/10 h-12 text-base transition-all-smooth"
+              onClick={handleOAuthSignIn}
+              disabled={oauthLoading || loading}
+              aria-label="Sign in with Google"
             >
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              <span>Download Admin Resources</span>
-            </button>
+              {oauthLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Authenticating with Google...</span>
+                </>
+              ) : (
+                <>
+                  <SiGoogle className="h-5 w-5 text-[#EA4335]" />
+                  <span className="font-medium">{copy.oauthProviders.google}</span>
+                </>
+              )}
+            </Button>
           </div>
-        </div>
 
-        <div className="pt-6 text-center">
-          <p className="text-xs font-light text-white/40 tracking-wider">
-            WildOut! Admin Portal
-          </p>
-          <p className="text-[10px] text-white/30 mt-1 tracking-[0.2em] uppercase">
-            Secure Access Only
-          </p>
-        </div>
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => setShowTerms(!showTerms)}
+              className="terms-toggle mobile-terms text-xs text-white/40 hover:text-white/60 transition-colors duration-200 flex items-center justify-center gap-1 mx-auto"
+              aria-label="Toggle terms and conditions"
+            >
+              {showTerms ? 'Hide' : 'Show'} Terms & Conditions
+              <span className={`transform transition-transform ${showTerms ? 'rotate-180' : 'rotate-0'}`}>
+                ▼
+              </span>
+            </button>
+
+            {showTerms && (
+              <div className="mobile-terms mt-4 text-xs text-white/50 space-y-2">
+                <p>By continuing, you agree to our Terms of Service and Privacy Policy.</p>
+                <p>We use Google OAuth for secure authentication.</p>
+                <p>Your data is protected and only used for authentication purposes.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -96,15 +96,21 @@ export const HeroSection = React.memo(() => {
             className="grid grid-cols-3 gap-8 pt-12 w-full max-w-3xl"
           >
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.events}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">
+                {hero.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'events' in hero.stats ? String(hero.stats.events) : '0'}
+              </div>
               <div className="text-sm md:text-base text-white/60">Events</div>
             </div>
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.members}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">
+                {hero.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'members' in hero.stats ? String(hero.stats.members) : '0'}
+              </div>
               <div className="text-sm md:text-base text-white/60">Members</div>
             </div>
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.partners}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">
+                {hero.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'partners' in hero.stats ? String(hero.stats.partners) : '0'}
+              </div>
               <div className="text-sm md:text-base text-white/60">Partners</div>
             </div>
           </motion.div>

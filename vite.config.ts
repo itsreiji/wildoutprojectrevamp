@@ -57,6 +57,20 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'build',
+    chunkSizeWarningLimit: 1000, // Increase limit to 1000 kB
+    rollupOptions: {
+      input: 'src/main.tsx',
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+          if (id.includes('styles') || id.includes('.css')) {
+            return 'styles';
+          }
+        },
+      },
+    },
   },
   server: {
     port: 5173,

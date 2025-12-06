@@ -45,7 +45,7 @@ function App() {
   return (
     <ThemeProvider defaultTheme="system" attribute="class">
       <AuthProvider>
-        <ContentProvider useDummyData={useDummyDataDefault}>
+        <ContentProvider>
           <EventsProvider useDummyData={useDummyDataDefault}>
             <PartnersProvider useDummyData={useDummyDataDefault}>
               <TeamProvider useDummyData={useDummyDataDefault}>

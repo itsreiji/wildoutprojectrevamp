@@ -154,7 +154,7 @@ export const DashboardAuditLog = () => {
             {auditLogs.map((log) => (
               <TableRow key={log.id} className="border-white/10 hover:bg-white/5">
                 <TableCell className="text-white/80">
-                  {new Date(log.created_at).toLocaleString()}
+                  {log.created_at ? new Date(log.created_at).toLocaleString() : 'N/A'}
                 </TableCell>
                 <TableCell className="text-white/70 font-mono text-xs">
                   <div className="flex items-center">

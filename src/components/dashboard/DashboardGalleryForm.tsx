@@ -208,8 +208,8 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
                   <SelectContent>
                     <SelectItem value="none">No event</SelectItem>
                     {events.map((event) => (
-                      <SelectItem key={event.id} value={event.id}>
-                        {event.title}
+                      <SelectItem key={event.id} value={event.id || ''}>
+                        {event.title || 'Untitled Event'}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -12,7 +12,10 @@ import type { Feature } from '@/types/content';
 
 export const DashboardAbout = React.memo(() => {
   const { about, saveAboutContent } = useContent();
-  const [formData, setFormData] = useState(about);
+  const [formData, setFormData] = useState({
+    ...about,
+    foundedYear: about.founded_year || ''
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -31,12 +34,12 @@ export const DashboardAbout = React.memo(() => {
   const handleAddStoryParagraph = () => {
     setFormData({
       ...formData,
-      story: [...formData.story, ''],
+      story: formData.story ? [...formData.story, ''] : [''],
     });
   };
 
   const handleUpdateStoryParagraph = (index: number, value: string) => {
-    const newStory = [...formData.story];
+    const newStory = formData.story ? [...formData.story] : [];
     newStory[index] = value;
     setFormData({ ...formData, story: newStory });
   };
@@ -44,27 +47,32 @@ export const DashboardAbout = React.memo(() => {
   const handleRemoveStoryParagraph = (index: number) => {
     setFormData({
       ...formData,
-      story: formData.story.filter((_, i) => i !== index),
+      story: formData.story ? formData.story.filter((_, i) => i !== index) : [],
     });
   };
 
   const handleAddFeature = () => {
     setFormData({
       ...formData,
-      features: [...formData.features, { title: '', description: '' }],
+      features: Array.isArray(formData.features) ? [...formData.features, { title: '', description: '' }] : [{ title: '', description: '' }],
     });
   };
 
   const handleUpdateFeature = (index: number, field: 'title' | 'description', value: string) => {
-    const newFeatures = [...formData.features];
-    newFeatures[index][field] = value;
+    const newFeatures = Array.isArray(formData.features) ? [...formData.features] : [];
+    if (newFeatures[index]) {
+      (newFeatures[index] as Feature)[field] = value;
+    } else {
+      newFeatures[index] = { title: '', description: '' };
+      (newFeatures[index] as Feature)[field] = value;
+    }
     setFormData({ ...formData, features: newFeatures });
   };
 
   const handleRemoveFeature = (index: number) => {
     setFormData({
       ...formData,
-      features: formData.features.filter((_, i) => i !== index),
+      features: Array.isArray(formData.features) ? formData.features.filter((_, i) => i !== index) : [],
     });
   };
 
@@ -110,7 +118,7 @@ export const DashboardAbout = React.memo(() => {
               <Label htmlFor="subtitle">Subtitle</Label>
               <Textarea
                 id="subtitle"
-                value={formData.subtitle}
+                value={formData.subtitle || ''}
                 onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
                 className="bg-white/5 border-white/10 text-white min-h-[100px]"
                 placeholder="A brief introduction about your organization..."
@@ -121,7 +129,7 @@ export const DashboardAbout = React.memo(() => {
               <Label htmlFor="foundedYear">Founded Year</Label>
               <Input
                 id="foundedYear"
-                value={formData.foundedYear}
+                value={formData.foundedYear || ''}
                 onChange={(e) => setFormData({ ...formData, foundedYear: e.target.value })}
                 className="bg-white/5 border-white/10 text-white"
                 placeholder="2020"
@@ -157,7 +165,7 @@ export const DashboardAbout = React.memo(() => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {formData.story.map((paragraph: string, index: number) => (
+            {(formData.story || []).map((paragraph: string, index: number) => (
               <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor={`story-${index}`}>Paragraph {index + 1}</Label>
@@ -209,7 +217,9 @@ export const DashboardAbout = React.memo(() => {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            {formData.features.map((feature: Feature, index: number) => (
+            {(Array.isArray(formData.features) ? formData.features : []).map((feature: any, index: number) => {
+              const featureObj = feature as Feature;
+              return (
               <div key={index} className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-white/90">Feature {index + 1}</h4>
@@ -226,7 +236,7 @@ export const DashboardAbout = React.memo(() => {
                   <Label htmlFor={`feature-title-${index}`}>Title</Label>
                   <Input
                     id={`feature-title-${index}`}
-                    value={feature.title}
+                    value={featureObj.title}
                     onChange={(e) => handleUpdateFeature(index, 'title', e.target.value)}
                     className="bg-white/5 border-white/10 text-white"
                     placeholder="Feature title..."
@@ -236,14 +246,15 @@ export const DashboardAbout = React.memo(() => {
                   <Label htmlFor={`feature-desc-${index}`}>Description</Label>
                   <Textarea
                     id={`feature-desc-${index}`}
-                    value={feature.description}
+                    value={featureObj.description}
                     onChange={(e) => handleUpdateFeature(index, 'description', e.target.value)}
                     className="bg-white/5 border-white/10 text-white min-h-[80px]"
                     placeholder="Feature description..."
                   />
                 </div>
               </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
       </motion.div>

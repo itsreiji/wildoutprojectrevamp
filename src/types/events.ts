@@ -3,6 +3,7 @@ import type { Database } from '../supabase/types';
 export type SupabaseEvent = Database['public']['Tables']['events']['Row'];
 export type NewSupabaseEvent = Database['public']['Tables']['events']['Insert'];
 export type UpdateSupabaseEvent = Database['public']['Tables']['events']['Update'];
+export type PublicEventsViewRow = Database['public']['Views']['public_events_view']['Row'];
 
 export interface EventArtist {
   name: string;

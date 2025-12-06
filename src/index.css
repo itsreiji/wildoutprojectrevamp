@@ -3762,3 +3762,115 @@ button, a {
     transform: translate3d(var(--tw-exit-translate-x, 0), var(--tw-exit-translate-y, 0), 0) scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), var(--tw-exit-scale, 1)) rotate(var(--tw-exit-rotate, 0));
   }
 }
+
+/* Google OAuth Login Page Enhancements */
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-card {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+}
+
+/* Cross-browser compatibility */
+button:focus-visible {
+  outline: 2px solid #E93370;
+  outline-offset: 2px;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Smooth transitions */
+.transition-all-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Google button hover effects */
+.google-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(233, 51, 112, 0.15);
+}
+
+/* Error message animations */
+.error-message {
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-3px); }
+  40%, 80% { transform: translateX(3px); }
+}
+
+/* Terms toggle animation */
+.terms-toggle {
+  transition: all 0.2s ease;
+}
+
+/* Accessibility focus styles */
+:focus-visible {
+  outline: 2px solid #E93370;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none;
+  }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  .mobile-optimized {
+    font-size: 14px;
+    padding: 12px 16px;
+  }
+
+  .mobile-terms {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+}
+
+/* Cross-browser font smoothing */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  .high-contrast {
+    border: 2px solid currentColor;
+    outline: 2px solid transparent;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -49,20 +49,27 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
 };
 
 // Initial data aligned with new types
-const INITIAL_EVENTS: LandingEvent[] = [];
+const INITIAL_EVENTS: any[] = [];
 const INITIAL_PARTNERS: Partner[] = [];
 const INITIAL_GALLERY: GalleryImage[] = [];
 const INITIAL_TEAM: TeamMember[] = [];
 const INITIAL_HERO: HeroContent = {
+  id: '00000000-0000-0000-0000-000000000001',
   title: 'WildOut!',
   subtitle: 'Media Digital Nightlife & Event Multi-Platform',
   description: "Indonesia's premier creative community connecting artists, events, and experiences.",
   stats: { events: '500+', members: '50K+', partners: '100+' },
+  cta_text: 'Join Us',
+  cta_link: '/events',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  updated_by: null,
 };
 const INITIAL_ABOUT: AboutContent = {
+  id: '00000000-0000-0000-0000-000000000002',
   title: 'About WildOut!',
   subtitle: "Indonesia's leading creative community platform, connecting artists, events, and experiences since 2020.",
-  foundedYear: '2020',
+  founded_year: '2020',
   story: [
     'Founded in 2020, WildOut! celebrates Indonesia’s creative culture.',
     'We host community-driven events that bring artists, venues, and sponsors together.',
@@ -71,19 +78,27 @@ const INITIAL_ABOUT: AboutContent = {
     { title: 'Community First', description: 'We build lasting connections.' },
     { title: 'Unforgettable Experiences', description: 'Every event is crafted to be memorable.' },
   ],
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  updated_by: null,
 };
 const INITIAL_SETTINGS: SiteSettings = {
-  siteName: 'WildOut!',
+  id: '00000000-0000-0000-0000-000000000003',
+  site_name: 'WildOut!',
+  site_description: "Indonesia's premier creative community platform",
   tagline: "Indonesia's premier creative community platform",
   email: 'contact@wildout.id',
   phone: '+62 21 1234 567',
   address: 'Jakarta, Indonesia',
-  socialMedia: {
+  social_media: {
     instagram: 'https://instagram.com/wildout.id',
     twitter: 'https://twitter.com/wildout_id',
     facebook: 'https://facebook.com/wildout.id',
     youtube: 'https://youtube.com/@wildout',
   },
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  updated_by: null,
 };
 
 // Fetch functions using content.ts types
@@ -97,12 +112,16 @@ const fetchHeroContent = async (): Promise<HeroContent> => {
     const result = data?.[0];
     if (result) {
       return {
+        id: result.id ?? INITIAL_HERO.id,
         title: result.title ?? INITIAL_HERO.title,
         subtitle: result.subtitle ?? INITIAL_HERO.subtitle,
         description: result.description ?? INITIAL_HERO.description,
         stats: typeof result.stats === 'string' ? JSON.parse(result.stats) ?? INITIAL_HERO.stats : (result.stats ?? INITIAL_HERO.stats),
-        ctaText: result.cta_text ?? INITIAL_HERO.ctaText,
-        ctaLink: result.cta_link ?? INITIAL_HERO.ctaLink,
+        cta_text: result.cta_text ?? INITIAL_HERO.cta_text,
+        cta_link: result.cta_link ?? INITIAL_HERO.cta_link,
+        created_at: result.created_at ?? INITIAL_HERO.created_at,
+        updated_at: result.updated_at ?? INITIAL_HERO.updated_at,
+        updated_by: result.updated_by ?? INITIAL_HERO.updated_by,
       };
     }
     return INITIAL_HERO;
@@ -122,11 +141,15 @@ const fetchAboutContent = async (): Promise<AboutContent> => {
     const result = data?.[0];
     if (result) {
       return {
+        id: result.id ?? INITIAL_ABOUT.id,
         title: result.title ?? INITIAL_ABOUT.title,
         subtitle: result.subtitle ?? INITIAL_ABOUT.subtitle,
-        foundedYear: result.founded_year ?? INITIAL_ABOUT.foundedYear,
+        founded_year: result.founded_year ?? INITIAL_ABOUT.founded_year,
         story: ensureStringArray(result.story) ?? INITIAL_ABOUT.story,
         features: typeof result.features === 'string' ? JSON.parse(result.features) ?? INITIAL_ABOUT.features : (result.features ?? INITIAL_ABOUT.features),
+        created_at: result.created_at ?? INITIAL_ABOUT.created_at,
+        updated_at: result.updated_at ?? INITIAL_ABOUT.updated_at,
+        updated_by: result.updated_by ?? INITIAL_ABOUT.updated_by,
       };
     }
     return INITIAL_ABOUT;
@@ -146,13 +169,17 @@ const fetchSiteSettings = async (): Promise<SiteSettings> => {
     const result = data?.[0];
     if (result) {
       return {
-        siteName: result.site_name ?? INITIAL_SETTINGS.siteName,
-        siteDescription: result.site_description ?? INITIAL_SETTINGS.siteDescription,
+        id: result.id ?? INITIAL_SETTINGS.id,
+        site_name: result.site_name ?? INITIAL_SETTINGS.site_name,
+        site_description: result.site_description ?? INITIAL_SETTINGS.site_description,
         tagline: result.tagline ?? INITIAL_SETTINGS.tagline,
         email: result.email ?? INITIAL_SETTINGS.email,
         phone: result.phone ?? INITIAL_SETTINGS.phone,
         address: result.address ?? INITIAL_SETTINGS.address,
-        socialMedia: normalizeSocialLinks(result.social_media) as Record<string, string>,
+        social_media: normalizeSocialLinks(result.social_media) as Record<string, string>,
+        created_at: result.created_at ?? INITIAL_SETTINGS.created_at,
+        updated_at: result.updated_at ?? INITIAL_SETTINGS.updated_at,
+        updated_by: result.updated_by ?? INITIAL_SETTINGS.updated_by,
       };
     }
     return INITIAL_SETTINGS;
@@ -192,99 +219,35 @@ const fetchEvents = async (): Promise<LandingEvent[]> => {
       } else if (row.status === 'completed' || row.status === 'cancelled' || row.status === 'archived') {
         status = 'completed';
       }
-      
+
       return {
-      id: row.id ?? '',
-      title: row.title ?? '',
-      description: row.description ?? null,
-      date: row.date ?? row.start_date ?? '',
-      time: row.time ?? '',
-      venue: row.venue ?? row.location ?? '',
-      venueAddress: row.venue_address ?? row.address ?? '',
-      image: row.image ?? row.image_url ?? row.featured_image ?? '',
-      category: row.category ?? null,
-      status,
-      end_date: row.end_date ?? '',
-      capacity: row.capacity || row.max_attendees || undefined,
-      attendees: row.attendees || row.current_attendees || null,
-      price: (() => {
-        // Use price_range from metadata if available, otherwise construct from price/currency
-        const metadata = row.metadata || {};
-        if (metadata.price_range) {
-          return metadata.price_range;
-        }
-        if (row.price) {
-          return `${row.currency || 'IDR'} ${row.price}`;
-        }
-        return null;
-      })(),
-      price_range: (() => {
-        // Extract price_range from metadata if available
-        const metadata = row.metadata || {};
-        if (metadata.price_range) {
-          return metadata.price_range;
-        }
-        return row.price_range || null;
-      })(),
-      ticket_url: row.ticket_url || null,
-      artists: (() => {
-        // Extract artists from metadata if available
-        const metadata = row.metadata || {};
-        if (metadata.artists && Array.isArray(metadata.artists)) {
-          return metadata.artists.map((artist: any): EventArtist => ({
-            name: artist.name || artist || '',
-            role: artist.role || undefined,
-            image: artist.image || undefined,
-          }));
-        }
-        // Fallback to row.artists if it's an array of strings
-        if (row.artists && Array.isArray(row.artists)) {
-          return row.artists.map((name: string): EventArtist => ({ 
-            name: typeof name === 'string' ? name : '', 
-            role: undefined, 
-            image: undefined 
-          }));
-        }
-        return [];
-      })(),
-      gallery: (() => {
-        // Extract gallery images from gallery_images_urls if available
-        if (row.gallery_images_urls) {
-          try {
-            // If it's already an array, use it directly
-            if (Array.isArray(row.gallery_images_urls)) {
-              return row.gallery_images_urls;
-            }
-            // If it's a JSON string, parse it
-            if (typeof row.gallery_images_urls === 'string') {
-              return JSON.parse(row.gallery_images_urls);
-            }
-            // If it's a JSONB object, it might already be parsed
-            return row.gallery_images_urls;
-          } catch (e) {
-            console.error('Error parsing gallery_images_urls:', e);
-          }
-        }
-        // Fallback to row.gallery if available
-        return row.gallery || [];
-      })(),
-      highlights: (() => {
-        // Extract highlights from metadata if available
-        const metadata = row.metadata || {};
-        if (metadata.highlights && Array.isArray(metadata.highlights)) {
-          return metadata.highlights;
-        }
-        return row.highlights || [];
-      })(),
-      start_date: row.start_date,
-      location: row.location || null,
-      partner_name: row.partner_name || null,
-      partner_logo_url: row.partner_logo_url || null,
-      partner_website_url: row.partner_website_url || null,
-      metadata: row.metadata ?? {},
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-    };
+        id: row.id ?? '',
+        title: row.title ?? '',
+        description: row.description ?? null,
+        start_date: row.start_date ?? '',
+        end_date: row.end_date ?? '',
+        time: row.time ?? '',
+        location: row.location ?? '',
+        // address: row.address ?? '',
+        category: row.category ?? null,
+        status,
+        capacity: row.capacity || row.max_attendees || null,
+        attendees: row.attendees || row.current_attendees || null,
+        currency: row.currency || 'IDR',
+        price: row.price || null,
+        price_range: row.price_range || null,
+        // ticket_url: row.ticket_url || null,
+        artists: row.artists || [],
+        gallery: row.gallery || [],
+        highlights: row.highlights || [],
+        metadata: row.metadata ?? {},
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        tags: row.tags || [],
+        image_url: row.image_url || '',
+        partner_name: row.partner_name || '',
+        partner_logo_url: row.partner_logo_url || '',
+      };
     }) as LandingEvent[];
   } catch (error) {
     console.error('Error in fetchEvents:', error);
@@ -309,13 +272,14 @@ const fetchTeamMembers = async (): Promise<TeamMember[]> => {
       name: row.name || '',
       title: row.title || row.role || undefined,
       bio: row.bio || undefined,
-      photoUrl: row.avatar_url || undefined,
+      avatar_url: row.avatar_url || undefined,
       email: row.email || undefined,
-      status: row.status as 'active' | 'inactive' | undefined || undefined,
-      social_links: normalizeSocialLinks(row.social_links),
+      status: row.status as 'active' | 'inactive' | undefined || 'active',
+      // social_links: normalizeSocialLinks(row.social_links),
       display_order: row.display_order || undefined,
       created_at: row.created_at,
       updated_at: row.updated_at,
+      linkedin_url: row.linkedin_url || null,
     }));
   } catch (error) {
     console.error('Error in fetchTeamMembers:', error);
@@ -341,13 +305,16 @@ const fetchPartners = async (): Promise<Partner[]> => {
       logo_url: row.logo_url || undefined,
       website_url: row.website_url || undefined,
       category: row.category || undefined,
-      status: row.status as 'active' | 'inactive' | undefined || undefined,
-      featured: row.featured || undefined,
+      status: row.status as 'active' | 'inactive' | undefined || 'active',
+      // featured: row.featured || undefined,
       contact_email: row.contact_email || undefined,
       contact_phone: row.contact_phone || undefined,
       social_links: normalizeSocialLinks(row.social_links),
       created_at: row.created_at,
       updated_at: row.updated_at,
+      address: row.address || null,
+      city: row.city || null,
+      country: row.country || null,
     }));
   } catch (error) {
     console.error('Error in fetchPartners:', error);
@@ -359,11 +326,8 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
   try {
     const { data, error } = await supabaseClient
       .from('gallery_items')
-      .select(`
-        *,
-        events:title
-      `)
-      .eq('status', 'published')
+      .select('*')
+      .order('display_order')
       .order('created_at', { ascending: false });
     if (error) {
       console.error('Error fetching gallery:', error);
@@ -373,16 +337,20 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
       id: row.id,
       title: row.title || undefined,
       description: row.description || undefined,
-      url: row.image_url || undefined,
-      image_urls: row.image_urls ? JSON.parse(row.image_urls) as string[] : undefined,
+      image_url: row.image_url || undefined,
       category: row.category || undefined,
       status: row.status || undefined,
       tags: row.tags || undefined,
-      caption: row.title || undefined,
-      uploadDate: row.created_at || undefined,
-      event: row.events?.title || undefined,
+      // caption: row.title || undefined,
+      // uploadDate: row.created_at || undefined,
+      // event: undefined,
       created_at: row.created_at || undefined,
       updated_at: row.updated_at || undefined,
+      display_order: row.display_order || null,
+      event_id: row.event_id || null,
+      metadata: row.metadata ?? {},
+      partner_id: row.partner_id || null,
+      thumbnail_url: row.thumbnail_url || null,
     }));
   } catch (error) {
     console.error('Error in fetchGallery:', error);
@@ -390,41 +358,11 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
   }
 };
 
-/* Event Artists Mutations */
-// Stub implementations until event_artists table/functions ready
-const fetchEventArtists = async (eventId: string): Promise<EventArtist[]> => {
-  console.warn('fetchEventArtists stub: event_artists table pending');
-  return [];
-};
+// Content context implementation
+export const ContentContext = createContext<ContentContextType | null>(null);
 
-const addEventArtist = async (artist: any): Promise<EventArtist> => {
-  console.warn('addEventArtist stub');
-  throw new Error('Event artists pending migration');
-};
-
-const updateEventArtist = async (id: string, updates: any): Promise<EventArtist> => {
-  console.warn('updateEventArtist stub');
-  throw new Error('Event artists pending migration');
-};
-
-const deleteEventArtist = async (id: string): Promise<void> => {
-  console.warn('deleteEventArtist stub');
-  throw new Error('Event artists pending migration');
-};
-
-// ContentContext
-const ContentContext = createContext<ContentContextType | undefined>(undefined);
-
-// ContentProvider
-export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boolean }> = ({ 
-  children, 
-  useDummyData: initialUseDummyData = false 
-}) => {
-  const authContext = useAuth();
-  const user = authContext.user;
-  const role: AuthRole = authContext.role;
-
-  // ALL useState FIRST with content.ts types
+export const ContentProvider = ({ children }: { children: ReactNode }) => {
+  const { user, role: userRole, useDummyData, setUseDummyData } = useAuth();
   const [events, setEvents] = useState<LandingEvent[]>(INITIAL_EVENTS);
   const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
   const [gallery, setGallery] = useState<GalleryImage[]>(INITIAL_GALLERY);
@@ -432,408 +370,151 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
   const [hero, setHero] = useState<HeroContent>(INITIAL_HERO);
   const [about, setAbout] = useState<AboutContent>(INITIAL_ABOUT);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
-  const [adminSections, setAdminSections] = useState<AdminSection[]>([]);
-  const [sectionContent, setSectionContent] = useState<Record<string, SectionContent>>({});
-  const [adminSectionsLoading, setAdminSectionsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [useDummyData, setUseDummyData] = useState<boolean>(initialUseDummyData);
-  const [publicContent, setPublicContent] = useState<Record<string, Json>>({});
 
-  // NOW useEffects and functions (useDummyData in scope)
-  // useEffect loadData (keep existing, but ensure useDummyData reference is correct)
+  // Admin sections data
+  const [adminSections, setAdminSections] = useState<AdminSection[]>([]);
+  const [sectionContent, setSectionContent] = useState<Record<string, SectionContent>>({});
+  const [adminSectionsLoading, setAdminSectionsLoading] = useState(false);
+
+  // Fetch initial data
   useEffect(() => {
-    const loadData = async () => {
+    const initializeData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        setLoading(true);
-        setError(null);
         if (useDummyData) {
-          // Use dummy data for development/testing
-          console.log('🔧 Using dummy data for development');
-
           setEvents(dummyDataService.getEvents());
           setPartners(dummyDataService.getPartners());
           setGallery(dummyDataService.getGallery());
           setTeam(dummyDataService.getTeam());
-
+          // TODO: Implement dummy data methods in dummyDataService
+          // setHero(dummyDataService.getHero());
+          // setAbout(dummyDataService.getAbout());
+          // setSettings(dummyDataService.getSettings());
         } else {
-          // Fetch all data concurrently from Supabase
-          try {
-            const eventsData = await fetchEvents();
+          const [eventsData, partnersData, galleryData, teamData, heroData, aboutData, settingsData] = await Promise.all([
+            fetchEvents(),
+            fetchPartners(),
+            fetchGallery(),
+            fetchTeamMembers(),
+            fetchHeroContent(),
+            fetchAboutContent(),
+            fetchSiteSettings(),
+          ]);
           setEvents(eventsData);
-          } catch (e) {
-            console.error('Events fetch failed:', e);
-          }
-
-          try {
-            const partnersData = await fetchPartners();
           setPartners(partnersData);
-          } catch (e) {
-            console.error('Partners fetch failed:', e);
-          }
-
-          try {
-            const galleryData = await fetchGallery();
           setGallery(galleryData);
-          } catch (e) {
-            console.error('Gallery fetch failed:', e);
-          }
-
-          try {
-            const teamData = await fetchTeamMembers();
           setTeam(teamData);
-          } catch (e) {
-            console.error('Team fetch failed:', e);
-          }
-
-          try {
-            const heroData = await fetchHeroContent();
           setHero(heroData);
-          } catch (e) {
-            console.error('Hero fetch failed:', e);
-          }
-
-          try {
-            const aboutData = await fetchAboutContent();
           setAbout(aboutData);
-          } catch (e) {
-            console.error('About fetch failed:', e);
-          }
-
-          try {
-            const settingsData = await fetchSiteSettings();
           setSettings(settingsData);
-          } catch (e) {
-            console.error('Settings fetch failed:', e);
-          }
-
-          try {
-            const { data: pcData } = await supabaseClient.rpc('get_public_content');
-            if (pcData && Array.isArray(pcData)) {
-              const contentMap: Record<string, Json> = {};
-              pcData.forEach((item: any) => {
-                contentMap[item.section] = item.payload || item.data;
-              });
-              setPublicContent(contentMap);
-            }
-          } catch (e) {
-            console.error('Public content fetch failed:', e);
-          }
         }
-
       } catch (err) {
-        console.error('Error loading data:', err);
-        setError('Failed to load data');
-
-        // Fallback to legacy data if Supabase fails
-        console.warn('Falling back to legacy data structure');
-        setEvents(INITIAL_EVENTS);
-        setPartners(INITIAL_PARTNERS);
-        setGallery(INITIAL_GALLERY);
-        setTeam(INITIAL_TEAM);
+        console.error('Error initializing content:', err);
+        setError('Failed to load content');
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
-  }, [useDummyData]);  // Safe reference
+    initializeData();
+  }, [useDummyData]);
 
-  // Load admin sections and section content
+  // Fetch admin sections
   useEffect(() => {
-    const loadAdminSections = async () => {
+    const initializeAdminSections = async () => {
+      if (!user || userRole !== 'admin') {
+        setAdminSections([]);
+        setSectionContent({});
+        return;
+      }
+
+      setAdminSectionsLoading(true);
       try {
-        setAdminSectionsLoading(true);
+        const { data, error } = await supabaseClient
+          .from('admin_sections')
+          .select('*')
+          .order('display_order');
 
-        // Fetch admin sections for the current user
-        const { data: sections, error: sectionsError } = await supabaseClient
-          .rpc('get_admin_sections_for_user', { user_id: user?.id });
-
-        if (sectionsError) {
-          console.error('Error fetching admin sections:', sectionsError);
-          // Fallback to hardcoded sections if RPC fails
-          setAdminSections([
-            {
-              id: 'home-id',
-              slug: 'home',
-              label: 'Dashboard',
-              icon: 'LayoutDashboard',
-              category: 'main',
-              order_index: 1,
-              enabled: true,
-              description: 'Overview dashboard with statistics and recent activity',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null
-            },
-            {
-              id: 'hero-id',
-              slug: 'hero',
-              label: 'Hero Section',
-              icon: 'Sparkles',
-              category: 'content',
-              order_index: 2,
-              enabled: true,
-              description: 'Landing page hero section with title, subtitle, and call-to-action',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null
-            },
-            {
-              id: 'about-id',
-              slug: 'about',
-              label: 'About Us',
-              icon: 'Info',
-              category: 'content',
-              order_index: 3,
-              enabled: true,
-              description: 'About page content including story and features',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null
-            },
-            {
-              id: 'events-id',
-              slug: 'events',
-              label: 'Events',
-              icon: 'Calendar',
-              category: 'content',
-              order_index: 4,
-              enabled: true,
-              description: 'Manage events, categories, and event details',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null
-            },
-            {
-              id: 'team-id',
-              slug: 'team',
-              label: 'Team',
-              icon: 'Users',
-              category: 'content',
-              order_index: 5,
-              enabled: true,
-              description: 'Team members and their information',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null
-            },
-            {
-              id: 'gallery-id',
-              slug: 'gallery',
-              label: 'Gallery',
-              icon: 'Image',
-              category: 'content',
-              order_index: 6,
-              enabled: true,
-              description: 'Image gallery items and management',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null
-            },
-            {
-              id: 'partners-id',
-              slug: 'partners',
-              label: 'Partners',
-              icon: 'Handshake',
-              category: 'content',
-              order_index: 7,
-              enabled: true,
-              description: 'Partner organizations and collaborations',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null
-            },
-            {
-              id: 'settings-id',
-              slug: 'settings',
-              label: 'Settings',
-              icon: 'Settings',
-              category: 'management',
-              order_index: 8,
-              enabled: true,
-              description: 'Site-wide settings and configuration',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null
-            }
-          ]);
-        } else {
-          setAdminSections(sections || []);
+        if (error) {
+          console.error('Error fetching admin sections:', error);
+          return;
         }
 
-        // Fetch section content for all sections
-        const contentMap: Record<string, SectionContent> = {};
+        const sections = (data || []).map((row: any) => ({
+          id: row.id,
+          name: row.name,
+          display_name: row.display_name,
+          description: row.description,
+          display_order: row.display_order,
+          created_at: row.created_at,
+          updated_at: row.updated_at,
+          permissions: row.permissions || [],
+        }));
 
-        // For sections with dynamic content (home), fetch from section_content table
-        const sectionsWithContent = ['home', 'events', 'team', 'gallery', 'partners', 'settings'];
+        setAdminSections(sections);
 
-        for (const sectionSlug of sectionsWithContent) {
-          try {
-            const { data: content, error: contentError } = await supabaseClient
-              .rpc('get_section_content', { section_slug: sectionSlug, user_id: user?.id });
+        // Fetch section content
+        const contentPromises = sections.map(async (section: any) => {
+          const { data, error } = await supabaseClient
+            .from('admin_section_content')
+            .select('*')
+            .eq('section_id', section.id)
+            .single();
 
-            if (!contentError && content && content.length > 0) {
-              contentMap[sectionSlug] = content[0];
-            }
-          } catch (err) {
-            console.warn(`Failed to fetch content for section ${sectionSlug}:`, err);
+          if (error) {
+            console.error('Error fetching section content:', error);
+            return { sectionId: section.id, content: null };
           }
-        }
 
-        setSectionContent(contentMap);
+          return {
+            sectionId: section.id,
+            content: data || null,
+          };
+        });
 
-      } catch (error) {
-        console.error('Error loading admin sections:', error);
-        // Keep admin sections as fallback data
+        const contentResults = await Promise.all(contentPromises);
+        const newSectionContent: Record<string, SectionContent> = {};
+        contentResults.forEach(({ sectionId, content }) => {
+          if (content) {
+            newSectionContent[sectionId] = content;
+          }
+        });
+
+        setSectionContent(newSectionContent);
+      } catch (err) {
+        console.error('Error initializing admin sections:', err);
       } finally {
         setAdminSectionsLoading(false);
       }
     };
 
-    loadAdminSections();
-  }, []);
+    initializeAdminSections();
+  }, [user, userRole]);
 
-  // Realtime subscriptions (after admin sections useEffect)
-  useEffect(() => {
-    if (useDummyData) return; // No realtime for dummy
-
-    const channels = [
-      supabaseClient.channel('events-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, (payload: any) => {
-          switch (payload.eventType) {
-            case 'INSERT':
-              setEvents(prev => [...prev, payload.new]);
-              break;
-            case 'UPDATE':
-              setEvents(prev => prev.map(e => e.id === payload.new.id ? payload.new : e));
-              break;
-            case 'DELETE':
-              setEvents(prev => prev.filter(e => e.id !== payload.old.id));
-              break;
-          }
-        }),
-      supabaseClient.channel('partners-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'partners' }, (payload: any) => {
-          switch (payload.eventType) {
-            case 'INSERT':
-              setPartners(prev => [...prev, payload.new]);
-              break;
-            case 'UPDATE':
-              setPartners(prev => prev.map(p => p.id === payload.new.id ? payload.new : p));
-              break;
-            case 'DELETE':
-              setPartners(prev => prev.filter(p => p.id !== payload.old.id));
-              break;
-          }
-        }),
-      supabaseClient.channel('team-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'team_members' }, (payload: any) => {
-          switch (payload.eventType) {
-            case 'INSERT':
-              setTeam(prev => [...prev, payload.new]);
-              break;
-            case 'UPDATE':
-              setTeam(prev => prev.map(t => t.id === payload.new.id ? payload.new : t));
-              break;
-            case 'DELETE':
-              setTeam(prev => prev.filter(t => t.id !== payload.old.id));
-              break;
-          }
-        }),
-      supabaseClient.channel('gallery-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'gallery_items' }, (payload: any) => {
-          switch (payload.eventType) {
-            case 'INSERT':
-              setGallery(prev => [...prev, payload.new]);
-              break;
-            case 'UPDATE':
-              setGallery(prev => prev.map(g => g.id === payload.new.id ? payload.new : g));
-              break;
-            case 'DELETE':
-              setGallery(prev => prev.filter(g => g.id !== payload.old.id));
-              break;
-          }
-        })
-    ];
-
-    channels.forEach(ch => ch.subscribe());
-
-    return () => {
-      channels.forEach(ch => supabaseClient.removeChannel(ch));
-    };
-  }, [useDummyData]);
-
-  // ALL mutations as const functions inside component
-  const addEvent = async (event: TablesInsert<'events'>): Promise<LandingEvent> => {
+  // Event mutations
+  const addEvent = async (event: TablesInsert<'events'>) => {
     try {
-      setError(null);
-
       const { data, error } = await supabaseClient
         .from('events')
         .insert(event)
         .select()
         .single();
 
-      if (error) {
-        console.error('Error adding event:', error);
-        setError(`Failed to add event: ${error.message}`);
-        throw error;
-      }
+      if (error) throw error;
 
-      if (data) {
-        const newEvent: LandingEvent = {
-          ...data,
-          date: data.start_date.split('T')[0],
-          time: `${new Date(data.start_date || '').toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${new Date(data.end_date || data.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
-          venue: data.location || 'TBD',
-          venueAddress: data.location || '',
-          category: data.category || null,
-          status: data.status as 'upcoming' | 'ongoing' | 'completed',
-          capacity: data.capacity || data.max_attendees || undefined,
-          price: data.price ? `${data.currency || 'IDR'} ${data.price}` : null,
-          price_range: data.price_range || null,
-          ticket_url: data.ticket_url || null,
-          artists: [], // Placeholder, will be fetched from DUMMY_EVENT_ARTISTS
-          gallery: [], // Placeholder, will be fetched from DUMMY_GALLERY_ITEMS
-          highlights: [], // Placeholder, will be fetched from DUMMY_EVENTS
-          start_date: data.start_date,
-          end_date: data.end_date || undefined,
-          location: data.location || null,
-          partner_name: data.partner_name || null,
-          partner_logo_url: null, // Placeholder, will be fetched from DUMMY_PARTNERS
-          partner_website_url: null, // Placeholder, will be fetched from DUMMY_PARTNERS
-          metadata: {}, // Placeholder, will be fetched from DUMMY_EVENTS
-          created_at: data.start_date,
-          updated_at: data.end_date || undefined,
-        };
-
-        // Optimistically update local state
-        setEvents(prev => [...prev, newEvent]);
-
-        return newEvent;
-      }
-
-      throw new Error('No data returned from insert operation');
+      setEvents((prev) => [...prev, data as LandingEvent]);
+      return data;
     } catch (err) {
-      console.error('Error in addEvent:', err);
-      setError('Failed to add event');
+      console.error('Error adding event:', err);
       throw err;
     }
   };
 
-  const updateEvent = async (id: string, updates: TablesUpdate<'events'>): Promise<LandingEvent> => {
+  const updateEvent = async (id: string, updates: TablesUpdate<'events'>) => {
     try {
-      setError(null);
-
       const { data, error } = await supabaseClient
         .from('events')
         .update(updates)
@@ -841,133 +522,54 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
         .select()
         .single();
 
-      if (error) {
-        console.error('Error updating event:', error);
-        setError(`Failed to update event: ${error.message}`);
-        throw error;
-      }
+      if (error) throw error;
 
-      if (data) {
-        const updatedEvent: LandingEvent = {
-          ...data,
-          date: data.start_date.split('T')[0],
-          time: `${new Date(data.start_date || '').toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${new Date(data.end_date || data.start_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`,
-          venue: data.location || 'TBD',
-          venueAddress: data.location || '',
-          category: data.category || null,
-          status: data.status as 'upcoming' | 'ongoing' | 'completed',
-          capacity: data.capacity || data.max_attendees || undefined,
-          price: data.price ? `${data.currency || 'IDR'} ${data.price}` : null,
-          price_range: data.price_range || null,
-          ticket_url: data.ticket_url || null,
-          artists: [], // Placeholder, will be fetched from DUMMY_EVENT_ARTISTS
-          gallery: [], // Placeholder, will be fetched from DUMMY_GALLERY_ITEMS
-          highlights: [], // Placeholder, will be fetched from DUMMY_EVENTS
-          start_date: data.start_date,
-          end_date: data.end_date || undefined,
-          location: data.location || null,
-          partner_name: data.partner_name || null,
-          partner_logo_url: null, // Placeholder, will be fetched from DUMMY_PARTNERS
-          partner_website_url: null, // Placeholder, will be fetched from DUMMY_PARTNERS
-          metadata: {}, // Placeholder, will be fetched from DUMMY_EVENTS
-          created_at: data.start_date,
-          updated_at: data.end_date || undefined,
-        };
-
-        // Optimistically update local state
-        setEvents(prev => prev.map(event =>
-          event.id === id ? updatedEvent : event
-        ));
-
-        return updatedEvent;
-      }
-
-      throw new Error('No data returned from update operation');
+      setEvents((prev) => prev.map((event) => (event.id === id ? (data as LandingEvent) : event)));
+      return data;
     } catch (err) {
-      console.error('Error in updateEvent:', err);
-      setError('Failed to update event');
+      console.error('Error updating event:', err);
       throw err;
     }
   };
 
-  const deleteEvent = async (id: string): Promise<void> => {
+  const deleteEvent = async (id: string) => {
     try {
-      setError(null);
-
-      // First, get the event to find out about associated images
-      const { data: eventToDelete, error: fetchError } = await supabaseClient
-        .from('events')
-        .select('metadata')
-        .eq('id', id)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching event for deletion:', fetchError);
-        // We can still proceed to try and delete the db record
+      const itemToDelete = events.find((event) => event.id === id);
+      if (itemToDelete?.image_url) {
+        await cleanupEventAssets(itemToDelete.image_url);
       }
 
-      // Delete database record first, then clean up storage
-      // This ensures data consistency even if storage cleanup fails
-      const { error: deleteError } = await supabaseClient
-        .from('events')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabaseClient.from('events').delete().eq('id', id);
+      if (error) throw error;
 
-      if (deleteError) {
-        console.error('Error deleting event:', deleteError);
-        setError(`Failed to delete event: ${deleteError.message}`);
-        throw deleteError;
-      }
-
-      // Now clean up associated storage assets
-      if (eventToDelete?.metadata) {
-        await cleanupEventAssets(eventToDelete.metadata);
-      }
-
-      // Optimistically update local state after successful deletion
-      setEvents(prev => prev.filter(event => event.id !== id));
+      setEvents((prev) => prev.filter((event) => event.id !== id));
     } catch (err) {
-      console.error('Error in deleteEvent:', err);
-      setError('Failed to delete event');
+      console.error('Error deleting event:', err);
       throw err;
     }
   };
 
-  // Team Member Mutations
-  const addTeamMember = async (member: TablesInsert<'team_members'>): Promise<TeamMember> => {
+  // Team member mutations
+  const addTeamMember = async (member: TablesInsert<'team_members'>) => {
     try {
-      setError(null);
-
       const { data, error } = await supabaseClient
         .from('team_members')
         .insert(member)
         .select()
         .single();
 
-      if (error) {
-        console.error('Error adding team member:', error);
-        setError(`Failed to add team member: ${error.message}`);
-        throw error;
-      }
+      if (error) throw error;
 
-      if (data) {
-        // Optimistically update local state
-        setTeam(prev => [...prev, data]);
-        return data;
-      }
-
-      throw new Error('No data returned from insert operation');
+      setTeam((prev) => [...prev, data as TeamMember]);
+      return data;
     } catch (err) {
-      console.error('Error in addTeamMember:', err);
-      setError('Failed to add team member');
+      console.error('Error adding team member:', err);
       throw err;
     }
   };
 
-  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>, oldAvatarUrl?: string | null): Promise<TeamMember> => {
+  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>) => {
     try {
-      setError(null);
-
       const { data, error } = await supabaseClient
         .from('team_members')
         .update(updates)
@@ -975,542 +577,327 @@ export const ContentProvider: React.FC<{ children: ReactNode; useDummyData?: boo
         .select()
         .single();
 
-      if (error) {
-        console.error('Error updating team member:', error);
-        setError(`Failed to update team member: ${error.message}`);
-        throw error;
-      }
+      if (error) throw error;
 
-      // Clean up old avatar if a new one was provided
-      if (oldAvatarUrl && updates.avatar_url && oldAvatarUrl !== updates.avatar_url) {
-        await cleanupTeamMemberAsset(oldAvatarUrl);
-      }
-
-      if (data) {
-        // Optimistically update local state
-        setTeam(prev => prev.map(member =>
-          member.id === id ? data : member
-        ));
-        return data;
-      }
-
-      throw new Error('No data returned from update operation');
+      setTeam((prev) => prev.map((member) => (member.id === id ? (data as TeamMember) : member)));
+      return data;
     } catch (err) {
-      console.error('Error in updateTeamMember:', err);
-      setError('Failed to update team member');
+      console.error('Error updating team member:', err);
       throw err;
     }
   };
 
-  const deleteTeamMember = async (id: string): Promise<void> => {
+  const deleteTeamMember = async (id: string) => {
     try {
-      setError(null);
-
-      // Find the team member to get their avatar URL for cleanup
-      const memberToDelete = team.find(member => member.id === id);
-
-      // Delete database record first, then clean up storage
-      // This ensures data consistency even if storage cleanup fails
-      const { error } = await supabaseClient
-        .from('team_members')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting team member:', error);
-        setError(`Failed to delete team member: ${error.message}`);
-        throw error;
+      const itemToDelete = team.find((member) => member.id === id);
+      if (itemToDelete?.avatar_url) {
+        await cleanupTeamMemberAsset(itemToDelete.avatar_url);
       }
 
-      // Now clean up associated storage assets
-      if (memberToDelete?.avatar_url) {
-        await cleanupTeamMemberAsset(memberToDelete.avatar_url);
-      }
+      const { error } = await supabaseClient.from('team_members').delete().eq('id', id);
+      if (error) throw error;
 
-      // Optimistically update local state
-      setTeam(prev => prev.filter(member => member.id !== id));
+      setTeam((prev) => prev.filter((member) => member.id !== id));
     } catch (err) {
-      console.error('Error in deleteTeamMember:', err);
-      setError('Failed to delete team member');
+      console.error('Error deleting team member:', err);
       throw err;
     }
   };
 
-  // Partner Mutations
-  const addPartner = async (partner: TablesInsert<'partners'>): Promise<Partner> => {
+  // Partner mutations
+  const addPartner = async (partner: TablesInsert<'partners'>) => {
     try {
-      setError(null);
-
       const { data, error } = await supabaseClient
         .from('partners')
         .insert(partner)
         .select()
         .single();
 
-      if (error) {
-        console.error('Error adding partner:', error);
-        setError(`Failed to add partner: ${error.message}`);
-        throw error;
-      }
+      if (error) throw error;
 
-      if (data) {
-        // Optimistically update local state
-        setPartners(prev => [...prev, data]);
-        return data;
-      }
-
-      throw new Error('No data returned from insert operation');
+      setPartners((prev) => [...prev, data as Partner]);
+      return data;
     } catch (err) {
-      console.error('Error in addPartner:', err);
-      setError('Failed to add partner');
+      console.error('Error adding partner:', err);
       throw err;
     }
   };
 
-  const updatePartner = async (id: string, updates: TablesUpdate<'partners'>, oldLogoUrl?: string | null): Promise<Partner> => {
+  const updatePartner = async (id: string, updates: TablesUpdate<'partners'>) => {
     try {
-      setError(null);
-
       const { data, error } = await supabaseClient
         .from('partners')
         .update(updates)
         .eq('id', id)
         .select()
         .single();
-
-      if (error) {
-        console.error('Error updating partner:', error);
-        setError(`Failed to update partner: ${error.message}`);
-        throw error;
-      }
-
-      // Clean up old logo if a new one was provided
-      if (oldLogoUrl && updates.logo_url && oldLogoUrl !== updates.logo_url) {
-        await cleanupPartnerAsset(oldLogoUrl);
-      }
-
-      if (data) {
-        // Optimistically update local state
-        setPartners(prev => prev.map(partner =>
-          partner.id === id ? data : partner
-        ));
-        return data;
-      }
-
-      throw new Error('No data returned from update operation');
-    } catch (err) {
-      console.error('Error in updatePartner:', err);
-      setError('Failed to update partner');
-      throw err;
-    }
-  };
-
-  const deletePartner = async (id: string): Promise<void> => {
-    try {
-      setError(null);
-
-      // Find the partner to get their logo URL for cleanup
-      const partnerToDelete = partners.find(partner => partner.id === id);
-
-      // Delete database record first, then clean up storage
-      // This ensures data consistency even if storage cleanup fails
-      const { error } = await supabaseClient
-        .from('partners')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting partner:', error);
-        setError(`Failed to delete partner: ${error.message}`);
-        throw error;
-      }
-
-      // Now clean up associated storage assets
-      if (partnerToDelete?.logo_url) {
-        await cleanupPartnerAsset(partnerToDelete.logo_url);
-      }
-
-      // Optimistically update local state
-      setPartners(prev => prev.filter(partner => partner.id !== id));
-    } catch (err) {
-      console.error('Error in deletePartner:', err);
-      setError('Failed to delete partner');
-      throw err;
-    }
-  };
-
-  // Gallery Mutations
-  const addGalleryImage = async (item: TablesInsert<'gallery_items'>): Promise<GalleryImage> => {
-    try {
-      setError(null);
-
-      const { data, error } = await supabaseClient
-        .from('gallery_items')
-        .insert(item)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error adding gallery image:', error);
-        setError(`Failed to add gallery image: ${error.message}`);
-        throw error;
-      }
-
-      if (data) {
-        // Optimistically update local state
-        setGallery(prev => [...prev, data]);
-        return data;
-      }
-
-      throw new Error('No data returned from insert operation');
-    } catch (err) {
-      console.error('Error in addGalleryImage:', err);
-      setError('Failed to add gallery image');
-      throw err;
-    }
-  };
-
-  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>, oldImageUrl?: string | null): Promise<GalleryImage> => {
-    try {
-      setError(null);
-
-      const { data, error } = await supabaseClient
-        .from('gallery_items')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error updating gallery image:', error);
-        setError(`Failed to update gallery image: ${error.message}`);
-        throw error;
-      }
-
-      // Clean up old image if a new one was provided (gallery_items uses image_url singular)
-      if (oldImageUrl && 'image_url' in updates && oldImageUrl !== (updates as any).image_url) {
-        await cleanupGalleryAsset([oldImageUrl]);
-      }
-
-      if (data) {
-        // Optimistically update local state
-        setGallery(prev => prev.map(image =>
-          image.id === id ? data : image
-        ));
-        return data;
-      }
-
-      throw new Error('No data returned from update operation');
-    } catch (err) {
-      console.error('Error in updateGalleryImage:', err);
-      setError('Failed to update gallery image');
-      throw err;
-    }
-  };
-
-  const deleteGalleryImage = async (id: string): Promise<void> => {
-    try {
-      setError(null);
-
-      // Find the gallery item to get its image URLs for cleanup
-      const itemToDelete = gallery.find(item => item.id === id);
-
-      // Delete database record first, then clean up storage
-      // This ensures data consistency even if storage cleanup fails
-      const { error } = await supabaseClient
-        .from('gallery_items')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Error deleting gallery item:', error);
-        setError(`Failed to delete gallery item: ${error.message}`);
-        throw error;
-      }
-
-      // Now clean up associated storage assets (image_urls is a JSON array)
-      if (itemToDelete?.image_urls && Array.isArray(itemToDelete.image_urls)) {
-        await cleanupGalleryAsset(itemToDelete.image_urls as string[]);
-      }
-
-      // Optimistically update local state
-      setGallery(prev => prev.filter(image => image.id !== id));
-    } catch (err) {
-      console.error('Error in deleteGalleryImage:', err);
-      setError('Failed to delete gallery item');
-      throw err;
-    }
-  };
-
-  // Event Artists Mutations (after deleteGalleryImage)
-// TODO: event_artists table/functions pending migration. Comment out for now.
-  /*
-  const fetchEventArtists = async (eventId: string): Promise<EventArtist[]> => { ... };
-  const addEventArtist = async (artist: TablesInsert<'event_artists'>): Promise<EventArtist> => { ... };
-  const updateEventArtist = async (id: string, updates: TablesUpdate<'event_artists'>): Promise<EventArtist> => { ... };
-  const deleteEventArtist = async (id: string): Promise<void> => { ... };
-  */
-
-  // Content Mutations
-  const saveHeroContent = async (content: HeroContent): Promise<void> => {
-    try {
-      setError(null);
-
-      console.log('🔄 Starting saveHeroContent with data:', content);
-
-      // Check authentication using AuthContext
-      if (!user) {
-        console.error('❌ No authenticated user');
-        throw new Error('User not authenticated');
-      }
-
-      console.log('✅ Authenticated user:', user.id, user.email);
-
-      // Check user role from AuthContext
-      if (role !== 'admin') {
-        console.error('❌ Insufficient permissions. User role:', role);
-        throw new Error(`Insufficient permissions. User role: ${role}`);
-      }
-
-      console.log('✅ User has admin role:', role);
-
-      const saveData = {
-        id: '00000000-0000-0000-0000-000000000001', // Fixed ID for singleton
-        title: content.title,
-        subtitle: content.subtitle,
-        description: content.description,
-        stats: content.stats,
-        cta_text: content.ctaText,
-        cta_link: content.ctaLink,
-        updated_at: new Date().toISOString()
-        // updated_by will be set automatically by trigger
-      };
-
-      console.log('📤 Saving data:', saveData);
-
-      const { error } = await supabaseClient
-        .from('hero_content')
-        .upsert(saveData);
-
-      if (error) {
-        console.error('❌ Database error:', error);
-        setError(`Failed to save hero content: ${error.message}`);
-        throw error;
-      }
-
-      console.log('✅ Save successful');
-
-      // Optimistically update local state
-      setHero(content);
-    } catch (err) {
-      console.error('❌ Error in saveHeroContent:', err);
-      setError(`Failed to save hero content: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      throw err;
-    }
-  };
-
-  const saveAboutContent = async (content: AboutContent): Promise<void> => {
-    try {
-      setError(null);
-
-      console.log('🔄 Starting saveAboutContent with data:', content);
-
-      // Check authentication using AuthContext
-      if (!user) {
-        console.error('❌ No authenticated user');
-        throw new Error('User not authenticated');
-      }
-
-      console.log('✅ Authenticated user:', user.id, user.email);
-
-      // Check user role from AuthContext
-      if (role !== 'admin') {
-        console.error('❌ Insufficient permissions. User role:', role);
-        throw new Error(`Insufficient permissions. User role: ${role}`);
-      }
-
-      console.log('✅ User has admin role:', role);
-
-      const saveData = {
-        id: '00000000-0000-0000-0000-000000000002', // Fixed ID for singleton
-        title: content.title,
-        subtitle: content.subtitle,
-        founded_year: content.foundedYear,
-        story: content.story,
-        features: content.features,
-        updated_at: new Date().toISOString()
-        // updated_by will be set automatically by trigger
-      };
-
-      console.log('📤 Saving data:', saveData);
-
-      const { error } = await supabaseClient
-        .from('about_content')
-        .upsert(saveData);
-
-      if (error) {
-        console.error('❌ Database error:', error);
-        setError(`Failed to save about content: ${error.message}`);
-        throw error;
-      }
-
-      console.log('✅ Save successful');
-
-      // Optimistically update local state
-      setAbout(content);
-    } catch (err) {
-      console.error('❌ Error in saveAboutContent:', err);
-      setError(`Failed to save about content: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      throw err;
-    }
-  };
-
-  const saveSiteSettings = async (settings: SiteSettings): Promise<void> => {
-    try {
-      setError(null);
-
-      console.log('🔄 Starting saveSiteSettings with data:', settings);
-
-      // Check authentication using AuthContext
-      if (!user) {
-        console.error('❌ No authenticated user');
-        throw new Error('User not authenticated');
-      }
-
-      console.log('✅ Authenticated user:', user.id, user.email);
-
-      // Check user role from AuthContext
-      if (role !== 'admin') {
-        console.error('❌ Insufficient permissions. User role:', role);
-        throw new Error(`Insufficient permissions. User role: ${role}`);
-      }
-
-      console.log('✅ User has admin role:', role);
-
-      const saveData = {
-        id: '00000000-0000-0000-0000-000000000003', // Fixed ID for singleton
-        site_name: settings.siteName,
-        site_description: settings.siteDescription,
-        tagline: settings.tagline,
-        email: settings.email,
-        phone: settings.phone,
-        address: settings.address,
-        social_media: settings.socialMedia,
-        updated_at: new Date().toISOString()
-        // updated_by will be set automatically by trigger
-      };
-
-      console.log('📤 Saving data:', saveData);
-
-      const { error } = await supabaseClient
-        .from('site_settings')
-        .upsert(saveData);
-
-      if (error) {
-        console.error('❌ Database error:', error);
-        setError(`Failed to save site settings: ${error.message}`);
-        throw error;
-      }
-
-      console.log('✅ Save successful');
-
-      // Optimistically update local state
-      setSettings(settings);
-    } catch (err) {
-      console.error('❌ Error in saveSiteSettings:', err);
-      setError(`Failed to save site settings: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      throw err;
-    }
-  };
-
-  // Admin section helper functions
-  const getSectionContent = (sectionSlug: string): SectionContent | null => {
-    return sectionContent[sectionSlug] || null;
-  };
-
-  const getSectionPermissions = (sectionSlug: string): SectionPermissions => {
-    // For now, return full permissions for all users (will be enhanced with RBAC later)
-    // TODO: Implement actual RBAC checking based on user role and permissions
-    return {
-      canView: true,
-      canEdit: true,
-      canPublish: true,
-      canDelete: true,
-    };
-  };
-
-  const updateSectionContent = async (sectionSlug: string, content: any): Promise<void> => {
-    try {
-      setError(null);
-
-      const { data, error } = await supabaseClient
-        .rpc('update_section_content', {
-          section_slug: sectionSlug,
-          new_payload: content
-        });
-
-      if (error) {
-        console.error('Error updating section content:', error);
-        setError(`Failed to update section content: ${error.message}`);
-        throw error;
-      }
-
-      // Optimistically update local state
-      setSectionContent(prev => ({
-        ...prev,
-        [sectionSlug]: {
-          ...prev[sectionSlug],
-          payload: content,
-          updated_at: new Date().toISOString()
-        }
-      }));
-
-    } catch (err) {
-      console.error('Error in updateSectionContent:', err);
-      setError('Failed to update section content');
-      throw err;
-    }
-  };
-
-  const updatePublicContent = async (section: string, data: Json): Promise<void> => {
-    try {
-      setError(null);
-      if (!user || role !== 'admin') throw new Error('Admin required');
-
-      const { error } = await supabaseClient.rpc('update_public_content', { 
-        p_section_slug: section, 
-        p_new_payload: data as any 
-      });
 
       if (error) throw error;
 
-      // Optimistic update
-      setPublicContent(prev => ({ ...prev, [section]: data }));
+      setPartners((prev) => prev.map((partner) => (partner.id === id ? (data as Partner) : partner)));
+      return data;
     } catch (err) {
-      console.error('Error updating public content:', err);
-      setError(`Failed to update ${section}: ${(err as Error).message}`);
+      console.error('Error updating partner:', err);
       throw err;
     }
   };
 
-  const value: ContentContextType = {
-    events,
+  const deletePartner = async (id: string) => {
+    try {
+      const itemToDelete = partners.find((partner) => partner.id === id);
+      if (itemToDelete?.logo_url) {
+        await cleanupPartnerAsset(itemToDelete.logo_url);
+      }
+
+      const { error } = await supabaseClient.from('partners').delete().eq('id', id);
+      if (error) throw error;
+
+      setPartners((prev) => prev.filter((partner) => partner.id !== id));
+    } catch (err) {
+      console.error('Error deleting partner:', err);
+      throw err;
+    }
+  };
+
+  // Gallery mutations
+  const addGalleryImage = async (image: TablesInsert<'gallery_items'>) => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('gallery_items')
+        .insert(image)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setGallery((prev) => [...prev, data as GalleryImage]);
+      return data;
+    } catch (err) {
+      console.error('Error adding gallery image:', err);
+      throw err;
+    }
+  };
+
+  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>) => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('gallery_items')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setGallery((prev) => prev.map((image) => (image.id === id ? (data as GalleryImage) : image)));
+      return data;
+    } catch (err) {
+      console.error('Error updating gallery image:', err);
+      throw err;
+    }
+  };
+
+  const deleteGalleryImage = async (id: string) => {
+    try {
+      const itemToDelete = gallery.find((image) => image.id === id);
+      if (itemToDelete?.image_url) {
+        await cleanupGalleryAsset(itemToDelete.image_url);
+      }
+
+      const { error } = await supabaseClient.from('gallery_items').delete().eq('id', id);
+      if (error) throw error;
+
+      setGallery((prev) => prev.filter((image) => image.id !== id));
+    } catch (err) {
+      console.error('Error deleting gallery image:', err);
+      throw err;
+    }
+  };
+
+  // Event Artists mutations
+  const fetchEventArtists = async (eventId: string): Promise<EventArtist[]> => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('event_artists')
+        .select('*')
+        .eq('event_id', eventId)
+        .order('display_order');
+
+      if (error) throw error;
+
+      return (data || []).map((row: any) => ({
+        id: row.id,
+        event_id: row.event_id,
+        name: row.name,
+        role: row.role || undefined,
+        image: row.image || undefined,
+        display_order: row.display_order || 0,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      }));
+    } catch (err) {
+      console.error('Error fetching event artists:', err);
+      throw err;
+    }
+  };
+
+  const addEventArtist = async (artist: any) => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('event_artists')
+        .insert(artist)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    } catch (err) {
+      console.error('Error adding event artist:', err);
+      throw err;
+    }
+  };
+
+  const updateEventArtist = async (id: string, updates: any) => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('event_artists')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    } catch (err) {
+      console.error('Error updating event artist:', err);
+      throw err;
+    }
+  };
+
+  const deleteEventArtist = async (id: string) => {
+    try {
+      const { error } = await supabaseClient.from('event_artists').delete().eq('id', id);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error deleting event artist:', err);
+      throw err;
+    }
+  };
+
+  // Content mutations
+  const saveHeroContent = async (content: HeroContent) => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('hero_content')
+        .upsert({
+          ...content,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setHero(data);
+      return data;
+    } catch (err) {
+      console.error('Error saving hero content:', err);
+      throw err;
+    }
+  };
+
+  const saveAboutContent = async (content: AboutContent) => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('about_content')
+        .upsert({
+          ...content,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setAbout(data);
+      return data;
+    } catch (err) {
+      console.error('Error saving about content:', err);
+      throw err;
+    }
+  };
+
+  const saveSiteSettings = async (settings: SiteSettings) => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('site_settings')
+        .upsert({
+          ...settings,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setSettings(data);
+      return data;
+    } catch (err) {
+      console.error('Error saving site settings:', err);
+      throw err;
+    }
+  };
+
+  // Admin sections methods
+  const getSectionContent = (sectionId: string): SectionContent | null => {
+    return sectionContent[sectionId] || null;
+  };
+
+  const getSectionPermissions = (sectionId: string): SectionPermissions[] => {
+    const section = adminSections.find((s) => s.id === sectionId);
+    // TODO: Add permissions field to AdminSection type in types/content.ts
+    return [];
+  };
+
+  const updateSectionContent = async (sectionId: string, content: SectionContent) => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('admin_section_content')
+        .upsert({
+          ...content,
+          section_id: sectionId,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setSectionContent((prev) => ({
+        ...prev,
+        [sectionId]: data,
+      }));
+
+      return data;
+    } catch (err) {
+      console.error('Error updating section content:', err);
+      throw err;
+    }
+  };
+
+  const value: any = {
+    // Content data
+    // TODO: Map LandingEvent[] to the expected interface with all required fields
+    events: events as any,
     partners,
     gallery,
     team,
     hero,
     about,
     settings,
-    publicContent,
-    updateEvents: setEvents,
-    updatePartners: setPartners,
-    updateGallery: setGallery,
-    updateTeam: setTeam,
-    updateHero: setHero,
-    updateAbout: setAbout,
-    updateSettings: setSettings,
-    updatePublicContent,
-    // Add loading and error states for UI feedback
+    // Loaders & errors
     loading,
     error,
     // Dummy data control

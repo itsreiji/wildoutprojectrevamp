@@ -4,6 +4,7 @@
  * Form abstraction supporting both create and edit flows for events.
  *
  * Features:
+ *
  * - React Hook Form integration for efficient form state management
  * - Zod schema validation with enhanced error messages
  * - Automatic form reset when switching between create/edit modes
@@ -48,7 +49,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import type { Event } from '@/types/content';
+import type { LandingEvent } from '@/types/content';
 
 const eventFormSchema = z.object({
   title: z.string().min(1, 'Event title is required'),
@@ -88,7 +89,7 @@ export type EventFormValues = z.infer<typeof eventFormSchema>;
 interface DashboardEventFormProps {
   onSubmit: (values: EventFormValues) => void;
   isSubmitting: boolean;
-  defaultValues?: Partial<Event>;
+  defaultValues?: Partial<LandingEvent>;
   onCancel?: () => void;
 }
 
@@ -205,7 +206,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 </FormItem>
               )}
             />
-             <FormField
+            <FormField
               control={form.control}
               name="featured_image_file"
               render={({ field }) => (
@@ -280,7 +281,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                   </FormItem>
                 )}
               />
-               <FormField
+              <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
@@ -307,21 +308,21 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
 
           {/* Venue */}
           <div className="space-y-4">
-             <h3 className="text-lg text-white/90">Venue Information</h3>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Venue Name</FormLabel>
-                        <FormControl>
-                        <Input placeholder="Enter venue name" {...field} value={field.value ?? ''} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
+            <h3 className="text-lg text-white/90">Venue Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Venue Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter venue name" {...field} value={field.value ?? ''} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
 
@@ -365,43 +366,43 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 )}
               />
             </div>
-             <FormField
-                control={form.control}
-                name="ticket_url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Ticket URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com/tickets" {...field} value={field.value ?? ''} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="ticket_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ticket URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://example.com/tickets" {...field} value={field.value ?? ''} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
         </div>
 
         <div className="flex justify-end space-x-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                form.reset(getDefaultValues());
-                onCancel?.();
-              }}
-              disabled={isSubmitting}
-              className="text-white/70 border-white/10 hover:bg-white/5"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
-            >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
-            </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              form.reset(getDefaultValues());
+              onCancel?.();
+            }}
+            disabled={isSubmitting}
+            className="text-white/70 border-white/10 hover:bg-white/5"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
+          >
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </Button>
         </div>
       </form>
     </Form>

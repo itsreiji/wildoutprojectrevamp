@@ -71,7 +71,7 @@ export const DashboardLayout = React.memo(
     };
 
     const displayInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
-    const displayName = user?.user_metadata?.full_name || (user?.email ? user.email.split('@')[0] : 'Admin User');
+    const displayName = (user?.user_metadata && typeof user.user_metadata === 'object' && 'full_name' in user.user_metadata ? user.user_metadata.full_name : null) || (user?.email ? user.email.split('@')[0] : 'Admin User');
     const displayEmail = user?.email || 'admin@wildout.id';
 
     return (
@@ -218,7 +218,7 @@ export const DashboardLayout = React.memo(
                     {displayInitial}
                   </div>
                   <div className="text-sm">
-                    <div className="text-white">{displayName}</div>
+                    <div className="text-white">{String(displayName)}</div>
                     <div className="text-white/60 text-xs">{displayEmail}</div>
                   </div>
                 </div>

@@ -25,7 +25,12 @@ interface UserProfile {
 export const DashboardSettings = React.memo(() => {
   const { settings, saveSiteSettings } = useStaticContent();
   const { role: currentUserRole } = useAuth();
-  const [formData, setFormData] = useState(settings);
+  const [formData, setFormData] = useState({
+    ...settings,
+    siteName: settings.site_name || '',
+    siteDescription: settings.site_description || '',
+    socialMedia: settings.social_media || {}
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
@@ -170,7 +175,7 @@ export const DashboardSettings = React.memo(() => {
                 id="siteName"
                 value={formData.siteName}
                 onChange={(e) =>
-                  setFormData({ ...formData, siteName: e.target.value })
+                  setFormData({ ...formData, siteName: e.target.value, site_name: e.target.value })
                 }
                 className="bg-white/5 border-white/10 text-white"
               />
@@ -182,7 +187,7 @@ export const DashboardSettings = React.memo(() => {
                 id="siteDescription"
                 value={formData.siteDescription}
                 onChange={(e) =>
-                  setFormData({ ...formData, siteDescription: e.target.value })
+                  setFormData({ ...formData, siteDescription: e.target.value, site_description: e.target.value })
                 }
                 className="bg-white/5 border-white/10 text-white"
               />
@@ -192,7 +197,7 @@ export const DashboardSettings = React.memo(() => {
               <Label htmlFor="tagline">Tagline</Label>
               <Textarea
                 id="tagline"
-                value={formData.tagline}
+                value={formData.tagline || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, tagline: e.target.value })
                 }
@@ -237,7 +242,7 @@ export const DashboardSettings = React.memo(() => {
               <Input
                 id="email"
                 type="email"
-                value={formData.email}
+                value={formData.email || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
@@ -252,7 +257,7 @@ export const DashboardSettings = React.memo(() => {
               </Label>
               <Input
                 id="phone"
-                value={formData.phone}
+                value={formData.phone || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
@@ -267,7 +272,7 @@ export const DashboardSettings = React.memo(() => {
               </Label>
               <Input
                 id="address"
-                value={formData.address}
+                value={formData.address || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
@@ -302,10 +307,12 @@ export const DashboardSettings = React.memo(() => {
               </Label>
               <Input
                 id="instagram"
-                value={formData.socialMedia.instagram}
-                onChange={(e) =>
-                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, instagram: e.target.value } })
-                }
+                value={typeof formData.socialMedia === 'object' && formData.socialMedia !== null && !Array.isArray(formData.socialMedia) && 'instagram' in formData.socialMedia ? String(formData.socialMedia.instagram) : ''}
+                onChange={(e) => {
+                  const currentSocialMedia = typeof formData.socialMedia === 'object' && formData.socialMedia !== null && !Array.isArray(formData.socialMedia) ? formData.socialMedia : {};
+                  const currentSocialMediaDb = typeof formData.social_media === 'object' && formData.social_media !== null && !Array.isArray(formData.social_media) ? formData.social_media : {};
+                  setFormData({ ...formData, socialMedia: { ...currentSocialMedia, instagram: e.target.value }, social_media: { ...currentSocialMediaDb, instagram: e.target.value } });
+                }}
                 className="bg-white/5 border-white/10 text-white"
                 placeholder="https://instagram.com/username"
               />
@@ -318,10 +325,12 @@ export const DashboardSettings = React.memo(() => {
               </Label>
               <Input
                 id="twitter"
-                value={formData.socialMedia.twitter}
-                onChange={(e) =>
-                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, twitter: e.target.value } })
-                }
+                value={typeof formData.socialMedia === 'object' && formData.socialMedia !== null && !Array.isArray(formData.socialMedia) && 'twitter' in formData.socialMedia ? String(formData.socialMedia.twitter) : ''}
+                onChange={(e) => {
+                  const currentSocialMedia = typeof formData.socialMedia === 'object' && formData.socialMedia !== null && !Array.isArray(formData.socialMedia) ? formData.socialMedia : {};
+                  const currentSocialMediaDb = typeof formData.social_media === 'object' && formData.social_media !== null && !Array.isArray(formData.social_media) ? formData.social_media : {};
+                  setFormData({ ...formData, socialMedia: { ...currentSocialMedia, twitter: e.target.value }, social_media: { ...currentSocialMediaDb, twitter: e.target.value } });
+                }}
                 className="bg-white/5 border-white/10 text-white"
                 placeholder="https://twitter.com/username"
               />
@@ -334,10 +343,12 @@ export const DashboardSettings = React.memo(() => {
               </Label>
               <Input
                 id="facebook"
-                value={formData.socialMedia.facebook}
-                onChange={(e) =>
-                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, facebook: e.target.value } })
-                }
+                value={typeof formData.socialMedia === 'object' && formData.socialMedia !== null && !Array.isArray(formData.socialMedia) && 'facebook' in formData.socialMedia ? String(formData.socialMedia.facebook) : ''}
+                onChange={(e) => {
+                  const currentSocialMedia = typeof formData.socialMedia === 'object' && formData.socialMedia !== null && !Array.isArray(formData.socialMedia) ? formData.socialMedia : {};
+                  const currentSocialMediaDb = typeof formData.social_media === 'object' && formData.social_media !== null && !Array.isArray(formData.social_media) ? formData.social_media : {};
+                  setFormData({ ...formData, socialMedia: { ...currentSocialMedia, facebook: e.target.value }, social_media: { ...currentSocialMediaDb, facebook: e.target.value } });
+                }}
                 className="bg-white/5 border-white/10 text-white"
                 placeholder="https://facebook.com/page"
               />
@@ -350,10 +361,12 @@ export const DashboardSettings = React.memo(() => {
               </Label>
               <Input
                 id="youtube"
-                value={formData.socialMedia.youtube}
-                onChange={(e) =>
-                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, youtube: e.target.value } })
-                }
+                value={typeof formData.socialMedia === 'object' && formData.socialMedia !== null && !Array.isArray(formData.socialMedia) && 'youtube' in formData.socialMedia ? String(formData.socialMedia.youtube) : ''}
+                onChange={(e) => {
+                  const currentSocialMedia = typeof formData.socialMedia === 'object' && formData.socialMedia !== null && !Array.isArray(formData.socialMedia) ? formData.socialMedia : {};
+                  const currentSocialMediaDb = typeof formData.social_media === 'object' && formData.social_media !== null && !Array.isArray(formData.social_media) ? formData.social_media : {};
+                  setFormData({ ...formData, socialMedia: { ...currentSocialMedia, youtube: e.target.value }, social_media: { ...currentSocialMediaDb, youtube: e.target.value } });
+                }}
                 className="bg-white/5 border-white/10 text-white"
                 placeholder="https://youtube.com/@channel"
               />

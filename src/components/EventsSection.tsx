@@ -6,7 +6,7 @@ import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useContent } from '../contexts/ContentContext';
-import type { LandingEvent as Event } from '@/types/content';
+import type { LandingEvent as Event, LandingEvent } from '@/types/content';
 import { useRouter } from './router';
 
 export const EventsSection = React.memo(() => {
@@ -58,8 +58,8 @@ export const EventsSection = React.memo(() => {
                   {/* Event Image */}
                   <div className="relative h-64 overflow-hidden">
                     <ImageWithFallback
-                      src={event.image}
-                      alt={event.title}
+                      src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : undefined) || undefined}
+                      alt={event.title || 'Event'}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
@@ -90,21 +90,26 @@ export const EventsSection = React.memo(() => {
                       <div className="flex items-center text-white/70">
                         <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
                         <span className="text-sm">
-                          {new Date(event.date).toLocaleDateString('en-US', {
+                          {(event as any).date ? new Date((event as any).date).toLocaleDateString('en-US', {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
-                          })}
+                          }) : event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          }) : 'TBD'}
                         </span>
                       </div>
                       <div className="flex items-center text-white/70">
                         <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">{event.time}</span>
+                        <span className="text-sm">{(event as any).time || (event.start_date ? new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'TBD')}</span>
                       </div>
                       <div className="flex items-center text-white/70">
                         <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">{event.venue}</span>
+                        <span className="text-sm">{(event as any).venue || event.location || 'TBD'}</span>
                       </div>
                       <div className="flex items-center text-white/70">
                         <Ticket className="h-4 w-4 mr-2 text-[#E93370]" />
@@ -113,31 +118,33 @@ export const EventsSection = React.memo(() => {
                     </div>
 
                     {/* Artists Preview */}
-                    <div className="flex items-center space-x-2">
-                      <Music className="h-4 w-4 text-[#E93370]" />
-                      <div className="flex -space-x-2">
-                        {event.artists.slice(0, 3).map((artist, idx) => (
-                          <div
-                            key={idx}
-                            className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
-                          >
-                            <ImageWithFallback
-                              src={artist.image}
-                              alt={artist.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
+                    {event.artists && Array.isArray(event.artists) && (
+                      <div className="flex items-center space-x-2">
+                        <Music className="h-4 w-4 text-[#E93370]" />
+                        <div className="flex -space-x-2">
+                          {event.artists.slice(0, 3).map((artist: any, idx: number) => (
+                            <div
+                              key={idx}
+                              className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
+                            >
+                              <ImageWithFallback
+                                src={artist?.image || undefined}
+                                alt={artist?.name || 'Artist'}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <span className="text-sm text-white/60">
+                          {event.artists.length} {event.artists.length === 1 ? 'Artist' : 'Artists'}
+                        </span>
                       </div>
-                      <span className="text-sm text-white/60">
-                        {event.artists.length} {event.artists.length === 1 ? 'Artist' : 'Artists'}
-                      </span>
-                    </div>
+                    )}
 
                     {/* CTA Button */}
                     <Button
                       className="w-full bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
-                      onClick={() => setSelectedEvent(event)}
+                      onClick={() => setSelectedEvent(event as LandingEvent)}
                     >
                       View Details
                     </Button>

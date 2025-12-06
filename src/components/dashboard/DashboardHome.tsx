@@ -116,7 +116,7 @@ export const DashboardHome = React.memo(() => {
       activities.push({
         type: 'gallery',
         action: 'Photo uploaded',
-        title: gallery[0]?.caption || 'New photo',
+        title: gallery[0]?.title || 'New photo',
         time: 'Recently',
         icon: Image,
       });
@@ -467,15 +467,21 @@ export const DashboardHome = React.memo(() => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-center">
-                <div className="text-4xl text-[#E93370] mb-2">{hero.stats.events}</div>
+                <div className="text-4xl text-[#E93370] mb-2">
+                  {hero.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'events' in hero.stats ? String(hero.stats.events) : '0'}
+                </div>
                 <div className="text-sm text-white/60">Events Hosted</div>
               </div>
               <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-center">
-                <div className="text-4xl text-[#E93370] mb-2">{hero.stats.members}</div>
+                <div className="text-4xl text-[#E93370] mb-2">
+                  {hero.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'members' in hero.stats ? String(hero.stats.members) : '0'}
+                </div>
                 <div className="text-sm text-white/60">Community Members</div>
               </div>
               <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-center">
-                <div className="text-4xl text-[#E93370] mb-2">{hero.stats.partners}</div>
+                <div className="text-4xl text-[#E93370] mb-2">
+                  {hero.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'partners' in hero.stats ? String(hero.stats.partners) : '0'}
+                </div>
                 <div className="text-sm text-white/60">Brand Partners</div>
               </div>
             </div>

@@ -99,9 +99,9 @@ export const DashboardEventArtists = () => {
     <div className="space-y-6">
       <div className="flex gap-4 items-center">
         <h2 className="text-3xl bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">Event Artists</h2>
-        <select value={selectedEventId} onChange={(e) => setSelectedEventId(e.target.value)} className="bg-white/5 border-white/10 text-white rounded-xl px-3 py-2">
+        <select value={selectedEventId || ''} onChange={(e) => setSelectedEventId(e.target.value || '')} className="bg-white/5 border-white/10 text-white rounded-xl px-3 py-2">
           <option value="">All Events</option>
-          {events.map(event => <option key={event.id} value={event.id}>{event.title}</option>)}
+          {events.map(event => <option key={event.id || ''} value={event.id || ''}>{event.title || 'Untitled Event'}</option>)}
         </select>
         <Button onClick={() => setIsDialogOpen(true)} className="bg-[#E93370] hover:bg-[#E93370]/90">
           <Plus className="mr-2 h-4 w-4" /> Add Artist

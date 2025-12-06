@@ -120,6 +120,10 @@ file_size_limit = "50MiB"
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
+# NOTE: This is for local development. For production, configure in Supabase Dashboard:
+# - Site URL: https://wildoutproject.com
+# - Redirect URLs: https://wildoutproject.com/login, https://wildoutproject.com/register, 
+#   https://wildoutproject.com/sadmin/login, and www variants if applicable
 site_url = "http://127.0.0.1:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = ["https://127.0.0.1:3000"]

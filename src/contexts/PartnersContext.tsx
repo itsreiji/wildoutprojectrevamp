@@ -58,21 +58,24 @@ export const PartnersProvider: React.FC<{ children: ReactNode; useDummyData?: bo
       
     if (error) throw error;
     
-    return (data || []).map((row: any): Partner => ({
-      id: row.id,
-      name: row.name || '',
-      description: row.description || undefined,
-      logo_url: row.logo_url || undefined,
-      website_url: row.website_url || undefined,
-      category: row.category || undefined,
-      status: row.status as 'active' | 'inactive' | undefined || undefined,
-      featured: row.featured || undefined,
-      contact_email: row.contact_email || undefined,
-      contact_phone: row.contact_phone || undefined,
-      social_links: normalizeSocialLinks(row.social_links),
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-    }));
+    return (data || []).map((row: any): Partner => {
+      const category: string = row.category && typeof row.category === 'string' ? row.category : 'general';
+      return {
+        id: row.id,
+        name: row.name || '',
+        description: row.description || undefined,
+        logo_url: row.logo_url || undefined,
+        website_url: row.website_url || undefined,
+        category,
+        status: (row.status && typeof row.status === 'string' ? row.status : 'active') as string,
+        featured: row.featured || undefined,
+        contact_email: row.contact_email || undefined,
+        contact_phone: row.contact_phone || undefined,
+        social_links: normalizeSocialLinks(row.social_links),
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      };
+    });
   };
 
   const { data: partners = [], isLoading: loading, error: queryError, refetch } = useQuery({
@@ -97,7 +100,7 @@ export const PartnersProvider: React.FC<{ children: ReactNode; useDummyData?: bo
         description: data.description || undefined,
         logo_url: data.logo_url || undefined,
         website_url: data.website_url || undefined,
-        category: undefined,
+        category: data.category || 'general',
         status: data.status as 'active' | 'inactive' | undefined || undefined,
         featured: data.featured || undefined,
         contact_email: data.contact_email || undefined,
@@ -134,7 +137,7 @@ export const PartnersProvider: React.FC<{ children: ReactNode; useDummyData?: bo
         description: data.description || undefined,
         logo_url: data.logo_url || undefined,
         website_url: data.website_url || undefined,
-        category: undefined,
+        category: data.category || 'general',
         status: data.status as 'active' | 'inactive' | undefined || undefined,
         featured: data.featured || undefined,
         contact_email: data.contact_email || undefined,

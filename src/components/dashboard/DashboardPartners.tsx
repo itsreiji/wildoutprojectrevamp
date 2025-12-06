@@ -159,6 +159,7 @@ export const DashboardPartners = React.memo(() => {
           await addPartner({
             ...partnerData,
             status: 'active',
+            category: 'general', // Add required category field
           });
           toast.success('Partner added successfully!');
         }

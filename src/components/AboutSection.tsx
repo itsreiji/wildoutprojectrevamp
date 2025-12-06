@@ -2,8 +2,9 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, Zap, Users, Sparkles } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
+import { AboutData, Feature } from '../types/content';
 
-const ICON_MAP: Record<number, any> = {
+const ICON_MAP: Record<number, React.ComponentType> = {
   0: Heart,
   1: Zap,
   2: Users,
@@ -12,6 +13,13 @@ const ICON_MAP: Record<number, any> = {
 
 export const AboutSection = React.memo(() => {
   const { about } = useContent();
+  const aboutData: AboutData = about || {
+    title: '',
+    subtitle: '',
+    features: [],
+    story: [],
+    founded_year: '',
+  };
 
   return (
     <section id="about" className="relative py-20 px-4">
@@ -26,17 +34,17 @@ export const AboutSection = React.memo(() => {
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4">
             <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
-              {about.title}
+              {aboutData.title}
             </span>
           </h2>
           <p className="text-lg text-white/60 max-w-3xl mx-auto">
-            {about.subtitle}
+            {aboutData.subtitle}
           </p>
         </motion.div>
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {about.features.map((feature, index) => {
+          {Array.isArray(aboutData.features) && (aboutData.features as Feature[]).map((feature, index) => {
             const Icon = ICON_MAP[index % 4] || Heart;
             return (
               <motion.div
@@ -50,7 +58,9 @@ export const AboutSection = React.memo(() => {
                 <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500 h-full">
                   {/* Icon */}
                   <div className="w-14 h-14 rounded-2xl bg-[#E93370]/10 flex items-center justify-center mb-4 group-hover:bg-[#E93370]/20 transition-colors duration-300">
-                    <Icon className="h-7 w-7 text-[#E93370]" />
+                    <div className="h-7 w-7 text-[#E93370]">
+                      <Icon />
+                    </div>
                   </div>
 
                   {/* Content */}
@@ -87,7 +97,7 @@ export const AboutSection = React.memo(() => {
                 Our Story
               </h3>
               <div className="space-y-4 text-white/70 leading-relaxed">
-                {about.story.map((paragraph, index) => (
+                {(aboutData.story || []).map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
               </div>
@@ -95,7 +105,7 @@ export const AboutSection = React.memo(() => {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
                 <div>
-                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{about.foundedYear}</div>
+                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{aboutData.founded_year || ''}</div>
                   <div className="text-sm text-white/60">Founded</div>
                 </div>
                 <div>

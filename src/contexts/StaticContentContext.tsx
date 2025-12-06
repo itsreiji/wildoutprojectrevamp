@@ -17,15 +17,22 @@ import type {
 
 // Initial data
 const INITIAL_HERO: HeroContent = {
+  id: '00000000-0000-0000-0000-000000000001',
   title: 'WildOut!',
   subtitle: 'Media Digital Nightlife & Event Multi-Platform',
   description: "Indonesia's premier creative community connecting artists, events, and experiences.",
   stats: { events: '500+', members: '50K+', partners: '100+' },
+  cta_text: 'Join Us',
+  cta_link: '/events',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  updated_by: null,
 };
 const INITIAL_ABOUT: AboutContent = {
+  id: '00000000-0000-0000-0000-000000000002',
   title: 'About WildOut!',
   subtitle: "Indonesia's leading creative community platform, connecting artists, events, and experiences since 2020.",
-  foundedYear: '2020',
+  founded_year: '2020',
   story: [
     'Founded in 2020, WildOut! celebrates Indonesia’s creative culture.',
     'We host community-driven events that bring artists, venues, and sponsors together.',
@@ -34,19 +41,27 @@ const INITIAL_ABOUT: AboutContent = {
     { title: 'Community First', description: 'We build lasting connections.' },
     { title: 'Unforgettable Experiences', description: 'Every event is crafted to be memorable.' },
   ],
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  updated_by: null,
 };
 const INITIAL_SETTINGS: SiteSettings = {
-  siteName: 'WildOut!',
+  id: '00000000-0000-0000-0000-000000000003',
+  site_name: 'WildOut!',
+  site_description: "Indonesia's premier creative community platform",
   tagline: "Indonesia's premier creative community platform",
   email: 'contact@wildout.id',
   phone: '+62 21 1234 567',
   address: 'Jakarta, Indonesia',
-  socialMedia: {
+  social_media: {
     instagram: 'https://instagram.com/wildout.id',
     twitter: 'https://twitter.com/wildout_id',
     facebook: 'https://facebook.com/wildout.id',
     youtube: 'https://youtube.com/@wildout',
   },
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  updated_by: null,
 };
 const INITIAL_GALLERY: GalleryImage[] = [];
 
@@ -135,12 +150,16 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
       const result = data?.[0];
       if (result) {
         return {
+          id: result.id ?? INITIAL_HERO.id,
           title: result.title ?? INITIAL_HERO.title,
           subtitle: result.subtitle ?? INITIAL_HERO.subtitle,
           description: result.description ?? INITIAL_HERO.description,
           stats: typeof result.stats === 'string' ? JSON.parse(result.stats) ?? INITIAL_HERO.stats : (result.stats ?? INITIAL_HERO.stats),
-          ctaText: result.cta_text ?? INITIAL_HERO.ctaText,
-          ctaLink: result.cta_link ?? INITIAL_HERO.ctaLink,
+          cta_text: result.cta_text ?? INITIAL_HERO.cta_text,
+          cta_link: result.cta_link ?? INITIAL_HERO.cta_link,
+          created_at: result.created_at ?? INITIAL_HERO.created_at,
+          updated_at: result.updated_at ?? INITIAL_HERO.updated_at,
+          updated_by: result.updated_by ?? INITIAL_HERO.updated_by,
         };
       }
       return INITIAL_HERO;
@@ -160,11 +179,15 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
       const result = data?.[0];
       if (result) {
         return {
+          id: result.id ?? INITIAL_ABOUT.id,
           title: result.title ?? INITIAL_ABOUT.title,
           subtitle: result.subtitle ?? INITIAL_ABOUT.subtitle,
-          foundedYear: result.founded_year ?? INITIAL_ABOUT.foundedYear,
+          founded_year: result.founded_year ?? INITIAL_ABOUT.founded_year,
           story: ensureStringArray(result.story) ?? INITIAL_ABOUT.story,
           features: typeof result.features === 'string' ? JSON.parse(result.features) ?? INITIAL_ABOUT.features : (result.features ?? INITIAL_ABOUT.features),
+          created_at: result.created_at ?? INITIAL_ABOUT.created_at,
+          updated_at: result.updated_at ?? INITIAL_ABOUT.updated_at,
+          updated_by: result.updated_by ?? INITIAL_ABOUT.updated_by,
         };
       }
       return INITIAL_ABOUT;
@@ -184,13 +207,17 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
       const result = data?.[0];
       if (result) {
         return {
-          siteName: result.site_name ?? INITIAL_SETTINGS.siteName,
-          siteDescription: result.site_description ?? INITIAL_SETTINGS.siteDescription,
+          id: result.id ?? INITIAL_SETTINGS.id,
+          site_name: result.site_name ?? INITIAL_SETTINGS.site_name,
+          site_description: result.site_description ?? INITIAL_SETTINGS.site_description,
           tagline: result.tagline ?? INITIAL_SETTINGS.tagline,
           email: result.email ?? INITIAL_SETTINGS.email,
           phone: result.phone ?? INITIAL_SETTINGS.phone,
           address: result.address ?? INITIAL_SETTINGS.address,
-          socialMedia: normalizeSocialLinks(result.social_media) as Record<string, string>,
+          social_media: normalizeSocialLinks(result.social_media) as Record<string, string>,
+          created_at: result.created_at ?? INITIAL_SETTINGS.created_at,
+          updated_at: result.updated_at ?? INITIAL_SETTINGS.updated_at,
+          updated_by: result.updated_by ?? INITIAL_SETTINGS.updated_by,
         };
       }
       return INITIAL_SETTINGS;
@@ -211,20 +238,19 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         console.error('Error fetching gallery:', error);
         return INITIAL_GALLERY;
       }
-      return (data || []).map((row: any): GalleryImage => ({
-        id: row.id,
-        title: row.title || undefined,
-        description: row.description || undefined,
-        url: row.image_url || undefined,
-        image_urls: row.image_urls ? JSON.parse(row.image_urls) as string[] : undefined,
-        category: row.category || undefined,
-        status: row.status || undefined,
-        tags: row.tags || undefined,
-        caption: row.title || undefined,
-        uploadDate: row.created_at || undefined,
-        event: row.event_title || undefined,
-        created_at: row.created_at || undefined,
-        updated_at: row.updated_at || undefined,
+      return (data || []).map((row: any) => ({
+        id: row.id || '',
+        title: row.title || '',
+        description: row.description ?? null,
+        image_url: row.image_url || '',
+        category: row.category || '',
+        status: row.status || 'published',
+        tags: row.tags || [],
+        display_order: row.display_order ?? null,
+        event_id: row.event_id ?? null,
+        metadata: row.metadata ?? {},
+        created_at: row.created_at || new Date().toISOString(),
+        updated_at: row.updated_at || new Date().toISOString(),
       }));
     } catch (error) {
       console.error('Error in fetchGallery:', error);
@@ -243,21 +269,23 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         setSettings(INITIAL_SETTINGS);
         setGallery(
             DUMMY_GALLERY_ITEMS.map(g => {
-              const imageUrls = ensureStringArray(g.image_urls) ?? [];
+              const imageUrls = ensureStringArray((g as any).image_urls) ?? [];
               return {
                 id: g.id || `gallery-${Date.now()}-${Math.random()}`,
-                title: g.title,
+                title: g.title || '',
                 description: g.description ?? null,
-                category: g.category ?? null,
+                category: (g.category ?? '') as string,
                 status: g.status ?? 'published',
                 tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
-                image_urls: imageUrls,
-                url: imageUrls[0] || '',
+                image_url: imageUrls[0] || '',
+                display_order: g.display_order ?? null,
+                event_id: g.event_id ?? null,
+                metadata: (g.metadata ?? {}) as any,
                 created_at: g.created_at ?? new Date().toISOString(),
                 updated_at: g.updated_at ?? new Date().toISOString(),
-              };
+              } as GalleryImage;
             })
-          );
+        );
       } else {
         const [heroData, aboutData, settingsData, galleryData] = await Promise.all([
           fetchHeroContent(),
@@ -449,8 +477,8 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         subtitle: content.subtitle,
         description: content.description,
         stats: content.stats,
-        cta_text: content.ctaText,
-        cta_link: content.ctaLink,
+        cta_text: content.cta_text,
+        cta_link: content.cta_link,
         updated_at: new Date().toISOString()
       };
 
@@ -482,7 +510,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         id: '00000000-0000-0000-0000-000000000002',
         title: content.title,
         subtitle: content.subtitle,
-        founded_year: content.foundedYear,
+        founded_year: content.founded_year,
         story: content.story,
         features: content.features,
         updated_at: new Date().toISOString()
@@ -514,13 +542,13 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
 
       const saveData = {
         id: '00000000-0000-0000-0000-000000000003',
-        site_name: settings.siteName,
-        site_description: settings.siteDescription,
+        site_name: settings.site_name,
+        site_description: settings.site_description,
         tagline: settings.tagline,
         email: settings.email,
         phone: settings.phone,
         address: settings.address,
-        social_media: settings.socialMedia,
+        social_media: settings.social_media,
         updated_at: new Date().toISOString()
       };
 
@@ -585,12 +613,11 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         throw error;
       }
 
-      if (oldImageUrls && updates.image_urls) {
-        const oldUrls = Array.isArray(oldImageUrls) ? oldImageUrls : [];
-        const newUrls = Array.isArray(updates.image_urls) ? updates.image_urls : [];
-        const urlsToCleanup = oldUrls.filter((url: string) => !newUrls.includes(url));
-        if (urlsToCleanup.length > 0) {
-          await cleanupGalleryAsset(urlsToCleanup);
+      // Note: image_urls is not part of GalleryImage type, using metadata instead
+      if (oldImageUrls && (updates as any).image_urls) {
+        // Note: image_urls is not part of GalleryImage type, cleanup handled via image_url
+        if (oldImageUrls && Array.isArray(oldImageUrls) && oldImageUrls.length > 0) {
+          await cleanupGalleryAsset(oldImageUrls);
         }
       }
 
@@ -621,8 +648,9 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         throw error;
       }
 
-      if (itemToDelete?.image_urls && Array.isArray(itemToDelete.image_urls)) {
-        await cleanupGalleryAsset(itemToDelete.image_urls as string[]);
+      // Note: image_urls is not part of GalleryImage type, using metadata or image_url for cleanup
+      if (itemToDelete?.image_url && typeof itemToDelete.image_url === 'string') {
+        await cleanupGalleryAsset([itemToDelete.image_url]);
       }
 
       setGallery(prev => prev.filter(image => image.id !== id));

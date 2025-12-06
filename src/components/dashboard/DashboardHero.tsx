@@ -11,7 +11,10 @@ import { toast } from 'sonner';
 
 export const DashboardHero = React.memo(() => {
   const { hero, saveHeroContent } = useContent();
-  const [formData, setFormData] = useState(hero);
+  const [formData, setFormData] = useState({
+    ...hero,
+    stats: hero.stats || { events: '500+', members: '50K+', partners: '100+' }
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -70,7 +73,7 @@ export const DashboardHero = React.memo(() => {
               <Label htmlFor="subtitle">Subtitle / Tagline</Label>
               <Input
                 id="subtitle"
-                value={formData.subtitle}
+                value={formData.subtitle || ''}
                 onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
                 className="bg-white/5 border-white/10 text-white"
                 placeholder="Media Digital Nightlife & Event Multi-Platform"
@@ -82,7 +85,7 @@ export const DashboardHero = React.memo(() => {
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
-                value={formData.description}
+                value={formData.description || ''}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="bg-white/5 border-white/10 text-white min-h-[100px]"
                 placeholder="Indonesia's premier creative community..."
@@ -100,11 +103,14 @@ export const DashboardHero = React.memo(() => {
                   <Label htmlFor="statsEvents">Events Count</Label>
                   <Input
                     id="statsEvents"
-                    value={formData.stats.events}
+                    value={typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'events' in formData.stats ? String(formData.stats.events) : ''}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        stats: { ...formData.stats, events: e.target.value },
+                        stats: { 
+                          ...(typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) ? formData.stats : { events: '', members: '', partners: '' }), 
+                          events: e.target.value 
+                        },
                       })
                     }
                     className="bg-white/5 border-white/10 text-white"
@@ -116,11 +122,14 @@ export const DashboardHero = React.memo(() => {
                   <Label htmlFor="statsMembers">Members Count</Label>
                   <Input
                     id="statsMembers"
-                    value={formData.stats.members}
+                    value={typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'members' in formData.stats ? String(formData.stats.members) : ''}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        stats: { ...formData.stats, members: e.target.value },
+                        stats: { 
+                          ...(typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) ? formData.stats : { events: '', members: '', partners: '' }), 
+                          members: e.target.value 
+                        },
                       })
                     }
                     className="bg-white/5 border-white/10 text-white"
@@ -132,11 +141,14 @@ export const DashboardHero = React.memo(() => {
                   <Label htmlFor="statsPartners">Partners Count</Label>
                   <Input
                     id="statsPartners"
-                    value={formData.stats.partners}
+                    value={typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'partners' in formData.stats ? String(formData.stats.partners) : ''}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        stats: { ...formData.stats, partners: e.target.value },
+                        stats: { 
+                          ...(typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) ? formData.stats : { events: '', members: '', partners: '' }), 
+                          partners: e.target.value 
+                        },
                       })
                     }
                     className="bg-white/5 border-white/10 text-white"
@@ -187,15 +199,21 @@ export const DashboardHero = React.memo(() => {
               </p>
               <div className="grid grid-cols-3 gap-4 pt-8 max-w-2xl mx-auto">
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <div className="text-2xl text-[#E93370]">{formData.stats.events || '0'}</div>
+                  <div className="text-2xl text-[#E93370]">
+                    {typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'events' in formData.stats ? String(formData.stats.events) : '0'}
+                  </div>
                   <div className="text-sm text-white/60">Events</div>
                 </div>
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <div className="text-2xl text-[#E93370]">{formData.stats.members || '0'}</div>
+                  <div className="text-2xl text-[#E93370]">
+                    {typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'members' in formData.stats ? String(formData.stats.members) : '0'}
+                  </div>
                   <div className="text-sm text-white/60">Members</div>
                 </div>
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <div className="text-2xl text-[#E93370]">{formData.stats.partners || '0'}</div>
+                  <div className="text-2xl text-[#E93370]">
+                    {typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'partners' in formData.stats ? String(formData.stats.partners) : '0'}
+                  </div>
                   <div className="text-sm text-white/60">Partners</div>
                 </div>
               </div>

@@ -19,6 +19,7 @@ export interface AuthError {
 }
 
 export type AuthRole = 'admin' | 'editor' | 'user' | 'anonymous';
+export type OAuthProvider = 'google';
 
 // Cache for user profile data to avoid repeated database calls
 interface CachedProfile {
@@ -55,7 +56,7 @@ const getUserRoleWithCache = async (userId: string): Promise<AuthRole> => {
   try {
     // Use RPC to get profile role safely
     const { data: profiles, error } = await supabaseClient.rpc('get_user_profile', { user_uuid: userId });
-    
+
     if (error) {
       console.warn('RPC error fetching user profile:', error);
     } else if (profiles && profiles.length > 0) {
@@ -104,13 +105,14 @@ interface AuthContextValue {
   error: string | null;
   isAuthenticated: boolean;
   lastActivity: number;
-  signInWithEmail: (email: string, password: string) => Promise<AuthError | null>;
-  signUpWithEmail: (email: string, password: string) => Promise<AuthError | null>;
-  sendMagicLink: (email: string) => Promise<AuthError | null>;
+  signInWithOAuth: (provider: OAuthProvider) => Promise<AuthError | null>;
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
   clearCache: () => void;
   validateSession: () => Promise<boolean>;
+  checkSecurityStatus: () => Promise<{ isSecure: boolean; issues?: string[] }>;
+  useDummyData: boolean;
+  setUseDummyData: (value: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -123,6 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const [useDummyData, setUseDummyData] = useState<boolean>(false);
 
   // Memoized authentication state
   const isAuthenticated = useMemo(() => !!user && !!session, [user, session]);
@@ -438,162 +441,88 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [updateSessionStateSync, clearCache]);
 
-  const signInWithEmail = useCallback(async (email: string, password: string) => {
+
+
+  const signInWithOAuth = useCallback(async (provider: OAuthProvider) => {
     setLoading(true);
     setError(null);
 
     try {
-      console.log('🔄 Signing in user...');
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password,
-      });
+      console.log(`🔄 Signing in with ${provider}...`);
 
-      if (error) {
-        console.error('❌ Sign in error:', error);
-        setError(error.message);
+      // Security: Validate provider is only Google
+      if (provider !== 'google') {
+        console.error('❌ Invalid OAuth provider. Only Google is supported.');
+        setError('Only Google authentication is supported for security reasons.');
         setLoading(false);
-        return error;
+        return { message: 'Only Google authentication is supported' } as AuthError;
       }
 
-      console.log('✅ Sign in successful');
-
-      // Get the correct role from database and update session state
-      let finalRole: AuthRole = 'user'; // Default fallback
-      try {
-        const userRole = await getUserRoleWithCache(data.user.id);
-        finalRole = userRole;
-        console.log('✅ User role fetched from database:', userRole);
-      } catch (roleError) {
-        console.warn('⚠️ Failed to fetch user role, using default:', roleError);
-      }
-
-      // Create session record in database with retry logic
-      if (data.session?.access_token) {
-        let retries = 3;
-        let sessionCreated = false;
-
-        while (retries > 0 && !sessionCreated) {
-          try {
-            const { error: sessionError } = await supabaseClient.rpc('create_user_session', {
-              session_token: data.session.access_token,
-              expiry_hours: 24
-            });
-
-            if (sessionError) {
-              // If it's a duplicate key error, try to update existing session instead
-              if (sessionError.message?.includes('duplicate') || sessionError.message?.includes('unique')) {
-                console.log('🔄 Session already exists, validating instead...');
-                // Validate the existing session
-                await supabaseClient.rpc('validate_user_session', {
-                  session_token_param: data.session.access_token
-                });
-                sessionCreated = true;
-              } else {
-                throw sessionError;
-              }
-            } else {
-              console.log('✅ Session record created in database');
-              sessionCreated = true;
-            }
-          } catch (sessionError: any) {
-            retries--;
-            if (retries === 0) {
-              console.warn('⚠️ Failed to create session record after retries:', sessionError);
-              // Continue with auth even if session creation fails
-            } else {
-              console.log(`🔄 Retrying session creation (${retries} attempts left)...`);
-              // Wait a bit before retrying
-              await new Promise(resolve => setTimeout(resolve, 500));
-            }
-          }
+      // Security: Check if we're in a secure context (HTTPS)
+      if (typeof window !== 'undefined' && window.location.protocol !== 'https:' && import.meta.env.VITE_APP_ENV === 'production') {
+        console.warn('⚠️ Insecure context detected. Redirecting to HTTPS...');
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          window.location.href = `https://${window.location.host}${window.location.pathname}`;
+          return null;
         }
       }
 
-      // Update session state with correct role
-      updateSessionStateSync(data.session);
-      setRole(finalRole); // Set the correct role immediately
-
-      setLoading(false);
-      return null;
-    } catch (signInError) {
-      console.error('❌ Unexpected sign in error:', signInError);
-      setError('An unexpected error occurred during sign in');
-      setLoading(false);
-      return { message: 'An unexpected error occurred during sign in' } as AuthError;
-    }
-  }, [updateSessionStateSync]);
-
-  const signUpWithEmail = useCallback(async (email: string, password: string) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      console.log('🔄 Signing up user...');
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider,
         options: {
-          data: {
-            role: 'user', // Default role for new users
+          redirectTo: typeof window !== 'undefined'
+            ? `${window.location.origin}${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`
+            : `${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`,
+          // Security: Use PKCE flow for better security
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
           }
         }
       });
 
       if (error) {
-        console.error('❌ Sign up error:', error);
-        setError(error.message);
+        console.error(`❌ ${provider} sign-in error:`, error);
+
+        // Enhanced error handling
+        let errorMessage = error.message;
+
+        // Handle specific error cases
+        if (error.message.includes('popup_closed')) {
+          errorMessage = 'Authentication popup was closed. Please try again.';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('invalid')) {
+          errorMessage = 'Invalid authentication request. Please try again.';
+        }
+
+        setError(errorMessage);
         setLoading(false);
-        return error;
+        return { message: errorMessage } as AuthError;
       }
 
-      console.log('✅ Sign up successful');
-
-      // For email confirmation flow, user might not be immediately signed in
-      if (data.user && data.session) {
-        await updateSessionState(data.session);
-      }
+      console.log(`✅ ${provider} sign-in successful`);
       setLoading(false);
       return null;
-    } catch (signUpError) {
-      console.error('❌ Unexpected sign up error:', signUpError);
-      setError('An unexpected error occurred during sign up');
-      setLoading(false);
-      return { message: 'An unexpected error occurred during sign up' } as AuthError;
-    }
-  }, [updateSessionState]);
+    } catch (oauthError) {
+      console.error(`❌ Unexpected ${provider} sign-in error:`, oauthError);
 
-  const sendMagicLink = useCallback(async (email: string) => {
-    setLoading(true);
-    setError(null);
+      // Enhanced error handling for different error types
+      let errorMessage = 'An unexpected error occurred during authentication';
 
-    try {
-      console.log('🔄 Sending magic link...');
-      const { error } = await supabaseClient.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo:
-            typeof window !== 'undefined'
-              ? `${window.location.origin}${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`
-              : `${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login`,
-        },
-      });
-
-      if (error) {
-        console.error('❌ Magic link error:', error);
-        setError(error.message);
-        setLoading(false);
-        return error;
+      if (oauthError instanceof Error) {
+        if (oauthError.message.includes('popup')) {
+          errorMessage = 'Popup blocked or closed. Please allow popups and try again.';
+        } else if (oauthError.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection.';
+        } else if (oauthError.message.includes('security')) {
+          errorMessage = 'Security validation failed. Please try again.';
+        }
       }
 
-      console.log('✅ Magic link sent');
+      setError(errorMessage);
       setLoading(false);
-      return null;
-    } catch (magicLinkError) {
-      console.error('❌ Unexpected magic link error:', magicLinkError);
-      setError('An unexpected error occurred sending magic link');
-      setLoading(false);
-      return { message: 'An unexpected error occurred sending magic link' } as AuthError;
+      return { message: errorMessage } as AuthError;
     }
   }, []);
 
@@ -635,6 +564,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [updateSessionState, clearCache, sessionId]);
 
+  // Security verification function
+  const checkSecurityStatus = useCallback(async (): Promise<{ isSecure: boolean; issues?: string[] }> => {
+    const issues: string[] = [];
+
+    // Check 1: HTTPS in production
+    if (typeof window !== 'undefined' && import.meta.env.VITE_APP_ENV === 'production') {
+      if (window.location.protocol !== 'https:') {
+        issues.push('Not using HTTPS in production environment');
+      }
+    }
+
+    // Check 2: Session validity
+    if (session && session.expires_at) {
+      const expiresAt = session.expires_at * 1000;
+      const timeUntilExpiry = expiresAt - Date.now();
+      if (timeUntilExpiry < 0) {
+        issues.push('Session has expired');
+      } else if (timeUntilExpiry < 5 * 60 * 1000) { // Less than 5 minutes
+        issues.push('Session will expire soon');
+      }
+    }
+
+    // Check 3: User role validation
+    if (isAuthenticated && role === 'anonymous') {
+      issues.push('Authenticated user has anonymous role');
+    }
+
+    // Check 4: Token presence
+    if (isAuthenticated && !sessionId) {
+      issues.push('Authenticated session missing token');
+    }
+
+    return {
+      isSecure: issues.length === 0,
+      issues: issues.length > 0 ? issues : undefined
+    };
+  }, [session, isAuthenticated, role, sessionId]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -646,13 +613,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         error,
         isAuthenticated,
         lastActivity,
-        signInWithEmail,
-        signUpWithEmail,
-        sendMagicLink,
+        signInWithOAuth,
         signOut,
         refreshSession,
         clearCache,
         validateSession,
+        checkSecurityStatus,
+        useDummyData,
+        setUseDummyData,
       }}
     >
       {children}
