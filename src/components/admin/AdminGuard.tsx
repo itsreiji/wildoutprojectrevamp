@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from '../router';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -7,10 +7,18 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
   const { navigate } = useRouter();
   const [isValidating, setIsValidating] = useState(true);
   const [sessionValid, setSessionValid] = useState<boolean | null>(null);
+  const [hasCheckedSession, setHasCheckedSession] = useState(false);
+  const hasRedirectedRef = useRef(false);
+  const lastCheckRef = useRef<number>(0);
 
   // Validate session on mount and when auth state changes
   useEffect(() => {
     const checkSession = async () => {
+      const now = Date.now();
+      // Throttle session validation to avoid infinite loops
+      if (now - lastCheckRef.current < 1000) return;
+      lastCheckRef.current = now;
+
       if (loading) {
         setIsValidating(true);
         return;
@@ -19,6 +27,7 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
       if (!isAuthenticated || !user) {
         setIsValidating(false);
         setSessionValid(false);
+        setHasCheckedSession(true);
         return;
       }
 
@@ -27,12 +36,14 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
       try {
         const isValid = await validateSession();
         setSessionValid(isValid);
+        setHasCheckedSession(true);
         if (!isValid) {
           console.log('🚫 Session validation failed, redirecting to login');
         }
       } catch (error) {
         console.error('Session validation error:', error);
         setSessionValid(false);
+        setHasCheckedSession(true);
       } finally {
         setIsValidating(false);
       }
@@ -43,9 +54,13 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
 
   // Add useEffect for redirects
   useEffect(() => {
-    if (loading || isValidating || sessionValid === null) return;
+    if (loading || isValidating || sessionValid === null || !hasCheckedSession) return;
+
+    // Prevent multiple redirects
+    if (hasRedirectedRef.current) return;
 
     if (sessionValid === false || !isAuthenticated || !user) {
+      hasRedirectedRef.current = true;
       navigate(`${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
@@ -55,10 +70,18 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
     if (role !== 'admin') {
       // Could navigate here too, but show denied page for now
     }
-  }, [loading, isValidating, sessionValid, isAuthenticated, user, role, navigate]);
+  }, [loading, isValidating, sessionValid, isAuthenticated, user, role, navigate, hasCheckedSession]);
 
-  // Debug logging
-  console.log('🔐 AdminGuard check:', { loading, isValidating, sessionValid, role, user: user?.email, isAuthenticated });
+  // Debug logging (throttled)
+  useEffect(() => {
+    const logCheck = () => {
+      const now = Date.now();
+      if (now - lastCheckRef.current < 2000) return;
+      lastCheckRef.current = now;
+      console.log('🔐 AdminGuard check:', { loading, isValidating, sessionValid, role, user: user?.email, isAuthenticated });
+    };
+    logCheck();
+  }, [loading, isValidating, sessionValid, role, user, isAuthenticated]);
 
   // Show loading state while checking
   if (loading || isValidating) {
@@ -74,6 +97,16 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
 
   // If session validation failed or not authenticated, return null or loading instead of navigate
   if (sessionValid === false || !isAuthenticated || !user) {
+    if (!hasCheckedSession) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-[#040404] text-white">
+          <div className="text-center">
+            <p className="text-lg font-semibold mb-2">Checking your access…</p>
+            <p className="text-sm text-white/60">Please wait while we verify your permissions</p>
+          </div>
+        </div>
+      );
+    }
     return null; // useEffect handles redirect
   }
 

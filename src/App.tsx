@@ -40,7 +40,7 @@ function App() {
     '/login': LoginPage,
     '/admin/login': LoginPage, // Keep legacy /admin/login for backward compatibility
     [adminBasePath]: AdminRoute,
-    [`${adminBasePath}/login`]: () => handleAdminLogin('/admin/'),
+    [`${adminBasePath}/login`]: LoginPage,
     [`${adminBasePath}/login?redirect=:redirect`]: LoginPage,
     [`${adminBasePath}/*`]: AdminRoute,
     '/test-ui': TestComponents,
@@ -49,7 +49,7 @@ function App() {
 
   const handleAdminLogin = (defaultRedirect: string) => {
     const path = new URLSearchParams(window.location.search).get('redirect');
-    return () => <LoginPage redirectTo={path || defaultRedirect} />;
+    return () => <LoginPage />;
   };
 
   return (
