@@ -121,9 +121,9 @@ interface StaticContentContextType {
 
 const StaticContentContext = createContext<StaticContentContextType | undefined>(undefined);
 
-export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData?: boolean }> = ({ 
-  children, 
-  useDummyData: initialUseDummyData = false 
+export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData?: boolean }> = ({
+  children,
+  useDummyData: initialUseDummyData = false
 }) => {
   const authContext = useAuth();
   const user = authContext.user;
@@ -268,23 +268,23 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         setAbout(INITIAL_ABOUT);
         setSettings(INITIAL_SETTINGS);
         setGallery(
-            DUMMY_GALLERY_ITEMS.map(g => {
-              const imageUrls = ensureStringArray((g as any).image_urls) ?? [];
-              return {
-                id: g.id || `gallery-${Date.now()}-${Math.random()}`,
-                title: g.title || '',
-                description: g.description ?? null,
-                category: (g.category ?? '') as string,
-                status: g.status ?? 'published',
-                tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
-                image_url: imageUrls[0] || '',
-                display_order: g.display_order ?? null,
-                event_id: g.event_id ?? null,
-                metadata: (g.metadata ?? {}) as any,
-                created_at: g.created_at ?? new Date().toISOString(),
-                updated_at: g.updated_at ?? new Date().toISOString(),
-              } as GalleryImage;
-            })
+          DUMMY_GALLERY_ITEMS.map(g => {
+            const imageUrls = ensureStringArray((g as any).image_urls) ?? [];
+            return {
+              id: g.id || `gallery-${Date.now()}-${Math.random()}`,
+              title: g.title || '',
+              description: g.description ?? null,
+              category: (g.category ?? '') as string,
+              status: g.status ?? 'published',
+              tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
+              image_url: imageUrls[0] || '',
+              display_order: g.display_order ?? null,
+              event_id: g.event_id ?? null,
+              metadata: (g.metadata ?? {}) as any,
+              created_at: g.created_at ?? new Date().toISOString(),
+              updated_at: g.updated_at ?? new Date().toISOString(),
+            } as GalleryImage;
+          })
         );
       } else {
         const [heroData, aboutData, settingsData, galleryData] = await Promise.all([
@@ -445,7 +445,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
         for (const sectionSlug of sectionsWithContent) {
           try {
             const { data: content, error: contentError } = await supabaseClient
-              .rpc('get_section_content', { section_slug: sectionSlug, p_user_id: user?.id });
+              .rpc('get_section_content', { p_section_slug: sectionSlug, p_user_id: user?.id });
 
             if (!contentError && content && content.length > 0) {
               contentMap[sectionSlug] = content[0];

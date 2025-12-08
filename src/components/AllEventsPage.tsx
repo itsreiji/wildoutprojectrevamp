@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, MapPin, Clock, Users, X, Search, Filter, ChevronLeft } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatting';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
@@ -162,7 +163,13 @@ export const AllEventsPage = React.memo(() => {
                           <Users className="h-4 w-4 mr-2 text-[#E93370]" />
                           <span>{event.attendees}/{event.capacity}</span>
                         </div>
-                        <span className="text-sm text-[#E93370]">{event.price}</span>
+                        <span className="text-sm text-[#E93370]">
+                          {event.price ? formatCurrency(
+                            typeof event.price === 'string' 
+                              ? Number(event.price.replace(/[^0-9]/g, '')) 
+                              : event.price
+                          ) : 'Free'}
+                        </span>
                       </div>
 
                       {/* Progress Bar */}

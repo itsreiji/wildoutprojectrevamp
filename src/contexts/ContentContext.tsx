@@ -433,10 +433,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
 
       setAdminSectionsLoading(true);
       try {
+        // Use RPC to get sections enabled for the user
         const { data, error } = await supabaseClient
-          .from('admin_sections')
-          .select('*')
-          .order('display_order');
+          .rpc('get_admin_sections_for_user', { p_user_id: user.id });
 
         if (error) {
           console.error('Error fetching admin sections:', error);
@@ -445,41 +444,50 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
 
         const sections = (data || []).map((row: any) => ({
           id: row.id,
-          name: row.name,
-          display_name: row.display_name,
+          slug: row.slug,
+          label: row.label,
+          display_name: row.label, // mapped for compatibility
+          name: row.slug, // mapped for compatibility
           description: row.description,
-          display_order: row.display_order,
+          display_order: row.order_index,
+          icon: row.icon,
+          category: row.category,
+          enabled: row.enabled,
           created_at: row.created_at,
           updated_at: row.updated_at,
-          permissions: row.permissions || [],
+          permissions: ['view', 'edit'], // Default permissions for now since RPC filters access
         }));
 
         setAdminSections(sections);
 
-        // Fetch section content
+        // Fetch section content using RPC
         const contentPromises = sections.map(async (section: any) => {
           const { data, error } = await supabaseClient
-            .from('admin_section_content')
-            .select('*')
-            .eq('section_id', section.id)
-            .single();
+            .rpc('get_section_content', {
+              p_section_slug: section.slug,
+              p_user_id: user.id
+            });
 
           if (error) {
-            console.error('Error fetching section content:', error);
-            return { sectionId: section.id, content: null };
+            console.error(`Error fetching section content for ${section.slug}:`, error);
+            return { sectionId: section.id, sectionSlug: section.slug, content: null };
           }
+
+          // RPC returns an array, take the first item if available
+          const contentData = data && data.length > 0 ? data[0] : null;
 
           return {
             sectionId: section.id,
-            content: data || null,
+            sectionSlug: section.slug,
+            content: contentData,
           };
         });
 
         const contentResults = await Promise.all(contentPromises);
         const newSectionContent: Record<string, SectionContent> = {};
-        contentResults.forEach(({ sectionId, content }) => {
-          if (content) {
-            newSectionContent[sectionId] = content;
+        contentResults.forEach(({ sectionSlug, content }) => {
+          if (content && sectionSlug) {
+            newSectionContent[sectionSlug] = content;
           }
         });
 
@@ -864,7 +872,7 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
   const updateSectionContent = async (sectionId: string, content: SectionContent) => {
     try {
       const { data, error } = await supabaseClient
-        .from('admin_section_content')
+        .from('section_content')
         .upsert({
           ...content,
           section_id: sectionId,

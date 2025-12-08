@@ -32,7 +32,7 @@ export const generateSalt = (length: number = HASH_CONFIG.SALT_SIZE): string => 
     // Fallback for SSR
     return Math.random().toString(36).substring(2, 2 + length);
   }
-  
+
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
@@ -42,12 +42,12 @@ export const generateSalt = (length: number = HASH_CONFIG.SALT_SIZE): string => 
  * Hash password using PBKDF2 with SHA-256
  */
 export const hashPassword = async (
-  password: string, 
+  password: string,
   salt?: string,
   iterations: number = HASH_CONFIG.ITERATIONS
 ): Promise<PasswordHashResult> => {
   const useSalt = salt || generateSalt();
-  
+
   if (typeof window === 'undefined') {
     // Fallback for SSR using crypto-js
     const derivedKey = CryptoJS.PBKDF2(password, useSalt, {
@@ -55,7 +55,7 @@ export const hashPassword = async (
       iterations,
       hasher: CryptoJS.algo.SHA256
     });
-    
+
     return {
       hash: derivedKey.toString(CryptoJS.enc.Hex),
       salt: useSalt,
@@ -63,7 +63,7 @@ export const hashPassword = async (
       algorithm: HASH_CONFIG.ALGORITHM
     };
   }
-  
+
   // Use Web Crypto API for better security
   const encoder = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey(
@@ -73,7 +73,7 @@ export const hashPassword = async (
     false,
     ['deriveBits']
   );
-  
+
   const derivedBits = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
@@ -84,10 +84,10 @@ export const hashPassword = async (
     keyMaterial,
     HASH_CONFIG.KEY_SIZE
   );
-  
+
   const hashArray = Array.from(new Uint8Array(derivedBits));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  
+
   return {
     hash: hashHex,
     salt: useSalt,
@@ -116,13 +116,11 @@ export const generateCSRFToken = (secret: string): CSRFProtection => {
   const token = crypto.randomUUID();
   const timestamp = Date.now();
   const data = `${token}:${timestamp}`;
-  
+
   // Create signature using HMAC-SHA256
-  const encoder = new TextEncoder();
-  const secretKey = encoder.encode(secret);
-  
-  const signature = CryptoJS.HmacSHA256(data, secretKey).toString();
-  
+  // CryptoJS accepts string directly for the secret key
+  const signature = CryptoJS.HmacSHA256(data, secret).toString();
+
   return {
     token,
     timestamp,
@@ -141,16 +139,16 @@ export const verifyCSRFToken = (
   maxAge: number = 3600000 // 1 hour
 ): boolean => {
   const now = Date.now();
-  
+
   // Check if token is expired
   if (now - timestamp > maxAge) {
     return false;
   }
-  
+
   // Verify signature
   const data = `${token}:${timestamp}`;
   const expectedSignature = CryptoJS.HmacSHA256(data, secret).toString();
-  
+
   return signature === expectedSignature;
 };
 
@@ -163,13 +161,13 @@ export const createSecureHeaders = (csrfToken?: CSRFProtection): Record<string, 
     'X-Requested-With': 'XMLHttpRequest',
     'X-Client-Version': '1.0.0'
   };
-  
+
   if (csrfToken) {
     headers['X-CSRF-Token'] = csrfToken.token;
     headers['X-CSRF-Timestamp'] = csrfToken.timestamp.toString();
     headers['X-CSRF-Signature'] = csrfToken.signature;
   }
-  
+
   return headers;
 };
 
@@ -183,12 +181,12 @@ export const validatePasswordComplexity = (password: string): {
 } => {
   const feedback: string[] = [];
   let score = 0;
-  
+
   // Length check
   if (password.length >= 12) score += 2;
   else if (password.length >= 8) score += 1;
   else feedback.push('Password must be at least 8 characters long');
-  
+
   // Character variety checks
   const checks = [
     { regex: /[a-z]/, message: 'Add lowercase letters' },
@@ -196,7 +194,7 @@ export const validatePasswordComplexity = (password: string): {
     { regex: /[0-9]/, message: 'Add numbers' },
     { regex: /[^a-zA-Z0-9]/, message: 'Add special characters' }
   ];
-  
+
   checks.forEach(check => {
     if (check.regex.test(password)) {
       score += 1;
@@ -204,7 +202,7 @@ export const validatePasswordComplexity = (password: string): {
       feedback.push(check.message);
     }
   });
-  
+
   // Common patterns check
   const commonPatterns = [
     /(.)\1{2,}/, // Repeating characters
@@ -214,14 +212,14 @@ export const validatePasswordComplexity = (password: string): {
     /password/i,
     /admin/i
   ];
-  
+
   commonPatterns.forEach(pattern => {
     if (pattern.test(password)) {
       score -= 1;
       feedback.push('Avoid common patterns and sequences');
     }
   });
-  
+
   // Dictionary words check (basic)
   const commonWords = ['password', 'admin', 'user', 'test', 'welcome'];
   const lowerPassword = password.toLowerCase();
@@ -231,10 +229,10 @@ export const validatePasswordComplexity = (password: string): {
       feedback.push('Avoid using common words');
     }
   });
-  
+
   // Ensure score is within bounds
   score = Math.max(0, Math.min(5, score));
-  
+
   return {
     isValid: score >= 3,
     score,
@@ -261,24 +259,24 @@ export const validateSecureEmail = (email: string): {
   errors: string[];
 } => {
   const errors: string[] = [];
-  
+
   // Basic format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     errors.push('Invalid email format');
   }
-  
+
   // Length checks
   if (email.length > 254) {
     errors.push('Email address is too long');
   }
-  
+
   // Disallow certain characters
   const dangerousChars = /[<>{}[\]\\]/;
   if (dangerousChars.test(email)) {
     errors.push('Email contains invalid characters');
   }
-  
+
   // Disallow common disposable email domains
   const disposableDomains = [
     '10minutemail.com',
@@ -286,12 +284,12 @@ export const validateSecureEmail = (email: string): {
     'guerrillamail.com',
     'mailinator.com'
   ];
-  
+
   const domain = email.split('@')[1]?.toLowerCase();
   if (domain && disposableDomains.includes(domain)) {
     errors.push('Disposable email addresses are not allowed');
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors
@@ -305,7 +303,7 @@ export const generateSecureToken = (length: number = 32): string => {
   if (typeof window === 'undefined') {
     return Math.random().toString(36).substring(2, 2 + length);
   }
-  
+
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
@@ -323,14 +321,14 @@ export const checkRateLimit = (
   if (typeof window === 'undefined') {
     return { allowed: true, attemptsRemaining: maxAttempts };
   }
-  
+
   try {
     const now = Date.now();
     const storageKey = `rate_limit_${key}`;
     const stored = localStorage.getItem(storageKey);
-    
+
     let info = { attempts: 0, lastAttempt: 0, blockedUntil: 0 };
-    
+
     if (stored) {
       try {
         info = JSON.parse(stored);
@@ -338,7 +336,7 @@ export const checkRateLimit = (
         // Ignore parse errors
       }
     }
-    
+
     // Check if currently blocked
     if (info.blockedUntil && now < info.blockedUntil) {
       return {
@@ -346,12 +344,12 @@ export const checkRateLimit = (
         timeRemaining: info.blockedUntil - now
       };
     }
-    
+
     // Reset window if enough time has passed
     if (now - info.lastAttempt > windowMs) {
       info = { attempts: 0, lastAttempt: 0, blockedUntil: 0 };
     }
-    
+
     // Check if limit exceeded
     if (info.attempts >= maxAttempts) {
       // Block for exponentially increasing duration
@@ -359,16 +357,16 @@ export const checkRateLimit = (
         blockDurationMs * Math.pow(2, Math.floor(info.attempts / maxAttempts)),
         24 * 60 * 60 * 1000 // Max 24 hours
       );
-      
+
       info.blockedUntil = now + blockDuration;
       localStorage.setItem(storageKey, JSON.stringify(info));
-      
+
       return {
         allowed: false,
         timeRemaining: blockDuration
       };
     }
-    
+
     return {
       allowed: true,
       attemptsRemaining: maxAttempts - info.attempts
@@ -384,14 +382,14 @@ export const checkRateLimit = (
  */
 export const recordRateLimitAttempt = (key: string): void => {
   if (typeof window === 'undefined') return;
-  
+
   try {
     const now = Date.now();
     const storageKey = `rate_limit_${key}`;
     const stored = localStorage.getItem(storageKey);
-    
+
     let info = { attempts: 0, lastAttempt: 0, blockedUntil: 0 };
-    
+
     if (stored) {
       try {
         info = JSON.parse(stored);
@@ -399,7 +397,7 @@ export const recordRateLimitAttempt = (key: string): void => {
         // Ignore parse errors
       }
     }
-    
+
     // Reset window if enough time has passed
     if (now - info.lastAttempt > 15 * 60 * 1000) {
       info = { attempts: 1, lastAttempt: now, blockedUntil: 0 };
@@ -407,7 +405,7 @@ export const recordRateLimitAttempt = (key: string): void => {
       info.attempts += 1;
       info.lastAttempt = now;
     }
-    
+
     localStorage.setItem(storageKey, JSON.stringify(info));
   } catch (error) {
     console.warn('Failed to record rate limit attempt:', error);
@@ -419,7 +417,7 @@ export const recordRateLimitAttempt = (key: string): void => {
  */
 export const clearRateLimit = (key: string): void => {
   if (typeof window === 'undefined') return;
-  
+
   try {
     localStorage.removeItem(`rate_limit_${key}`);
   } catch (error) {

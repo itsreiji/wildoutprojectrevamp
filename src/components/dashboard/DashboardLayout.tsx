@@ -116,7 +116,7 @@ export const DashboardLayout = React.memo(
               <img 
                 src={logo} 
                 alt="WildOut Logo" 
-                className="w-12 h-12 rounded-lg object-contain flex-shrink-0" 
+                className="w-24 h-24 rounded-lg object-contain flex-shrink-0" 
               />
             </div>
 

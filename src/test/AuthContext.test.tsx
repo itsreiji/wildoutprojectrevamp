@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useAuth } from '../../contexts/AuthContext';
-import { validateEmail, validatePassword, validatePasswordStrength, checkLoginRateLimit, recordFailedLogin, clearLoginAttempts, generateCsrfToken, validateCsrfToken } from '../../utils/authValidation';
-import { hashPassword, sanitizeInput, validateSecureEmail, checkRateLimit, recordRateLimitAttempt } from '../../utils/security';
+import { useAuth } from '../contexts/AuthContext';
+import { validateEmail, validatePassword, validatePasswordStrength, checkLoginRateLimit, recordFailedLogin, clearLoginAttempts, generateCsrfToken, validateCsrfToken } from '../utils/authValidation';
+import { hashPassword, verifyPassword, sanitizeInput, validateSecureEmail, checkRateLimit, recordRateLimitAttempt, validatePasswordComplexity, generateSecureToken, clearRateLimit } from '../utils/security';
 
 // Mock Supabase client
 vi.mock('../../supabase/client', () => ({
@@ -86,7 +86,7 @@ describe('AuthContext', () => {
 
   it('should generate and validate CSRF tokens', () => {
     const token = generateCsrfToken();
-    
+
     expect(token.token).toBeDefined();
     expect(token.timestamp).toBeDefined();
     expect(token.signature).toBeDefined();
@@ -102,7 +102,7 @@ describe('AuthContext', () => {
   it('should sanitize input', () => {
     const maliciousInput = '<script>alert("xss")</script>test@example.com';
     const sanitized = sanitizeInput(maliciousInput);
-    
+
     expect(sanitized).not.toContain('<script>');
     expect(sanitized).not.toContain('</script>');
     expect(sanitized).toBe('test@example.com');
@@ -193,8 +193,9 @@ describe('AuthContext', () => {
     expect(token1).toBeDefined();
     expect(token2).toBeDefined();
     expect(token1).not.toBe(token2);
-    expect(token1.length).toBe(32);
-    expect(token2.length).toBe(32);
+    // generateSecureToken returns hex string, so 32 bytes = 64 hex chars
+    expect(token1.length).toBe(64);
+    expect(token2.length).toBe(64);
   });
 
   it('should clear rate limit', () => {

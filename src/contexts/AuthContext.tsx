@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { supabaseClient } from '../supabase/client';
 import { validateEmail } from '../utils/authValidation';
-import { validatePasswordComplexity as validatePassword, checkRateLimit, recordRateLimitAttempt as recordFailedLogin, clearRateLimit as clearLoginAttempts, generateCSRFToken, verifyCSRFToken, sanitizeInput, validateSecureEmail } from '../utils/security';
+import { validatePasswordComplexity as validatePassword, checkRateLimit, recordRateLimitAttempt, clearRateLimit as clearLoginAttempts, generateCSRFToken, verifyCSRFToken, sanitizeInput, validateSecureEmail } from '../utils/security';
 import { auditService } from '../services/auditService';
 // AuthContext and hook
 export const AuthContext = createContext<any>(null);
@@ -118,36 +118,132 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [csrfTimestamp, setCsrfTimestamp] = useState<number>(0);
   const [csrfSignature, setCsrfSignature] = useState<string>('');
 
-  // Placeholder functions
+  // Session validation function
+  const validateSession = useCallback(async (): Promise<boolean> => {
+    try {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      
+      if (error || !session) {
+        console.warn('Session validation failed:', error?.message || 'No active session');
+        return false;
+      }
+
+      // Verify the token hasn't expired
+      const expiresAt = session.expires_at ? session.expires_at * 1000 : 0;
+      if (expiresAt < Date.now()) {
+        console.warn('Session expired');
+        return false;
+      }
+
+      // Verify user role is valid
+      const userRole = await getUserRoleWithCache(session.user.id);
+      if (!['admin', 'editor', 'user'].includes(userRole)) {
+        console.warn('Invalid user role:', userRole);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error validating session:', error);
+      return false;
+    }
+  }, []);
+
+  // Authentication functions
   const signInWithOAuth = async (provider: string) => { return { message: 'OAuth not implemented' } as AuthError; };
-  const signOut = async () => { setUser(null); setRole('anonymous'); return; };
+  const signOut = async () => { 
+    await supabaseClient.auth.signOut();
+    setUser(null); 
+    setRole('anonymous'); 
+    return; 
+  };
   const clearError = () => setError(null);
   const signUp = async () => { return { message: 'SignUp not implemented' } as AuthError; };
   const resetPassword = async () => { return { message: 'ResetPassword not implemented' } as AuthError; };
   const updateProfile = async () => { return; };
-  const refreshSession = async () => { return; };
-  const checkSession = async () => { return; };
+  const refreshSession = async () => { 
+    const { data, error } = await supabaseClient.auth.refreshSession();
+    if (error) throw error;
+    return data.session;
+  };
+  const checkSession = async () => {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    return session;
+  };
   const isInitialized = true;
 
-  // Update session state helper
+  // Get remembered email from localStorage
+  const getRememberedEmail = (): string => {
+    if (typeof window !== 'undefined' && localStorage.getItem('remember_me') === 'true') {
+      return localStorage.getItem('remembered_email') || '';
+    }
+    return '';
+  };
+
+  // Computed authentication status
+  const isAuthenticated = !!user;
+
+  // Update session state helper with improved error handling
   const updateSessionState = async (session: Session | null) => {
     setLoading(true);
-    if (session?.user) {
-      setUser(session.user);
-      const role = await getUserRoleWithCache(session.user.id);
-      setRole(role);
-    } else {
+    try {
+      if (session?.user) {
+        try {
+          const role = await getUserRoleWithCache(session.user.id);
+          setUser(session.user);
+          setRole(role);
+          console.log('Session state updated for user:', session.user.email, 'with role:', role);
+        } catch (error) {
+          console.error('Error getting user role:', error);
+          // If we can't get the role, still set the user but with 'user' role as fallback
+          setUser(session.user);
+          setRole('user');
+        }
+      } else {
+        console.log('No active session, setting anonymous user');
+        setUser(null);
+        setRole('anonymous');
+      }
+    } catch (error) {
+      console.error('Error updating session state:', error);
       setUser(null);
       setRole('anonymous');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Listen to auth state changes
+  // Define wrapper for failed login recording
+  const recordFailedLogin = (email: string) => {
+    // Use the same rate limit attempt function for failed login tracking
+    recordRateLimitAttempt(`login_${email}`);
+  };
+
   useEffect(() => {
+    // Fetch initial session on mount
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        if (error) {
+          console.error('Error fetching initial session:', error);
+          setLoading(false);
+          return;
+        }
+        await updateSessionState(session);
+      } catch (err) {
+        console.error('Failed to initialize auth:', err);
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    // Listen to auth state changes
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event: string, session: Session | null) => {
       updateSessionState(session);
     });
+
     return () => {
       subscription?.unsubscribe();
     };
@@ -207,7 +303,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       if (error.message.includes('invalid_credentials')) {
         errorMessage = 'Invalid email or password. Please try again.';
         recordFailedLogin(sanitizedEmail);
-        recordFailedLogin(`login_${sanitizedEmail}`);
+        recordRateLimitAttempt(`login_${sanitizedEmail}`);
       } else if (error.message.includes('user_not_found')) {
         errorMessage = 'No account found with this email. Please check your email or create a new account.';
       } else if (error.message.includes('too_many_requests')) {
@@ -221,7 +317,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
     // Clear failed login attempts on successful login
     clearLoginAttempts(sanitizedEmail);
-    clearLoginAttempts(`login_${sanitizedEmail}`);
 
     // Set remember me if enabled
     if (rememberMe && typeof window !== 'undefined') {
@@ -255,7 +350,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         updateProfile,
         refreshSession,
         checkSession,
+        validateSession, // Add validateSession to context
         isInitialized,
+        getRememberedEmail,
+        isAuthenticated,
         csrfToken,
         csrfTimestamp,
         csrfSignature,
@@ -266,4 +364,5 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   );
 };
 
+export { AuthProvider };
 export default AuthProvider;

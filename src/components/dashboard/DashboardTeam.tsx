@@ -26,7 +26,7 @@ import { motion } from 'motion/react';
 import { Plus, Search, Edit, Trash2, Mail, Upload } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useTeam } from '../../contexts/TeamContext';
@@ -326,6 +326,9 @@ export const DashboardTeam = React.memo(() => {
             <DialogTitle className="text-2xl">
               {editingMember ? 'Edit Team Member' : 'Add Team Member'}
             </DialogTitle>
+            <DialogDescription className="text-white/70">
+              {editingMember ? 'Update the team member information below.' : 'Fill in the information below to add a new team member.'}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="max-h-[60vh] overflow-y-auto">

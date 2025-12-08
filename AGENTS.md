@@ -164,6 +164,52 @@ graph TD
 - Run `pnpm supabase`
 - Run `pnpm install -g supabase`
 
+## Design Consistency
+
+To maintain a consistent look and feel across the application, follow these guidelines:
+
+### Layout & Spacing
+- Use the 8-point grid system for all spacing (8px increments)
+- Maintain consistent padding and margins using Tailwind's spacing scale
+- Use container components for content width constraints
+- Ensure responsive behavior across all breakpoints
+
+### Typography
+- Use the defined typography scale from the design system
+- Maintain consistent line heights and letter spacing
+- Follow the established hierarchy (h1-h6, body, caption, etc.)
+- Use text utilities from the design system for consistency
+
+### Colors
+- Use only the colors defined in the Tailwind theme configuration
+- Follow the semantic color naming convention (primary, secondary, success, etc.)
+- Maintain proper contrast ratios for accessibility
+- Use opacity utilities for hover/focus states
+
+### Components
+- Use Shadcn UI components as the primary component library
+- Extend existing components rather than creating new ones with similar functionality
+- Follow the established component composition patterns
+- Document any new components in Storybook
+
+### Forms
+- Use consistent form field spacing and validation states
+- Follow the established form layout patterns
+- Use form components from the design system
+- Maintain consistent error message styling and placement
+
+### Icons
+- Use Lucide icons exclusively
+- Maintain consistent icon sizing based on context
+- Use the same icon for the same action throughout the app
+- Follow the established icon button patterns
+
+### Animations
+- Use consistent animation durations and easing functions
+- Follow the established motion design system
+- Ensure animations enhance usability rather than distract
+- Respect reduced motion preferences
+
 ## Commands
 
 ### Build/Lint/Test

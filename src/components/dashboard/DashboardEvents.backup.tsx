@@ -27,7 +27,6 @@ import React, { useState } from 'react';
 import { Plus, Search, Edit, Trash2, Calendar, MapPin, Users, CheckSquare, Square, ArrowUpDown } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { formatCurrency } from '@/utils/formatting';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
@@ -44,7 +43,7 @@ import type { LandingEvent } from '@/types/content';
  * DashboardEvents component for managing event CRUD operations
  * Integrates with ContentContext mutation functions (addEvent, updateEvent, deleteEvent)
  */
-export const DashboardEvents = () => {
+const DashboardEvents = () => {
     const { events = [], addEvent, updateEvent, deleteEvent, loading, error } = useEvents();
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -78,15 +77,15 @@ export const DashboardEvents = () => {
     const sortedEvents = [...filteredEvents].sort((a, b) => {
         let aValue: any = a[sortField];
         let bValue: any = b[sortField];
-
+        
         if (sortField === 'start_date') {
             aValue = a.start_date ? new Date(a.start_date).getTime() : 0;
             bValue = b.start_date ? new Date(b.start_date).getTime() : 0;
         }
-
+        
         if (aValue === null || aValue === undefined) aValue = '';
         if (bValue === null || bValue === undefined) bValue = '';
-
+        
         if (sortDirection === 'asc') {
             return aValue > bValue ? 1 : -1;
         } else {
@@ -341,12 +340,12 @@ export const DashboardEvents = () => {
             'bg-rose-500/20 text-rose-400 border-rose-500/40',
             'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
         ];
-
+        
         // Simple hash function to get consistent colors for the same category
         const hash = category.split('').reduce((acc, char) => {
             return char.charCodeAt(0) + ((acc << 5) - acc);
         }, 0);
-
+        
         const index = Math.abs(hash) % colors.length;
         return `${colors[index]} border rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap`;
     };
@@ -420,202 +419,181 @@ export const DashboardEvents = () => {
                                 </Button>
                             </TableHead>
                             <TableHead className="w-48 px-4 py-3 text-white/90 text-sm font-semibold">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                                    onClick={() => handleSort('start_date')}
-                                >
-                                    Date & Time
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
-                                </Button>
-                            </TableHead>
-                            <TableHead className="w-48 px-4 py-3 text-white/90 text-sm font-semibold">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                                    onClick={() => handleSort('location')}
-                                >
-                                    Venue
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
-                                </Button>
-                            </TableHead>
-                            <TableHead className="w-32 px-4 py-3 text-white/90 text-sm font-semibold">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                                    onClick={() => handleSort('category')}
-                                >
-                                    Category
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
-                                </Button>
-                            </TableHead>
-                            <TableHead className="w-36 px-4 py-3 text-white/90 text-sm font-semibold">Attendance</TableHead>
-                            <TableHead className="w-28 px-4 py-3 text-white/90 text-sm font-semibold">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                                    onClick={() => handleSort('status')}
-                                >
-                                    Status
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
-                                </Button>
-                            </TableHead>
-                            <TableHead className="w-24 px-4 py-3 text-white/90 text-right text-sm font-semibold">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {paginatedEvents.map((event) => (
-                            <TableRow key={event.id} className="border-white/10 hover:bg-white/5">
-                                <TableCell className="px-4 py-3">
-                                    <Checkbox
-                                        checked={selectedEvents.has(event.id)}
-                                        onCheckedChange={(checked) => handleSelectEvent(event.id, checked as boolean)}
-                                        className="border-white/30"
-                                    />
-                                </TableCell>
-                                <TableCell className="px-4 py-3">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
-                                            {event.image_url || (event.metadata && typeof event.metadata === 'object' && 
-                                             !Array.isArray(event.metadata) && 'featured_image' in event.metadata && 
-                                             event.metadata.featured_image) ? (
-                                                <img 
-                                                    src={event.image_url || String((event.metadata as any)?.featured_image || '')} 
-                                                    alt={event.title || 'Event'} 
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => {
-                                                        // If image fails to load, show the category badge instead
-                                                        const parent = e.currentTarget.parentElement;
-                                                        if (parent) {
-                                                            parent.innerHTML = `
-                                                                <div class="w-full h-full flex items-center justify-center">
-                                                                    <div class="${getCategoryColor(event.category || '')} text-xs px-2 py-1 rounded">
-                                                                        {event.category || 'Event'}
-                                                                    </div>
-                                                                </div>
-                                                            `;
-                                                        }
-                                                    }}
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <div className={`${getCategoryColor(event.category || '')} text-xs px-2 py-1 rounded`}>
-                                                        {event.category || 'Event'}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className="text-sm font-medium text-white truncate">{event.title}</div>
-                                            <div className="text-xs text-white/60">
-                                                {event.price_range ? (
-                                                    formatCurrency(Number(event.price_range.replace(/[^0-9]/g, '')))
-                                                ) : 'TBD'}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                                onClick={() => handleSort('start_date')}
+                            >
+                                Date & Time
+                                <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                            </Button>
+                        </TableHead>
+                        <TableHead className="w-48 px-4 py-3 text-white/90 text-sm font-semibold">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                                onClick={() => handleSort('location')}
+                            >
+                                Venue
+                                <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                            </Button>
+                        </TableHead>
+                        <TableHead className="w-32 px-4 py-3 text-white/90 text-sm font-semibold">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                                onClick={() => handleSort('category')}
+                            >
+                                Category
+                                <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                            </Button>
+                        </TableHead>
+                        <TableHead className="w-36 px-4 py-3 text-white/90 text-sm font-semibold">Attendance</TableHead>
+                        <TableHead className="w-28 px-4 py-3 text-white/90 text-sm font-semibold">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                                onClick={() => handleSort('status')}
+                            >
+                                Status
+                                <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                            </Button>
+                        </TableHead>
+                        <TableHead className="w-24 px-4 py-3 text-white/90 text-right text-sm font-semibold">Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {paginatedEvents.map((event) => (
+                        <TableRow key={event.id} className="border-white/10 hover:bg-white/5">
+                            <TableCell className="px-4 py-3">
+                                <Checkbox
+                                    checked={selectedEvents.has(event.id)}
+                                    onCheckedChange={(checked) => handleSelectEvent(event.id, checked as boolean)}
+                                    className="border-white/30"
+                                />
+                            </TableCell>
+                            <TableCell className="px-4 py-3">
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
+                                        {event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata && event.metadata.featured_image ? (
+                                            <img src={String(event.metadata.featured_image)} alt={event.title || 'Event'} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-16 flex items-center justify-center">
+                                                <Badge 
+                                                    className={`${getCategoryColor(event.category || '')} hover:opacity-90 transition-opacity w-full flex justify-center`}
+                                                    title={event.category || ''}
+                                                >
+                                                    {event.category}
+                                                </Badge>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3 text-white/70">
+                                    <div className="min-w-0">
+                                        <div className="text-sm font-medium text-white truncate">{event.title}</div>
+                                        <div className="text-xs text-white/60">{event.price_range || 'TBD'}</div>
+                                    </div>
+                                </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-white/70">
+                                <div className="flex items-center space-x-2">
+                                    <Calendar className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
+                                    <div className="text-sm">
+                                        {event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                        }) : 'TBD'}
+                                        {event.start_date && (
+                                            <span className="text-white/50"> • {new Date(event.start_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-white/70">
+                                <div className="flex items-center space-x-2">
+                                    <MapPin className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
+                                    <div className="text-sm truncate">{event.location || 'TBD'}</div>
+                                </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-3">
+                                <div className="w-24">
+                                    <Badge 
+                                        className={`${getCategoryColor(event.category || '')} hover:opacity-90 transition-opacity w-full flex justify-center`}
+                                        title={event.category || ''}
+                                    >
+                                        {event.category}
+                                    </Badge>
+                                </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-white/70">
+                                <div className="flex flex-col w-full">
                                     <div className="flex items-center space-x-2">
-                                        <Calendar className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
-                                        <div className="text-sm">
-                                            {event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric',
-                                            }) : 'TBD'}
-                                            {event.start_date && (
-                                                <span className="text-white/50"> • {new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                            )}
-                                        </div>
+                                        <Users className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
+                                        <span className="text-sm">
+                                            {event.attendees || 0}/{event.capacity || '∞'}
+                                        </span>
                                     </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3 text-white/70">
-                                    <div className="flex items-center space-x-2">
-                                        <MapPin className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
-                                        <div className="text-sm truncate">{event.location || 'TBD'}</div>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3">
-                                    <div className="w-24">
-                                        <Badge
-                                            className={`${getCategoryColor(event.category || '')} hover:opacity-90 transition-opacity w-full flex justify-center`}
-                                            title={event.category || ''}
-                                        >
-                                            {event.category}
-                                        </Badge>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3 text-white/70">
-                                    <div className="flex flex-col w-full">
-                                        <div className="flex items-center space-x-2">
-                                            <Users className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
-                                            <span className="text-sm">
-                                                {event.attendees || 0}/{event.capacity || '∞'}
-                                            </span>
-                                        </div>
-                                        <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
-                                            <div
-                                                className="bg-gradient-to-r from-[#E93370] to-[#FF8A9F] h-full rounded-full"
-                                                style={{
-                                                    width: event.capacity && event.capacity > 0
-                                                        ? `${Math.min(100, Math.round(((event.attendees || 0) / event.capacity) * 100))}%`
-                                                        : '0%'
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3">
-                                    <div className="w-24">
-                                        <Badge
-                                            className={`${getStatusColor(event.status || '')} hover:opacity-90 transition-opacity w-full flex justify-center`}
-                                            title={event.status || ''}
-                                        >
-                                            {event.status}
-                                        </Badge>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3 text-right">
-                                    <div className="flex justify-end space-x-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
-                                            onClick={() => handleEdit(event)}
-                                        >
-                                            <Edit className="h-3.5 w-3.5" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 text-red-500/70 hover:text-red-500 hover:bg-red-500/10"
-                                            onClick={() => {
-                                                setDeletingEventId(event.id);
-                                                setIsDeleteDialogOpen(true);
+                                    <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
+                                        <div
+                                            className="bg-gradient-to-r from-[#E93370] to-[#FF8A9F] h-full rounded-full"
+                                            style={{
+                                                width: event.capacity && event.capacity > 0 
+                                                    ? `${Math.min(100, Math.round(((event.attendees || 0) / event.capacity) * 100))}%` 
+                                                    : '0%'
                                             }}
-                                        >
-                                            <Trash2 className="h-3.5 w-3.5" />
-                                        </Button>
+                                        />
                                     </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                                </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-3">
+                                <div className="w-24">
+                                    <Badge 
+                                        className={`${getStatusColor(event.status || '')} hover:opacity-90 transition-opacity w-full flex justify-center`}
+                                        title={event.status || ''}
+                                    >
+                                        {event.status}
+                                    </Badge>
+                                </div>
+                            </TableCell>
+                            <TableCell className="px-4 py-3 text-right">
+                                <div className="flex justify-end space-x-1">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
+                                        onClick={() => handleEdit(event)}
+                                    >
+                                        <Edit className="h-3.5 w-3.5" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-7 w-7 text-red-500/70 hover:text-red-500 hover:bg-red-500/10"
+                                        onClick={() => {
+                                            setDeletingEventId(event.id);
+                                            setIsDeleteDialogOpen(true);
+                                        }}
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
 
-                {paginatedEvents.length === 0 && (
-                    <div className="text-center py-16 text-white/60">
-                        <Calendar className="h-16 w-16 mx-auto mb-4 text-white/20" />
-                        <p className="text-lg">No events found</p>
-                        <p className="text-sm mt-2">Create your first event to get started!</p>
-                    </div>
-                )}
-            </div>
+            {paginatedEvents.length === 0 && (
+                <div className="text-center py-16 text-white/60">
+                    <Calendar className="h-16 w-16 mx-auto mb-4 text-white/20" />
+                    <p className="text-lg">No events found</p>
+                    <p className="text-sm mt-2">Create your first event to get started!</p>
+                </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -640,8 +618,8 @@ export const DashboardEvents = () => {
                                     variant={currentPage === page ? "default" : "outline"}
                                     size="sm"
                                     onClick={() => setCurrentPage(page)}
-                                    className={currentPage === page
-                                        ? "bg-[#E93370] text-white border-[#E93370]"
+                                    className={currentPage === page 
+                                        ? "bg-[#E93370] text-white border-[#E93370]" 
                                         : "border-white/10 text-white/70 hover:bg-white/10 hover:text-white"
                                     }
                                 >
@@ -704,4 +682,9 @@ export const DashboardEvents = () => {
             </Dialog>
         </div>
     );
-};
+}
+
+// Set display name
+DashboardEvents.displayName = 'DashboardEvents';
+
+export default DashboardEvents;

@@ -39,9 +39,21 @@ export const formatTime = (time: string): string => {
  * @returns Formatted currency string
  */
 export const formatCurrency = (amount: number, currency: string = 'IDR'): string => {
+  if (currency === 'IDR') {
+    // Format IDR with dots as thousand separators and no decimal places
+    const formatter = new Intl.NumberFormat('id-ID', {
+      style: 'decimal',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+    return `IDR ${formatter.format(amount).replace(/,/g, '.')}`;
+  }
+  
   const formatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(amount);
   
   // Replace non-breaking space with regular space for consistency

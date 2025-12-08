@@ -11,6 +11,12 @@ import {
   Eye,
   Clock,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
@@ -250,7 +256,7 @@ export const DashboardHome = React.memo(() => {
               <CardDescription className="text-white/60">Current state of all events</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[300px] w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -294,7 +300,7 @@ export const DashboardHome = React.memo(() => {
               <CardDescription className="text-white/60">Distribution by event type</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[300px] w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={categoryData}>
                     <XAxis
@@ -331,7 +337,7 @@ export const DashboardHome = React.memo(() => {
               <CardDescription className="text-white/60">Monthly performance overview</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[300px] w-full min-w-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={monthlyTrendData}>
                     <defs>
@@ -427,7 +433,14 @@ export const DashboardHome = React.memo(() => {
                 <span className="text-sm text-white/80">Average Attendance Rate</span>
                 <span className="text-sm text-[#E93370]">{stats.avgAttendanceRate}%</span>
               </div>
-              <Progress value={stats.avgAttendanceRate} className="h-3" />
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DialogDescription className="sr-only">
+                    Team member management dialog
+                  </DialogDescription>
+                </DialogTrigger>
+                <Progress value={stats.avgAttendanceRate} className="h-3" />
+              </Dialog>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                 {events.slice(0, 3).map((event) => {

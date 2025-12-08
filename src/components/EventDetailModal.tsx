@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Calendar, MapPin, Clock, Users, Music, Ticket, Share2, Heart, ExternalLink } from 'lucide-react';
+import { formatCurrency } from '@/utils/formatting';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -100,7 +101,11 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                 <div className="flex flex-wrap gap-4">
                   <Button className="flex-1 bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl">
                     <Ticket className="mr-2 h-5 w-5" />
-                    Get Tickets - {event.price}
+                    Get Tickets - {event.price ? formatCurrency(
+                      typeof event.price === 'string' 
+                        ? Number(event.price.replace(/[^0-9]/g, '')) 
+                        : event.price
+                    ) : 'Free'}
                   </Button>
                   <Button variant="outline" className="border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl">
                     <Heart className="h-5 w-5" />
@@ -249,7 +254,13 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                         </div>
                         <div>
                           <div className="text-white/60">Price Range</div>
-                          <div className="text-white">{event.price}</div>
+                          <div className="text-white">
+                            {event.price ? formatCurrency(
+                              typeof event.price === 'string' 
+                                ? Number(event.price.replace(/[^0-9]/g, '')) 
+                                : event.price
+                            ) : 'Free'}
+                          </div>
                         </div>
                       </div>
                     </div>

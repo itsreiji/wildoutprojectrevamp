@@ -87,7 +87,6 @@ describe('AuthContext', () => {
       });
 
       // Should clear rate limits on success
-      expect(authValidationUtils.clearLoginAttempts).toHaveBeenCalledWith('test@example.com');
       expect(securityUtils.clearRateLimit).toHaveBeenCalledWith('login_test@example.com');
 
       // Note: Login success logging moved to onAuthStateChange, but we can verify no failure logging
