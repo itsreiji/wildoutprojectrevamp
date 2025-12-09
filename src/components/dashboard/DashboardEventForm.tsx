@@ -94,6 +94,20 @@ interface DashboardEventFormProps {
 }
 
 export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCancel }: DashboardEventFormProps) {
+  const formatDateForInput = (dateString: string | null | undefined): string => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      // Ensure we have a valid date
+      if (isNaN(date.getTime())) return '';
+      // Format as YYYY-MM-DD for date input
+      return date.toISOString().split('T')[0];
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
+  };
+
   const getDefaultValues = (): EventFormValues => {
     if (!defaultValues) {
       return {
@@ -115,8 +129,8 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
     return {
       title: defaultValues.title || '',
       description: defaultValues.description || null,
-      start_date: defaultValues.start_date ? new Date(defaultValues.start_date).toISOString().substring(0, 10) : '',
-      end_date: defaultValues.end_date ? new Date(defaultValues.end_date).toISOString().substring(0, 10) : '',
+      start_date: formatDateForInput(defaultValues.start_date),
+      end_date: formatDateForInput(defaultValues.end_date),
       location: defaultValues.location || null,
       category: defaultValues.category || '',
       status: (defaultValues.status as 'upcoming' | 'ongoing' | 'completed') || 'upcoming',
@@ -154,22 +168,29 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
-        <div className="space-y-6 py-4">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+        <div className="space-y-6">
           {/* Basic Info */}
           <div className="space-y-4">
-            <h3 className="text-lg text-white/90">Basic Information</h3>
+            <h3 className="text-lg font-medium text-white/90">Basic Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Event Title *</FormLabel>
+                    <FormLabel htmlFor="title" className="text-white/80 text-sm font-medium">
+                      Event Title <span className="text-[#E93370]">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter event title" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                      <Input 
+                        id="title"
+                        placeholder="Enter event title" 
+                        {...field} 
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors" 
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
                   </FormItem>
                 )}
               />
@@ -178,11 +199,18 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category *</FormLabel>
+                    <FormLabel htmlFor="category" className="text-white/80 text-sm font-medium">
+                      Category <span className="text-[#E93370]">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Music Festival" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                      <Input 
+                        id="category"
+                        placeholder="e.g., Music Festival" 
+                        {...field} 
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
                   </FormItem>
                 )}
               />
@@ -192,76 +220,95 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
+                <FormItem className="md:col-span-2">
+                  <FormLabel htmlFor="description" className="text-white/80 text-sm font-medium">Description</FormLabel>
                   <FormControl>
                     <Textarea
+                      id="description"
                       placeholder="Enter event description"
                       {...field}
                       value={field.value ?? ''}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[100px]"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[#E93370] text-sm mt-1" />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="featured_image_file"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Featured Image</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="gallery_images_files"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Gallery Images</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => field.onChange(e.target.files)}
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="featured_image_file"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="featured_image" className="text-white/80 text-sm font-medium">Featured Image</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          id="featured_image"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
+                          className="h-11 w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors file:bg-white/5 file:border-white/10 file:text-white/80 file:hover:bg-white/10 file:hover:border-white/20 file:focus:outline-none file:focus:ring-1 file:focus:ring-[#E93370]/50 file:transition-colors file:cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-white/10 file:text-sm file:font-medium"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="gallery_images_files"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="gallery_images" className="text-white/80 text-sm font-medium">Gallery Images</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          id="gallery_images"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => field.onChange(e.target.files)}
+                          className="h-11 w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors file:bg-white/5 file:border-white/10 file:text-white/80 file:hover:bg-white/10 file:hover:border-white/20 file:focus:outline-none file:focus:ring-1 file:focus:ring-[#E93370]/50 file:transition-colors file:cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-white/10 file:text-sm file:font-medium"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
 
           {/* Date & Time */}
           <div className="space-y-4">
-            <h3 className="text-lg text-white/90">Date & Time</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <h3 className="text-lg font-medium text-white/90">Date & Time</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="start_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Date *</FormLabel>
+                    <FormLabel htmlFor="start_date" className="text-white/80 text-sm font-medium">
+                      Start Date <span className="text-[#E93370]">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} className="bg-white/5 border-white/10 text-white" />
+                      <div className="relative">
+                        <Input 
+                          type="date" 
+                          {...field}
+                          value={field.value || ''}
+                          min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
+                          className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+                        />
+                      </div>
                     </FormControl>
-                    <FormDescription className="text-white/50">
-                      Select when the event starts (in your local timezone)
+                    <FormDescription className="text-white/60 text-xs mt-1">
+                      Event start date (local timezone)
                     </FormDescription>
-                    <FormMessage />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
                   </FormItem>
                 )}
               />
@@ -270,56 +317,94 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="end_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Date *</FormLabel>
+                    <FormLabel htmlFor="end_date" className="text-white/80 text-sm font-medium">
+                      End Date <span className="text-[#E93370]">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} className="bg-white/5 border-white/10 text-white" />
+                      <div className="relative">
+                        <Input 
+                          type="date" 
+                          {...field}
+                          value={field.value || ''}
+                          min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
+                          className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+                        />
+                      </div>
                     </FormControl>
-                    <FormDescription className="text-white/50">
-                      Must be after or equal to start date
+                    <FormDescription className="text-white/60 text-xs mt-1">
+                      Event end date (local timezone)
                     </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status *</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger className="bg-white/5 border-white/10 text-white">
-                          <SelectValue placeholder="Select event status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-black/95 border-white/10 text-white">
-                        <SelectItem value="upcoming">Upcoming</SelectItem>
-                        <SelectItem value="ongoing">Ongoing</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
                   </FormItem>
                 )}
               />
             </div>
+            
+            {/* Status Field - Moved outside the grid to match other form fields */}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel htmlFor="status" className="text-white/80 text-sm font-medium">
+                    Status <span className="text-[#E93370]">*</span>
+                  </FormLabel>
+                  <div className="w-full">
+                    <Select 
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger id="status" className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:bg-white/10 hover:border-white/20 focus:ring-1 focus:ring-[#E93370]/50 focus:ring-offset-0">
+                          <SelectValue placeholder="Select status" className="capitalize" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent 
+                        className="bg-[#1a1a1a] border-white/10 min-w-[var(--radix-select-trigger-width)]"
+                        position="popper"
+                        sideOffset={4}
+                        align="start"
+                        side="bottom"
+                      >
+                        {["upcoming", "ongoing", "completed"].map((status) => (
+                          <SelectItem 
+                            key={status}
+                            value={status}
+                            className="w-full bg-[#1a1a1a] text-white/90 hover:bg-[#E93370]/10 focus:bg-[#E93370]/10 focus:text-white/90 data-[state=checked]:font-medium data-[state=checked]:text-[#E93370]"
+                          >
+                            <span className="w-full capitalize">{status}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <FormMessage className="text-[#E93370] text-sm mt-1" />
+                </FormItem>
+              )}
+            />
           </div>
 
           {/* Venue */}
           <div className="space-y-4">
-            <h3 className="text-lg text-white/90">Venue Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h3 className="text-lg font-medium text-white/90">Venue Information</h3>
+            <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Venue Name</FormLabel>
+                    <FormLabel htmlFor="location" className="text-white/80 text-sm font-medium">Venue Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter venue name" {...field} value={field.value ?? ''} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                      <Input 
+                        id="location"
+                        placeholder="Enter venue name" 
+                        {...field} 
+                        value={field.value ?? ''} 
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
                   </FormItem>
                 )}
               />
@@ -328,27 +413,28 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
 
           {/* Capacity & Pricing */}
           <div className="space-y-4">
-            <h3 className="text-lg text-white/90">Capacity & Pricing</h3>
+            <h3 className="text-lg font-medium text-white/90">Capacity & Pricing</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="capacity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Capacity</FormLabel>
+                    <FormLabel className="text-white/80 text-sm font-medium">Capacity</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
+                        min="0"
                         placeholder="e.g., 500"
                         value={field.value ?? ''}
                         onChange={(e) => {
                           const nextValue = e.target.value === '' ? null : Number(e.target.value);
                           field.onChange(nextValue);
                         }}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
                   </FormItem>
                 )}
               />
@@ -357,51 +443,71 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="price_range"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price Range</FormLabel>
+                    <FormLabel className="text-white/80 text-sm font-medium">Price Range</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., IDR 250K - 500K" {...field} value={field.value ?? ''} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                      <Input 
+                        placeholder="e.g., IDR 250K - 500K" 
+                        {...field} 
+                        value={field.value ?? ''} 
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="ticket_url"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel className="text-white/80 text-sm font-medium">Ticket URL</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="https://example.com/tickets" 
+                        {...field} 
+                        value={field.value ?? ''} 
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
                   </FormItem>
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="ticket_url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ticket URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://example.com/tickets" {...field} value={field.value ?? ''} className="bg-white/5 border-white/10 text-white placeholder:text-white/40" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
         </div>
 
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-end space-x-3 pt-4 border-t border-white/10">
           <Button
             type="button"
             variant="outline"
+            size="lg"
             onClick={() => {
               form.reset(getDefaultValues());
               onCancel?.();
             }}
             disabled={isSubmitting}
-            className="text-white/70 border-white/10 hover:bg-white/5"
+            className="h-11 px-6 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
           >
             Cancel
           </Button>
           <Button
             type="submit"
+            size="lg"
             disabled={isSubmitting}
-            className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
+            className="h-11 px-6 bg-[#E93370] hover:bg-[#E93370]/90 text-white font-medium transition-colors"
           >
-            {isSubmitting ? 'Saving...' : 'Save Changes'}
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+              </>
+            ) : 'Save Changes'}
           </Button>
         </div>
       </form>

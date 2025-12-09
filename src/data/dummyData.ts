@@ -16,12 +16,12 @@ export const DUMMY_EVENTS: Database['public']['Tables']['events']['Insert'][] = 
     category: 'Festival',
     status: 'upcoming',
     max_attendees: 2000,
-    website_url: 'https://wildout.id/events/neon-nights',
+    website_url: 'https://wildoutproject.com/events/neon-nights',
     partner_id: 'partner-001',
     partner_name: 'Red Bull',
     metadata: {
       price_range: 'IDR 250K - 500K',
-      ticket_url: 'https://wildout.id/events/neon-nights',
+      ticket_url: 'https://wildoutproject.com/events/neon-nights',
       highlights: [
         'International DJ lineup',
         '360-degree LED installations',
@@ -42,12 +42,12 @@ export const DUMMY_EVENTS: Database['public']['Tables']['events']['Insert'][] = 
     category: 'Concert',
     status: 'upcoming',
     max_attendees: 300,
-    website_url: 'https://wildout.id/events/sunset-sessions',
+    website_url: 'https://wildoutproject.com/events/sunset-sessions',
     partner_id: 'partner-002',
     partner_name: 'Spotify',
     metadata: {
       price_range: 'IDR 150K - 300K',
-      ticket_url: 'https://wildout.id/events/sunset-sessions',
+      ticket_url: 'https://wildoutproject.com/events/sunset-sessions',
       highlights: [
         'Rooftop venue with panoramic views',
         'Acoustic singer-songwriter performances',
@@ -68,12 +68,12 @@ export const DUMMY_EVENTS: Database['public']['Tables']['events']['Insert'][] = 
     category: 'Exhibition',
     status: 'ongoing',
     max_attendees: 500,
-    website_url: 'https://wildout.id/events/urban-art',
+    website_url: 'https://wildoutproject.com/events/urban-art',
     partner_id: 'partner-003',
     partner_name: 'Nike',
     metadata: {
       price_range: 'IDR 50K - 100K',
-      ticket_url: 'https://wildout.id/events/urban-art',
+      ticket_url: 'https://wildoutproject.com/events/urban-art',
       highlights: [
         'Interactive art installations',
         'Artist talks and workshops',
@@ -94,12 +94,12 @@ export const DUMMY_EVENTS: Database['public']['Tables']['events']['Insert'][] = 
     category: 'Club Night',
     status: 'upcoming',
     max_attendees: 1500,
-    website_url: 'https://wildout.id/events/bass-rebellion',
+    website_url: 'https://wildoutproject.com/events/bass-rebellion',
     partner_id: 'partner-004',
     partner_name: 'Heineken',
     metadata: {
       price_range: 'IDR 150K - 250K',
-      ticket_url: 'https://wildout.id/events/bass-rebellion',
+      ticket_url: 'https://wildoutproject.com/events/bass-rebellion',
       highlights: [
         'Underground warehouse venue',
         'Heavy bass sound system',
@@ -120,12 +120,12 @@ export const DUMMY_EVENTS: Database['public']['Tables']['events']['Insert'][] = 
     category: 'Conference',
     status: 'upcoming',
     max_attendees: 800,
-    website_url: 'https://wildout.id/events/creative-summit',
+    website_url: 'https://wildoutproject.com/events/creative-summit',
     partner_id: 'partner-005',
     partner_name: 'Google',
     metadata: {
       price_range: 'IDR 500K - 1.5M',
-      ticket_url: 'https://wildout.id/events/creative-summit',
+      ticket_url: 'https://wildoutproject.com/events/creative-summit',
       highlights: [
         'Keynote speeches from industry leaders',
         'Interactive workshops',
@@ -146,12 +146,12 @@ export const DUMMY_EVENTS: Database['public']['Tables']['events']['Insert'][] = 
     category: 'Concert',
     status: 'upcoming',
     max_attendees: 400,
-    website_url: 'https://wildout.id/events/jazz-stars',
+    website_url: 'https://wildoutproject.com/events/jazz-stars',
     partner_id: 'partner-006',
     partner_name: 'Apple Music',
     metadata: {
       price_range: 'IDR 300K - 750K',
-      ticket_url: 'https://wildout.id/events/jazz-stars',
+      ticket_url: 'https://wildoutproject.com/events/jazz-stars',
       highlights: [
         'Outdoor concert venue',
         'Premium dining options',
@@ -202,7 +202,7 @@ export const DUMMY_TEAM_MEMBERS: Database['public']['Tables']['team_members']['I
   {
     name: 'Sarah Chen',
     title: 'CEO & Founder',
-    email: 'sarah@wildout.id',
+    email: 'sarah@wildoutproject.com',
     bio: 'Visionary leader with 10+ years experience in nightlife and entertainment industry. Founded WildOut! in 2020 with a mission to create unforgettable experiences.',
     avatar_url: 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400',
     status: 'active',
@@ -212,7 +212,7 @@ export const DUMMY_TEAM_MEMBERS: Database['public']['Tables']['team_members']['I
   {
     name: 'Michael Rodriguez',
     title: 'Creative Director',
-    email: 'michael@wildout.id',
+    email: 'michael@wildoutproject.com',
     bio: 'Award-winning creative with passion for innovative event experiences. Leads our design and creative strategy across all WildOut! productions.',
     avatar_url: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400',
     status: 'active',
@@ -222,7 +222,7 @@ export const DUMMY_TEAM_MEMBERS: Database['public']['Tables']['team_members']['I
   {
     name: 'Aisha Patel',
     title: 'Marketing Director',
-    email: 'aisha@wildout.id',
+    email: 'aisha@wildoutproject.com',
     bio: 'Digital marketing strategist specializing in community engagement. Grew our social media following to 100K+ through authentic storytelling.',
     avatar_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400',
     status: 'active',
@@ -232,7 +232,7 @@ export const DUMMY_TEAM_MEMBERS: Database['public']['Tables']['team_members']['I
   {
     name: 'David Kim',
     title: 'Operations Manager',
-    email: 'david@wildout.id',
+    email: 'david@wildoutproject.com',
     bio: 'Expert in logistics and operational excellence for large-scale events. Ensures every WildOut! event runs flawlessly from planning to execution.',
     avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
     status: 'active',
@@ -242,7 +242,7 @@ export const DUMMY_TEAM_MEMBERS: Database['public']['Tables']['team_members']['I
   {
     name: 'Priya Sharma',
     title: 'Event Coordinator',
-    email: 'priya@wildout.id',
+    email: 'priya@wildoutproject.com',
     bio: 'Meticulous planner ensuring flawless event execution. Coordinates with artists, venues, and teams to deliver exceptional experiences.',
     avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400',
     status: 'active',
@@ -252,7 +252,7 @@ export const DUMMY_TEAM_MEMBERS: Database['public']['Tables']['team_members']['I
   {
     name: 'James Wilson',
     title: 'Technical Director',
-    email: 'james@wildout.id',
+    email: 'james@wildoutproject.com',
     bio: 'Audio-visual expert with cutting-edge production knowledge. Designs immersive experiences using the latest technology and lighting systems.',
     avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
     status: 'active',
@@ -262,7 +262,7 @@ export const DUMMY_TEAM_MEMBERS: Database['public']['Tables']['team_members']['I
   {
     name: 'Natasha Williams',
     title: 'Social Media Manager',
-    email: 'natasha@wildout.id',
+    email: 'natasha@wildoutproject.com',
     bio: 'Content creator building vibrant online communities. Manages our social media presence and engages with our creative audience worldwide.',
     avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
     status: 'active',
@@ -272,7 +272,7 @@ export const DUMMY_TEAM_MEMBERS: Database['public']['Tables']['team_members']['I
   {
     name: 'Alex Zhang',
     title: 'Sponsorship Manager',
-    email: 'alex@wildout.id',
+    email: 'alex@wildoutproject.com',
     bio: 'Building strategic partnerships with leading brands. Connects WildOut! with companies that share our vision for creative innovation.',
     avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
     status: 'active',

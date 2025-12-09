@@ -91,7 +91,7 @@ export const TeamSection = React.memo(() => {
         >
           <p className="text-white/60 mb-4">Want to join our amazing team?</p>
           <a
-            href="mailto:careers@wildout.id"
+            href="mailto:careers@wildoutproject.com"
             className="inline-flex items-center px-8 py-3 bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl transition-all duration-300 shadow-lg shadow-[#E93370]/20 hover:shadow-[#E93370]/40"
           >
             <Mail className="mr-2 h-5 w-5" />

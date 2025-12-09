@@ -87,7 +87,7 @@ export const RegisterPage: React.FC = () => {
                 onChange={event => setEmail(event.target.value)}
                 autoComplete="email"
                 className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
-                placeholder="you@wildout.id"
+                placeholder="you@wildoutproject.com"
                 required
               />
             </div>

@@ -72,7 +72,7 @@ export const DashboardLayout = React.memo(
 
     const displayInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
     const displayName = (user?.user_metadata && typeof user.user_metadata === 'object' && 'full_name' in user.user_metadata ? user.user_metadata.full_name : null) || (user?.email ? user.email.split('@')[0] : 'Admin User');
-    const displayEmail = user?.email || 'admin@wildout.id';
+    const displayEmail = user?.email || 'admin@wildoutproject.com';
 
     return (
       <div

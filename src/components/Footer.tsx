@@ -82,7 +82,7 @@ export const Footer = React.memo(() => {
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
                   <a href={`mailto:${settings.email ?? ''}`} className="hover:text-[#E93370] transition-colors">
-                    {settings.email ?? 'contact@wildout.id'}
+                    {settings.email ?? 'contact@wildoutproject.com'}
                   </a>
                 </div>
                 <div className="flex items-center">

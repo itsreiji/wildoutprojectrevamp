@@ -150,7 +150,34 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, []);
 
   // Authentication functions
-  const signInWithOAuth = async (provider: string) => { return { message: 'OAuth not implemented' } as AuthError; };
+  const signInWithOAuth = async (provider: OAuthProvider) => {
+    try {
+      if (provider !== 'google') {
+        return { message: 'Only Google authentication is supported' } as AuthError;
+      }
+
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) {
+        console.error('OAuth error:', error);
+        return { message: error.message || 'Authentication failed' } as AuthError;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('OAuth error:', error);
+      return { message: 'An unexpected error occurred' } as AuthError;
+    }
+  };
   const signOut = async () => { 
     await supabaseClient.auth.signOut();
     setUser(null); 

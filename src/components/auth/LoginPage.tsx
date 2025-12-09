@@ -7,7 +7,6 @@ import { SiGoogle } from 'react-icons/si';
 import { Loader2, AlertTriangle, CheckCircle2, Eye, EyeOff, Shield, Clock, User, Mail, Lock } from 'lucide-react';
 import { validateEmail, validatePasswordStrength, checkLoginRateLimit } from '../../utils/authValidation';
 import { checkRateLimit } from '../../utils/security';
-import { WCAGComplianceChecker } from './WCAGComplianceChecker';
 
 const copy = {
   title: 'Admin access',
@@ -425,16 +424,6 @@ export const LoginPage: React.FC = () => {
             )}
           </div>
 
-          {/* WCAG Compliance Checker */}
-          <WCAGComplianceChecker
-            email={email}
-            password={password}
-            emailValidation={emailValidation}
-            passwordStrength={passwordStrength}
-            rateLimitInfo={rateLimitInfo}
-            showPassword={showPassword}
-            onTogglePassword={() => setShowPassword(!showPassword)}
-          />
         </div>
       </div>
     </div>

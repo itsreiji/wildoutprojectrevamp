@@ -136,6 +136,39 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
           )}
         />
 
+        {/* Instagram Field */}
+        <FormField
+          control={form.control}
+          name="social_links.instagram"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instagram</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-gray-400">@</span>
+                  </div>
+                  <Input 
+                    type="text" 
+                    placeholder="username" 
+                    className="pl-8"
+                    value={field.value || ''}
+                    onChange={(e) => {
+                      // Remove @ symbol if user includes it
+                      const value = e.target.value.replace(/^@/, '');
+                      field.onChange(value || null);
+                    }}
+                  />
+                </div>
+              </FormControl>
+              <FormDescription>
+                Optional Instagram username (without @)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Bio Field */}
         <FormField
           control={form.control}
