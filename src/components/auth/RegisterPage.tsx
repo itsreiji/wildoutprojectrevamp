@@ -1,7 +1,32 @@
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from '../router';
 import { useAuth } from '../../contexts/AuthContext';
 import { Background3D } from '../Background3D';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../../components/ui/form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+
+const registerSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const copy = {
   title: 'Create account',
@@ -16,11 +41,17 @@ const copy = {
 export const RegisterPage: React.FC = () => {
   const { signInWithOAuth, role, loading } = useAuth();
   const { navigate, getAdminPath } = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
+
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema) as any,
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
   useEffect(() => {
     if (role === 'admin') {
@@ -28,33 +59,22 @@ export const RegisterPage: React.FC = () => {
     }
   }, [role, navigate, getAdminPath]);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const onSubmit = async (values: RegisterFormValues) => {
     setFormError(null);
     setInfoMessage(null);
 
-    if (!email || !password || !confirmPassword) {
-      setFormError('Please fill in all fields.');
-      return;
-    }
+    // Registration is handled via OAuth only in the original code? 
+    // The original code had logic for email/password but then said "Registration is handled via OAuth only" 
+    // and set error = null and then a success message.
+    // However, it also checked `if (error)` which was unreachable null.
+    // I will preserve the simulated behavior but cleaner.
 
-    if (password !== confirmPassword) {
-      setFormError('Passwords do not match.');
-      return;
-    }
+    // Simulating registration based on previous code logic
+    // The previous code explicitly had `const error = null;` and `if (error) ...`
+    // Effectively it just showed success message.
 
-    if (password.length < 6) {
-      setFormError('Password must be at least 6 characters long.');
-      return;
-    }
-
-    // Registration is handled via OAuth only
-    const error = null;
-    if (error) {
-      setFormError(error as string || 'Registration failed');
-      return;
-    }
-
+    // In a real app this would call signUpWithEmailPassword
+    // For now, mirroring previous behavior:
     setInfoMessage('Account created successfully! Please check your email to verify your account, then sign in.');
   };
 
@@ -76,78 +96,98 @@ export const RegisterPage: React.FC = () => {
             </p>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-white/90">
-                {copy.emailLabel}
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={event => setEmail(event.target.value)}
-                autoComplete="email"
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
-                placeholder="you@wildoutproject.com"
-                required
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white/90">{copy.emailLabel}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="you@wildoutproject.com"
+                        {...field}
+                        className="rounded-2xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-white/90">
-                {copy.passwordLabel}
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={event => setPassword(event.target.value)}
-                autoComplete="new-password"
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
-                placeholder="••••••••"
-                required
-                minLength={6}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white/90">{copy.passwordLabel}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                        className="rounded-2xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-white/90">
-                {copy.confirmPasswordLabel}
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={event => setConfirmPassword(event.target.value)}
-                autoComplete="new-password"
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:outline-none focus:ring-2 focus:ring-[#E93370]/20 transition-all duration-300"
-                placeholder="••••••••"
-                required
-                minLength={6}
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white/90">{copy.confirmPasswordLabel}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                        className="rounded-2xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {formError && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3">
-                <p className="text-sm text-red-300" role="alert">
-                  {formError}
-                </p>
-              </div>
-            )}
+              {formError && (
+                <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-300" />
+                  <p className="text-sm text-red-300" role="alert">
+                    {formError}
+                  </p>
+                </div>
+              )}
 
-            {infoMessage && (
-              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3">
-                <p className="text-sm text-emerald-300" role="status">
-                  {infoMessage}
-                </p>
-              </div>
-            )}
+              {infoMessage && (
+                <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                  <p className="text-sm text-emerald-300" role="status">
+                    {infoMessage}
+                  </p>
+                </div>
+              )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-2xl bg-[#E93370] hover:bg-[#E93370]/90 text-white px-6 py-4 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:cursor-wait disabled:opacity-60 backdrop-blur-xl"
-            >
-              {loading ? 'Creating account…' : copy.submit}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-2xl bg-[#E93370] hover:bg-[#E93370]/90 text-white h-auto py-4 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-xl"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  copy.submit
+                )}
+              </Button>
+            </form>
+          </Form>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -158,13 +198,14 @@ export const RegisterPage: React.FC = () => {
             </div>
           </div>
 
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={handleSignIn}
-            className="w-full rounded-2xl border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] text-white px-6 py-4 text-sm font-medium transition-all duration-300 backdrop-blur-xl"
+            className="w-full rounded-2xl border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] text-white h-auto py-4 text-sm font-medium transition-all duration-300 backdrop-blur-xl"
           >
             {copy.signIn}
-          </button>
+          </Button>
 
           <div className="pt-6 text-center">
             <p className="text-xs font-light text-white/40 tracking-wider">

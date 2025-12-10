@@ -140,6 +140,19 @@ export const DashboardTeam = React.memo(() => {
         }
       }
 
+      // Prepare social links with proper typing
+      const socialLinks: Record<string, string | null> = {
+        ...(editingMember?.metadata?.social_links || {}),
+        ...(values.social_links?.instagram ? { instagram: values.social_links.instagram } : {})
+      };
+
+      // Clean up social_links to remove null/undefined/empty values
+      Object.keys(socialLinks).forEach((key: string) => {
+        if (!socialLinks[key]) {
+          delete socialLinks[key];
+        }
+      });
+
       // Prepare team member data
       const memberData = {
         name: values.name,
@@ -147,7 +160,11 @@ export const DashboardTeam = React.memo(() => {
         email: values.email,
         bio: values.bio || null,
         avatar_url: avatarUrl || null,
-        social_links: values.social_links || {},
+        metadata: {
+          ...(editingMember?.metadata || {}),
+          social_links: Object.keys(socialLinks).length > 0 ? socialLinks : null
+        },
+        updated_at: new Date().toISOString()
       };
 
       try {
@@ -290,7 +307,7 @@ export const DashboardTeam = React.memo(() => {
                     rel="noopener noreferrer"
                     className="hover:text-[#E93370] transition-colors truncate"
                   >
-                    @{member.social_links.instagram}
+                    @{member.social_links.instagram.replace('@', '')}
                   </a>
                 </div>
               )}

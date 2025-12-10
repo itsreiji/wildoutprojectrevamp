@@ -1,24 +1,5 @@
-declare module 'npm:*' {
-  const value: any;
-  export default value;
-}
 
 declare module 'jsr:*' {
-  const value: any;
-  export default value;
-}
-
-declare module 'npm:hono' {
-  const value: any;
-  export default value;
-}
-
-declare module 'npm:hono/cors' {
-  const value: any;
-  export default value;
-}
-
-declare module 'npm:hono/logger' {
   const value: any;
   export default value;
 }
@@ -40,11 +21,32 @@ declare module '@jsr/supabase__supabase-js' {
 
 declare module 'vitest';
 
-declare const Deno: {
-  env: {
+// Deno namespace for Supabase Edge Functions
+declare namespace Deno {
+  const env: {
     get(key: string): string | undefined;
     toObject(): Record<string, string>;
   };
-  args: string[];
-};
+  const args: string[];
+  function serve<T>(
+    handler: (request: Request) => Response | Promise<Response>,
+    options?: { port?: number }
+  ): void;
+}
+
+// Extend Window interface for browser environment
+interface Window {
+  Deno?: typeof Deno;
+}
+
+// Add custom environment variables interface
+interface ImportMetaEnv {
+  readonly VITE_SUPABASE_URL: string;
+  readonly VITE_SUPABASE_ANON_KEY: string;
+  readonly VITE_APP_ENV: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
 

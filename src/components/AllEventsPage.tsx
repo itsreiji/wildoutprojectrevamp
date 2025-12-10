@@ -165,9 +165,9 @@ export const AllEventsPage = React.memo(() => {
                         </div>
                         <span className="text-sm text-[#E93370]">
                           {event.price ? formatCurrency(
-                            typeof event.price === 'string' 
-                              ? Number(event.price.replace(/[^0-9]/g, '')) 
-                              : event.price
+                            typeof event.price === 'string'
+                              ? Number((event.price as string).replace(/[^0-9]/g, ''))
+                              : Number(event.price)
                           ) : 'Free'}
                         </span>
                       </div>

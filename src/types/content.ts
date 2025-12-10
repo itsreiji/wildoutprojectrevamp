@@ -25,6 +25,18 @@ export interface Partner {
 }
 
 // TeamMember from Supabase - Custom interface to fix property names
+export interface SocialLinks {
+  instagram?: string | null;
+  twitter?: string | null;
+  linkedin?: string | null;
+  [key: string]: string | null | undefined;
+}
+
+export interface TeamMemberMetadata {
+  social_links?: SocialLinks;
+  [key: string]: any;
+}
+
 export interface TeamMember {
   id: string;
   name: string;
@@ -34,7 +46,8 @@ export interface TeamMember {
   email: string | null;
   status?: string;
   linkedin_url?: string | null;
-  social_links?: Record<string, string | null>;
+  metadata?: TeamMemberMetadata | null;
+  social_links?: SocialLinks; // For backward compatibility
   display_order?: number | null;
   created_at?: string | null;
   updated_at?: string | null;

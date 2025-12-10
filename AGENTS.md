@@ -74,6 +74,7 @@ WildOut! is a media digital nightlife and event multi-platform connecting artist
 ## Design Reference
 
 - Always Follow Git Commit ID b62b3e27dca9ccd6dd8fd58bdd6745b618e9d3f9 for reference mockup. STRICT RULE TO FOLLOW.
+- Radix UI (full implement on admin)
 - shadcnui llm.txt [text](https://ui.shadcn.com/llms.txt)
 
 ## Database Schema
@@ -220,11 +221,3 @@ To maintain a consistent look and feel across the application, follow these guid
 - **Run Single Test**: `pnpm test <filename>` - Run specific test file
 - **Test Coverage**: `pnpm test:coverage` - Generate coverage reports
 - **Watch Mode**: `pnpm test:watch` - Run tests in watch mode
-
-## Rule References
-
-- Cursor Rules: `.cursor/rules/cursor_rules.mdc`
-- Dev Workflow: `.cursor/rules/taskmaster/dev_workflow.mdc`
-- Taskmaster Commands: `.cursor/rules/taskmaster/taskmaster.mdc`
-- Self Improvement: `.cursor/rules/self_improve.mdc`
-- VS Code Rules: `.github/instructions/vscode_rules.instructions.md`

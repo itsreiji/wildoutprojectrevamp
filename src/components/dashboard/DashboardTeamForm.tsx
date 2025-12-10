@@ -74,7 +74,7 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
       title: defaultValues.title || '',
       email: defaultValues.email || '',
       bio: defaultValues.bio || '',
-      social_links: defaultValues.social_links || {},
+      social_links: (defaultValues.social_links as Record<string, string | null>) || {},
     };
   };
 
@@ -90,102 +90,118 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {/* Name Field */}
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name *</FormLabel>
-              <FormControl>
-                <Input placeholder="John Doe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Title Field */}
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title/Role *</FormLabel>
-              <FormControl>
-                <Input placeholder="CEO & Founder" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Email Field */}
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email *</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="john@example.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Instagram Field */}
-        <FormField
-          control={form.control}
-          name="social_links.instagram"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Instagram</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-400">@</span>
-                  </div>
-                  <Input 
-                    type="text" 
-                    placeholder="username" 
-                    className="pl-8"
-                    value={field.value || ''}
-                    onChange={(e) => {
-                      // Remove @ symbol if user includes it
-                      const value = e.target.value.replace(/^@/, '');
-                      field.onChange(value || null);
-                    }}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Name Field */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium">Name *</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="John Doe"
+                    className="w-full"
+                    {...field}
                   />
-                </div>
-              </FormControl>
-              <FormDescription>
-                Optional Instagram username (without @)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
 
-        {/* Bio Field */}
+          {/* Title Field */}
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium">Title/Role *</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="CEO & Founder"
+                    className="w-full"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+
+          {/* Email Field */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium">Email *</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="john@example.com"
+                    className="w-full"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+
+          {/* Instagram Field */}
+          <FormField
+            control={form.control}
+            name="social_links.instagram"
+            render={({ field }) => (
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium">Instagram</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-400">@</span>
+                    </div>
+                    <Input
+                      type="text"
+                      placeholder="username"
+                      className="pl-8 w-full"
+                      value={field.value || ''}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/^@/, '');
+                        field.onChange(value || null);
+                      }}
+                    />
+                  </div>
+                </FormControl>
+                <FormDescription className="text-xs">
+                  Optional Instagram username (without @)
+                </FormDescription>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Bio Field - Full width */}
         <FormField
           control={form.control}
           name="bio"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bio</FormLabel>
+            <FormItem className="space-y-2">
+              <FormLabel className="text-sm font-medium">Bio</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Brief biography or description"
-                  className="resize-none h-24"
+                  className="resize-none h-32 w-full"
                   {...field}
                   value={field.value || ''}
                 />
               </FormControl>
-              <FormDescription>Optional biographical information about the team member</FormDescription>
-              <FormMessage />
+              <FormDescription className="text-xs">
+                Optional biographical information about the team member
+              </FormDescription>
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -195,10 +211,10 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
           control={form.control}
           name="avatar_file"
           render={({ field: { onChange, value, ...field } }) => (
-            <FormItem>
-              <FormLabel>Avatar Image</FormLabel>
+            <FormItem className="space-y-2">
+              <FormLabel className="text-sm font-medium">Avatar Image</FormLabel>
               <FormControl>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center">
                   <Input
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
@@ -207,39 +223,53 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
                       onChange(file);
                     }}
                     disabled={isSubmitting}
+                    className="w-full"
                     {...field}
                   />
                 </div>
               </FormControl>
-              <FormDescription>
+              <FormDescription className="text-xs">
                 JPG, PNG, WebP, or GIF format. Max 10MB. {defaultValues?.avatar_url && 'Upload a new image to replace the current one.'}
               </FormDescription>
               {defaultValues?.avatar_url && (
-                <div className="mt-2 text-sm text-white/60">
+                <div className="mt-1 text-xs text-muted-foreground">
                   Current avatar: {defaultValues.avatar_url.split('/').pop()}
                 </div>
               )}
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
 
         {/* Form Actions */}
-        <div className="flex gap-2 justify-end pt-4">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-border">
           <Button
             type="button"
             variant="outline"
             onClick={onCancel}
             disabled={isSubmitting}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
+            className="bg-[#E93370] hover:bg-[#E93370]/90 text-white w-full sm:w-auto"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Saving...' : defaultValues?.id ? 'Update' : 'Add'} Team Member
+            {isSubmitting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving...
+              </>
+            ) : defaultValues?.id ? (
+              'Update Team Member'
+            ) : (
+              'Add Team Member'
+            )}
           </Button>
         </div>
       </form>

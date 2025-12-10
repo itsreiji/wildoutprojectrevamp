@@ -39,7 +39,8 @@ vi.mock('../../utils/security', () => ({
   recordRateLimitAttempt: vi.fn(),
   clearRateLimit: vi.fn(),
   generateCSRFToken: vi.fn(() => ({ token: 'test-token', timestamp: Date.now(), signature: 'sig' })),
-  verifyCSRFToken: vi.fn(() => true)
+  verifyCSRFToken: vi.fn(() => true),
+  validatePasswordComplexity: vi.fn(() => ({ isValid: true, score: 3, feedback: [] }))
 }));
 
 vi.mock('../../utils/authValidation', () => ({
@@ -146,7 +147,7 @@ describe('AuthContext', () => {
 
   describe('signInWithOAuth', () => {
     it('should handle OAuth sign in failure and log audit event', async () => {
-      const error = { message: 'popup_closed' };
+      const error = { message: 'popup was closed' };
       vi.mocked(supabaseClient.auth.signInWithOAuth).mockResolvedValue({
         data: { provider: 'google', url: 'test' } as any,
         error: error as any

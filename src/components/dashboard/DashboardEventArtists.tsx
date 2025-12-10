@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Plus, Trash2, Edit, MoreHorizontal } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import type { EventArtist } from '@/types/content';
@@ -29,14 +44,14 @@ export const DashboardEventArtists = () => {
     performance_time: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedEventId, setSelectedEventId] = useState<string>(''); // Filter by event
+  const [selectedEventId, setSelectedEventId] = useState<string>('all'); // Filter by event, default to 'all' for Select compatibility
 
   useEffect(() => {
     loadArtists();
   }, [selectedEventId]);
 
   const loadArtists = async () => {
-    if (!selectedEventId) {
+    if (!selectedEventId || selectedEventId === 'all') {
       setArtists([]);
       return;
     }
@@ -63,7 +78,7 @@ export const DashboardEventArtists = () => {
       }
       loadArtists();
       setIsDialogOpen(false);
-      setFormData({ event_id: selectedEventId, artist_name: '', role: '', performance_time: '' });
+      setFormData({ event_id: selectedEventId === 'all' ? '' : selectedEventId, artist_name: '', role: '', performance_time: '' });
       setEditingArtist(null);
     } catch (error) {
       toast.error('Failed to save artist');
@@ -99,10 +114,24 @@ export const DashboardEventArtists = () => {
     <div className="space-y-6">
       <div className="flex gap-4 items-center">
         <h2 className="text-3xl bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">Event Artists</h2>
-        <select value={selectedEventId || ''} onChange={(e) => setSelectedEventId(e.target.value || '')} className="bg-white/5 border-white/10 text-white rounded-xl px-3 py-2">
-          <option value="">All Events</option>
-          {events.map(event => <option key={event.id || ''} value={event.id || ''}>{event.title || 'Untitled Event'}</option>)}
-        </select>
+        <div className="w-[200px]">
+          <Select
+            value={selectedEventId}
+            onValueChange={(value) => setSelectedEventId(value)}
+          >
+            <SelectTrigger className="border-white/10 text-white">
+              <SelectValue placeholder="Select Event" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="cursor-pointer">All Events</SelectItem>
+              {events.map((event) => (
+                <SelectItem key={event.id} value={event.id!} className="cursor-pointer">
+                  {event.title || 'Untitled Event'}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <Button onClick={() => setIsDialogOpen(true)} className="bg-[#E93370] hover:bg-[#E93370]/90">
           <Plus className="mr-2 h-4 w-4" /> Add Artist
         </Button>
@@ -114,7 +143,7 @@ export const DashboardEventArtists = () => {
             <TableHead>Artist</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Time</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -125,8 +154,32 @@ export const DashboardEventArtists = () => {
               <TableCell>{artist.role}</TableCell>
               <TableCell>{artist.performance_time}</TableCell>
               <TableCell>
-                <Button size="sm" variant="outline" onClick={() => handleEdit(artist)} className="mr-2"><Edit className="h-4 w-4" /></Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(artist.id!)}><Trash2 className="h-4 w-4" /></Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuItem
+                      onClick={() => handleEdit(artist)}
+                      className="cursor-pointer"
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => handleDelete(artist.id!)}
+                      className="text-red-500 cursor-pointer"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}
@@ -137,10 +190,27 @@ export const DashboardEventArtists = () => {
           <DialogTitle>{editingArtist ? 'Edit Artist' : 'Add Artist'}</DialogTitle>
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <Input placeholder="Event ID" value={formData.event_id} onChange={e => setFormData({...formData, event_id: e.target.value})} />
-              <Input placeholder="Artist Name" value={formData.artist_name} onChange={e => setFormData({...formData, artist_name: e.target.value})} />
-              <Input placeholder="Role" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} />
-              <Input type="time" value={formData.performance_time} onChange={e => setFormData({...formData, performance_time: e.target.value})} />
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Event</label>
+                <Select
+                  value={formData.event_id}
+                  onValueChange={(value) => setFormData({ ...formData, event_id: value })}
+                >
+                  <SelectTrigger className="border-white/10 text-white">
+                    <SelectValue placeholder="Select an event" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {events.map((event) => (
+                      <SelectItem key={event.id} value={event.id!} className="cursor-pointer">
+                        {event.title || 'Untitled Event'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Input placeholder="Artist Name" value={formData.artist_name} onChange={e => setFormData({ ...formData, artist_name: e.target.value })} />
+              <Input placeholder="Role" value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value })} />
+              <Input type="time" value={formData.performance_time} onChange={e => setFormData({ ...formData, performance_time: e.target.value })} />
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>

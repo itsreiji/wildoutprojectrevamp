@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState } from 'react';
 import {
   LayoutDashboard,
   Calendar,
@@ -7,231 +6,278 @@ import {
   Image,
   Handshake,
   Settings,
-  Menu,
-  X,
   LogOut,
   ChevronLeft,
   Sparkles,
   Info,
 } from 'lucide-react';
-import { Button } from '../ui/button';
 import { useRouter } from '../router';
-import { Link } from '../router/Link';
 import { cn } from '../ui/utils';
 import { useStaticContent } from '../../contexts/StaticContentContext';
 import { useAuth } from '../../contexts/AuthContext';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+  SidebarInset,
+  SidebarSeparator,
+} from '@/components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-// Navigation items are now loaded from Supabase via useContent
+export const DashboardLayout = React.memo(({ children }: DashboardLayoutProps) => {
+  const { getCurrentSubPath, navigate, getAdminPath } = useRouter();
+  const { adminSections, getSectionPermissions } = useStaticContent();
+  const { user, signOut } = useAuth();
 
-export const DashboardLayout = React.memo(
-  ({ children }: DashboardLayoutProps) => {
-    const { getCurrentSubPath, navigate, getAdminPath } = useRouter();
-    const { adminSections, getSectionPermissions } = useStaticContent();
-    const { user, signOut } = useAuth();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [viewportWidth, setViewportWidth] = useState<number>(
-      typeof window !== 'undefined' ? window.innerWidth : 0
-    );
+  // Derive current page from URL path
+  const currentPage = getCurrentSubPath() || 'home';
 
-    useEffect(() => {
-      const handleResize = () => setViewportWidth(window.innerWidth);
-      handleResize();
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate(getAdminPath('login'));
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
-    const isMobile = viewportWidth < 768;
-    const isCompact = viewportWidth >= 768 && viewportWidth < 1280;
-    const showLabels = isMobile || !isCompact;
-    const sidebarWidth = isMobile ? 288 : isCompact ? 96 : 240;
+  const displayInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
+  const displayName = (user?.user_metadata && typeof user.user_metadata === 'object' && 'full_name' in user.user_metadata ? user.user_metadata.full_name : null) || (user?.email ? user.email.split('@')[0] : 'Admin User');
+  const displayEmail = user?.email || 'admin@wildoutproject.com';
 
-    useEffect(() => {
-      if (isMobile) {
-        setSidebarOpen(false);
-      } else {
-        setSidebarOpen(true);
-      }
-    }, [isMobile]);
+  const iconMap: Record<string, any> = {
+    LayoutDashboard,
+    Sparkles,
+    Info,
+    Calendar,
+    Users,
+    Image,
+    Handshake,
+    Settings,
+  };
 
-    // Derive current page from URL path
-    const currentPage = getCurrentSubPath() || 'home';
+  // Close sidebar by default on mobile
+  const [isMobile, setIsMobile] = React.useState(false);
 
-    const handleLogout = async () => {
-      try {
-        await signOut();
-        navigate(getAdminPath('login'));
-      } catch (error) {
-        console.error('Logout failed:', error);
-      }
+  // Check for mobile on mount and window resize
+  React.useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint is 768px
     };
+    
+    // Initial check
+    checkIfMobile();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIfMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
 
-    const displayInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'A';
-    const displayName = (user?.user_metadata && typeof user.user_metadata === 'object' && 'full_name' in user.user_metadata ? user.user_metadata.full_name : null) || (user?.email ? user.email.split('@')[0] : 'Admin User');
-    const displayEmail = user?.email || 'admin@wildoutproject.com';
-
-    return (
-      <div
-        className="relative min-h-screen bg-[#0a0a0a] text-white"
-        style={{ paddingLeft: isMobile ? 0 : sidebarWidth }}
+  return (
+    <SidebarProvider defaultOpen={!isMobile}>
+      <div 
+        className="relative flex h-screen w-full overflow-hidden bg-background group/sidebar-wrapper" 
+        data-sidebar-wrapper
+        data-testid="dashboard-layout"
       >
-        {/* Mobile Sidebar Backdrop */}
-        <AnimatePresence>
-          {isMobile && sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-        </AnimatePresence>
-
-        {/* Sidebar */}
-        <motion.aside
-          role="navigation"
-          aria-label="Admin sections"
-          initial={false}
-          animate={
-            isMobile ? (sidebarOpen ? { x: 0 } : { x: -sidebarWidth - 24 }) : { x: 0 }
-          }
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className={cn(
-            'fixed inset-y-0 left-0 z-40 flex flex-col bg-black/40 backdrop-blur-xl border-r border-white/10 transition-transform duration-300',
-            isMobile ? (sidebarOpen ? 'pointer-events-auto' : 'pointer-events-none') : 'pointer-events-auto'
-          )}
-          style={{ width: sidebarWidth }}
+        {/* Overlay for mobile when sidebar is open */}
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => {
+            const sidebar = document.querySelector('[data-slot="sidebar"]');
+            if (sidebar?.getAttribute('data-state') === 'expanded') {
+              const trigger = document.querySelector('[data-sidebar="trigger"]') as HTMLElement;
+              trigger?.click();
+            }
+          }}
+          style={{
+            display: isMobile ? 'block' : 'none',
+            opacity: isMobile ? 1 : 0,
+            pointerEvents: isMobile ? 'auto' : 'none',
+            transition: 'opacity 0.3s ease-in-out'
+          }}
+        />
+        <Sidebar 
+          collapsible="icon" 
+          className="fixed top-0 left-0 h-full border-r border-sidebar-border bg-card z-40 transition-all duration-300 ease-in-out" 
+          side="left"
+          style={{
+            '--sidebar-width': isMobile ? '16rem' : '16rem',
+            '--sidebar-width-icon': '3rem',
+            transform: isMobile ? 'translateX(-100%)' : 'translateX(0)',
+            ...(isMobile ? {
+              boxShadow: '2px 0 8px rgba(0,0,0,0.1)'
+            } : {})
+          } as React.CSSProperties}
         >
-          <div className="flex-1 flex flex-col">
-            {/* Logo Section */}
-            <div
-              className="border-b border-white/10 flex items-center px-4 py-6 flex-shrink-0"
-              style={{ justifyContent: 'center' }}
+          <SidebarHeader className="h-16 border-b border-sidebar-border flex items-center justify-center px-4">
+            <div 
+              className="flex items-center gap-2 font-semibold text-lg overflow-hidden transition-all duration-300 group-data-[collapsible=icon]:p-0"
+              data-testid="dashboard-logo"
             >
-              <img 
-                src={logo} 
-                alt="WildOut Logo" 
-                className="w-24 h-24 rounded-lg object-contain flex-shrink-0" 
+              <img
+                src={logo}
+                alt="WildOut Logo"
+                className="h-8 w-8 object-contain"
+                data-testid="logo-image"
               />
+              <span 
+                className="whitespace-nowrap transition-all duration-300 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0"
+                data-testid="logo-text"
+              >
+                WildOut
+              </span>
             </div>
+          </SidebarHeader>
 
-            {/* Navigation Items */}
-            <nav className="flex-1 flex flex-col gap-2 p-3 overflow-y-auto">
+          <SidebarContent className="px-2 py-4 overflow-y-auto">
+            <SidebarMenu>
               {adminSections
                 .filter((section) => getSectionPermissions(section.slug).canView)
                 .sort((a, b) => a.order_index - b.order_index)
                 .map((section) => {
-                  const iconMap: Record<string, any> = {
-                    LayoutDashboard,
-                    Sparkles,
-                    Info,
-                    Calendar,
-                    Users,
-                    Image,
-                    Handshake,
-                    Settings,
-                  };
                   const Icon = iconMap[section.icon] || LayoutDashboard;
                   const isActive = currentPage === section.slug;
 
                   return (
-                    <button
-                      key={section.id}
-                      onClick={() => {
-                        navigate(getAdminPath(section.slug));
-                        if (isMobile) setSidebarOpen(false);
-                      }}
-                      className={cn(
-                        'group flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-300',
-                        showLabels ? 'justify-start' : 'justify-center',
-                        isActive
-                          ? 'bg-[#E93370]/20 text-[#E93370]'
-                          : 'text-white/70 hover:bg-white/10 hover:text-white'
-                      )}
-                    >
-                      <Icon className="w-5 h-5 flex-shrink-0" />
-                      {showLabels && <span className="truncate text-sm font-medium">{section.label}</span>}
-                    </button>
+                    <SidebarMenuItem key={section.id}>
+                      <SidebarMenuButton
+                        asChild={false}
+                        isActive={isActive}
+                        onClick={() => navigate(getAdminPath(section.slug))}
+                        data-testid={`nav-${section.slug}`}
+                        data-active={isActive}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Icon className={cn("h-4 w-4 transition-colors duration-300", isActive && "text-sidebar-primary")} data-testid={`nav-icon-${section.slug}`} />
+                          <span className="text-sm transition-colors duration-300">{section.label}</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
                   );
                 })}
-            </nav>
+            </SidebarMenu>
+          </SidebarContent>
 
-            {/* Footer Actions */}
-            <div className="p-3 border-t border-white/10 space-y-2 flex-shrink-0">
-              <button
-                onClick={() => navigate('/')}
-                className={cn(
-                  'w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-300 text-white/70 hover:bg-white/10 hover:text-white',
-                  showLabels ? 'justify-start' : 'justify-center'
-                )}
-              >
-                <ChevronLeft className="w-5 h-5 flex-shrink-0" />
-                {showLabels && <span className="truncate text-sm font-medium">Back to Site</span>}
-              </button>
-              <button
-                onClick={handleLogout}
-                className={cn(
-                  'w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-300 text-white/70 hover:bg-[#E93370]/10 hover:text-[#E93370]',
-                  showLabels ? 'justify-start' : 'justify-center'
-                )}
-              >
-                <LogOut className="w-5 h-5 flex-shrink-0" />
-                {showLabels && <span className="truncate text-sm font-medium">Logout</span>}
-              </button>
-            </div>
-          </div>
-        </motion.aside>
-
-        {/* Main Content */}
-        <div className="min-h-screen flex flex-col">
-          {/* Top Bar */}
-          <header className="sticky top-0 z-20 bg-black/40 backdrop-blur-xl border-b border-white/10 flex-shrink-0">
-            <div className="flex items-center justify-between px-6 py-4">
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setSidebarOpen(true)}
-                  className={cn('w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white', 
-                    isMobile ? 'flex' : 'hidden'
-                  )}
+          <SidebarFooter className="border-t border-sidebar-border p-2 mt-auto">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild={false}
+                  onClick={() => navigate('/')}
+                  data-testid="back-to-site-button"
                 >
-                  <Menu className="h-5 w-5" />
-                </button>
-                <div>
-                  <h2 className="text-lg font-semibold">
-                    {adminSections.find((item) => item.slug === currentPage)?.label || 'Dashboard'}
-                  </h2>
-                  <p className="text-xs text-white/60">Manage your content</p>
-                </div>
-              </div>
+                  <div className="flex items-center gap-2">
+                    <ChevronLeft className="h-4 w-4" />
+                    <span className="text-sm">Back to Site</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
 
-              <div className="flex items-center space-x-3">
-                <div className={cn(
-                  'flex items-center space-x-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10',
-                  isMobile ? 'hidden' : 'flex'
-                )}>
-                  <div className="w-8 h-8 rounded-full bg-[#E93370] flex items-center justify-center text-xs font-semibold">
-                    {displayInitial}
-                  </div>
-                  <div className="text-sm">
-                    <div className="text-white">{String(displayName)}</div>
-                    <div className="text-white/60 text-xs">{displayEmail}</div>
-                  </div>
-                </div>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton
+                      asChild={false}
+                      size="lg"
+                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-full"
+                      data-testid="user-menu-button"
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <Avatar className="h-8 w-8 rounded-lg" data-testid="user-avatar">
+                          <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground" data-testid="user-avatar-fallback">
+                            {displayInitial}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-medium text-sidebar-foreground" data-testid="user-name">{displayName}</span>
+                          <span className="truncate text-xs text-sidebar-foreground/60" data-testid="user-email">{displayEmail}</span>
+                        </div>
+                      </div>
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg bg-sidebar border-sidebar-border text-sidebar-foreground"
+                    side="top"
+                    align="start"
+                    sideOffset={4}
+                  >
+                    <div className="flex items-center gap-4 px-4" data-testid="user-profile">
+                      <Avatar className="h-8 w-8" data-testid="user-avatar">
+                        <AvatarFallback data-testid="user-avatar-fallback">{displayInitial}</AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-medium text-sidebar-foreground" data-testid="user-name">{displayName}</span>
+                        <span className="truncate text-xs text-sidebar-foreground/60" data-testid="user-email">{displayEmail}</span>
+                      </div>
+                    </div>
+                    <Separator className="bg-sidebar-border my-1" />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10 focus:text-destructive flex items-center gap-2"
+                      data-testid="logout-button"
+                    >
+                      <LogOut className="h-4 w-4" data-testid="logout-icon" />
+                      <span data-testid="logout-label">Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+          <SidebarRail />
+          <SidebarRail />
+        </Sidebar>
+
+        <div 
+          className="relative flex-1 flex flex-col h-full min-w-0 transition-all duration-300 ease-in-out ml-0 md:ml-[var(--sidebar-width)] group-data-[collapsible=icon]/sidebar-wrapper:ml-0 md:group-data-[collapsible=icon]/sidebar-wrapper:ml-[var(--sidebar-width-icon)]"
+          style={{
+            marginLeft: isMobile ? 0 : undefined,
+            width: isMobile ? '100%' : undefined,
+          }}
+        >
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card/95 backdrop-blur-sm sticky top-0 z-20 w-full px-4 md:px-6">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 h-4 bg-border" />
+              <div className="flex flex-col">
+                <h1 className="text-sm font-medium leading-none text-foreground">
+                  {adminSections.find((item) => item.slug === currentPage)?.label || 'Dashboard'}
+                </h1>
               </div>
             </div>
           </header>
-
-          {/* Page Content */}
-          <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+          
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-background relative z-10">
+            <div className="w-full max-w-[1600px] mx-auto">
+              {children}
+            </div>
+          </main>
         </div>
       </div>
-    );
-  }
-);
+    </SidebarProvider>
+  );
+});
 
 DashboardLayout.displayName = 'DashboardLayout';

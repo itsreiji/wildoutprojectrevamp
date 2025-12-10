@@ -4,12 +4,27 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { loading, role, user, isAuthenticated, validateSession } = useAuth();
-  const { navigate } = useRouter();
+  const { navigate, currentPath } = useRouter();
   const [isValidating, setIsValidating] = useState(true);
   const [sessionValid, setSessionValid] = useState<boolean | null>(null);
   const [hasCheckedSession, setHasCheckedSession] = useState(false);
   const hasRedirectedRef = useRef(false);
   const lastCheckRef = useRef<number>(0);
+  
+  // Debug: Log current path and auth state
+  useEffect(() => {
+    console.log('🔄 AdminGuard mounted or updated', {
+      currentPath,
+      loading,
+      isAuthenticated,
+      role,
+      user: user ? { email: user.email, id: user.id } : null,
+      isValidating,
+      sessionValid,
+      hasCheckedSession,
+      hasRedirected: hasRedirectedRef.current
+    });
+  }, [currentPath, loading, isAuthenticated, role, user, isValidating, sessionValid, hasCheckedSession]);
 
   // Validate session on mount and when auth state changes
   useEffect(() => {
@@ -23,12 +38,14 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
       lastCheckRef.current = now;
 
       console.log('🔍 AdminGuard - checkSession', { 
+        currentPath,
         loading, 
         isAuthenticated, 
-        user: user?.email,
+        user: user ? { email: user.email, id: user.id } : null,
         role,
         sessionValid,
-        hasCheckedSession
+        hasCheckedSession,
+        hasRedirected: hasRedirectedRef.current
       });
 
       if (loading) {
@@ -117,13 +134,15 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
   // Handle redirects based on auth state
   useEffect(() => {
     console.log('🔄 AdminGuard - Redirect check:', { 
+      currentPath,
       loading, 
       isValidating, 
       sessionValid, 
       isAuthenticated, 
       role, 
       hasCheckedSession,
-      hasRedirected: hasRedirectedRef.current
+      hasRedirected: hasRedirectedRef.current,
+      user: user ? { email: user.email, id: user.id } : null
     });
 
     if (loading || isValidating || sessionValid === null || !hasCheckedSession) {
@@ -139,12 +158,23 @@ export const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }
 
     // Handle unauthorized access
     if (sessionValid === false || !isAuthenticated || !user) {
-      console.log('🔐 Unauthorized access detected, redirecting to login');
-      hasRedirectedRef.current = true;
-      const redirectPath = window.location.pathname + window.location.search;
-      const loginPath = `${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login?redirect=${encodeURIComponent(redirectPath)}`;
-      console.log('↪️ Redirecting to:', loginPath);
-      navigate(loginPath);
+      console.log('🔐 Unauthorized access detected, redirecting to login', {
+        sessionValid,
+        isAuthenticated,
+        user: user ? { email: user.email, id: user.id } : null,
+        currentPath,
+        hasRedirected: hasRedirectedRef.current
+      });
+      
+      if (!hasRedirectedRef.current) {
+        hasRedirectedRef.current = true;
+        const redirectPath = window.location.pathname + window.location.search;
+        const loginPath = `${import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin'}/login?redirect=${encodeURIComponent(redirectPath)}`;
+        console.log('↪️ Redirecting to:', loginPath);
+        navigate(loginPath);
+      } else {
+        console.log('⚠️ Already redirected, preventing infinite loop');
+      }
       return;
     }
 

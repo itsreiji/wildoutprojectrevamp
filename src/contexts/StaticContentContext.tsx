@@ -3,7 +3,6 @@ import { supabaseClient } from '../supabase/client';
 import { useAuth } from './AuthContext';
 import type { AuthRole } from './AuthContext';
 import type { TablesInsert, TablesUpdate, Json } from '../supabase/types';
-import { DUMMY_GALLERY_ITEMS } from '../data/dummyData';
 import { cleanupGalleryAsset } from '../utils/storageHelpers';
 import type {
   HeroContent,
@@ -101,8 +100,6 @@ interface StaticContentContextType {
   loading: boolean;
   adminSectionsLoading: boolean;
   error: string | null;
-  useDummyData: boolean;
-  setUseDummyData: React.Dispatch<React.SetStateAction<boolean>>;
   updateHero: React.Dispatch<React.SetStateAction<HeroContent>>;
   updateAbout: React.Dispatch<React.SetStateAction<AboutContent>>;
   updateSettings: React.Dispatch<React.SetStateAction<SiteSettings>>;
@@ -121,9 +118,8 @@ interface StaticContentContextType {
 
 const StaticContentContext = createContext<StaticContentContextType | undefined>(undefined);
 
-export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData?: boolean }> = ({
-  children,
-  useDummyData: initialUseDummyData = false
+export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
+  children
 }) => {
   const authContext = useAuth();
   const user = authContext.user;
@@ -138,7 +134,6 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
   const [loading, setLoading] = useState(true);
   const [adminSectionsLoading, setAdminSectionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [useDummyData, setUseDummyData] = useState<boolean>(initialUseDummyData);
 
   const fetchHeroContent = async (): Promise<HeroContent> => {
     try {
@@ -263,41 +258,16 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
       setLoading(true);
       setError(null);
 
-      if (useDummyData) {
-        setHero(INITIAL_HERO);
-        setAbout(INITIAL_ABOUT);
-        setSettings(INITIAL_SETTINGS);
-        setGallery(
-          DUMMY_GALLERY_ITEMS.map(g => {
-            const imageUrls = ensureStringArray((g as any).image_urls) ?? [];
-            return {
-              id: g.id || `gallery-${Date.now()}-${Math.random()}`,
-              title: g.title || '',
-              description: g.description ?? null,
-              category: (g.category ?? '') as string,
-              status: g.status ?? 'published',
-              tags: Array.isArray(g.tags) ? g.tags.filter((tag): tag is string => typeof tag === 'string') : [],
-              image_url: imageUrls[0] || '',
-              display_order: g.display_order ?? null,
-              event_id: g.event_id ?? null,
-              metadata: (g.metadata ?? {}) as any,
-              created_at: g.created_at ?? new Date().toISOString(),
-              updated_at: g.updated_at ?? new Date().toISOString(),
-            } as GalleryImage;
-          })
-        );
-      } else {
-        const [heroData, aboutData, settingsData, galleryData] = await Promise.all([
-          fetchHeroContent(),
-          fetchAboutContent(),
-          fetchSiteSettings(),
-          fetchGallery()
-        ]);
-        setHero(heroData);
-        setAbout(aboutData);
-        setSettings(settingsData);
-        setGallery(galleryData);
-      }
+      const [heroData, aboutData, settingsData, galleryData] = await Promise.all([
+        fetchHeroContent(),
+        fetchAboutContent(),
+        fetchSiteSettings(),
+        fetchGallery()
+      ]);
+      setHero(heroData);
+      setAbout(aboutData);
+      setSettings(settingsData);
+      setGallery(galleryData);
     } catch (err) {
       console.error('Error loading static content:', err);
       setError('Failed to load static content');
@@ -308,7 +278,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
 
   useEffect(() => {
     loadStaticContent();
-  }, [useDummyData]);
+  }, []);
 
   // Load admin sections
   useEffect(() => {
@@ -714,8 +684,6 @@ export const StaticContentProvider: React.FC<{ children: ReactNode; useDummyData
     loading,
     adminSectionsLoading,
     error,
-    useDummyData,
-    setUseDummyData,
     updateHero: setHero,
     updateAbout: setAbout,
     updateSettings: setSettings,

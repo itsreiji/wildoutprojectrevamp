@@ -21,7 +21,7 @@ const SPAN_PATTERNS = [
 
 export const GallerySection = React.memo(() => {
   const { gallery, events } = useContent();
-  const [selectedEventId, setSelectedEventId] = useState<string>('');
+  const [selectedEventId, setSelectedEventId] = useState<string>('all');
 
   const filteredGallery = useMemo(() => {
     if (selectedEventId === 'all') return gallery;
@@ -84,7 +84,7 @@ export const GallerySection = React.memo(() => {
                   alt={image.title || image.description || 'Gallery image'}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                
+
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-4 left-4 right-4">

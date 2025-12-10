@@ -134,13 +134,21 @@ export const DashboardHome = React.memo(() => {
   const COLORS = ['#E93370', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="dashboard-home">
       {/* Header */}
-      <div>
-        <h2 className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
+      <div data-testid="dashboard-header">
+        <h2 
+          className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent"
+          data-testid="dashboard-title"
+        >
           Dashboard Overview
         </h2>
-        <p className="text-white/60">Welcome back! Here's what's happening with your platform</p>
+        <p 
+          className="text-white/60"
+          data-testid="dashboard-subtitle"
+        >
+          Welcome back! Here's what's happening with your events.
+        </p>
       </div>
 
       {/* Key Stats Cards */}
@@ -149,22 +157,18 @@ export const DashboardHome = React.memo(() => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          data-testid="total-events-card"
         >
-          <Card className="bg-gradient-to-br from-[#E93370]/20 to-transparent backdrop-blur-xl border-[#E93370]/30 hover:border-[#E93370]/50 transition-all">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/60 mb-1">Total Events</p>
-                  <h3 className="text-3xl text-white">{stats.totalEvents}</h3>
-                  <div className="flex items-center mt-2 text-xs text-green-400">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    <span>{stats.upcomingEvents} upcoming</span>
-                  </div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-[#E93370]/20 flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-[#E93370]" />
-                </div>
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 hover:border-[#E93370]/30 transition-all duration-300 h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-white/80" data-testid="total-events-title">Total Events</CardTitle>
+              <div className="h-4 w-4 text-[#E93370]" data-testid="total-events-icon">
+                <Calendar className="h-4 w-4" />
               </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white" data-testid="total-events-count">{stats.totalEvents}</div>
+              <p className="text-xs text-white/60" data-testid="total-events-description">All-time events created</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -173,22 +177,18 @@ export const DashboardHome = React.memo(() => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
+          data-testid="team-members-card"
         >
-          <Card className="bg-gradient-to-br from-blue-500/20 to-transparent backdrop-blur-xl border-blue-500/30 hover:border-blue-500/50 transition-all">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/60 mb-1">Team Members</p>
-                  <h3 className="text-3xl text-white">{stats.totalTeamMembers}</h3>
-                  <div className="flex items-center mt-2 text-xs text-blue-400">
-                    <Activity className="h-3 w-3 mr-1" />
-                    <span>{stats.activeTeamMembers} active</span>
-                  </div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-blue-400" />
-                </div>
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 hover:border-[#3B82F6]/30 transition-all duration-300 h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-white/80" data-testid="team-members-title">Team Members</CardTitle>
+              <div className="h-4 w-4 text-[#3B82F6]" data-testid="team-members-icon">
+                <Users className="h-4 w-4" />
               </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white" data-testid="team-members-count">{stats.totalTeamMembers}</div>
+              <p className="text-xs text-white/60" data-testid="team-members-description">Total team members</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -197,22 +197,18 @@ export const DashboardHome = React.memo(() => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
+          data-testid="gallery-photos-card"
         >
-          <Card className="bg-gradient-to-br from-purple-500/20 to-transparent backdrop-blur-xl border-purple-500/30 hover:border-purple-500/50 transition-all">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/60 mb-1">Gallery Photos</p>
-                  <h3 className="text-3xl text-white">{stats.totalGalleryImages}</h3>
-                  <div className="flex items-center mt-2 text-xs text-purple-400">
-                    <Eye className="h-3 w-3 mr-1" />
-                    <span>Public collection</span>
-                  </div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                  <Image className="h-6 w-6 text-purple-400" />
-                </div>
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 hover:border-[#10B981]/30 transition-all duration-300 h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-white/80" data-testid="gallery-photos-title">Gallery Photos</CardTitle>
+              <div className="h-4 w-4 text-[#10B981]" data-testid="gallery-photos-icon">
+                <Image className="h-4 w-4" />
               </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white" data-testid="gallery-photos-count">{stats.totalGalleryImages}</div>
+              <p className="text-xs text-white/60" data-testid="gallery-photos-description">Total gallery photos</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -221,22 +217,18 @@ export const DashboardHome = React.memo(() => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
+          data-testid="partners-card"
         >
-          <Card className="bg-gradient-to-br from-green-500/20 to-transparent backdrop-blur-xl border-green-500/30 hover:border-green-500/50 transition-all">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/60 mb-1">Partners</p>
-                  <h3 className="text-3xl text-white">{stats.totalPartners}</h3>
-                  <div className="flex items-center mt-2 text-xs text-green-400">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    <span>{stats.activePartners} active</span>
-                  </div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-                  <Handshake className="h-6 w-6 text-green-400" />
-                </div>
+          <Card className="bg-white/5 backdrop-blur-xl border-white/10 hover:border-[#8B5CF6]/30 transition-all duration-300 h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-white/80" data-testid="partners-title">Partners</CardTitle>
+              <div className="h-4 w-4 text-[#8B5CF6]" data-testid="partners-icon">
+                <Handshake className="h-4 w-4" />
               </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-white" data-testid="partners-count">{stats.totalPartners}</div>
+              <p className="text-xs text-white/60" data-testid="partners-description">Total partners</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -249,11 +241,12 @@ export const DashboardHome = React.memo(() => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.4 }}
+          data-testid="event-status-distribution-chart"
         >
           <Card className="bg-white/5 backdrop-blur-xl border-white/10">
             <CardHeader>
-              <CardTitle className="text-white">Event Status Distribution</CardTitle>
-              <CardDescription className="text-white/60">Current state of all events</CardDescription>
+              <CardTitle className="text-white" data-testid="event-status-distribution-title">Event Status Distribution</CardTitle>
+              <CardDescription className="text-white/60" data-testid="event-status-distribution-description">Current state of all events</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px] w-full min-w-0">

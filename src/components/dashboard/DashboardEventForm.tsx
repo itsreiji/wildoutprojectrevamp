@@ -63,7 +63,19 @@ const eventFormSchema = z.object({
     'End date must be a valid date'
   ),
   location: z.string().optional().nullable(),
-  category: z.string().min(1, 'Category is required'),
+  category: z.enum([
+    'music',
+    'sports',
+    'arts',
+    'food',
+    'community',
+    'other',
+    'festival',
+    'concert',
+    'exhibition',
+    'club',
+    'conference',
+  ]),
   status: z.enum(['upcoming', 'ongoing', 'completed']),
   capacity: z
     .union([z.number().min(0, 'Capacity must be 0 or greater'), z.null()])
@@ -116,7 +128,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
         start_date: '',
         end_date: '',
         location: null,
-        category: '',
+        category: undefined as any, // Cast to any to allow undefined initially for required field
         status: 'upcoming',
         capacity: null,
         price_range: null,
@@ -132,7 +144,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
       start_date: formatDateForInput(defaultValues.start_date),
       end_date: formatDateForInput(defaultValues.end_date),
       location: defaultValues.location || null,
-      category: defaultValues.category || '',
+      category: (defaultValues.category || undefined) as any,
       status: (defaultValues.status as 'upcoming' | 'ongoing' | 'completed') || 'upcoming',
       capacity: defaultValues.capacity ?? null,
       price_range: defaultValues.price_range || null,
@@ -173,7 +185,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
           {/* Basic Info */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-white/90">Basic Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
               <FormField
                 control={form.control}
                 name="title"
@@ -183,11 +195,11 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                       Event Title <span className="text-[#E93370]">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input 
+                      <Input
                         id="title"
-                        placeholder="Enter event title" 
-                        {...field} 
-                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors" 
+                        placeholder="Enter event title"
+                        {...field}
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
                       />
                     </FormControl>
                     <FormMessage className="text-[#E93370] text-sm mt-1" />
@@ -202,14 +214,26 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                     <FormLabel htmlFor="category" className="text-white/80 text-sm font-medium">
                       Category <span className="text-[#E93370]">*</span>
                     </FormLabel>
-                    <FormControl>
-                      <Input 
-                        id="category"
-                        placeholder="e.g., Music Festival" 
-                        {...field} 
-                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
-                      />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger id="category" className="h-11 w-full relative z-10">
+                          <SelectValue placeholder="Select a category" className="capitalize" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent position="popper" className="z-50">
+                        <SelectItem value="music">Music</SelectItem>
+                        <SelectItem value="sports">Sports</SelectItem>
+                        <SelectItem value="arts">Arts</SelectItem>
+                        <SelectItem value="food">Food</SelectItem>
+                        <SelectItem value="community">Community</SelectItem>
+                        <SelectItem value="festival">Festival</SelectItem>
+                        <SelectItem value="concert">Concert</SelectItem>
+                        <SelectItem value="exhibition">Exhibition</SelectItem>
+                        <SelectItem value="club">Club</SelectItem>
+                        <SelectItem value="conference">Conference</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage className="text-[#E93370] text-sm mt-1" />
                   </FormItem>
                 )}
@@ -243,7 +267,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                   <FormItem>
                     <FormLabel htmlFor="featured_image" className="text-white/80 text-sm font-medium">Featured Image</FormLabel>
                     <FormControl>
-                      <div className="relative">
+                      <div className="relative z-0">
                         <Input
                           id="featured_image"
                           type="file"
@@ -296,8 +320,8 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input 
-                          type="date" 
+                        <Input
+                          type="date"
                           {...field}
                           value={field.value || ''}
                           min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
@@ -322,8 +346,8 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input 
-                          type="date" 
+                        <Input
+                          type="date"
                           {...field}
                           value={field.value || ''}
                           min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
@@ -339,7 +363,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 )}
               />
             </div>
-            
+
             {/* Status Field - Moved outside the grid to match other form fields */}
             <FormField
               control={form.control}
@@ -350,28 +374,21 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                     Status <span className="text-[#E93370]">*</span>
                   </FormLabel>
                   <div className="w-full">
-                    <Select 
+                    <Select
                       value={field.value}
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger id="status" className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:bg-white/10 hover:border-white/20 focus:ring-1 focus:ring-[#E93370]/50 focus:ring-offset-0">
+                        <SelectTrigger id="status" className="h-11 w-full">
                           <SelectValue placeholder="Select status" className="capitalize" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent 
-                        className="bg-[#1a1a1a] border-white/10 min-w-[var(--radix-select-trigger-width)]"
-                        position="popper"
-                        sideOffset={4}
-                        align="start"
-                        side="bottom"
-                      >
+                      <SelectContent position="popper">
                         {["upcoming", "ongoing", "completed"].map((status) => (
-                          <SelectItem 
+                          <SelectItem
                             key={status}
                             value={status}
-                            className="w-full bg-[#1a1a1a] text-white/90 hover:bg-[#E93370]/10 focus:bg-[#E93370]/10 focus:text-white/90 data-[state=checked]:font-medium data-[state=checked]:text-[#E93370]"
                           >
                             <span className="w-full capitalize">{status}</span>
                           </SelectItem>
@@ -396,11 +413,11 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                   <FormItem>
                     <FormLabel htmlFor="location" className="text-white/80 text-sm font-medium">Venue Name</FormLabel>
                     <FormControl>
-                      <Input 
+                      <Input
                         id="location"
-                        placeholder="Enter venue name" 
-                        {...field} 
-                        value={field.value ?? ''} 
+                        placeholder="Enter venue name"
+                        {...field}
+                        value={field.value ?? ''}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
                       />
                     </FormControl>
@@ -445,10 +462,10 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                   <FormItem>
                     <FormLabel className="text-white/80 text-sm font-medium">Price Range</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="e.g., IDR 250K - 500K" 
-                        {...field} 
-                        value={field.value ?? ''} 
+                      <Input
+                        placeholder="e.g., IDR 250K - 500K"
+                        {...field}
+                        value={field.value ?? ''}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
                       />
                     </FormControl>
@@ -463,10 +480,10 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                   <FormItem className="md:col-span-2">
                     <FormLabel className="text-white/80 text-sm font-medium">Ticket URL</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="https://example.com/tickets" 
-                        {...field} 
-                        value={field.value ?? ''} 
+                      <Input
+                        placeholder="https://example.com/tickets"
+                        {...field}
+                        value={field.value ?? ''}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
                       />
                     </FormControl>

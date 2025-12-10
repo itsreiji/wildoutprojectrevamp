@@ -24,13 +24,21 @@
  */
 
 import React, { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Calendar, MapPin, Users, CheckSquare, Square, ArrowUpDown } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Calendar, MapPin, Users, CheckSquare, Square, ArrowUpDown, MoreHorizontal } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { formatCurrency } from '@/utils/formatting';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 import { useEvents } from '../../contexts/EventsContext';
 import { toast } from 'sonner';
 import { DashboardEventForm, EventFormValues } from './DashboardEventForm';
@@ -276,13 +284,13 @@ export const DashboardEvents = () => {
                 location: values.location || null,
                 category: values.category,
                 status: values.status,
-                capacity: values.capacity ?? null,
-                price_range: values.price_range || null,
-                ticket_url: values.ticket_url || null,
+                max_attendees: values.capacity ?? null,
                 metadata: {
                     ...(editingEvent?.metadata && typeof editingEvent.metadata === 'object' && !Array.isArray(editingEvent.metadata) ? editingEvent.metadata : {}),
                     featured_image: featuredImageUrl,
                     gallery_images: galleryImageUrls,
+                    price_range: values.price_range || null,
+                    ticket_url: values.ticket_url || null,
                 },
             };
 
@@ -291,7 +299,7 @@ export const DashboardEvents = () => {
                     await updateEvent(editingEvent.id, eventData);
                     toast.success('Event updated successfully!');
                 } else {
-                    await addEvent(eventData as any);
+                    await addEvent(eventData);
                     toast.success('Event created successfully!');
                 }
                 setIsDialogOpen(false);
@@ -366,7 +374,7 @@ export const DashboardEvents = () => {
                         <Button
                             onClick={handleBulkDelete}
                             disabled={isDeleting}
-                            className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-600/20"
+                            className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
                         >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete {selectedEvents.size} {selectedEvents.size === 1 ? 'Event' : 'Events'}
@@ -399,12 +407,12 @@ export const DashboardEvents = () => {
                 <Table>
                     <TableHeader>
                         <TableRow className="border-white/10 hover:bg-white/5">
-                            <TableHead className="w-16 px-4 py-3 text-white/90 text-sm font-semibold">
-                                <div className="flex items-center">
+                            <TableHead className="w-16 py-3 pl-5 pr-0">
+                                <div className="flex items-center justify-start w-4">
                                     <Checkbox
                                         checked={paginatedEvents.length > 0 && selectedEvents.size === paginatedEvents.length}
                                         onCheckedChange={handleSelectAll}
-                                        className="border-white/30 h-4 w-4"
+                                        className="border-white/30 h-4 w-4 flex-shrink-0"
                                     />
                                 </div>
                             </TableHead>
@@ -470,22 +478,24 @@ export const DashboardEvents = () => {
                     <TableBody>
                         {paginatedEvents.map((event) => (
                             <TableRow key={event.id} className="border-white/10 hover:bg-white/5">
-                                <TableCell className="px-4 py-3">
-                                    <Checkbox
-                                        checked={selectedEvents.has(event.id)}
-                                        onCheckedChange={(checked) => handleSelectEvent(event.id, checked as boolean)}
-                                        className="border-white/30"
-                                    />
+                                <TableCell className="py-3 pl-5 pr-0">
+                                    <div className="flex items-center justify-start w-4">
+                                        <Checkbox
+                                            checked={selectedEvents.has(event.id)}
+                                            onCheckedChange={(checked) => handleSelectEvent(event.id, checked as boolean)}
+                                            className="border-white/30 h-4 w-4 flex-shrink-0"
+                                        />
+                                    </div>
                                 </TableCell>
                                 <TableCell className="px-4 py-3">
                                     <div className="flex items-center space-x-3">
                                         <div className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
-                                            {event.image_url || (event.metadata && typeof event.metadata === 'object' && 
-                                             !Array.isArray(event.metadata) && 'featured_image' in event.metadata && 
-                                             event.metadata.featured_image) ? (
-                                                <img 
-                                                    src={event.image_url || String((event.metadata as any)?.featured_image || '')} 
-                                                    alt={event.title || 'Event'} 
+                                            {event.image_url || (event.metadata && typeof event.metadata === 'object' &&
+                                                !Array.isArray(event.metadata) && 'featured_image' in event.metadata &&
+                                                event.metadata.featured_image) ? (
+                                                <img
+                                                    src={event.image_url || String((event.metadata as any)?.featured_image || '')}
+                                                    alt={event.title || 'Event'}
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {
                                                         // If image fails to load, show the category badge instead
@@ -581,26 +591,36 @@ export const DashboardEvents = () => {
                                     </div>
                                 </TableCell>
                                 <TableCell className="px-4 py-3 text-right">
-                                    <div className="flex justify-end space-x-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 text-white/70 hover:text-white hover:bg-white/10"
-                                            onClick={() => handleEdit(event)}
-                                        >
-                                            <Edit className="h-3.5 w-3.5" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7 text-red-500/70 hover:text-red-500 hover:bg-red-500/10"
-                                            onClick={() => {
-                                                setDeletingEventId(event.id);
-                                                setIsDeleteDialogOpen(true);
-                                            }}
-                                        >
-                                            <Trash2 className="h-3.5 w-3.5" />
-                                        </Button>
+                                    <div className="flex justify-end">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4 text-white/70 hover:text-white" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuItem
+                                                    onClick={() => handleEdit(event)}
+                                                    className="cursor-pointer"
+                                                >
+                                                    <Edit className="mr-2 h-4 w-4" />
+                                                    Edit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        setDeletingEventId(event.id);
+                                                        setIsDeleteDialogOpen(true);
+                                                    }}
+                                                    className="text-red-500 cursor-pointer"
+                                                >
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </TableCell>
                             </TableRow>

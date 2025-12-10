@@ -64,11 +64,12 @@
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/supabase/functions/server/**/*"
   ],
   "exclude": [
     "node_modules",
     "build",
-    "src/supabase/functions/server"
+    "dist"
   ]
 }

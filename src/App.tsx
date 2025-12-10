@@ -24,7 +24,6 @@ function App() {
   const isDevelopment = import.meta.env.DEV;
   // Use Supabase data by default, even in development
   // Set VITE_USE_DUMMY_DATA=true in .env to use dummy data for testing
-  const useDummyDataDefault = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
   const adminBasePath = import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin';
 
   const AdminRoute: React.FC = () => (
@@ -56,10 +55,10 @@ function App() {
     <ThemeProvider defaultTheme="system" attribute="class">
       <AuthProvider>
         <ContentProvider>
-          <EventsProvider useDummyData={useDummyDataDefault}>
-            <PartnersProvider useDummyData={useDummyDataDefault}>
-              <TeamProvider useDummyData={useDummyDataDefault}>
-                <StaticContentProvider useDummyData={useDummyDataDefault}>
+          <EventsProvider>
+            <PartnersProvider>
+              <TeamProvider>
+                <StaticContentProvider>
                   <RouterProvider>
                     <Router routes={routes} />
                   </RouterProvider>

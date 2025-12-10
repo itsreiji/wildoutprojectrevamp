@@ -122,7 +122,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const validateSession = useCallback(async (): Promise<boolean> => {
     try {
       const { data: { session }, error } = await supabaseClient.auth.getSession();
-      
+
       if (error || !session) {
         console.warn('Session validation failed:', error?.message || 'No active session');
         return false;
@@ -169,7 +169,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
       if (error) {
         console.error('OAuth error:', error);
-        return { message: error.message || 'Authentication failed' } as AuthError;
+        const errorMessage = error.message || 'Authentication failed';
+        await auditService.logLoginFailure(`oauth_${provider}`, errorMessage);
+        return { message: errorMessage } as AuthError;
       }
 
       return null;
@@ -178,17 +180,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       return { message: 'An unexpected error occurred' } as AuthError;
     }
   };
-  const signOut = async () => { 
+  const signOut = async () => {
     await supabaseClient.auth.signOut();
-    setUser(null); 
-    setRole('anonymous'); 
-    return; 
+    setUser(null);
+    setRole('anonymous');
+    return;
   };
   const clearError = () => setError(null);
   const signUp = async () => { return { message: 'SignUp not implemented' } as AuthError; };
   const resetPassword = async () => { return { message: 'ResetPassword not implemented' } as AuthError; };
   const updateProfile = async () => { return; };
-  const refreshSession = async () => { 
+  const refreshSession = async () => {
     const { data, error } = await supabaseClient.auth.refreshSession();
     if (error) throw error;
     return data.session;
@@ -343,7 +345,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }
 
     // Clear failed login attempts on successful login
-    clearLoginAttempts(sanitizedEmail);
+    clearLoginAttempts(`login_${sanitizedEmail}`);
 
     // Set remember me if enabled
     if (rememberMe && typeof window !== 'undefined') {

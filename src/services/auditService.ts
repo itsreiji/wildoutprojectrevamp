@@ -1,4 +1,4 @@
-import { supabaseClient } from '../supabase/client';
+import supabase from '../supabase/client'; // Import default export
 
 export type AuditAction =
   | 'LOGIN_SUCCESS'
@@ -25,7 +25,7 @@ export const auditService = {
    */
   logEvent: async ({ action, userId, userRole, recordId, details, ipAddress, userAgent }: LogEntry) => {
     try {
-      const { error } = await supabaseClient
+      const { error } = await supabase
         .from('audit_log')
         .insert({
           action,
@@ -40,9 +40,13 @@ export const auditService = {
 
       if (error) {
         console.error('Failed to log audit event:', error);
+        throw error; // Re-throw to allow calling functions to handle the error
       }
+
+      return { success: true };
     } catch (err) {
       console.error('Error logging audit event:', err);
+      throw err; // Re-throw to allow calling functions to handle the error
     }
   },
 
@@ -50,7 +54,7 @@ export const auditService = {
    * Log a successful login
    */
   logLoginSuccess: async (userId: string, role: string, provider: string) => {
-    await auditService.logEvent({
+    return await auditService.logEvent({
       action: 'LOGIN_SUCCESS',
       userId,
       userRole: role,
@@ -63,7 +67,7 @@ export const auditService = {
    * Log a failed login attempt
    */
   logLoginFailure: async (email: string, reason: string) => {
-    await auditService.logEvent({
+    return await auditService.logEvent({
       action: 'LOGIN_FAILURE',
       recordId: email,
       details: { email, reason },
@@ -74,7 +78,7 @@ export const auditService = {
    * Log a logout event
    */
   logLogout: async (userId: string) => {
-    await auditService.logEvent({
+    return await auditService.logEvent({
       action: 'LOGOUT',
       userId,
     });

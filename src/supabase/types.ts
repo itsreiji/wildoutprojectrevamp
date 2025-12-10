@@ -640,6 +640,7 @@ export type Database = {
           linkedin_url: string | null
           metadata: Json | null
           name: string
+          social_links: Json | null
           status: string
           title: string | null
           twitter_handle: string | null
@@ -655,6 +656,7 @@ export type Database = {
           linkedin_url?: string | null
           metadata?: Json | null
           name: string
+          social_links?: Json | null
           status?: string
           title?: string | null
           twitter_handle?: string | null
@@ -670,6 +672,7 @@ export type Database = {
           linkedin_url?: string | null
           metadata?: Json | null
           name?: string
+          social_links?: Json | null
           status?: string
           title?: string | null
           twitter_handle?: string | null

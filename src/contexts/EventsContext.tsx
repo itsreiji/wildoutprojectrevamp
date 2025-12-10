@@ -2,8 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseClient } from '../supabase/client';
 import type { TablesInsert, TablesUpdate } from '../supabase/types';
-import { dummyDataService } from '../services/dummyDataService';
-import { cleanupEventAssets } from '../utils/storageHelpers';
+import { cleanupEventAssets, cleanupGalleryAsset } from '../utils/storageHelpers';
 import type { LandingEvent } from '@/types/content';
 import type { EventArtist, AdminEventArtist } from '../types/events';
 
@@ -11,8 +10,6 @@ interface EventsContextType {
   events: LandingEvent[];
   loading: boolean;
   error: string | null;
-  useDummyData: boolean;
-  setUseDummyData: React.Dispatch<React.SetStateAction<boolean>>;
   addEvent: (event: TablesInsert<'events'>) => Promise<LandingEvent>;
   updateEvent: (id: string, updates: TablesUpdate<'events'>) => Promise<LandingEvent>;
   deleteEvent: (id: string) => Promise<void>;
@@ -21,25 +18,20 @@ interface EventsContextType {
 
 const EventsContext = createContext<EventsContextType | undefined>(undefined);
 
-export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: boolean }> = ({
-  children,
-  useDummyData: initialUseDummyData = false
+export const EventsProvider: React.FC<{ children: ReactNode }> = ({
+  children
 }) => {
-  const [useDummyData, setUseDummyData] = useState<boolean>(initialUseDummyData);
   const queryClient = useQueryClient();
 
   const fetchEvents = async (): Promise<LandingEvent[]> => {
-    if (useDummyData) {
-      return dummyDataService.getEvents();
-    }
 
     const { data, error } = await supabaseClient
       .from('public_events_view')
       .select('*')
       .order('start_date', { ascending: true });
-      
+
     if (error) throw error;
-    
+
     return (data || []).map((row: any): LandingEvent => {
       // Map database status to LandingEvent status
       let status: LandingEvent['status'] = 'upcoming';
@@ -59,7 +51,7 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
       } else if (row.status === 'completed' || row.status === 'cancelled' || row.status === 'archived') {
         status = 'completed';
       }
-      
+
       return {
         id: row.id ?? '',
         title: row.title ?? '',
@@ -85,7 +77,11 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
           if (metadata.price_range) return metadata.price_range;
           return row.price_range || null;
         })(),
-        ticket_url: row.ticket_url || null,
+        ticket_url: (() => {
+          const metadata = row.metadata || {};
+          if (metadata.ticket_url) return metadata.ticket_url;
+          return row.ticket_url || null;
+        })(),
         artists: (() => {
           const metadata = row.metadata || {};
           if (metadata.artists && Array.isArray(metadata.artists)) {
@@ -136,7 +132,7 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
   };
 
   const { data: events = [], isLoading: loading, error: queryError, refetch } = useQuery({
-    queryKey: ['events', useDummyData],
+    queryKey: ['events'],
     queryFn: fetchEvents,
   });
 
@@ -150,7 +146,7 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
 
       if (error) throw error;
       if (!data) throw new Error('No data returned from insert operation');
-      
+
       // We need to refetch to get the full view data
       return data as unknown as LandingEvent; // Temporary cast, real data comes from refetch
     },
@@ -170,7 +166,7 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
 
       if (error) throw error;
       if (!data) throw new Error('No data returned from update operation');
-      
+
       return data as unknown as LandingEvent;
     },
     onSuccess: () => {
@@ -189,6 +185,23 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
 
       if (fetchError) console.error('Error fetching event for deletion:', fetchError);
 
+      // Fetch associated gallery items to clean up their assets later
+      const { data: galleryItems, error: galleryFetchError } = await supabaseClient
+        .from('gallery_items')
+        .select('image_url')
+        .eq('event_id', id);
+
+      if (galleryFetchError) console.error('Error fetching gallery items for deletion:', galleryFetchError);
+
+      // Delete associated gallery items first (to satisfy Foreign Key constraints)
+      const { error: galleryDeleteError } = await supabaseClient
+        .from('gallery_items')
+        .delete()
+        .eq('event_id', id);
+
+      if (galleryDeleteError) throw galleryDeleteError;
+
+      // Now delete the event
       const { error: deleteError } = await supabaseClient
         .from('events')
         .delete()
@@ -196,8 +209,15 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
 
       if (deleteError) throw deleteError;
 
+      // Cleanup assets
       if (eventToDelete?.metadata) {
         await cleanupEventAssets(eventToDelete.metadata);
+      }
+
+      if (galleryItems && galleryItems.length > 0) {
+        const galleryUrls = galleryItems.map((item: { image_url: string }) => item.image_url);
+        // We need to import this function
+        await cleanupGalleryAsset(galleryUrls);
       }
     },
     onSuccess: () => {
@@ -209,8 +229,6 @@ export const EventsProvider: React.FC<{ children: ReactNode; useDummyData?: bool
     events,
     loading,
     error: queryError ? (queryError as Error).message : null,
-    useDummyData,
-    setUseDummyData,
     addEvent: async (event: TablesInsert<'events'>) => {
       await addEventMutation.mutateAsync(event);
       // Return a placeholder or fetch the specific event if needed

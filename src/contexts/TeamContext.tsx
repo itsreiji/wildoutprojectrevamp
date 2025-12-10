@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabaseClient } from '../supabase/client';
 import type { TablesInsert, TablesUpdate, Json } from '../supabase/types';
-import { dummyDataService } from '../services/dummyDataService';
 import { cleanupTeamMemberAsset } from '../utils/storageHelpers';
 import type { TeamMember } from '@/types/content';
 
@@ -10,8 +9,6 @@ interface TeamContextType {
   team: TeamMember[];
   loading: boolean;
   error: string | null;
-  useDummyData: boolean;
-  setUseDummyData: React.Dispatch<React.SetStateAction<boolean>>;
   addTeamMember: (member: TablesInsert<'team_members'>) => Promise<TeamMember>;
   updateTeamMember: (id: string, updates: TablesUpdate<'team_members'>, oldAvatarUrl?: string | null) => Promise<TeamMember>;
   deleteTeamMember: (id: string) => Promise<void>;
@@ -38,17 +35,12 @@ const normalizeSocialLinks = (value: Json | undefined): Record<string, string | 
   );
 };
 
-export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolean }> = ({
-  children,
-  useDummyData: initialUseDummyData = false
+export const TeamProvider: React.FC<{ children: ReactNode }> = ({
+  children
 }) => {
-  const [useDummyData, setUseDummyData] = useState<boolean>(initialUseDummyData);
   const queryClient = useQueryClient();
 
   const fetchTeamMembers = async (): Promise<TeamMember[]> => {
-    if (useDummyData) {
-      return dummyDataService.getTeam();
-    }
 
     const { data, error } = await supabaseClient
       .from('team_members')
@@ -56,9 +48,9 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
       .eq('status', 'active')
       .order('display_order')
       .order('name');
-      
+
     if (error) throw error;
-    
+
     return (data || []).map((row: any): TeamMember => ({
       id: row.id,
       name: row.name || '',
@@ -75,7 +67,7 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
   };
 
   const { data: team = [], isLoading: loading, error: queryError, refetch } = useQuery({
-    queryKey: ['team', useDummyData],
+    queryKey: ['team'],
     queryFn: fetchTeamMembers,
   });
 
@@ -89,7 +81,7 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
 
       if (error) throw error;
       if (!data) throw new Error('No data returned from insert operation');
-      
+
       return {
         id: data.id,
         name: data.name || '',
@@ -124,7 +116,7 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
       if (oldAvatarUrl && updates.avatar_url && oldAvatarUrl !== updates.avatar_url) {
         await cleanupTeamMemberAsset(oldAvatarUrl);
       }
-      
+
       return {
         id: data.id,
         name: data.name || '',
@@ -168,8 +160,6 @@ export const TeamProvider: React.FC<{ children: ReactNode; useDummyData?: boolea
     team,
     loading,
     error: queryError ? (queryError as Error).message : null,
-    useDummyData,
-    setUseDummyData,
     addTeamMember: async (member: TablesInsert<'team_members'>) => {
       return await addTeamMemberMutation.mutateAsync(member);
     },

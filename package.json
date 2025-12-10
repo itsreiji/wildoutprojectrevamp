@@ -4,7 +4,7 @@
       "private": true,
       "dependencies": {
             "@hookform/resolvers": "^5.2.2",
-            "@jsr/supabase__supabase-js": "^2.86.2",
+            "@jsr/supabase__supabase-js": "^2.87.1",
             "@radix-ui/react-accordion": "^1.2.12",
             "@radix-ui/react-alert-dialog": "^1.1.15",
             "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -30,6 +30,7 @@
             "@radix-ui/react-tabs": "^1.1.13",
             "@radix-ui/react-toggle": "^1.1.10",
             "@radix-ui/react-toggle-group": "^1.1.11",
+            "@radix-ui/react-toolbar": "^1.1.11",
             "@radix-ui/react-tooltip": "^1.2.8",
             "@tanstack/react-query": "^5.90.12",
             "class-variance-authority": "^0.7.1",
@@ -37,13 +38,13 @@
             "crypto-js": "^4.2.0",
             "date-fns": "^4.1.0",
             "embla-carousel-react": "^8.6.0",
-            "hono": "^4.10.7",
+            "hono": "^4.10.8",
             "input-otp": "^1.4.2",
             "lucide-react": "^0.556.0",
             "motion": "*",
             "next-themes": "^0.4.6",
             "react": "^19.2.1",
-            "react-day-picker": "^9.11.3",
+            "react-day-picker": "^9.12.0",
             "react-dom": "^19.2.1",
             "react-hook-form": "^7.68.0",
             "react-icons": "^5.5.0",
@@ -61,7 +62,7 @@
             "@testing-library/user-event": "^14.6.1",
             "@types/crypto-js": "^4.2.2",
             "@types/jsdom": "^27.0.0",
-            "@types/node": "^24.10.1",
+            "@types/node": "^24.10.2",
             "@types/react": "^19.2.7",
             "@types/react-dom": "^19.2.3",
             "@vitejs/plugin-react-swc": "^4.2.2",
@@ -69,7 +70,7 @@
             "@vitest/ui": "^4.0.15",
             "autoprefixer": "^10.4.22",
             "clsx": "*",
-            "jsdom": "^27.2.0",
+            "jsdom": "^27.3.0",
             "postcss": "^8.5.6",
             "tailwind-merge": "*",
             "tailwindcss": "^4.1.17",
@@ -77,7 +78,7 @@
             "tsx": "^4.21.0",
             "turbo": "^2.6.3",
             "typescript": "^5.9.3",
-            "vite": "7.2.6",
+            "vite": "7.2.7",
             "vitest": "^4.0.15"
       },
       "scripts": {
@@ -89,5 +90,5 @@
             "test:coverage": "vitest run --coverage",
             "test:watch": "vitest run --watch"
       },
-      "packageManager": "pnpm@10.24.0"
+      "packageManager": "pnpm@10.25.0"
 }

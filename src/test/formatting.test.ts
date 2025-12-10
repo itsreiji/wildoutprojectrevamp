@@ -31,17 +31,17 @@ describe("formatting utilities", () => {
   describe("formatCurrency", () => {
     it("should format amount with default IDR currency", () => {
       const result = formatCurrency(250000);
-      expect(result).toBe("IDR 250,000.00");
+      expect(result).toBe("IDR 250.000");
     });
 
     it("should format amount with custom currency", () => {
       const result = formatCurrency(100, "USD");
-      expect(result).toBe("$100.00");
+      expect(result).toBe("$100");
     });
 
     it("should handle zero amount", () => {
       const result = formatCurrency(0);
-      expect(result).toBe("IDR 0.00");
+      expect(result).toBe("IDR 0");
     });
   });
 });

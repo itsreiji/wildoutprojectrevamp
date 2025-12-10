@@ -4,7 +4,7 @@ import { supabaseClient } from '../supabase/client';
 import { useAuth } from './AuthContext';
 import type { AuthRole } from './AuthContext';
 import type { Json, TablesInsert, TablesUpdate } from '../supabase/types';
-import { dummyDataService } from '../services/dummyDataService';
+
 import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
 import type {
   TeamMember,
@@ -275,7 +275,7 @@ const fetchTeamMembers = async (): Promise<TeamMember[]> => {
       avatar_url: row.avatar_url || undefined,
       email: row.email || undefined,
       status: row.status as 'active' | 'inactive' | undefined || 'active',
-      // social_links: normalizeSocialLinks(row.social_links),
+      social_links: normalizeSocialLinks(row.social_links),
       display_order: row.display_order || undefined,
       created_at: row.created_at,
       updated_at: row.updated_at,
@@ -362,7 +362,7 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
 export const ContentContext = createContext<ContentContextType | null>(null);
 
 export const ContentProvider = ({ children }: { children: ReactNode }) => {
-  const { user, role: userRole, useDummyData, setUseDummyData } = useAuth();
+  const { user, role: userRole } = useAuth();
   const [events, setEvents] = useState<LandingEvent[]>(INITIAL_EVENTS);
   const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
   const [gallery, setGallery] = useState<GalleryImage[]>(INITIAL_GALLERY);
@@ -384,33 +384,22 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       setLoading(true);
       setError(null);
       try {
-        if (useDummyData) {
-          setEvents(dummyDataService.getEvents());
-          setPartners(dummyDataService.getPartners());
-          setGallery(dummyDataService.getGallery());
-          setTeam(dummyDataService.getTeam());
-          // TODO: Implement dummy data methods in dummyDataService
-          // setHero(dummyDataService.getHero());
-          // setAbout(dummyDataService.getAbout());
-          // setSettings(dummyDataService.getSettings());
-        } else {
-          const [eventsData, partnersData, galleryData, teamData, heroData, aboutData, settingsData] = await Promise.all([
-            fetchEvents(),
-            fetchPartners(),
-            fetchGallery(),
-            fetchTeamMembers(),
-            fetchHeroContent(),
-            fetchAboutContent(),
-            fetchSiteSettings(),
-          ]);
-          setEvents(eventsData);
-          setPartners(partnersData);
-          setGallery(galleryData);
-          setTeam(teamData);
-          setHero(heroData);
-          setAbout(aboutData);
-          setSettings(settingsData);
-        }
+        const [eventsData, partnersData, galleryData, teamData, heroData, aboutData, settingsData] = await Promise.all([
+          fetchEvents(),
+          fetchPartners(),
+          fetchGallery(),
+          fetchTeamMembers(),
+          fetchHeroContent(),
+          fetchAboutContent(),
+          fetchSiteSettings(),
+        ]);
+        setEvents(eventsData);
+        setPartners(partnersData);
+        setGallery(galleryData);
+        setTeam(teamData);
+        setHero(heroData);
+        setAbout(aboutData);
+        setSettings(settingsData);
       } catch (err) {
         console.error('Error initializing content:', err);
         setError('Failed to load content');
@@ -420,7 +409,7 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     };
 
     initializeData();
-  }, [useDummyData]);
+  }, []);
 
   // Fetch admin sections
   useEffect(() => {
@@ -908,9 +897,6 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     // Loaders & errors
     loading,
     error,
-    // Dummy data control
-    useDummyData,
-    setUseDummyData,
     // Event mutations
     addEvent,
     updateEvent,
