@@ -90,23 +90,24 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form id="admin-team-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div id="admin-team-form-fields-grid" className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name Field */}
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="space-y-2">
-                <FormLabel className="text-sm font-medium">Name *</FormLabel>
+              <FormItem id="admin-team-form-name-field" className="space-y-2">
+                <FormLabel htmlFor="admin-team-form-name-input" className="text-sm font-medium">Name *</FormLabel>
                 <FormControl>
                   <Input
+                    id="admin-team-form-name-input"
                     placeholder="John Doe"
                     className="w-full"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className="text-xs" />
+                <FormMessage id="admin-team-form-name-error" className="text-xs" />
               </FormItem>
             )}
           />
@@ -116,16 +117,17 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
             control={form.control}
             name="title"
             render={({ field }) => (
-              <FormItem className="space-y-2">
-                <FormLabel className="text-sm font-medium">Title/Role *</FormLabel>
+              <FormItem id="admin-team-form-title-field" className="space-y-2">
+                <FormLabel htmlFor="admin-team-form-title-input" className="text-sm font-medium">Title/Role *</FormLabel>
                 <FormControl>
                   <Input
+                    id="admin-team-form-title-input"
                     placeholder="CEO & Founder"
                     className="w-full"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className="text-xs" />
+                <FormMessage id="admin-team-form-title-error" className="text-xs" />
               </FormItem>
             )}
           />
@@ -135,17 +137,18 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="space-y-2">
-                <FormLabel className="text-sm font-medium">Email *</FormLabel>
+              <FormItem id="admin-team-form-email-field" className="space-y-2">
+                <FormLabel htmlFor="admin-team-form-email-input" className="text-sm font-medium">Email *</FormLabel>
                 <FormControl>
                   <Input
+                    id="admin-team-form-email-input"
                     type="email"
                     placeholder="john@example.com"
                     className="w-full"
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className="text-xs" />
+                <FormMessage id="admin-team-form-email-error" className="text-xs" />
               </FormItem>
             )}
           />
@@ -155,14 +158,15 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
             control={form.control}
             name="social_links.instagram"
             render={({ field }) => (
-              <FormItem className="space-y-2">
-                <FormLabel className="text-sm font-medium">Instagram</FormLabel>
+              <FormItem id="admin-team-form-instagram-field" className="space-y-2">
+                <FormLabel htmlFor="admin-team-form-instagram-input" className="text-sm font-medium">Instagram</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <span className="text-gray-400">@</span>
                     </div>
                     <Input
+                      id="admin-team-form-instagram-input"
                       type="text"
                       placeholder="username"
                       className="pl-8 w-full"
@@ -174,10 +178,10 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
                     />
                   </div>
                 </FormControl>
-                <FormDescription className="text-xs">
+                <FormDescription id="admin-team-form-instagram-description" className="text-xs">
                   Optional Instagram username (without @)
                 </FormDescription>
-                <FormMessage className="text-xs" />
+                <FormMessage id="admin-team-form-instagram-error" className="text-xs" />
               </FormItem>
             )}
           />
@@ -188,20 +192,21 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
           control={form.control}
           name="bio"
           render={({ field }) => (
-            <FormItem className="space-y-2">
-              <FormLabel className="text-sm font-medium">Bio</FormLabel>
+            <FormItem id="admin-team-form-bio-field" className="space-y-2">
+              <FormLabel htmlFor="admin-team-form-bio-textarea" className="text-sm font-medium">Bio</FormLabel>
               <FormControl>
                 <Textarea
+                  id="admin-team-form-bio-textarea"
                   placeholder="Brief biography or description"
                   className="resize-none h-32 w-full"
                   {...field}
                   value={field.value || ''}
                 />
               </FormControl>
-              <FormDescription className="text-xs">
+              <FormDescription id="admin-team-form-bio-description" className="text-xs">
                 Optional biographical information about the team member
               </FormDescription>
-              <FormMessage className="text-xs" />
+              <FormMessage id="admin-team-form-bio-error" className="text-xs" />
             </FormItem>
           )}
         />
@@ -211,11 +216,12 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
           control={form.control}
           name="avatar_file"
           render={({ field: { onChange, value, ...field } }) => (
-            <FormItem className="space-y-2">
-              <FormLabel className="text-sm font-medium">Avatar Image</FormLabel>
+            <FormItem id="admin-team-form-avatar-field" className="space-y-2">
+              <FormLabel htmlFor="admin-team-form-avatar-input" className="text-sm font-medium">Avatar Image</FormLabel>
               <FormControl>
                 <div className="flex items-center">
                   <Input
+                    id="admin-team-form-avatar-input"
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={(e) => {
@@ -228,22 +234,23 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
                   />
                 </div>
               </FormControl>
-              <FormDescription className="text-xs">
+              <FormDescription id="admin-team-form-avatar-description" className="text-xs">
                 JPG, PNG, WebP, or GIF format. Max 10MB. {defaultValues?.avatar_url && 'Upload a new image to replace the current one.'}
               </FormDescription>
               {defaultValues?.avatar_url && (
-                <div className="mt-1 text-xs text-muted-foreground">
+                <div id="admin-team-form-avatar-current" className="mt-1 text-xs text-muted-foreground">
                   Current avatar: {defaultValues.avatar_url.split('/').pop()}
                 </div>
               )}
-              <FormMessage className="text-xs" />
+              <FormMessage id="admin-team-form-avatar-error" className="text-xs" />
             </FormItem>
           )}
         />
 
         {/* Form Actions */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-border">
+        <div id="admin-team-form-actions" className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-border">
           <Button
+            id="admin-team-form-cancel-button"
             type="button"
             variant="outline"
             onClick={onCancel}
@@ -253,13 +260,14 @@ export function DashboardTeamForm({ onSubmit, isSubmitting, defaultValues, onCan
             Cancel
           </Button>
           <Button
+            id="admin-team-form-submit-button"
             type="submit"
             className="bg-[#E93370] hover:bg-[#E93370]/90 text-white w-full sm:w-auto"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg id="admin-team-form-submit-spinner" className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>

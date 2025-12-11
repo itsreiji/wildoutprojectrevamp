@@ -142,18 +142,22 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+      <form id="admin-gallery-form" onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
         {/* Title Field */}
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Gallery Title *</FormLabel>
+            <FormItem id="admin-gallery-form-title-field">
+              <FormLabel htmlFor="admin-gallery-form-title-input">Gallery Title *</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Summer Festival 2025" {...field} />
+                <Input
+                  id="admin-gallery-form-title-input"
+                  placeholder="e.g., Summer Festival 2025"
+                  {...field}
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage id="admin-gallery-form-title-error" />
             </FormItem>
           )}
         />
@@ -163,17 +167,18 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="description"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
+            <FormItem id="admin-gallery-form-description-field">
+              <FormLabel htmlFor="admin-gallery-form-description-textarea">Description</FormLabel>
               <FormControl>
                 <Textarea
+                  id="admin-gallery-form-description-textarea"
                   placeholder="Brief description of the gallery"
                   className="resize-none h-20"
                   {...field}
                   value={field.value || ''}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage id="admin-gallery-form-description-error" />
             </FormItem>
           )}
         />
@@ -183,12 +188,17 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="category"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Category</FormLabel>
+            <FormItem id="admin-gallery-form-category-field">
+              <FormLabel htmlFor="admin-gallery-form-category-input">Category</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Events, Performances, Behind-the-Scenes" {...field} value={field.value || ''} />
+                <Input
+                  id="admin-gallery-form-category-input"
+                  placeholder="e.g., Events, Performances, Behind-the-Scenes"
+                  {...field}
+                  value={field.value || ''}
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage id="admin-gallery-form-category-error" />
             </FormItem>
           )}
         />
@@ -198,24 +208,26 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="event_id"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Link to Event (optional)</FormLabel>
+            <FormItem id="admin-gallery-form-event-field">
+              <FormLabel htmlFor="admin-gallery-form-event-select">Link to Event (optional)</FormLabel>
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value || undefined}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an event..." />
-                  </SelectTrigger>
+                  <FormControl>
+                    <SelectTrigger id="admin-gallery-form-event-select">
+                      <SelectValue placeholder="Select an event..." />
+                    </SelectTrigger>
+                  </FormControl>
                   <SelectContent>
-                    <SelectItem value="none">No event</SelectItem>
+                    <SelectItem id="admin-gallery-form-event-select-none" value="none">No event</SelectItem>
                     {events.map((event) => (
-                      <SelectItem key={event.id} value={event.id || ''}>
+                      <SelectItem id={`admin-gallery-form-event-select-${event.id}`} key={event.id} value={event.id || ''}>
                         {event.title || 'Untitled Event'}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage />
+              <FormMessage id="admin-gallery-form-event-error" />
             </FormItem>
           )}
         />
@@ -225,11 +237,12 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="image_files"
           render={() => (
-            <FormItem>
-              <FormLabel>Gallery Images {!defaultValues?.id && '*'}</FormLabel>
+            <FormItem id="admin-gallery-form-images-field">
+              <FormLabel htmlFor="admin-gallery-form-images-input">Gallery Images {!defaultValues?.id && '*'}</FormLabel>
               <FormControl>
                 <div className="flex flex-col gap-2">
                   <Input
+                    id="admin-gallery-form-images-input"
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     multiple
@@ -239,34 +252,36 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
                   />
                 </div>
               </FormControl>
-              <FormDescription>
+              <FormDescription id="admin-gallery-form-images-description">
                 JPG, PNG, WebP, or GIF format. Max 10MB per file. You can select multiple images at once.
               </FormDescription>
-              <FormMessage />
+              <FormMessage id="admin-gallery-form-images-error" />
             </FormItem>
           )}
         />
 
         {/* Image Previews */}
         {previewUrls.length > 0 && (
-          <div>
-            <FormLabel className="mb-2 block">Selected Images ({previewUrls.length})</FormLabel>
-            <div className="grid grid-cols-3 gap-2">
+          <div id="admin-gallery-form-previews">
+            <FormLabel id="admin-gallery-form-previews-title" className="mb-2 block">Selected Images ({previewUrls.length})</FormLabel>
+            <div id="admin-gallery-form-previews-grid" className="grid grid-cols-3 gap-2">
               {previewUrls.map((url, index) => (
-                <div key={index} className="relative group">
+                <div key={`admin-gallery-form-preview-${index}`} id={`admin-gallery-form-preview-${index}`} className="relative group">
                   <img
+                    id={`admin-gallery-form-preview-image-${index}`}
                     src={url}
                     alt={`Preview ${index + 1}`}
                     className="w-full h-24 object-cover rounded-lg"
                   />
                   <Button
+                    id={`admin-gallery-form-preview-remove-${index}`}
                     type="button"
                     variant="destructive"
                     size="icon"
                     onClick={() => removeFile(index)}
                     className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X className="h-3 w-3" />
+                    <X id={`admin-gallery-form-preview-remove-icon-${index}`} className="h-3 w-3" />
                   </Button>
                 </div>
               ))}
@@ -275,8 +290,9 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
         )}
 
         {/* Form Actions */}
-        <div className="flex gap-2 justify-end pt-4">
+        <div id="admin-gallery-form-actions" className="flex gap-2 justify-end pt-4">
           <Button
+            id="admin-gallery-form-cancel-button"
             type="button"
             variant="outline"
             onClick={onCancel}
@@ -285,6 +301,7 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
             Cancel
           </Button>
           <Button
+            id="admin-gallery-form-submit-button"
             type="submit"
             className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
             disabled={isSubmitting}

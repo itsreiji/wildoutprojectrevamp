@@ -35,6 +35,7 @@ export const EventsSection = React.memo(() => {
               Discover the hottest events in Indonesia's creative scene
             </p>
             <Button
+              id="events-view-all-button"
               onClick={() => navigate('/events')}
               className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
             >
@@ -44,9 +45,10 @@ export const EventsSection = React.memo(() => {
           </motion.div>
 
           {/* Events Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+          <div id="events-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {events.filter(e => e.status === 'upcoming').slice(0, 4).map((event, index) => (
               <motion.div
+                id={`events-item-${event.id}`}
                 key={event.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -54,31 +56,32 @@ export const EventsSection = React.memo(() => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="group relative"
               >
-                <div className="relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500">
+                <div id={`events-item-${event.id}-card`} className="relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500">
                   {/* Event Image */}
                   <div className="relative h-64 overflow-hidden">
                     <ImageWithFallback
+                      id={`events-item-${event.id}-image`}
                       src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : undefined) || undefined}
                       alt={event.title || 'Event'}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                    
+
                     {/* Category Badge */}
-                    <Badge className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0">
+                    <Badge id={`events-item-${event.id}-category-badge`} className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0">
                       {event.category}
                     </Badge>
 
                     {/* Capacity Indicator */}
-                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90">
+                    <div id={`events-item-${event.id}-capacity-indicator`} className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90">
                       <Users className="inline h-4 w-4 mr-1" />
                       {event.attendees}/{event.capacity}
                     </div>
                   </div>
 
                   {/* Event Info */}
-                  <div className="p-6 space-y-4">
-                    <h3 className="text-2xl text-white group-hover:text-[#E93370] transition-colors duration-300">
+                  <div id={`events-item-${event.id}-info`} className="p-6 space-y-4">
+                    <h3 id={`events-item-${event.id}-title`} className="text-2xl text-white group-hover:text-[#E93370] transition-colors duration-300">
                       {event.title}
                     </h3>
 
@@ -143,6 +146,7 @@ export const EventsSection = React.memo(() => {
 
                     {/* CTA Button */}
                     <Button
+                      id={`events-item-${event.id}-details-button`}
                       className="w-full bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
                       onClick={() => setSelectedEvent(event as LandingEvent)}
                     >

@@ -8,6 +8,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  define: {
+    'import.meta.vitest': 'undefined',
+  },
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     alias: {
@@ -57,18 +60,34 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'build',
+    sourcemap: true, // Generate source maps for better debugging
+    minify: 'esbuild',
     chunkSizeWarningLimit: 1000, // Increase limit to 1000 kB
     rollupOptions: {
       input: 'src/main.tsx',
       output: {
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            return 'vendor';
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor';
+            }
+            if (id.includes('@radix-ui')) {
+              return 'radix-ui';
+            }
+            if (id.includes('react-hook-form') || id.includes('@hookform')) {
+              return 'forms';
+            }
+            if (id.includes('date-fns') || id.includes('crypto-js')) {
+              return 'utils';
+            }
+            return 'vendor-other';
           }
           if (id.includes('styles') || id.includes('.css')) {
             return 'styles';
           }
         },
+        sourcemapExcludeSources: false,
+        sourcemapFileNames: '[name].[hash].js.map',
       },
     },
   },

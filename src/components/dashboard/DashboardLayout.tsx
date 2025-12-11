@@ -96,13 +96,15 @@ export const DashboardLayout = React.memo(({ children }: DashboardLayoutProps) =
 
   return (
     <SidebarProvider defaultOpen={!isMobile}>
-      <div 
-        className="relative flex h-screen w-full overflow-hidden bg-background group/sidebar-wrapper" 
+      <div
+        id="dashboard-layout-container"
+        className="relative flex h-screen w-full overflow-hidden bg-background group/sidebar-wrapper"
         data-sidebar-wrapper
         data-testid="dashboard-layout"
       >
         {/* Overlay for mobile when sidebar is open */}
-        <div 
+        <div
+          id="dashboard-mobile-overlay"
           className="fixed inset-0 bg-black/50 z-30 md:hidden"
           onClick={() => {
             const sidebar = document.querySelector('[data-slot="sidebar"]');
@@ -118,9 +120,10 @@ export const DashboardLayout = React.memo(({ children }: DashboardLayoutProps) =
             transition: 'opacity 0.3s ease-in-out'
           }}
         />
-        <Sidebar 
-          collapsible="icon" 
-          className="fixed top-0 left-0 h-full border-r border-sidebar-border bg-card z-40 transition-all duration-300 ease-in-out" 
+        <Sidebar
+          id="dashboard-sidebar"
+          collapsible="icon"
+          className="fixed top-0 left-0 h-full border-r border-sidebar-border bg-card z-40 transition-all duration-300 ease-in-out"
           side="left"
           style={{
             '--sidebar-width': isMobile ? '16rem' : '16rem',
@@ -131,28 +134,31 @@ export const DashboardLayout = React.memo(({ children }: DashboardLayoutProps) =
             } : {})
           } as React.CSSProperties}
         >
-          <SidebarHeader className="h-16 border-b border-sidebar-border flex items-center justify-center px-4">
-            <div 
+          <SidebarHeader id="dashboard-sidebar-header" className="h-16 border-b border-sidebar-border flex items-center justify-center px-4">
+            <div
               className="flex items-center gap-2 font-semibold text-lg overflow-hidden transition-all duration-300 group-data-[collapsible=icon]:p-0"
               data-testid="dashboard-logo"
+              id="dashboard-logo"
             >
               <img
                 src={logo}
                 alt="WildOut Logo"
                 className="h-8 w-8 object-contain"
                 data-testid="logo-image"
+                id="logo-image"
               />
-              <span 
+              <span
                 className="whitespace-nowrap transition-all duration-300 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:w-0"
                 data-testid="logo-text"
+                id="logo-text"
               >
                 WildOut
               </span>
             </div>
           </SidebarHeader>
 
-          <SidebarContent className="px-2 py-4 overflow-y-auto">
-            <SidebarMenu>
+          <SidebarContent id="dashboard-sidebar-content" className="px-2 py-4 overflow-y-auto">
+            <SidebarMenu id="dashboard-sidebar-menu">
               {adminSections
                 .filter((section) => getSectionPermissions(section.slug).canView)
                 .sort((a, b) => a.order_index - b.order_index)
@@ -161,8 +167,9 @@ export const DashboardLayout = React.memo(({ children }: DashboardLayoutProps) =
                   const isActive = currentPage === section.slug;
 
                   return (
-                    <SidebarMenuItem key={section.id}>
+                    <SidebarMenuItem id={`sidebar-menu-item-${section.slug}`} key={section.id}>
                       <SidebarMenuButton
+                        id={`sidebar-menu-button-${section.slug}`}
                         asChild={false}
                         isActive={isActive}
                         onClick={() => navigate(getAdminPath(section.slug))}
@@ -170,8 +177,12 @@ export const DashboardLayout = React.memo(({ children }: DashboardLayoutProps) =
                         data-active={isActive}
                       >
                         <div className="flex items-center gap-2">
-                          <Icon className={cn("h-4 w-4 transition-colors duration-300", isActive && "text-sidebar-primary")} data-testid={`nav-icon-${section.slug}`} />
-                          <span className="text-sm transition-colors duration-300">{section.label}</span>
+                          <Icon
+                            id={`nav-icon-${section.slug}`}
+                            className={cn("h-4 w-4 transition-colors duration-300", isActive && "text-sidebar-primary")}
+                            data-testid={`nav-icon-${section.slug}`}
+                          />
+                          <span id={`nav-label-${section.slug}`} className="text-sm transition-colors duration-300">{section.label}</span>
                         </div>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -180,33 +191,35 @@ export const DashboardLayout = React.memo(({ children }: DashboardLayoutProps) =
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="border-t border-sidebar-border p-2 mt-auto">
-            <SidebarMenu>
-              <SidebarMenuItem>
+          <SidebarFooter id="dashboard-sidebar-footer" className="border-t border-sidebar-border p-2 mt-auto">
+            <SidebarMenu id="dashboard-sidebar-footer-menu">
+              <SidebarMenuItem id="sidebar-menu-item-back-to-site">
                 <SidebarMenuButton
+                  id="sidebar-menu-button-back-to-site"
                   asChild={false}
                   onClick={() => navigate('/')}
                   data-testid="back-to-site-button"
                 >
                   <div className="flex items-center gap-2">
-                    <ChevronLeft className="h-4 w-4" />
-                    <span className="text-sm">Back to Site</span>
+                    <ChevronLeft id="back-to-site-icon" className="h-4 w-4" />
+                    <span id="back-to-site-label" className="text-sm">Back to Site</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              <SidebarMenuItem>
+              <SidebarMenuItem id="sidebar-menu-item-user-profile">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <SidebarMenuButton
+                      id="user-menu-trigger"
                       asChild={false}
                       size="lg"
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-full"
                       data-testid="user-menu-button"
                     >
                       <div className="flex items-center gap-2 w-full">
-                        <Avatar className="h-8 w-8 rounded-lg" data-testid="user-avatar">
-                          <AvatarFallback className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground" data-testid="user-avatar-fallback">
+                        <Avatar id="user-avatar" className="h-8 w-8 rounded-lg" data-testid="user-avatar">
+                          <AvatarFallback id="user-avatar-fallback" className="rounded-lg bg-sidebar-primary text-sidebar-primary-foreground" data-testid="user-avatar-fallback">
                             {displayInitial}
                           </AvatarFallback>
                         </Avatar>
@@ -218,58 +231,61 @@ export const DashboardLayout = React.memo(({ children }: DashboardLayoutProps) =
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
+                    id="user-menu-content"
                     className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg bg-sidebar border-sidebar-border text-sidebar-foreground"
                     side="top"
                     align="start"
                     sideOffset={4}
                   >
-                    <div className="flex items-center gap-4 px-4" data-testid="user-profile">
-                      <Avatar className="h-8 w-8" data-testid="user-avatar">
-                        <AvatarFallback data-testid="user-avatar-fallback">{displayInitial}</AvatarFallback>
+                    <div id="user-profile-content" className="flex items-center gap-4 px-4" data-testid="user-profile">
+                      <Avatar id="user-profile-avatar" className="h-8 w-8" data-testid="user-avatar">
+                        <AvatarFallback id="user-profile-avatar-fallback" data-testid="user-avatar-fallback">{displayInitial}</AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-medium text-sidebar-foreground" data-testid="user-name">{displayName}</span>
-                        <span className="truncate text-xs text-sidebar-foreground/60" data-testid="user-email">{displayEmail}</span>
+                        <span id="user-profile-name" className="truncate font-medium text-sidebar-foreground" data-testid="user-name">{displayName}</span>
+                        <span id="user-profile-email" className="truncate text-xs text-sidebar-foreground/60" data-testid="user-email">{displayEmail}</span>
                       </div>
                     </div>
-                    <Separator className="bg-sidebar-border my-1" />
+                    <Separator id="user-menu-separator" className="bg-sidebar-border my-1" />
                     <DropdownMenuItem
+                      id="logout-menu-item"
                       onClick={handleLogout}
                       className="text-destructive hover:bg-destructive/10 focus:bg-destructive/10 focus:text-destructive flex items-center gap-2"
                       data-testid="logout-button"
                     >
-                      <LogOut className="h-4 w-4" data-testid="logout-icon" />
-                      <span data-testid="logout-label">Log out</span>
+                      <LogOut id="logout-icon" className="h-4 w-4" data-testid="logout-icon" />
+                      <span id="logout-label" data-testid="logout-label">Log out</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarFooter>
-          <SidebarRail />
-          <SidebarRail />
+          <SidebarRail id="dashboard-sidebar-rail-left" />
+          <SidebarRail id="dashboard-sidebar-rail-right" />
         </Sidebar>
 
-        <div 
+        <div
+          id="dashboard-main-content"
           className="relative flex-1 flex flex-col h-full min-w-0 transition-all duration-300 ease-in-out ml-0 md:ml-[var(--sidebar-width)] group-data-[collapsible=icon]/sidebar-wrapper:ml-0 md:group-data-[collapsible=icon]/sidebar-wrapper:ml-[var(--sidebar-width-icon)]"
           style={{
             marginLeft: isMobile ? 0 : undefined,
             width: isMobile ? '100%' : undefined,
           }}
         >
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card/95 backdrop-blur-sm sticky top-0 z-20 w-full px-4 md:px-6">
+          <header id="dashboard-header" className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card/95 backdrop-blur-sm sticky top-0 z-20 w-full px-4 md:px-6">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mr-2 h-4 bg-border" />
+              <SidebarTrigger id="sidebar-trigger" className="-ml-1" />
+              <Separator id="dashboard-header-separator" orientation="vertical" className="mr-2 h-4 bg-border" />
               <div className="flex flex-col">
-                <h1 className="text-sm font-medium leading-none text-foreground">
+                <h1 id="dashboard-header-title" className="text-sm font-medium leading-none text-foreground">
                   {adminSections.find((item) => item.slug === currentPage)?.label || 'Dashboard'}
                 </h1>
               </div>
             </div>
           </header>
-          
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-background relative z-10">
+
+          <main id="dashboard-main" className="flex-1 overflow-y-auto p-4 md:p-6 bg-background relative z-10">
             <div className="w-full max-w-[1600px] mx-auto">
               {children}
             </div>

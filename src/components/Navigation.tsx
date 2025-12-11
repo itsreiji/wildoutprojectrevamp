@@ -9,10 +9,10 @@ import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: '/', hash: '#' },
   { id: 'events', label: 'Events', href: '/events' },
-  { id: 'about', label: 'About', href: '/', hash: '#about' },
-  { id: 'team', label: 'Team', href: '/', hash: '#team' },
-  { id: 'gallery', label: 'Gallery', href: '/', hash: '#gallery' },
-  { id: 'partners', label: 'Partners', href: '/', hash: '#partners' },
+  { id: 'about', label: 'About', href: '/', hash: '#about-section' },
+  { id: 'team', label: 'Team', href: '/', hash: '#team-section' },
+  { id: 'gallery', label: 'Gallery', href: '/', hash: '#gallery-section' },
+  { id: 'partners', label: 'Partners', href: '/', hash: '#partners-section' },
 ];
 
 const NavigationComponent = () => {
@@ -64,7 +64,7 @@ const NavigationComponent = () => {
   };
 
   return (
-    <>
+    <div id="navigation-container">
       {/* Desktop & Mobile Header */}
       <motion.header
         initial={{ y: -100 }}
@@ -102,20 +102,21 @@ const NavigationComponent = () => {
               <button
                 id="desktop-admin-button"
                 data-testid="desktop-admin-button"
+                aria-label="Admin Dashboard"
                 onClick={async () => {
                   console.log('🔵 Admin button clicked - Desktop');
                   console.log('🔵 Current path before navigation:', window.location.pathname);
-                  
+
                   // Close mobile menu if open
                   setIsMobileMenuOpen(false);
-                  
+
                   try {
                     const adminPath = getAdminPath();
                     console.log('🔵 Navigating to admin path:', adminPath);
-                    
+
                     // First try client-side navigation
                     navigate(adminPath);
-                    
+
                     // Force a reload after a small delay to ensure context is properly initialized
                     setTimeout(() => {
                       console.log('🔄 Forcing page reload to ensure context is fresh');
@@ -129,11 +130,12 @@ const NavigationComponent = () => {
                 }}
                 className="group ml-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#E93370] border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] hover:text-white rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 active:scale-95"
               >
-                <LayoutDashboard 
+                <LayoutDashboard
+                  id="desktop-admin-icon"
                   className="h-4 w-4 group-hover:scale-110 transition-transform duration-300"
                   data-testid="desktop-admin-icon"
                 />
-                <span data-testid="desktop-admin-label">Admin</span>
+                <span id="desktop-admin-label" data-testid="desktop-admin-label">Admin</span>
               </button>
             </nav>
 
@@ -207,19 +209,20 @@ const NavigationComponent = () => {
                     <button
                       id="mobile-admin-button"
                       data-testid="mobile-admin-button"
+                      aria-label="Admin Dashboard"
                       onClick={async () => {
                         console.log('🔵 Admin button clicked - Mobile');
                         console.log('🔵 Current path before navigation:', window.location.pathname);
-                        
+
                         setIsMobileMenuOpen(false);
-                        
+
                         try {
                           const adminPath = getAdminPath();
                           console.log('🔵 Navigating to admin path (mobile):', adminPath);
-                          
+
                           // First try client-side navigation
                           navigate(adminPath);
-                          
+
                           // Force a reload after a small delay to ensure context is properly initialized
                           setTimeout(() => {
                             console.log('🔄 Forcing page reload to ensure context is fresh (mobile)');
@@ -233,11 +236,12 @@ const NavigationComponent = () => {
                       }}
                       className="w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center gap-3 border border-[#E93370]/20 hover:border-[#E93370] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50"
                     >
-                      <LayoutDashboard 
+                      <LayoutDashboard
+                        id="mobile-admin-icon"
                         className="h-5 w-5 group-hover:scale-110 transition-transform duration-300"
                         data-testid="mobile-admin-icon"
                       />
-                      <span className="font-medium" data-testid="mobile-admin-label">Admin Dashboard</span>
+                      <span id="mobile-admin-label" className="font-medium" data-testid="mobile-admin-label">Admin Dashboard</span>
                     </button>
                   </div>
                 </nav>
@@ -253,7 +257,7 @@ const NavigationComponent = () => {
           </>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 };
 

@@ -23,7 +23,7 @@ export const TeamSection = React.memo(() => {
   };
 
   return (
-    <section id="team" className="relative py-20 px-4">
+    <section id="team-section" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div
@@ -55,10 +55,11 @@ export const TeamSection = React.memo(() => {
               className="group cursor-pointer"
               onClick={() => handleMemberClick(member)}
             >
-              <div className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 h-full">
+              <div id={`team-member-${member.id}-card`} className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 h-full">
                 {/* Photo */}
                 <div className="relative h-72 overflow-hidden">
                   <ImageWithFallback
+                    id={`team-member-${member.id}-avatar`}
                     src={member.avatar_url || 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400'}
                     alt={member.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -67,18 +68,19 @@ export const TeamSection = React.memo(() => {
 
                   {/* Info Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-xl text-white mb-1">{member.name}</h3>
-                    <p className="text-sm text-[#E93370] mb-3">{member.title || ''}</p>
+                    <h3 id={`team-member-${member.id}-name`} className="text-xl text-white mb-1">{member.name}</h3>
+                    <p id={`team-member-${member.id}-title`} className="text-sm text-[#E93370] mb-3">{member.title || ''}</p>
                   </div>
                 </div>
 
                 {/* Bio & Contact */}
-                <div className="p-6 space-y-4">
+                <div id={`team-member-${member.id}-bio`} className="p-6 space-y-4">
                   <p className="text-sm text-white/70 line-clamp-2">{member.bio}</p>
 
                   <div className="space-y-3">
                     {member.email && (
                       <a
+                        id={`team-member-${member.id}-email-link`}
                         href={`mailto:${member.email}`}
                         className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors group"
                       >
@@ -88,6 +90,7 @@ export const TeamSection = React.memo(() => {
                     )}
                     {(member.social_links?.instagram || member.metadata?.social_links?.instagram) && (
                       <a
+                        id={`team-member-${member.id}-instagram-link`}
                         href={`https://instagram.com/${(member.social_links?.instagram || member.metadata?.social_links?.instagram || '').replace('@', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"

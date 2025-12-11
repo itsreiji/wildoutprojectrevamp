@@ -247,38 +247,44 @@ export const DashboardGallery = React.memo(() => {
   };
 
   return (
-    <div className="space-y-6">
+    <div id="admin-gallery-container" className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
+      <div id="admin-gallery-header" className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div id="admin-gallery-header-content">
+          <h2 id="admin-gallery-title" className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
             Gallery Management
           </h2>
-          <p className="text-white/60">Manage event photos - changes sync to landing page instantly</p>
+          <p id="admin-gallery-subtitle" className="text-white/60">Manage event photos - changes sync to landing page instantly</p>
         </div>
-        <div className="flex space-x-2">
+        <div id="admin-gallery-header-actions" className="flex space-x-2">
           {selectedImages.size > 0 && (
             <Button
+              id="admin-gallery-bulk-delete-button"
               variant="outline"
               onClick={handleBulkDelete}
               disabled={isDeleting}
               className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-xl"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 id="admin-gallery-bulk-delete-icon" className="mr-2 h-4 w-4" />
               Delete ({selectedImages.size})
             </Button>
           )}
-          <Button onClick={handleCreate} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button
+            id="admin-gallery-create-button"
+            onClick={handleCreate}
+            className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
+          >
+            <Plus id="admin-gallery-create-icon" className="mr-2 h-4 w-4" />
             New Gallery
           </Button>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+      <div id="admin-gallery-search-container" className="relative">
+        <Search id="admin-gallery-search-icon" className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
         <Input
+          id="admin-gallery-search-input"
           type="text"
           placeholder="Search by title, description or category..."
           value={searchQuery}
@@ -288,7 +294,7 @@ export const DashboardGallery = React.memo(() => {
       </div>
 
       {/* Gallery Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div id="admin-gallery-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredItems.map((item, index) => {
           const imageUrl = getGalleryImage(item);
           return (
@@ -333,6 +339,7 @@ export const DashboardGallery = React.memo(() => {
 
               {/* Selection Checkbox */}
               <button
+                id={`admin-gallery-selection-checkbox-${item.id}`}
                 onClick={() => toggleImageSelection(item.id)}
                 className={`absolute top-3 left-3 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 ${
                   selectedImages.has(item.id)
@@ -342,6 +349,7 @@ export const DashboardGallery = React.memo(() => {
               >
                 {selectedImages.has(item.id) && (
                   <svg
+                    id={`admin-gallery-selection-check-icon-${item.id}`}
                     className="w-4 h-4 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -358,15 +366,16 @@ export const DashboardGallery = React.memo(() => {
               </button>
 
               {/* Actions */}
-              <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div id={`admin-gallery-item-actions-${item.id}`} className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
+                  id={`admin-gallery-edit-button-${item.id}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleEdit(item);
                   }}
                   className="w-8 h-8 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white hover:bg-[#E93370]/20 hover:border-[#E93370]/30 transition-all duration-200"
                 >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg id={`admin-gallery-edit-icon-${item.id}`} className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
@@ -376,24 +385,26 @@ export const DashboardGallery = React.memo(() => {
                 }}>
                   <AlertDialogTrigger asChild>
                     <button
+                      id={`admin-gallery-delete-trigger-${item.id}`}
                       onClick={() => setDeletingItemId(item.id)}
                       className="w-8 h-8 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-red-400 hover:bg-red-500/20 hover:border-red-500/30 transition-all duration-200"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 id={`admin-gallery-delete-icon-${item.id}`} className="h-4 w-4" />
                     </button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-black/95 backdrop-blur-xl border-white/10">
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-white">Delete Gallery Item?</AlertDialogTitle>
-                      <AlertDialogDescription className="text-white/70">
+                  <AlertDialogContent id={`admin-gallery-delete-dialog-${item.id}`} className="bg-black/95 backdrop-blur-xl border-white/10">
+                    <AlertDialogHeader id={`admin-gallery-delete-dialog-header-${item.id}`}>
+                      <AlertDialogTitle id={`admin-gallery-delete-dialog-title-${item.id}`} className="text-white">Delete Gallery Item?</AlertDialogTitle>
+                      <AlertDialogDescription id={`admin-gallery-delete-dialog-description-${item.id}`} className="text-white/70">
                         Are you sure you want to delete <span className="font-semibold text-white">"{item.title}"</span>? This action cannot be undone. All associated images will be removed from storage.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel className="bg-white/10 text-white hover:bg-white/20 border-white/20">
+                    <AlertDialogFooter id={`admin-gallery-delete-dialog-footer-${item.id}`}>
+                      <AlertDialogCancel id={`admin-gallery-delete-dialog-cancel-${item.id}`} className="bg-white/10 text-white hover:bg-white/20 border-white/20">
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction
+                        id={`admin-gallery-delete-dialog-confirm-${item.id}`}
                         onClick={() => handleDelete(item.id)}
                         disabled={isDeleting}
                         className="bg-red-600 hover:bg-red-700 text-white"
@@ -410,23 +421,24 @@ export const DashboardGallery = React.memo(() => {
       </div>
 
       {filteredItems.length === 0 && (
-        <div className="text-center py-12 text-white/60">
-          <ImageIcon className="h-16 w-16 mx-auto mb-4 text-white/40" />
-          <p>No gallery items found. Create your first gallery!</p>
+        <div id="admin-gallery-empty-state" className="text-center py-12 text-white/60">
+          <ImageIcon id="admin-gallery-empty-icon" className="h-16 w-16 mx-auto mb-4 text-white/40" />
+          <p id="admin-gallery-empty-text">No gallery items found. Create your first gallery!</p>
         </div>
       )}
 
       {/* Create/Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">
+      <Dialog id="admin-gallery-form-dialog" open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent id="admin-gallery-form-dialog-content" className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-2xl">
+          <DialogHeader id="admin-gallery-form-dialog-header">
+            <DialogTitle id="admin-gallery-form-dialog-title" className="text-2xl">
               {editingGallery ? 'Edit Gallery Item' : 'Create New Gallery'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="max-h-[60vh] overflow-y-auto">
+          <div id="admin-gallery-form-container" className="max-h-[60vh] overflow-y-auto">
             <DashboardGalleryForm
+              id="admin-gallery-form"
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
               defaultValues={editingGallery || undefined}

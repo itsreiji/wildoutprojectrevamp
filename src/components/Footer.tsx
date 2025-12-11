@@ -58,7 +58,7 @@ export const Footer = React.memo(() => {
     .filter(Boolean) as Array<{ icon: any; href: string; label: string }>;
 
   return (
-    <footer className="relative pt-20 pb-8 px-4 z-20">
+    <footer id="footer-section" className="relative pt-20 pb-8 px-4 z-20">
       <div className="container mx-auto max-w-7xl">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
@@ -81,13 +81,13 @@ export const Footer = React.memo(() => {
               <div className="space-y-3 text-sm text-white/60">
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a href={`mailto:${settings.email ?? ''}`} className="hover:text-[#E93370] transition-colors">
+                  <a id="footer-email-link" href={`mailto:${settings.email ?? ''}`} className="hover:text-[#E93370] transition-colors">
                     {settings.email ?? 'contact@wildoutproject.com'}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a href={`tel:${(settings.phone ?? '').replace(/\s/g, '')}`} className="hover:text-[#E93370] transition-colors">
+                  <a id="footer-phone-link" href={`tel:${(settings.phone ?? '').replace(/\s/g, '')}`} className="hover:text-[#E93370] transition-colors">
                     {settings.phone ?? '+62 21 1234 567'}
                   </a>
                 </div>
@@ -145,11 +145,12 @@ export const Footer = React.memo(() => {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
+                  id="footer-newsletter-email-input"
                   type="email"
                   placeholder="Enter your email"
                   className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#E93370]/50 transition-colors"
                 />
-                <button className="px-8 py-3 rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white transition-colors duration-300 whitespace-nowrap">
+                <button id="footer-newsletter-subscribe-button" className="px-8 py-3 rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white transition-colors duration-300 whitespace-nowrap">
                   Subscribe
                 </button>
               </div>
@@ -190,6 +191,7 @@ export const Footer = React.memo(() => {
                 const Icon = social.icon;
                 return (
                   <a
+                    id={`footer-${social.label.toLowerCase()}-link`}
                     key={index}
                     href={social.href}
                     aria-label={social.label}
@@ -203,15 +205,15 @@ export const Footer = React.memo(() => {
 
             {/* Additional Links - unchanged */}
             <div className="flex items-center gap-4 text-sm text-white/40">
-              <a href="#" className="hover:text-[#E93370] transition-colors">
+              <a id="footer-privacy-link" href="#" className="hover:text-[#E93370] transition-colors">
                 Privacy
               </a>
               <span>•</span>
-              <a href="#" className="hover:text-[#E93370] transition-colors">
+              <a id="footer-terms-link" href="#" className="hover:text-[#E93370] transition-colors">
                 Terms
               </a>
               <span>•</span>
-              <a href="#" className="hover:text-[#E93370] transition-colors">
+              <a id="footer-cookies-link" href="#" className="hover:text-[#E93370] transition-colors">
                 Cookies
               </a>
             </div>

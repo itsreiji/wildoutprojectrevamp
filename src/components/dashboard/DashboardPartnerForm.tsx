@@ -105,18 +105,22 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id="admin-partner-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {/* Name Field */}
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Partner Name *</FormLabel>
+            <FormItem id="admin-partner-form-name-field">
+              <FormLabel htmlFor="admin-partner-form-name-input">Partner Name *</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Red Bull, Spotify" {...field} />
+                <Input
+                  id="admin-partner-form-name-input"
+                  placeholder="e.g., Red Bull, Spotify"
+                  {...field}
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage id="admin-partner-form-name-error" />
             </FormItem>
           )}
         />
@@ -126,23 +130,23 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="sponsorship_level"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Sponsorship Level *</FormLabel>
+            <FormItem id="admin-partner-form-level-field">
+              <FormLabel htmlFor="admin-partner-form-level-select">Sponsorship Level *</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger id="admin-partner-form-level-select">
                     <SelectValue placeholder="Select tier" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="bronze">Bronze</SelectItem>
-                  <SelectItem value="silver">Silver</SelectItem>
-                  <SelectItem value="gold">Gold</SelectItem>
-                  <SelectItem value="platinum">Platinum</SelectItem>
+                  <SelectItem id="admin-partner-form-level-select-bronze" value="bronze">Bronze</SelectItem>
+                  <SelectItem id="admin-partner-form-level-select-silver" value="silver">Silver</SelectItem>
+                  <SelectItem id="admin-partner-form-level-select-gold" value="gold">Gold</SelectItem>
+                  <SelectItem id="admin-partner-form-level-select-platinum" value="platinum">Platinum</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>Tier determines visibility and placement priority</FormDescription>
-              <FormMessage />
+              <FormDescription id="admin-partner-form-level-description">Tier determines visibility and placement priority</FormDescription>
+              <FormMessage id="admin-partner-form-level-error" />
             </FormItem>
           )}
         />
@@ -152,13 +156,19 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="website_url"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Website URL</FormLabel>
+            <FormItem id="admin-partner-form-website-field">
+              <FormLabel htmlFor="admin-partner-form-website-input">Website URL</FormLabel>
               <FormControl>
-                <Input type="url" placeholder="https://example.com" {...field} value={field.value || ''} />
+                <Input
+                  id="admin-partner-form-website-input"
+                  type="url"
+                  placeholder="https://example.com"
+                  {...field}
+                  value={field.value || ''}
+                />
               </FormControl>
-              <FormDescription>Partner website URL for reference</FormDescription>
-              <FormMessage />
+              <FormDescription id="admin-partner-form-website-description">Partner website URL for reference</FormDescription>
+              <FormMessage id="admin-partner-form-website-error" />
             </FormItem>
           )}
         />
@@ -168,18 +178,19 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="description"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
+            <FormItem id="admin-partner-form-description-field">
+              <FormLabel htmlFor="admin-partner-form-description-textarea">Description</FormLabel>
               <FormControl>
                 <Textarea
+                  id="admin-partner-form-description-textarea"
                   placeholder="Brief description of the partnership"
                   className="resize-none h-20"
                   {...field}
                   value={field.value || ''}
                 />
               </FormControl>
-              <FormDescription>Optional description of the partnership</FormDescription>
-              <FormMessage />
+              <FormDescription id="admin-partner-form-description-description">Optional description of the partnership</FormDescription>
+              <FormMessage id="admin-partner-form-description-error" />
             </FormItem>
           )}
         />
@@ -189,12 +200,18 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="contact_email"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contact Email</FormLabel>
+            <FormItem id="admin-partner-form-email-field">
+              <FormLabel htmlFor="admin-partner-form-email-input">Contact Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="contact@partner.com" {...field} value={field.value || ''} />
+                <Input
+                  id="admin-partner-form-email-input"
+                  type="email"
+                  placeholder="contact@partner.com"
+                  {...field}
+                  value={field.value || ''}
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage id="admin-partner-form-email-error" />
             </FormItem>
           )}
         />
@@ -204,12 +221,17 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="contact_phone"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contact Phone</FormLabel>
+            <FormItem id="admin-partner-form-phone-field">
+              <FormLabel htmlFor="admin-partner-form-phone-input">Contact Phone</FormLabel>
               <FormControl>
-                <Input placeholder="+62 812 3456 7890" {...field} value={field.value || ''} />
+                <Input
+                  id="admin-partner-form-phone-input"
+                  placeholder="+62 812 3456 7890"
+                  {...field}
+                  value={field.value || ''}
+                />
               </FormControl>
-              <FormMessage />
+              <FormMessage id="admin-partner-form-phone-error" />
             </FormItem>
           )}
         />
@@ -219,11 +241,12 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
           control={form.control}
           name="logo_file"
           render={({ field: { onChange, value, ...field } }) => (
-            <FormItem>
-              <FormLabel>Partner Logo</FormLabel>
+            <FormItem id="admin-partner-form-logo-field">
+              <FormLabel htmlFor="admin-partner-form-logo-input">Partner Logo</FormLabel>
               <FormControl>
                 <div className="flex items-center gap-2">
                   <Input
+                    id="admin-partner-form-logo-input"
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={(e) => {
@@ -235,22 +258,23 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
                   />
                 </div>
               </FormControl>
-              <FormDescription>
+              <FormDescription id="admin-partner-form-logo-description">
                 JPG, PNG, WebP, or GIF format. Max 10MB. {defaultValues?.logo_url && 'Upload a new logo to replace the current one.'}
               </FormDescription>
               {defaultValues?.logo_url && (
-                <div className="mt-2 text-sm text-white/60">
+                <div id="admin-partner-form-logo-current" className="mt-2 text-sm text-white/60">
                   Current logo: {defaultValues.logo_url.split('/').pop()}
                 </div>
               )}
-              <FormMessage />
+              <FormMessage id="admin-partner-form-logo-error" />
             </FormItem>
           )}
         />
 
         {/* Form Actions */}
-        <div className="flex gap-2 justify-end pt-4">
+        <div id="admin-partner-form-actions" className="flex gap-2 justify-end pt-4">
           <Button
+            id="admin-partner-form-cancel-button"
             type="button"
             variant="outline"
             onClick={onCancel}
@@ -259,6 +283,7 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
             Cancel
           </Button>
           <Button
+            id="admin-partner-form-submit-button"
             type="submit"
             className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
             disabled={isSubmitting}

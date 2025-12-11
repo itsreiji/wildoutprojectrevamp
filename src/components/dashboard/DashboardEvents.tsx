@@ -325,6 +325,24 @@ export const DashboardEvents = () => {
         }
     };
 
+    const getCategoryColor = (category: string): string => {
+        const colors = [
+            'bg-blue-500/20 text-blue-400 border-blue-500/40',
+            'bg-purple-500/20 text-purple-400 border-purple-500/40',
+            'bg-pink-500/20 text-pink-400 border-pink-500/40',
+            'bg-rose-500/20 text-rose-400 border-rose-500/40',
+            'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
+        ];
+
+        // Simple hash function to get consistent colors for the same category
+        const hash = category.split('').reduce((acc: number, char: string) => {
+            return char.charCodeAt(0) + ((acc << 5) - acc);
+        }, 0);
+
+        const index = Math.abs(hash) % colors.length;
+        return `${colors[index]} border rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap`;
+    };
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'upcoming':
@@ -338,390 +356,380 @@ export const DashboardEvents = () => {
         }
     };
 
-    const getCategoryColor = (category: string) => {
-        // Generate a consistent color based on category name
-        const colors = [
-            'bg-purple-500/20 text-purple-400 border-purple-500/40',
-            'bg-pink-500/20 text-pink-400 border-pink-500/40',
-            'bg-indigo-500/20 text-indigo-400 border-indigo-500/40',
-            'bg-teal-500/20 text-teal-400 border-teal-500/40',
-            'bg-amber-500/20 text-amber-400 border-amber-500/40',
-            'bg-rose-500/20 text-rose-400 border-rose-500/40',
-            'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
-        ];
-
-        // Simple hash function to get consistent colors for the same category
-        const hash = category.split('').reduce((acc, char) => {
-            return char.charCodeAt(0) + ((acc << 5) - acc);
-        }, 0);
-
-        const index = Math.abs(hash) % colors.length;
-        return `${colors[index]} border rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap`;
-    };
-
     return (
-        <div className="space-y-6">
-            {/* Header with Bulk Actions */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h2 className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
+        <div id="admin-events-container" className="space-y-6" data-testid="dashboard-events">
+            <div className="flex flex-col space-y-4">
+                <div id="admin-events-header">
+                    <h2
+                        id="admin-events-title"
+                        className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent"
+                        data-testid="events-page-title"
+                    >
                         Event Management
                     </h2>
-                    <p className="text-white/60">Create and manage events - changes sync to landing page instantly</p>
+                    <p id="admin-events-subtitle" className="text-white/60" data-testid="events-page-subtitle">
+                        Create and manage events - changes sync to landing page instantly
+                    </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    {selectedEvents.size > 0 && (
+
+                {/* Header with Bulk Actions */}
+                <div id="admin-events-actions-header" className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div id="admin-events-actions-container" className="flex items-center gap-3">
+                        {selectedEvents.size > 0 && (
+                            <Button
+                                id="admin-events-bulk-delete-button"
+                                onClick={handleBulkDelete}
+                                disabled={isDeleting}
+                                className="bg-[#E9370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
+                                data-testid="events-bulk-delete-button"
+                            >
+                                <Trash2 id="admin-events-bulk-delete-icon" className="mr-2 h-4 w-4" data-testid="events-bulk-delete-icon" />
+                                <span id="admin-events-bulk-delete-text" data-testid="events-bulk-delete-text">
+                                    Delete {selectedEvents.size} {selectedEvents.size === 1 ? 'Event' : 'Events'}
+                                </span>
+                            </Button>
+                        )}
                         <Button
-                            onClick={handleBulkDelete}
-                            disabled={isDeleting}
+                            id="admin-events-create-event-button"
+                            onClick={handleCreate}
                             className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
+                            data-testid="events-create-event-button"
                         >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete {selectedEvents.size} {selectedEvents.size === 1 ? 'Event' : 'Events'}
+                            <Plus id="admin-events-create-event-icon" className="mr-2 h-4 w-4" data-testid="events-create-event-icon" />
+                            <span id="admin-events-create-event-text" data-testid="events-create-event-text">Create Event</span>
                         </Button>
-                    )}
-                    <Button
-                        onClick={handleCreate}
-                        className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
-                    >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create Event
-                    </Button>
+                    </div>
                 </div>
-            </div>
 
             {/* Search Bar */}
-            <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+            <div id="admin-events-search-container" className="relative" data-testid="events-search-container">
+                <Search
+                    id="admin-events-search-icon"
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40"
+                    data-testid="events-search-icon"
+                />
                 <Input
+                    id="admin-events-search-input"
                     type="text"
+                    data-testid="events-event-search-input"
                     placeholder="Search events by name or category..."
                     value={searchQuery}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                    className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl h-12"
+                    className="pl-12 pr-4 py-6 bg-white/5 border-white/10 focus-visible:ring-[#E9370] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 />
             </div>
 
             {/* Events Table */}
-            <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
-                <Table>
-                    <TableHeader>
-                        <TableRow className="border-white/10 hover:bg-white/5">
-                            <TableHead className="w-16 py-3 pl-5 pr-0">
+            <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden" data-testid="events-events-table">
+                <Table data-testid="events-table">
+                    <TableHeader data-testid="events-table-header">
+                        <TableRow className="border-white/10 hover:bg-white/5" data-testid="events-header-row">
+                            <TableHead className="w-16 py-3 pl-5 pr-0" data-testid="events-select-all-header">
                                 <div className="flex items-center justify-start w-4">
                                     <Checkbox
                                         checked={paginatedEvents.length > 0 && selectedEvents.size === paginatedEvents.length}
                                         onCheckedChange={handleSelectAll}
                                         className="border-white/30 h-4 w-4 flex-shrink-0"
+                                        data-testid="events-select-all-checkbox"
                                     />
                                 </div>
                             </TableHead>
-                            <TableHead className="min-w-[200px] px-4 py-3 text-white/90 text-sm font-semibold">
+                            <TableHead className="min-w-[200px] px-4 py-3 text-white/90 text-sm font-semibold" data-testid="events-event-name-header">
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
                                     onClick={() => handleSort('title')}
+                                    data-testid="events-sort-by-title-button"
                                 >
-                                    Event Name
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                                    <span data-testid="events-title-header-text">Event Name</span>
+                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" data-testid="events-title-sort-icon" />
                                 </Button>
                             </TableHead>
-                            <TableHead className="w-48 px-4 py-3 text-white/90 text-sm font-semibold">
+                            <TableHead className="w-48 px-4 py-3 text-white/90 text-sm font-semibold" data-testid="events-date-time-header">
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
                                     onClick={() => handleSort('start_date')}
+                                    data-testid="events-sort-by-date-button"
                                 >
-                                    Date & Time
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                                    <span data-testid="events-date-header-text">Date & Time</span>
+                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" data-testid="events-date-sort-icon" />
                                 </Button>
                             </TableHead>
-                            <TableHead className="w-48 px-4 py-3 text-white/90 text-sm font-semibold">
+                            <TableHead className="w-48 px-4 py-3 text-white/90 text-sm font-semibold" data-testid="events-venue-header">
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
                                     onClick={() => handleSort('location')}
+                                    data-testid="events-sort-by-location-button"
                                 >
-                                    Venue
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                                    <span data-testid="events-venue-header-text">Venue</span>
+                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" data-testid="events-venue-sort-icon" />
                                 </Button>
                             </TableHead>
-                            <TableHead className="w-32 px-4 py-3 text-white/90 text-sm font-semibold">
+                            <TableHead className="w-32 px-4 py-3 text-white/90 text-sm font-semibold" data-testid="events-category-header">
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
                                     onClick={() => handleSort('category')}
+                                    data-testid="events-sort-by-category-button"
                                 >
-                                    Category
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                                    <span data-testid="events-category-header-text">Category</span>
+                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" data-testid="events-category-sort-icon" />
                                 </Button>
                             </TableHead>
-                            <TableHead className="w-36 px-4 py-3 text-white/90 text-sm font-semibold">Attendance</TableHead>
-                            <TableHead className="w-28 px-4 py-3 text-white/90 text-sm font-semibold">
+                            <TableHead className="w-36 px-4 py-3 text-white/90 text-sm font-semibold" data-testid="events-attendance-header">
+                                <span data-testid="events-attendance-header-text">Attendance</span>
+                            </TableHead>
+                            <TableHead className="w-28 px-4 py-3 text-white/90 text-sm font-semibold" data-testid="events-status-header">
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
                                     onClick={() => handleSort('status')}
+                                    data-testid="events-sort-by-status-button"
                                 >
-                                    Status
-                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+                                    <span data-testid="events-status-header-text">Status</span>
+                                    <ArrowUpDown className="ml-2 h-3.5 w-3.5" data-testid="events-status-sort-icon" />
                                 </Button>
                             </TableHead>
-                            <TableHead className="w-24 px-4 py-3 text-white/90 text-right text-sm font-semibold">Actions</TableHead>
+                            <TableHead className="w-24 px-4 py-3 text-white/90 text-right text-sm font-semibold" data-testid="events-actions-header">
+                                <span data-testid="events-actions-header-text">Actions</span>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
+                    <TableBody data-testid="events-table-body">
                         {paginatedEvents.map((event) => (
-                            <TableRow key={event.id} className="border-white/10 hover:bg-white/5">
-                                <TableCell className="py-3 pl-5 pr-0">
+                            <TableRow
+                                key={event.id}
+                                className="border-white/10 hover:bg-white/5"
+                                data-testid={`events-event-row-${event.id}`}
+                                data-event-id={event.id}
+                            >
+                                <TableCell className="py-3 pl-5 pr-0" data-testid={`events-select-event-${event.id}`}>
                                     <div className="flex items-center justify-start w-4">
                                         <Checkbox
                                             checked={selectedEvents.has(event.id)}
                                             onCheckedChange={(checked) => handleSelectEvent(event.id, checked as boolean)}
                                             className="border-white/30 h-4 w-4 flex-shrink-0"
+                                            data-testid={`events-select-event-checkbox-${event.id}`}
                                         />
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-4 py-3">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
-                                            {event.image_url || (event.metadata && typeof event.metadata === 'object' &&
-                                                !Array.isArray(event.metadata) && 'featured_image' in event.metadata &&
-                                                event.metadata.featured_image) ? (
-                                                <img
-                                                    src={event.image_url || String((event.metadata as any)?.featured_image || '')}
-                                                    alt={event.title || 'Event'}
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => {
-                                                        // If image fails to load, show the category badge instead
-                                                        const parent = e.currentTarget.parentElement;
-                                                        if (parent) {
-                                                            parent.innerHTML = `
-                                                                <div class="w-full h-full flex items-center justify-center">
-                                                                    <div class="${getCategoryColor(event.category || '')} text-xs px-2 py-1 rounded">
-                                                                        {event.category || 'Event'}
-                                                                    </div>
-                                                                </div>
-                                                            `;
-                                                        }
-                                                    }}
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <div className={`${getCategoryColor(event.category || '')} text-xs px-2 py-1 rounded`}>
-                                                        {event.category || 'Event'}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className="text-sm font-medium text-white truncate">{event.title}</div>
-                                            <div className="text-xs text-white/60">
-                                                {event.price_range ? (
-                                                    formatCurrency(Number(event.price_range.replace(/[^0-9]/g, '')))
-                                                ) : 'TBD'}
+                                <TableCell className="min-w-[200px] px-4 py-3" data-testid={`events-event-name-cell-${event.id}`}>
+                                    <div className="flex flex-col">
+                                        <span className="font-medium text-white" data-testid={`events-event-title-${event.id}`}>
+                                            {event.title || 'Untitled Event'}
+                                        </span>
+                                        {event.description && (
+                                            <span className="text-xs text-white/60 mt-1 line-clamp-2" data-testid={`events-event-description-${event.id}`}>
+                                                {event.description}
+                                            </span>
+                                        )}
+                                    </div>
+                                </TableCell>
+                                <TableCell className="w-48 px-4 py-3" data-testid={`events-event-date-cell-${event.id}`}>
+                                    <div className="flex items-center gap-2">
+                                        <Calendar className="h-4 w-4 text-white/60 flex-shrink-0" data-testid="events-date-icon" />
+                                        <div>
+                                            <div className="text-sm text-white" data-testid={`events-event-date-${event.id}`}>
+                                                {event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    year: 'numeric'
+                                                }) : 'No date'}
+                                            </div>
+                                            <div className="text-xs text-white/60" data-testid={`events-event-time-${event.id}`}>
+                                                {(() => {
+                                                    const startTime = event.start_date ? new Date(event.start_date).toLocaleTimeString('en-US', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                        hour12: true
+                                                    }) : '';
+                                                    const endTime = event.end_date ? new Date(event.end_date).toLocaleTimeString('en-US', {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit',
+                                                        hour12: true
+                                                    }) : '';
+                                                    return startTime + (endTime ? ` - ${endTime}` : '');
+                                                })()}
                                             </div>
                                         </div>
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-4 py-3 text-white/70">
-                                    <div className="flex items-center space-x-2">
-                                        <Calendar className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
-                                        <div className="text-sm">
-                                            {event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric',
-                                            }) : 'TBD'}
-                                            {event.start_date && (
-                                                <span className="text-white/50"> • {new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                            )}
-                                        </div>
+                                <TableCell className="w-48 px-4 py-3" data-testid={`events-event-venue-cell-${event.id}`}>
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="h-4 w-4 text-white/60 flex-shrink-0" data-testid="events-venue-icon" />
+                                        <span className="text-sm text-white" data-testid={`events-event-location-${event.id}`}>
+                                            {event.location || 'No location'}
+                                        </span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-4 py-3 text-white/70">
-                                    <div className="flex items-center space-x-2">
-                                        <MapPin className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
-                                        <div className="text-sm truncate">{event.location || 'TBD'}</div>
+                                <TableCell className="w-32 px-4 py-3" data-testid={`events-event-category-cell-${event.id}`}>
+                                    <Badge
+                                        className={getCategoryColor(event.category || '')}
+                                        data-testid={`events-event-category-${event.id}`}
+                                    >
+                                        {event.category || 'Uncategorized'}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell className="w-36 px-4 py-3" data-testid={`events-event-attendance-cell-${event.id}`}>
+                                    <div className="flex items-center gap-2">
+                                        <Users className="h-4 w-4 text-white/60 flex-shrink-0" data-testid="events-attendance-icon" />
+                                        <span className="text-sm text-white" data-testid={`events-event-attendance-${event.id}`}>
+                                            {event.attendees || '0'} / {event.capacity || '∞'}
+                                        </span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="px-4 py-3">
-                                    <div className="w-24">
-                                        <Badge
-                                            className={`${getCategoryColor(event.category || '')} hover:opacity-90 transition-opacity w-full flex justify-center`}
-                                            title={event.category || ''}
+                                <TableCell className="w-28 px-4 py-3" data-testid={`events-event-status-cell-${event.id}`}>
+                                    <Badge
+                                        className={getStatusColor(event.status || 'draft')}
+                                        data-testid={`events-event-status-${event.id}`}
+                                    >
+                                        {event.status || 'draft'}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell className="w-24 px-4 py-3 text-right" data-testid={`events-event-actions-cell-${event.id}`}>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 p-0 hover:bg-white/10"
+                                                data-testid={`events-event-actions-button-${event.id}`}
+                                            >
+                                                <MoreHorizontal className="h-4 w-4 text-white/60" data-testid="events-more-actions-icon" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            align="end"
+                                            className="bg-gray-900 border-gray-700 text-white"
+                                            data-testid={`events-event-actions-menu-${event.id}`}
                                         >
-                                            {event.category}
-                                        </Badge>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3 text-white/70">
-                                    <div className="flex flex-col w-full">
-                                        <div className="flex items-center space-x-2">
-                                            <Users className="h-3.5 w-3.5 text-[#E93370] shrink-0" />
-                                            <span className="text-sm">
-                                                {event.attendees || 0}/{event.capacity || '∞'}
-                                            </span>
-                                        </div>
-                                        <div className="w-full bg-white/10 rounded-full h-1.5 mt-2">
-                                            <div
-                                                className="bg-gradient-to-r from-[#E93370] to-[#FF8A9F] h-full rounded-full"
-                                                style={{
-                                                    width: event.capacity && event.capacity > 0
-                                                        ? `${Math.min(100, Math.round(((event.attendees || 0) / event.capacity) * 100))}%`
-                                                        : '0%'
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3">
-                                    <div className="w-24">
-                                        <Badge
-                                            className={`${getStatusColor(event.status || '')} hover:opacity-90 transition-opacity w-full flex justify-center`}
-                                            title={event.status || ''}
-                                        >
-                                            {event.status}
-                                        </Badge>
-                                    </div>
-                                </TableCell>
-                                <TableCell className="px-4 py-3 text-right">
-                                    <div className="flex justify-end">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="h-4 w-4 text-white/70 hover:text-white" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem
-                                                    onClick={() => handleEdit(event)}
-                                                    className="cursor-pointer"
-                                                >
-                                                    <Edit className="mr-2 h-4 w-4" />
-                                                    Edit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onClick={() => {
-                                                        setDeletingEventId(event.id);
-                                                        setIsDeleteDialogOpen(true);
-                                                    }}
-                                                    className="text-red-500 cursor-pointer"
-                                                >
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
+                                            <DropdownMenuItem
+                                                onClick={() => handleEdit(event)}
+                                                className="cursor-pointer hover:bg-gray-80"
+                                                data-testid="events-edit-event-action"
+                                            >
+                                                <Edit className="mr-2 h-4 w-4" data-testid="events-edit-icon" />
+                                                <span data-testid="events-edit-text">Edit</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => handleDelete(event.id)}
+                                                className="cursor-pointer text-red-400 hover:bg-red-500/10"
+                                                data-testid="events-delete-event-action"
+                                            >
+                                                <Trash2 className="mr-2 h-4 w-4" data-testid="events-delete-icon" />
+                                                <span data-testid="events-delete-text">Delete</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
-
-                {paginatedEvents.length === 0 && (
-                    <div className="text-center py-16 text-white/60">
-                        <Calendar className="h-16 w-16 mx-auto mb-4 text-white/20" />
-                        <p className="text-lg">No events found</p>
-                        <p className="text-sm mt-2">Create your first event to get started!</p>
-                    </div>
-                )}
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="flex items-center justify-between">
-                    <div className="text-sm text-white/60">
-                        Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, sortedEvents.length)} of {sortedEvents.length} events
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                            disabled={currentPage === 1}
-                            className="border-white/10 text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-50"
-                        >
-                            Previous
-                        </Button>
-                        <div className="flex items-center space-x-1">
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                <Button
-                                    key={page}
-                                    variant={currentPage === page ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setCurrentPage(page)}
-                                    className={currentPage === page
-                                        ? "bg-[#E93370] text-white border-[#E93370]"
-                                        : "border-white/10 text-white/70 hover:bg-white/10 hover:text-white"
-                                    }
-                                >
-                                    {page}
-                                </Button>
-                            ))}
-                        </div>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                            disabled={currentPage === totalPages}
-                            className="border-white/10 text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-50"
-                        >
-                            Next
-                        </Button>
-                    </div>
+            <div className="flex items-center justify-between px-4 py-3 border-t border-white/10" data-testid="events-pagination">
+                <div className="text-sm text-white/60" data-testid="events-pagination-info">
+                    Showing <span className="font-medium text-white" data-testid="events-showing-from">{Math.min((currentPage - 1) * itemsPerPage + 1, filteredEvents.length)}</span> to{' '}
+                    <span className="font-medium text-white" data-testid="events-showing-to">
+                        {Math.min(currentPage * itemsPerPage, filteredEvents.length)}
+                    </span>{' '}
+                    of <span className="font-medium text-white" data-testid="events-total-items">{filteredEvents.length}</span> events
                 </div>
-            )}
+                <div className="flex items-center space-x-2" data-testid="events-pagination-controls">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
+                        data-testid="events-previous-page-button"
+                    >
+                        Previous
+                    </Button>
+                    <div className="flex items-center space-x-1" data-testid="events-page-numbers">
+                        {Array.from({ length: Math.ceil(filteredEvents.length / itemsPerPage) }, (_, i) => i + 1).map((page) => (
+                            <Button
+                                key={page}
+                                variant={currentPage === page ? 'outline' : 'ghost'}
+                                size="sm"
+                                className={`h-8 w-8 p-0 ${currentPage === page ? 'bg-white/10 border-white/20 text-white' : 'text-white/60 hover:bg-white/5'}`}
+                                onClick={() => setCurrentPage(page)}
+                                data-testid={`events-page-button-${page}`}
+                                data-active={currentPage === page}
+                            >
+                                {page}
+                            </Button>
+                        ))}
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(p => Math.min(Math.ceil(filteredEvents.length / itemsPerPage), p + 1))}
+                        disabled={currentPage * itemsPerPage >= filteredEvents.length}
+                        className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
+                        data-testid="events-next-page-button"
+                    >
+                        Next
+                    </Button>
+                </div>
+            </div>
+
+            {/* Create/Edit Event Dialog */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent className="sm:max-w-[600px] bg-gray-900 border-gray-800 text-white" data-testid="events-create-edit-dialog">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-bold text-white" data-testid="events-create-edit-dialog-title">
+                            {editingEvent ? 'Edit Event' : 'Create New Event'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <DashboardEventForm
+                        initialValues={editingEvent || undefined}
+                        onSubmit={handleSubmit}
+                        onCancel={() => setIsDialogOpen(false)}
+                        isSubmitting={isSubmitting}
+                        data-testid="events-dashboard-event-form"
+                    />
+                </DialogContent>
+            </Dialog>
 
             {/* Delete Confirmation Dialog */}
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <AlertDialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white">
+                <AlertDialogContent className="bg-gray-900 border-gray-800 text-white" data-testid="events-delete-confirmation-dialog">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Event: {deletingEventId ? filteredEvents.find(e => e.id === deletingEventId)?.title || 'Unknown Event' : ''}</AlertDialogTitle>
-                        <AlertDialogDescription className="text-white/70">
-                            This action cannot be undone. The event and all associated media will be permanently deleted from the system.
+                        <AlertDialogTitle data-testid="events-delete-confirmation-title">Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-gray-400" data-testid="events-delete-confirmation-description">
+                            This action cannot be undone. This will permanently delete the event and remove all associated data.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting} className="text-white/70 border-white/10 hover:bg-white/5">
+                        <AlertDialogCancel
+                            className="bg-transparent border-gray-700 text-white hover:bg-gray-800"
+                            disabled={isDeleting}
+                            data-testid="events-cancel-delete-button"
+                        >
                             Cancel
                         </AlertDialogCancel>
                         <AlertDialogAction
+                            className="bg-red-600 hover:bg-red-70 text-white"
                             onClick={() => deletingEventId && handleDelete(deletingEventId)}
                             disabled={isDeleting}
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            data-testid="events-confirm-delete-button"
                         >
                             {isDeleting ? 'Deleting...' : 'Delete'}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-
-            {/* Create/Edit Dialog */}
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="text-2xl bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
-                            {editingEvent ? 'Edit Event' : 'Create New Event'}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <DashboardEventForm
-                        onSubmit={handleSubmit}
-                        isSubmitting={isSubmitting}
-                        onCancel={() => setIsDialogOpen(false)}
-                        defaultValues={editingEvent || undefined}
-                    />
-                </DialogContent>
-            </Dialog>
         </div>
+    </div>
     );
 };

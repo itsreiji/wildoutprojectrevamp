@@ -30,7 +30,7 @@ export const GallerySection = React.memo(() => {
 
   const displayImages = filteredGallery.slice(0, 6);
   return (
-    <section id="gallery" className="relative py-20 px-4">
+    <section id="gallery-section" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div
