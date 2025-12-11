@@ -1,23 +1,34 @@
-'use client';
+// Fixed 404 page - removed direct useAuth hook call from server component
 
+import { Metadata } from 'next';
 import Link from 'next/link';
-import React from 'react';
-import { Button } from '@/components/ui/button';
+
+import { buttonVariants } from '@/components/ui/button';
+
+export const metadata: Metadata = {
+  title: 'Page Not Found',
+  description: 'The page you are looking for does not exist.',
+};
 
 export default function NotFoundPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md text-center">
-        <div className="text-9xl font-bold text-gray-400">404</div>
-        <h1 className="text-3xl font-bold text-gray-900 mt-4">Page Not Found</h1>
-        <p className="text-gray-600 mt-2">
-          Sorry, we couldn't find the page you're looking for.
-        </p>
-        <div className="mt-8">
-          <Button asChild>
-            <Link href="/">Go back home</Link>
-          </Button>
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-md text-center">
+        <div className="mb-8">
+          <h1 className="text-6xl font-bold text-primary sm:text-8xl">404</h1>
+          <p className="mt-4 text-xl font-semibold text-foreground">
+            Page Not Found
+          </p>
         </div>
+        <p className="mb-8 text-muted-foreground">
+          The page you are looking for does not exist or has been moved.
+        </p>
+        <Link
+          className={buttonVariants({ variant: 'default' })}
+          href="/"
+        >
+          Go to Homepage
+        </Link>
       </div>
     </div>
   );

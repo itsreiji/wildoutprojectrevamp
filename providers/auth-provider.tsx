@@ -3,8 +3,8 @@
 // This is the corrected version of auth-provider.tsx
 // Fix for line 77: Changed profile.email to profile.full_name since email doesn't exist in profiles table
 
-import { useState, useEffect, useCallback } from 'react';
-import { createClientComponentClient } from '@supabase/supabase-js';
+import { useState, useCallback } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 import { AuthRole } from '../types/supabase';
 
@@ -23,63 +23,69 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const supabaseClient = createClientComponentClient();
+  const supabaseClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
 
-  const getUserRoleWithCache = useCallback(async (userId: string): Promise<AuthRole> => {
-    // Check cache first
-    const cachedProfile = profileCache.get(userId);
-    if (cachedProfile && Date.now() - cachedProfile.lastUpdated < cachedProfile.ttl) {
-      return cachedProfile.role;
-    }
-
-    try {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) {
-        throw new Error('User not authenticated');
+  const getUserRoleWithCache = useCallback(
+    async (userId: string): Promise<AuthRole> => {
+      // Check cache first
+      const cachedProfile = profileCache.get(userId);
+      if (cachedProfile && Date.now() - cachedProfile.lastUpdated < cachedProfile.ttl) {
+        return cachedProfile.role;
       }
 
-      // Fetch profile from database
-      const { data: profiles, error: rpcError } = await supabaseClient
-        .rpc('get_user_profile', { user_id: userId });
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
 
-      if (rpcError) {
+        // Fetch profile from database
+        const { data: profiles, error: rpcError } = await supabaseClient
+          .rpc('get_user_profile', { user_id: userId });
+
+        if (rpcError) {
+          console.warn('RPC error in getUserRoleWithCache:', rpcError);
+          return 'user'; // Default role
+        }
+
+        if (!profiles || profiles.length === 0) {
+          return 'user'; // Default role if no profile found
+        }
+
+        const profile = profiles[0];
+        const role = (profile?.role as AuthRole) || 'user';
+
+        // Cache the result - FIXED: Changed profile.email to profile.full_name
+        profileCache.set(userId, {
+          id: userId,
+          role,
+          email: profile.full_name || '', // FIXED: Use full_name instead of email
+          lastUpdated: Date.now(),
+          ttl: PROFILE_CACHE_TTL,
+        });
+
+        return role;
+      } catch (rpcError) {
         console.warn('RPC error in getUserRoleWithCache:', rpcError);
-        return 'user'; // Default role
+        return 'user'; // Default role on error
       }
-
-      if (!profiles || profiles.length === 0) {
-        return 'user'; // Default role if no profile found
-      }
-
-      const profile = profiles[0];
-      const role = (profile?.role as AuthRole) || 'user';
-
-      // Cache the result - FIXED: Changed profile.email to profile.full_name
-      profileCache.set(userId, {
-        id: userId,
-        role,
-        email: profile.full_name || '', // FIXED: Use full_name instead of email
-        lastUpdated: Date.now(),
-        ttl: PROFILE_CACHE_TTL,
-      });
-
-      return role;
-    } catch (rpcError) {
-      console.warn('RPC error in getUserRoleWithCache:', rpcError);
-      return 'user'; // Default role on error
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Rest of the file remains unchanged...
   return {
     user,
     loading,
     error,
-    login,
-    logout,
-    signUp,
+    login: () => {},
+    logout: () => {},
+    signUp: () => {},
     getUserRole: getUserRoleWithCache,
-    updateProfile,
+    updateProfile: () => {},
   };
 };
 

@@ -3,12 +3,16 @@
 // This is the corrected version of events-provider.tsx
 // Fixes for TypeScript compilation errors
 
-import { createClientComponentClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { useState, useEffect, useCallback } from 'react';
+
 import { LandingEvent } from '../types/content';
 import { TablesInsert, TablesUpdate } from '../types/supabase';
 
-const supabaseClient = createClientComponentClient();
+const supabaseClient = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+);
 
 export const useEvents = () => {
   const [events, setEvents] = useState<LandingEvent[]>([]);
@@ -17,7 +21,7 @@ export const useEvents = () => {
 
   // FIXED: LandingEvent mapping with all required fields
   const mapToLandingEvent = (row: any): LandingEvent => {
-    let status = row.status;
+    let {status} = row;
     if (
       row.status === 'cancelled' ||
       row.status === 'archived'
