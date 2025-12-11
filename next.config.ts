@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
-    serverComponentsExternalPackages: ["@jsr/supabase__supabase-js"],
+    // serverComponentsExternalPackages: ["@jsr/supabase__supabase-js"], // Removed deprecated option
   },
   env: {
     // Environment variables that should be available in the browser
@@ -14,7 +14,20 @@ const nextConfig: NextConfig = {
   },
   images: {
     // Configure image optimization settings if needed
-    domains: ['images.unsplash.com', 'avatars.githubusercontent.com', 'your-supabase-project.supabase.co'], // Add your image domains
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'your-supabase-project.supabase.co',
+      },
+    ], // Add your image domains as remote patterns
   },
   typescript: {
     // !! WARN !!
@@ -35,6 +48,8 @@ const nextConfig: NextConfig = {
     // Important: return the modified config
     return config;
   },
+  // Add turbopack config to resolve build conflict
+  turbopack: {},
 };
 
 export default nextConfig;
