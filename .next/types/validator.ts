@@ -92,19 +92,19 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
-// Validate ../../app/sadmin/logout/page.tsx
+// Validate ../../app/sadmin/dashboard/page.tsx
 {
-  type __IsExpected<Specific extends AppPageConfig<"/sadmin/logout">> = Specific
-  const handler = {} as typeof import("../../app/sadmin/logout/page.js")
+  type __IsExpected<Specific extends AppPageConfig<"/sadmin/dashboard">> = Specific
+  const handler = {} as typeof import("../../app/sadmin/dashboard/page.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
 }
 
-// Validate ../../app/sadmin/page.tsx
+// Validate ../../app/sadmin/logout/page.tsx
 {
-  type __IsExpected<Specific extends AppPageConfig<"/sadmin">> = Specific
-  const handler = {} as typeof import("../../app/sadmin/page.js")
+  type __IsExpected<Specific extends AppPageConfig<"/sadmin/logout">> = Specific
+  const handler = {} as typeof import("../../app/sadmin/logout/page.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

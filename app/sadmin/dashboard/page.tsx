@@ -1,5 +1,5 @@
 import { AdminGuard } from '@/components/admin/AdminGuard';
-import { Dashboard } from '@/components/Dashboard';
+import { Dashboard } from '@/components/common/Dashboard';
 
 export default function AdminPage() {
   return (
