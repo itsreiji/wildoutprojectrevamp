@@ -10,7 +10,7 @@ interface RateLimitState {
 
 const rateLimitStore = new Map<string, RateLimitState>();
 
-export const checkRateLimit = (key: string, maxAttempts = 5, windowMs = 900000): { allowed: boolean; timeRemaining?: number } => {
+export const checkRateLimit = (key: string, maxAttempts = 5): { allowed: boolean; timeRemaining?: number } => {
   const now = Date.now();
   const record = rateLimitStore.get(key);
 
@@ -29,7 +29,7 @@ export const checkRateLimit = (key: string, maxAttempts = 5, windowMs = 900000):
     // Rate limit exceeded
     return {
       allowed: false,
-      timeRemaining: record.resetTime - now
+      timeRemaining: record.resetTime - now,
     };
   }
 
@@ -45,14 +45,14 @@ export const recordRateLimitAttempt = (key: string, windowMs = 900000) => {
     rateLimitStore.set(key, {
       attempts: 1,
       lastAttempt: now,
-      resetTime: now + windowMs
+      resetTime: now + windowMs,
     });
   } else {
     // Increment attempt count
     rateLimitStore.set(key, {
       ...record,
       attempts: record.attempts + 1,
-      lastAttempt: now
+      lastAttempt: now,
     });
   }
 };
@@ -66,11 +66,11 @@ export const generateCSRFToken = (secret: string) => {
   const timestamp = Date.now();
   const token = `${timestamp}.${Math.random().toString(36).substring(2, 15)}`;
   const signature = CryptoJS.HmacSHA256(`${token}.${secret}`, secret).toString();
-  
+
   return {
     token,
     timestamp,
-    signature
+    signature,
   };
 };
 
@@ -87,7 +87,7 @@ export const verifyCSRFToken = (token: string, timestamp: number, signature: str
 // Input sanitization
 export const sanitizeInput = (input: string): string => {
   if (typeof input !== 'string') return '';
-  
+
   // Remove potentially dangerous characters/scripts
   return input
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -124,36 +124,36 @@ export const validateSecureEmail = (email: string): { isValid: boolean; errors: 
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
 // Password validation
 export const validatePasswordComplexity = (password: string) => {
   const feedback: string[] = [];
-  
+
   if (password.length < 8) {
     feedback.push('Password must be at least 8 characters long');
   }
-  
+
   if (!/[a-z]/.test(password)) {
     feedback.push('Password must contain at least one lowercase letter');
   }
-  
+
   if (!/[A-Z]/.test(password)) {
     feedback.push('Password must contain at least one uppercase letter');
   }
-  
+
   if (!/\d/.test(password)) {
     feedback.push('Password must contain at least one number');
   }
-  
+
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
     feedback.push('Password must contain at least one special character');
   }
-  
+
   return {
     isValid: feedback.length === 0,
-    feedback
+    feedback,
   };
 };

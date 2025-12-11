@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/providers/auth-provider';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import Link from 'next/link';
+import { useAuth } from '@/providers/auth-provider';
+
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
@@ -18,12 +20,12 @@ export default function RegisterPage() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { user } = useAuth();
   const router = useRouter();
-  
+
   // If user is already logged in, redirect to dashboard
-  if (user && user.id) {
+  if (user?.id) {
     router.push('/sadmin');
   }
 
@@ -39,7 +41,7 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
-    
+
     if (!acceptTerms) {
       setError('You must accept the terms and conditions');
       setLoading(false);
@@ -51,10 +53,10 @@ export default function RegisterPage() {
     try {
       // This is a placeholder - implement actual registration
       console.log('Registering user:', { email, password, fullName });
-      
+
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // For now, redirect to login after "registration"
       router.push('/login?registered=true');
     } catch (err) {
@@ -72,7 +74,7 @@ export default function RegisterPage() {
           <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
           <CardDescription>Sign up to get started</CardDescription>
         </CardHeader>
-        
+
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
@@ -80,77 +82,77 @@ export default function RegisterPage() {
                 {error}
               </div>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="full-name">Full Name</Label>
               <Input
+                required
                 id="full-name"
-                type="text"
                 placeholder="John Doe"
+                type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
+                required
                 id="email"
-                type="email"
                 placeholder="name@example.com"
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
+                required
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>
               <Input
+                required
                 id="confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                required
               />
             </div>
-            
+
             <div className="flex items-center space-x-2 mt-4">
               <Checkbox
-                id="accept-terms"
                 checked={acceptTerms}
+                id="accept-terms"
                 onCheckedChange={(checked) => setAcceptTerms(!!checked)}
               />
               <Label htmlFor="accept-terms">
-                I agree to the <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>
+                I agree to the <Link className="text-blue-600 hover:underline" href="/terms">Terms of Service</Link> and <Link className="text-blue-600 hover:underline" href="/privacy">Privacy Policy</Link>
               </Label>
             </div>
           </CardContent>
-          
+
           <CardFooter className="flex flex-col space-y-3">
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              className="w-full"
               disabled={loading}
+              type="submit"
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </Button>
-            
+
             <div className="text-center text-sm text-gray-600 mt-4">
               Already have an account?{' '}
-              <Link href="/login" className="text-blue-600 hover:underline">
+              <Link className="text-blue-600 hover:underline" href="/login">
                 Sign in
               </Link>
             </div>

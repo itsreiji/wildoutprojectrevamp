@@ -1,31 +1,32 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/providers/auth-provider';
-import { useContent } from '@/providers/content-provider';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Users, 
-  Calendar, 
-  Camera, 
-  Users2, 
+import {
+  Users,
+  Calendar,
+  Camera,
+  Users2,
   Settings,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/providers/auth-provider';
+import { useContent } from '@/providers/content-provider';
 
 export const Dashboard = () => {
   const { user, role, loading: authLoading } = useAuth();
-  const { 
-    events, 
-    partners, 
-    gallery, 
-    team, 
+  const {
+    events,
+    partners,
+    gallery,
+    team,
     loading: contentLoading,
-    adminSections 
+    adminSections,
   } = useContent();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
@@ -49,7 +50,7 @@ export const Dashboard = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4" />
           <p className="text-lg text-gray-600">Loading dashboard...</p>
         </div>
       </div>
@@ -62,7 +63,7 @@ export const Dashboard = () => {
         <div className="text-center p-6 bg-red-100 rounded-lg">
           <h2 className="text-xl font-bold text-red-700">Access Denied</h2>
           <p className="text-red-600 mt-2">Please sign in to access the dashboard</p>
-          <Button className="mt-4" asChild>
+          <Button asChild className="mt-4">
             <Link href="/login">Sign In</Link>
           </Button>
         </div>
@@ -79,13 +80,13 @@ export const Dashboard = () => {
     { id: 'settings', slug: 'settings', label: 'Settings', icon: Settings, description: 'Manage site settings' },
   ];
 
-  const sections = adminSections.length > 0 
+  const sections = adminSections.length > 0
     ? adminSections.map(section => ({
         id: section.id,
         slug: section.slug,
         label: section.label,
         icon: Settings, // Using Settings as default since we can't dynamically import icons
-        description: section.description || ''
+        description: section.description || '',
       }))
     : defaultSections;
 
@@ -93,9 +94,9 @@ export const Dashboard = () => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Mobile sidebar toggle button */}
       <div className="md:hidden fixed top-4 left-4 z-50">
-        <Button 
-          variant="outline" 
+        <Button
           size="icon"
+          variant="outline"
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -103,7 +104,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Sidebar */}
-      <aside 
+      <aside
         className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r h-full transform transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
@@ -112,7 +113,7 @@ export const Dashboard = () => {
           <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">Welcome, {user.email}</p>
         </div>
-        
+
         <nav className="p-4">
           <ul className="space-y-2">
             {sections.map((section) => {
@@ -120,8 +121,8 @@ export const Dashboard = () => {
               return (
                 <li key={section.id}>
                   <Button
-                    variant={activeSection === section.slug ? 'secondary' : 'ghost'}
                     className="w-full justify-start"
+                    variant={activeSection === section.slug ? 'secondary' : 'ghost'}
                     onClick={() => {
                       setActiveSection(section.slug);
                       if (window.innerWidth < 768) {
@@ -148,7 +149,7 @@ export const Dashboard = () => {
           </div>
           <div className="ml-auto flex items-center space-x-4">
             <span className="text-sm text-gray-500">Role: {role}</span>
-            <Button variant="outline" size="sm">
+            <Button size="sm" variant="outline">
               <Link href="/sadmin/logout">Logout</Link>
             </Button>
           </div>
@@ -243,10 +244,10 @@ export const Dashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   {sections.map((section) => (
-                    <Link 
-                      key={section.id} 
-                      href={`/sadmin/${section.slug}`}
+                    <Link
+                      key={section.id}
                       className="block"
+                      href={`/sadmin/${section.slug}`}
                     >
                       <Card className="hover:shadow-md transition-shadow">
                         <CardHeader>

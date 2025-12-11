@@ -1,10 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+
 import { supabaseClient } from '../lib/supabase/client';
-import { useAuth } from './auth-provider';
-import type { TablesInsert, TablesUpdate } from '../types/supabase';
 import type { Partner } from '../types/content';
+import type { TablesInsert, TablesUpdate } from '../types/supabase';
+
+import { useAuth } from './auth-provider';
+
 
 interface PartnersContextType {
   partners: Partner[];
@@ -17,7 +20,7 @@ interface PartnersContextType {
 
 const PartnersContext = createContext<PartnersContextType | null>(null);
 
-export function PartnersProvider({ children }: { children: ReactNode }) {
+export const PartnersProvider = ({ children }: { children: ReactNode }) => {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +41,7 @@ export function PartnersProvider({ children }: { children: ReactNode }) {
         }
         return acc;
       },
-      {}
+      {},
     );
   };
 
@@ -51,7 +54,7 @@ export function PartnersProvider({ children }: { children: ReactNode }) {
         .select('*')
         .eq('status', 'active')
         .order('name');
-        
+
       if (error) {
         console.error('Error fetching partners:', error);
         throw error;
@@ -149,14 +152,14 @@ export function PartnersProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const value = {
+  const value = React.useMemo(() => ({
     partners,
     loading,
     error,
     addPartner,
     updatePartner,
     deletePartner,
-  };
+  }), [partners, loading, error]);
 
   return <PartnersContext.Provider value={value}>{children}</PartnersContext.Provider>;
 }

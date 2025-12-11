@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useContent } from '@/providers/content-provider';
-import { useEvents } from '@/providers/events-provider';
-import { useAuth } from '@/providers/auth-provider';
+import { useMemo } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { useContent } from '@/providers/content-provider';
+import { useEvents } from '@/providers/events-provider';
 
 // Define types based on the expected data
 interface Event {
@@ -24,26 +24,22 @@ interface Event {
 export const LandingPage = () => {
   const { hero, about, settings, loading, error } = useContent();
   const { events } = useEvents();
-  const { user, loading: authLoading } = useAuth();
-  const [displayedEvents, setDisplayedEvents] = useState<Event[]>([]);
 
-  useEffect(() => {
-    // Filter and sort events for display (e.g., upcoming events)
+  const displayedEvents = useMemo(() => {
     if (events && events.length > 0) {
-      const upcomingEvents = events
+      return events
         .filter(event => event.status !== 'completed')
         .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
-        .slice(0, 6); // Show only first 6 events
-      
-      setDisplayedEvents(upcomingEvents as Event[]);
+        .slice(0, 6) as Event[]; // Show only first 6 events
     }
+    return [];
   }, [events]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4" />
           <p className="text-lg text-gray-600">Loading...</p>
         </div>
       </div>
@@ -56,8 +52,8 @@ export const LandingPage = () => {
         <div className="text-center p-6 bg-red-100 rounded-lg">
           <h2 className="text-xl font-bold text-red-700">Error Loading Content</h2>
           <p className="text-red-600 mt-2">{error}</p>
-          <Button 
-            className="mt-4" 
+          <Button
+            className="mt-4"
             onClick={() => window.location.reload()}
           >
             Retry
@@ -71,7 +67,7 @@ export const LandingPage = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
       <section className="relative py-20 md:py-28 bg-gradient-to-r from-blue-900 to-purple-900 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="absolute inset-0 bg-black opacity-50" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
@@ -102,16 +98,16 @@ export const LandingPage = () => {
               )}
             </div>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                size="lg" 
+              <Button
                 className="px-8 py-3 text-lg bg-white text-blue-900 hover:bg-gray-100 rounded-full"
+                size="lg"
               >
                 {hero?.cta_text || 'Join Us'}
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
+              <Button
                 className="px-8 py-3 text-lg border-2 rounded-full"
+                size="lg"
+                variant="outline"
               >
                 Learn More
               </Button>
@@ -130,7 +126,7 @@ export const LandingPage = () => {
             <p className="text-lg text-gray-600 mb-8">
               {about?.subtitle || "Indonesia's leading creative community platform, connecting artists, events, and experiences since 2020."}
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
               {about?.story?.map((story, index) => (
                 <Card key={index} className="border-0 shadow-none bg-gray-50">
@@ -143,7 +139,7 @@ export const LandingPage = () => {
                 </Card>
               ))}
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
               {about?.features?.map((feature, index) => (
                 <Card key={index} className="border-0 shadow-sm">
@@ -169,32 +165,32 @@ export const LandingPage = () => {
               Discover the latest events happening in the creative community
             </p>
           </div>
-          
+
           {displayedEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayedEvents.map((event) => (
                 <Card key={event.id} className="overflow-hidden transition-all hover:shadow-lg">
                   {event.image_url && (
                     <div className="h-48 overflow-hidden">
-                      <img 
-                        src={event.image_url} 
-                        alt={event.title} 
+                      <img
+                        alt={event.title}
                         className="w-full h-full object-cover"
+                        src={event.image_url}
                       />
                     </div>
                   )}
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <CardTitle className="text-xl">{event.title}</CardTitle>
-                      <Badge 
-                        variant={event.status === 'ongoing' ? 'default' : 
+                      <Badge
+                        variant={event.status === 'ongoing' ? 'default' :
                                 event.status === 'completed' ? 'secondary' : 'outline'}
                       >
                         {event.status}
                       </Badge>
                     </div>
                     {event.category && (
-                      <Badge variant="secondary" className="w-fit mt-2">
+                      <Badge className="w-fit mt-2" variant="secondary">
                         {event.category}
                       </Badge>
                     )}
@@ -225,9 +221,9 @@ export const LandingPage = () => {
               <p className="text-gray-600">Check back later for new events</p>
             </div>
           )}
-          
+
           <div className="text-center mt-12">
-            <Button variant="outline" className="rounded-full px-6">
+            <Button className="rounded-full px-6" variant="outline">
               View All Events
             </Button>
           </div>
@@ -242,7 +238,7 @@ export const LandingPage = () => {
             <p className="text-lg text-gray-600 mb-10">
               Have questions or want to collaborate? Reach out to our team
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {settings?.email && (
                 <Card className="border-0 shadow-sm bg-gray-50">
@@ -250,32 +246,32 @@ export const LandingPage = () => {
                     <CardTitle className="text-lg">Email</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <a 
-                      href={`mailto:${settings.email}`} 
+                    <a
                       className="text-blue-600 hover:underline"
+                      href={`mailto:${settings.email}`}
                     >
                       {settings.email}
                     </a>
                   </CardContent>
                 </Card>
               )}
-              
+
               {settings?.phone && (
                 <Card className="border-0 shadow-sm bg-gray-50">
                   <CardHeader>
                     <CardTitle className="text-lg">Phone</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <a 
-                      href={`tel:${settings.phone}`} 
+                    <a
                       className="text-blue-600 hover:underline"
+                      href={`tel:${settings.phone}`}
                     >
                       {settings.phone}
                     </a>
                   </CardContent>
                 </Card>
               )}
-              
+
               {settings?.address && (
                 <Card className="border-0 shadow-sm bg-gray-50">
                   <CardHeader>
@@ -287,46 +283,46 @@ export const LandingPage = () => {
                 </Card>
               )}
             </div>
-            
+
             <div className="mt-10">
               <h3 className="text-xl font-semibold mb-4">Follow Us</h3>
               <div className="flex justify-center space-x-4">
                 {settings?.social_media?.instagram && (
-                  <a 
-                    href={settings.social_media.instagram} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <a
                     className="text-gray-700 hover:text-blue-600"
+                    href={settings.social_media.instagram}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     Instagram
                   </a>
                 )}
                 {settings?.social_media?.twitter && (
-                  <a 
-                    href={settings.social_media.twitter} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <a
                     className="text-gray-700 hover:text-blue-600"
+                    href={settings.social_media.twitter}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     Twitter
                   </a>
                 )}
                 {settings?.social_media?.facebook && (
-                  <a 
-                    href={settings.social_media.facebook} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <a
                     className="text-gray-700 hover:text-blue-600"
+                    href={settings.social_media.facebook}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     Facebook
                   </a>
                 )}
                 {settings?.social_media?.youtube && (
-                  <a 
-                    href={settings.social_media.youtube} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <a
                     className="text-gray-700 hover:text-blue-600"
+                    href={settings.social_media.youtube}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     YouTube
                   </a>

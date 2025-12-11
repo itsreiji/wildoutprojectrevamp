@@ -1,10 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+
 import { supabaseClient } from '../lib/supabase/client';
-import { useAuth } from './auth-provider';
-import type { TablesInsert, TablesUpdate } from '../types/supabase';
 import type { LandingEvent } from '../types/content';
+import type { TablesInsert, TablesUpdate } from '../types/supabase';
+
+import { useAuth } from './auth-provider';
+
 
 interface EventsContextType {
   events: LandingEvent[];
@@ -18,7 +21,7 @@ interface EventsContextType {
 
 const EventsContext = createContext<EventsContextType | null>(null);
 
-export function EventsProvider({ children }: { children: ReactNode }) {
+export const EventsProvider = ({ children }: { children: ReactNode }) => {
   const [events, setEvents] = useState<LandingEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,12 +34,12 @@ export function EventsProvider({ children }: { children: ReactNode }) {
         .from('public_events_view')
         .select('*')
         .order('start_date', { ascending: true });
-        
+
       if (error) {
         console.error('Error fetching events:', error);
         throw error;
       }
-      
+
       const eventsData = (data || []).map((row: any): LandingEvent => {
         // Map database status to LandingEvent status
         let status: LandingEvent['status'] = 'upcoming';
@@ -85,7 +88,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
           partner_logo_url: row.partner_logo_url || '',
         };
       }) as LandingEvent[];
-      
+
       setEvents(eventsData);
       return eventsData;
     } catch (error) {
@@ -165,7 +168,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const value = {
+  const value = React.useMemo(() => ({
     events,
     loading,
     error,
@@ -173,7 +176,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
     updateEvent,
     deleteEvent,
     fetchEvents,
-  };
+  }), [events, loading, error]);
 
   return <EventsContext.Provider value={value}>{children}</EventsContext.Provider>;
 }

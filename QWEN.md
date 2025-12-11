@@ -2,16 +2,16 @@
 
 ## Project Overview
 
-WildOut! is a comprehensive event management platform featuring a public landing page and a sophisticated admin dashboard. The application is built with React, TypeScript, and Vite, with Supabase serving as the backend for data management and authentication. The platform enables real-time synchronization between the public landing page and admin dashboard, with all content managed through Supabase as the single source of truth.
+WildOut! is a comprehensive event management platform featuring a public landing page and a sophisticated admin dashboard. The application has been migrated to Next.js 16 with the App Router architecture, with Supabase serving as the backend for data management and authentication. The platform enables real-time synchronization between the public landing page and admin dashboard, with all content managed through Supabase as the single source of truth.
 
 ### Key Technologies
-- **Frontend**: React 19, TypeScript, Vite
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript
 - **Styling**: Tailwind CSS with Radix UI components
 - **Database/Backend**: Supabase (PostgreSQL, Auth, Storage)
 - **State Management**: React Context API with custom providers
 - **Data Fetching**: TanStack Query (React Query)
 - **UI Components**: Radix UI primitives, Lucide React icons
-- **Build Tool**: Vite with Turbo for monorepo support
+- **Build Tool**: Next.js Compiler
 - **Package Manager**: pnpm
 
 ### Architecture Highlights
@@ -24,25 +24,42 @@ WildOut! is a comprehensive event management platform featuring a public landing
 ## Directory Structure
 
 ```
-src/
-├── admin/                    # Admin-specific components
-├── assets/                   # Static assets
-├── components/               # UI components (LandingPage, Dashboard, sections)
-├── contexts/                 # React Context providers
-├── data/                     # Static data and content
-├── guidelines/               # Development guidelines
-├── lib/                      # Utility libraries
-├── pages/                    # Page components
-├── scripts/                  # Utility scripts
-├── services/                 # Service layer (audit service)
-├── styles/                   # CSS styles
-├── supabase/                 # Supabase client and types
-├── test/                     # Test utilities
-├── types/                    # Type definitions
-├── utils/                    # Utility functions
-├── App.tsx                   # Main application router
-├── main.tsx                  # Application entry point
-└── index.css                 # Global styles
+app/
+├── api/                      # Next.js API routes
+├── sadmin/                   # Admin dashboard pages
+├── login/                    # Login page
+├── register/                 # Registration page
+├── events/                   # Events page
+├── test-ui/                  # UI test page
+├── 404/                      # Not found page
+├── layout.tsx               # Root layout with providers
+├── page.tsx                 # Landing page
+└── globals.css              # Global styles
+components/
+├── ui/                      # Shadcn UI components
+├── admin/                   # Admin-specific components
+├── LandingPage.tsx          # Landing page component
+├── Dashboard.tsx            # Dashboard component
+├── router.tsx               # Router components (placeholder)
+└── ...                      # Other UI components
+providers/
+├── auth-provider.tsx        # Authentication provider
+├── content-provider.tsx     # Content provider
+├── events-provider.tsx      # Events provider
+├── partners-provider.tsx    # Partners provider
+├── static-content-provider.tsx # Static content provider
+├── team-provider.tsx        # Team provider
+└── query-provider.tsx       # Query provider
+lib/
+├── supabase/                # Supabase client
+├── utils.ts                 # Utility functions
+└── ...                      # Other utility modules
+types/                       # Type definitions
+├── content.ts               # Content-related types
+├── supabase.ts              # Supabase-generated types
+└── ...                      # Other type definitions
+services/                    # Service implementations
+utils/                       # Utility functions
 ```
 
 ## Building and Running
@@ -56,25 +73,26 @@ src/
 1. Install dependencies: `pnpm install`
 2. Set up environment variables (copy from `.env.example`):
    ```
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    ```
 3. Optional configuration:
-   - `VITE_ADMIN_BASE_PATH` to customize admin URL (default: `/sadmin`)
-   - `VITE_USE_DUMMY_DATA` for development with mock data
+   - `NEXT_PUBLIC_ADMIN_BASE_PATH` to customize admin URL (default: `/sadmin`)
+   - `NEXT_PUBLIC_USE_DUMMY_DATA` for development with mock data
 
 ### Development Commands
 - `pnpm dev`: Start development server
 - `pnpm build`: Build for production
+- `pnpm start`: Start production server
+- `pnpm lint`: Run Next.js linting
+- `pnpm type-check`: Type check without emitting
 - `pnpm test`: Run tests
 - `pnpm test:ui`: Run tests with UI
 - `pnpm test:coverage`: Run tests with coverage report
-- `pnpm type-check`: Type check without emitting
 - `pnpm format`: Format all files with Prettier
 - `pnpm format:check`: Check if files are formatted with Prettier
-- `pnpm lint`: Run ESLint on TypeScript and TSX files
-- `pnpm lint:parallel`: Run ESLint, type checking, and format checking in parallel
-- `pnpm lint:all`: Run ESLint, type checking, and format in sequence
+- `pnpm lint:parallel`: Run all linting tools in parallel (ESLint, TypeScript, Prettier)
+- `pnpm lint:all`: Run all linting sequentially
 
 ### Database Setup
 1. Apply Supabase migrations to create all necessary tables
@@ -92,7 +110,8 @@ src/
 - Role-based access control with admin/editor/user roles
 - OAuth (Google) and email/password authentication
 - Session validation and security measures
-- Remember me functionality with local storage
+- Remember me functionality with Next.js cookies
+- Server-side authentication handling through Next.js API routes
 
 ### State Management
 - React Context API for global state (AuthContext, ContentContext, etc.)
@@ -140,6 +159,6 @@ src/
 - Permission inheritance with optional user-specific overrides
 
 ### Configurable Admin Base Path
-- Default admin dashboard accessible at `/sadmin` 
-- Configurable via `VITE_ADMIN_BASE_PATH` environment variable
+- Default admin dashboard accessible at `/sadmin`
+- Configurable via `NEXT_PUBLIC_ADMIN_BASE_PATH` environment variable
 - Automatic link generation based on configured base path

@@ -1,10 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+
 import { supabaseClient } from '../lib/supabase/client';
-import { useAuth } from './auth-provider';
-import type { Json } from '../types/supabase';
 import type { HeroContent, AboutContent, SiteSettings } from '../types/content';
+import type { Json } from '../types/supabase';
+
+import { useAuth } from './auth-provider';
+
 
 // Helper functions for data normalization
 const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> => {
@@ -21,7 +24,7 @@ const normalizeSocialLinks = (value: Json | undefined): Record<string, string | 
       }
       return acc;
     },
-    {}
+    {},
   );
 };
 
@@ -46,7 +49,7 @@ interface StaticContentContextType {
 
 const StaticContentContext = createContext<StaticContentContextType | null>(null);
 
-export function StaticContentProvider({ children }: { children: ReactNode }) {
+export const StaticContentProvider = ({ children }: { children: ReactNode }) => {
   const [hero, setHero] = useState<HeroContent | null>(null);
   const [about, setAbout] = useState<AboutContent | null>(null);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
@@ -154,11 +157,11 @@ export function StaticContentProvider({ children }: { children: ReactNode }) {
             'Founded in 2020, WildOut! celebrates Indonesia’s creative culture.',
             'We host community-driven events that bring artists, venues, and sponsors together.',
           ],
-          features: typeof result.features === 'string' 
+          features: typeof result.features === 'string'
             ? JSON.parse(result.features) ?? [
                 { title: 'Community First', description: 'We build lasting connections.' },
                 { title: 'Unforgettable Experiences', description: 'Every event is crafted to be memorable.' },
-              ] 
+              ]
             : (result.features ?? [
                 { title: 'Community First', description: 'We build lasting connections.' },
                 { title: 'Unforgettable Experiences', description: 'Every event is crafted to be memorable.' },
@@ -296,7 +299,7 @@ export function StaticContentProvider({ children }: { children: ReactNode }) {
         .from('hero_content')
         .upsert({
           ...content,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -319,7 +322,7 @@ export function StaticContentProvider({ children }: { children: ReactNode }) {
         .from('about_content')
         .upsert({
           ...content,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -342,7 +345,7 @@ export function StaticContentProvider({ children }: { children: ReactNode }) {
         .from('site_settings')
         .upsert({
           ...settings,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -369,7 +372,7 @@ export function StaticContentProvider({ children }: { children: ReactNode }) {
             fetchAboutContent(),
             fetchSiteSettings(),
           ]);
-          
+
           setHero(heroData);
           setAbout(aboutData);
           setSettings(settingsData);
@@ -380,7 +383,7 @@ export function StaticContentProvider({ children }: { children: ReactNode }) {
           setLoading(false);
         }
       };
-      
+
       loadStaticContent();
     } else {
       setHero(null);
@@ -390,7 +393,7 @@ export function StaticContentProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const value = {
+  const value = React.useMemo(() => ({
     hero,
     about,
     settings,
@@ -399,7 +402,7 @@ export function StaticContentProvider({ children }: { children: ReactNode }) {
     saveHeroContent,
     saveAboutContent,
     saveSiteSettings,
-  };
+  }), [hero, about, settings, loading, error]);
 
   return <StaticContentContext.Provider value={value}>{children}</StaticContentContext.Provider>;
 }

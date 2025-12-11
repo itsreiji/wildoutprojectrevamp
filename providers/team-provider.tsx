@@ -1,10 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+
 import { supabaseClient } from '../lib/supabase/client';
-import { useAuth } from './auth-provider';
-import type { TablesInsert, TablesUpdate } from '../types/supabase';
 import type { TeamMember } from '../types/content';
+import type { TablesInsert, TablesUpdate } from '../types/supabase';
+
+import { useAuth } from './auth-provider';
+
 
 interface TeamContextType {
   team: TeamMember[];
@@ -17,7 +20,7 @@ interface TeamContextType {
 
 const TeamContext = createContext<TeamContextType | null>(null);
 
-export function TeamProvider({ children }: { children: ReactNode }) {
+export const TeamProvider = ({ children }: { children: ReactNode }) => {
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +41,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
         }
         return acc;
       },
-      {}
+      {},
     );
   };
 
@@ -52,7 +55,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
         .eq('status', 'active')
         .order('display_order')
         .order('name');
-        
+
       if (error) {
         console.error('Error fetching team members:', error);
         throw error;
@@ -147,14 +150,14 @@ export function TeamProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const value = {
+  const value = React.useMemo(() => ({
     team,
     loading,
     error,
     addTeamMember,
     updateTeamMember,
     deleteTeamMember,
-  };
+  }), [team, loading, error]);
 
   return <TeamContext.Provider value={value}>{children}</TeamContext.Provider>;
 }

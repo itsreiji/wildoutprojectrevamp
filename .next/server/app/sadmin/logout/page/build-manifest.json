@@ -8,10 +8,10 @@
   "rootMainFiles": [
     "static/chunks/158e64b1782dc70a.js",
     "static/chunks/da6eaf1c7b9eb192.js",
-    "static/chunks/0fb8e83010942983.js",
-    "static/chunks/9217847c656d9dad.js",
     "static/chunks/ed21acd43d03da9e.js",
-    "static/chunks/turbopack-8380fe4ead084b9d.js"
+    "static/chunks/9217847c656d9dad.js",
+    "static/chunks/0fb8e83010942983.js",
+    "static/chunks/turbopack-862de9401bdedf3d.js"
   ],
   "pages": {},
   "ampFirstPages": []

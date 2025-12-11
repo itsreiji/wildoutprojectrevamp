@@ -117,8 +117,8 @@ export interface ContentContextType {
   deleteGalleryImage: (id: string) => Promise<void>;
   // Event Artists mutations
   fetchEventArtists: (eventId: string) => Promise<EventArtist[]>;
-  addEventArtist: (artist: any) => Promise<any>;
-  updateEventArtist: (id: string, updates: any) => Promise<any>;
+  addEventArtist: (artist: Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>) => Promise<EventArtist>;
+  updateEventArtist: (id: string, updates: Partial<Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>>) => Promise<EventArtist>;
   deleteEventArtist: (id: string) => Promise<void>;
   // Content mutations
   saveHeroContent: (content: HeroContent) => Promise<any>;

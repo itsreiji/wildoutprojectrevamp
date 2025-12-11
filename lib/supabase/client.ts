@@ -1,5 +1,6 @@
 import { createClient } from '@jsr/supabase__supabase-js';
-import type { Database } from '../types/supabase';
+
+import type { Database } from '../../types/supabase';
 
 // Supabase configuration from environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -25,7 +26,7 @@ const createEnhancedStorage = () => ({
       const value = localStorage.getItem(key);
 
       // Special handling for session data to track session ID
-      if (key === 'sb-' + supabaseUrl.split('//')[1] + '-auth-token' && value) {
+      if (key === `sb-${  supabaseUrl.split('//')[1]  }-auth-token` && value) {
         const parsed = JSON.parse(value);
         if (parsed?.access_token) {
           localStorage.setItem(SESSION_ID_KEY, parsed.access_token);
@@ -44,7 +45,7 @@ const createEnhancedStorage = () => ({
       localStorage.setItem(key, value);
 
       // Track session ID changes for cross-page consistency
-      if (key === 'sb-' + supabaseUrl.split('//')[1] + '-auth-token') {
+      if (key === `sb-${  supabaseUrl.split('//')[1]  }-auth-token`) {
         const parsed = JSON.parse(value);
         if (parsed?.access_token) {
           localStorage.setItem(SESSION_ID_KEY, parsed.access_token);
@@ -60,7 +61,7 @@ const createEnhancedStorage = () => ({
       localStorage.removeItem(key);
 
       // Clear session ID when auth token is removed
-      if (key === 'sb-' + supabaseUrl.split('//')[1] + '-auth-token') {
+      if (key === `sb-${  supabaseUrl.split('//')[1]  }-auth-token`) {
         localStorage.removeItem(SESSION_ID_KEY);
       }
     } catch (error) {

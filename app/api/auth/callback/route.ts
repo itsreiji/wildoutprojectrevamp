@@ -1,6 +1,6 @@
 // app/api/auth/callback/route.ts
-import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   // Get URL parameters
@@ -46,7 +46,8 @@ export async function GET(request: NextRequest) {
         // Set the session in a cookie (or handle it as needed)
         // Note: In a real app, you should handle sessions more securely
         // This is just a simplified example
-        cookies().set('sb-access-token', data.access_token, {
+        const cookieStore = await cookies();
+        cookieStore.set('sb-access-token', data.access_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           maxAge: data.expires_in,
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
         });
 
         if (data.refresh_token) {
-          cookies().set('sb-refresh-token', data.refresh_token, {
+          cookieStore.set('sb-refresh-token', data.refresh_token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             maxAge: 1209600, // 2 weeks

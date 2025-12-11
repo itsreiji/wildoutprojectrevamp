@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { useEvents } from '@/providers/events-provider';
-import { useAuth } from '@/providers/auth-provider';
-import { AdminGuard } from '@/components/admin/AdminGuard';
-import { Plus, Calendar, MapPin, Users } from 'lucide-react';
+import { Calendar, MapPin, Users } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/providers/auth-provider';
+import { useEvents } from '@/providers/events-provider';
 
 export default function AllEventsPage() {
   const { events, loading, error } = useEvents();
@@ -24,7 +24,7 @@ export default function AllEventsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4" />
           <p className="text-lg text-gray-600">Loading events...</p>
         </div>
       </div>
@@ -59,25 +59,25 @@ export default function AllEventsPage() {
             <Card key={event.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               {event.image_url && (
                 <div className="h-48 overflow-hidden">
-                  <img 
-                    src={event.image_url} 
-                    alt={event.title} 
+                  <img
+                    alt={event.title}
                     className="w-full h-full object-cover"
+                    src={event.image_url}
                   />
                 </div>
               )}
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-xl">{event.title}</CardTitle>
-                  <Badge 
-                    variant={event.status === 'ongoing' ? 'default' : 
+                  <Badge
+                    variant={event.status === 'ongoing' ? 'default' :
                             event.status === 'completed' ? 'secondary' : 'outline'}
                   >
                     {event.status}
                   </Badge>
                 </div>
                 {event.category && (
-                  <Badge variant="secondary" className="w-fit mt-2">
+                  <Badge className="w-fit mt-2" variant="secondary">
                     {event.category}
                   </Badge>
                 )}
@@ -104,9 +104,9 @@ export default function AllEventsPage() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="mt-4">
-                  <Button variant="outline" className="w-full" asChild>
+                  <Button asChild className="w-full" variant="outline">
                     <Link href={`/events/${event.id}`}>View Details</Link>
                   </Button>
                 </div>

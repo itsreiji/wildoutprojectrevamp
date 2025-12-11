@@ -1,9 +1,9 @@
 'use client';
 
-import { ReactNode } from 'react';
-import { useAuth } from '@/providers/auth-provider';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
+
+import { useAuth } from '@/providers/auth-provider';
 
 interface AdminGuardProps {
   children: ReactNode;
@@ -17,7 +17,7 @@ export const AdminGuard = ({ children, requiredRole = 'admin' }: AdminGuardProps
   useEffect(() => {
     if (!loading) {
       // If user is not authenticated or doesn't have required role
-      if (!user || role === 'anonymous' || 
+      if (!user || role === 'anonymous' ||
           (requiredRole === 'admin' && role !== 'admin') ||
           (requiredRole === 'editor' && !['admin', 'editor'].includes(role))) {
         // Redirect to login
@@ -31,7 +31,7 @@ export const AdminGuard = ({ children, requiredRole = 'admin' }: AdminGuardProps
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4" />
           <p className="text-lg text-gray-600">Checking authorization...</p>
         </div>
       </div>
@@ -39,12 +39,12 @@ export const AdminGuard = ({ children, requiredRole = 'admin' }: AdminGuardProps
   }
 
   // If user has required role, render children
-  if (user && 
-      role !== 'anonymous' && 
+  if (user &&
+      role !== 'anonymous' &&
       ((requiredRole === 'admin' && role === 'admin') ||
        (requiredRole === 'editor' && ['admin', 'editor'].includes(role)) ||
        (requiredRole === 'user' && ['admin', 'editor', 'user'].includes(role)))) {
-    return <>{children}</>;
+    return children;
   }
 
   // Otherwise, return null (should redirect via useEffect before this renders)

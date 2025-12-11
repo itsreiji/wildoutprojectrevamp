@@ -140,8 +140,24 @@ export default typescriptEslint.config(
       ],
       'react/jsx-pascal-case': 'error',
       'react/jsx-props-no-multi-spaces': 'error',
-      'react/jsx-space-before-closing': 'error',
-      'react/jsx-max-depth': ['error', { max: 5 }],
+      // 'react/jsx-space-before-closing': 'error', // Deprecated
+      'react/jsx-tag-spacing': [
+        'error',
+        {
+          closingSlash: 'never',
+          beforeSelfClosing: 'always',
+          afterOpening: 'never',
+          beforeClosing: 'never',
+        },
+      ],
+      'react/jsx-max-depth': ['warn', { max: 10 }],
+      'react/function-component-definition': [
+        'warn',
+        {
+          namedComponents: ['arrow-function', 'function-declaration'],
+          unnamedComponents: 'arrow-function',
+        },
+      ],
       'react/jsx-no-literals': 'off',
       'react/jsx-sort-default-props': 'off',
       'react/jsx-no-bind': 'off',

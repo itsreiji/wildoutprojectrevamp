@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     if (!supabaseUrl) {
       return NextResponse.json(
         { error: 'Missing Supabase configuration' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (!supabaseUrl || !supabaseAnonKey) {
       return NextResponse.json(
         { error: 'Missing Supabase configuration' },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     console.error('Auth proxy error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

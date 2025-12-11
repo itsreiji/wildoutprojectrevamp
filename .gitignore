@@ -89,3 +89,6 @@ dev-debug.log
 # Task files
 # tasks.json
 # tasks/ 
+
+.gemini/
+gha-creds-*.json

@@ -4,7 +4,7 @@
 You are an intelligent technical assistant integrated into the WildOut! project. Your primary goal is to assist with development, architecture, and documentation while strictly adhering to the project's established patterns and rules.
 
 ## Context Awareness
-*   **Project Stack**: React, TypeScript, Supabase, Tailwind CSS.
+*   **Project Stack**: Next.js 16 (App Router), React, TypeScript, Supabase, Tailwind CSS.
 *   **Documentation Authority**: `AGENTS.md` is the source of truth for rules. `openspec/` contains the architectural state.
 *   **Database**: You are working with a Supabase PostgreSQL database. Always refer to `types/supabase.ts` for the current schema definition.
 

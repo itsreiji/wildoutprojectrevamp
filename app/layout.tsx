@@ -1,24 +1,13 @@
 import './globals.css';
-import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-
 import { ThemeProvider } from 'next-themes';
 
-import { QueryProvider } from './providers/query-provider';
-import { AuthProvider } from './providers/auth-provider';
-import { ContentProvider } from './providers/content-provider';
-import { EventsProvider } from './providers/events-provider';
-import { PartnersProvider } from './providers/partners-provider';
-import { StaticContentProvider } from './providers/static-content-provider';
-import { TeamProvider } from './providers/team-provider';
-import { Toaster } from './components/ui/sonner';
+import { CombinedProviders } from '../providers/CombinedProviders';
+import { metadata } from './metadata';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: 'WildOut! - Event Management Platform',
-  description: 'Comprehensive event management platform with admin dashboard and landing page',
-};
+export { metadata };
 
 export default function RootLayout({
   children,
@@ -26,30 +15,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html suppressHydrationWarning lang="en">
       <body className={inter.className}>
         <ThemeProvider
+          disableTransitionOnChange
+          enableSystem
           attribute="class"
           defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
         >
-          <QueryProvider>
-            <AuthProvider>
-              <ContentProvider>
-                <EventsProvider>
-                  <PartnersProvider>
-                    <TeamProvider>
-                      <StaticContentProvider>
-                        {children}
-                        <Toaster />
-                      </StaticContentProvider>
-                    </TeamProvider>
-                  </PartnersProvider>
-                </EventsProvider>
-              </ContentProvider>
-            </AuthProvider>
-          </QueryProvider>
+          <CombinedProviders>
+            {children}
+          </CombinedProviders>
         </ThemeProvider>
       </body>
     </html>

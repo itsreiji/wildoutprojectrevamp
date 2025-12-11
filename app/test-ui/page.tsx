@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Toaster } from '@/components/ui/sonner';
 
 export default function TestComponents() {
@@ -18,7 +19,7 @@ export default function TestComponents() {
       <Toaster />
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">UI Components Test Page</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Buttons */}
           <Card>
@@ -58,17 +59,17 @@ export default function TestComponents() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="test-input">Test Input</Label>
-                <Input 
-                  id="test-input" 
-                  placeholder="Enter something..." 
+                <Input
+                  id="test-input"
+                  placeholder="Enter something..."
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                 />
               </div>
               <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="test-checkbox"
+                <Checkbox
                   checked={checkboxChecked}
+                  id="test-checkbox"
                   onCheckedChange={(checked) => setCheckboxChecked(!!checked)}
                 />
                 <Label htmlFor="test-checkbox">Test Checkbox</Label>
@@ -103,7 +104,7 @@ export default function TestComponents() {
               <p>Additional component example</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Component 2</CardTitle>
@@ -112,7 +113,7 @@ export default function TestComponents() {
               <p>Another component example</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Component 3</CardTitle>

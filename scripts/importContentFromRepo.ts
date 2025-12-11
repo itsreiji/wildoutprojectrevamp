@@ -13,9 +13,10 @@
  * - With Supabase CLI: npx supabase db reset (will run all migrations including this import)
  */
 
-import { createClient } from '@jsr/supabase__supabase-js';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { createClient } from '@jsr/supabase__supabase-js';
 
 // Configuration
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
@@ -36,8 +37,8 @@ if (!SUPABASE_SERVICE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 /**
@@ -78,7 +79,7 @@ function extractContentFromFile(): {
   // Parse the extracted JavaScript objects
   const parseJSObject = (jsString: string): any => {
     // Simple parsing - replace single quotes with double quotes and handle arrays
-    let parsed = jsString
+    const parsed = jsString
       .replace(/'/g, '"')  // Single quotes to double quotes
       .replace(/,(\s*[}\]])/g, '$1'); // Remove trailing commas
 
@@ -94,7 +95,7 @@ function extractContentFromFile(): {
   return {
     hero: parseJSObject(heroMatch[1]),
     about: parseJSObject(aboutMatch[1]),
-    settings: parseJSObject(settingsMatch[1])
+    settings: parseJSObject(settingsMatch[1]),
   };
 }
 
@@ -114,7 +115,7 @@ async function importHeroContent(heroData: any): Promise<void> {
       stats: heroData.stats,
       cta_text: heroData.ctaText,
       cta_link: heroData.ctaLink,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
       // Note: updated_by not set during import since we don't have authenticated user
     });
 
@@ -140,7 +141,7 @@ async function importAboutContent(aboutData: any): Promise<void> {
       founded_year: aboutData.foundedYear,
       story: aboutData.story,
       features: aboutData.features,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
       // Note: updated_by not set during import since we don't have authenticated user
     });
 
@@ -168,7 +169,7 @@ async function importSiteSettings(settingsData: any): Promise<void> {
       phone: settingsData.phone,
       address: settingsData.address,
       social_media: settingsData.socialMedia,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
       // Note: updated_by not set during import since we don't have authenticated user
     });
 
@@ -187,7 +188,7 @@ async function checkIfEmpty(): Promise<boolean> {
     supabase.from('hero_content').select('id').limit(1),
     supabase.from('about_content').select('id').limit(1),
     supabase.from('site_settings').select('id').limit(1),
-    supabase.from('admin_sections').select('id').limit(1)
+    supabase.from('admin_sections').select('id').limit(1),
   ]);
 
   const hasHero = heroResult.data && heroResult.data.length > 0;
@@ -212,7 +213,7 @@ async function seedAdminSections(): Promise<void> {
       icon: 'LayoutDashboard',
       category: 'main',
       order_index: 1,
-      description: 'Overview dashboard with statistics and recent activity'
+      description: 'Overview dashboard with statistics and recent activity',
     },
     {
       slug: 'hero',
@@ -220,7 +221,7 @@ async function seedAdminSections(): Promise<void> {
       icon: 'Sparkles',
       category: 'content',
       order_index: 2,
-      description: 'Landing page hero section with title, subtitle, and call-to-action'
+      description: 'Landing page hero section with title, subtitle, and call-to-action',
     },
     {
       slug: 'about',
@@ -228,7 +229,7 @@ async function seedAdminSections(): Promise<void> {
       icon: 'Info',
       category: 'content',
       order_index: 3,
-      description: 'About page content including story and features'
+      description: 'About page content including story and features',
     },
     {
       slug: 'events',
@@ -236,7 +237,7 @@ async function seedAdminSections(): Promise<void> {
       icon: 'Calendar',
       category: 'content',
       order_index: 4,
-      description: 'Manage events, categories, and event details'
+      description: 'Manage events, categories, and event details',
     },
     {
       slug: 'team',
@@ -244,7 +245,7 @@ async function seedAdminSections(): Promise<void> {
       icon: 'Users',
       category: 'content',
       order_index: 5,
-      description: 'Team members and their information'
+      description: 'Team members and their information',
     },
     {
       slug: 'gallery',
@@ -252,7 +253,7 @@ async function seedAdminSections(): Promise<void> {
       icon: 'Image',
       category: 'content',
       order_index: 6,
-      description: 'Image gallery items and management'
+      description: 'Image gallery items and management',
     },
     {
       slug: 'partners',
@@ -260,7 +261,7 @@ async function seedAdminSections(): Promise<void> {
       icon: 'Handshake',
       category: 'content',
       order_index: 7,
-      description: 'Partner organizations and collaborations'
+      description: 'Partner organizations and collaborations',
     },
     {
       slug: 'settings',
@@ -268,8 +269,8 @@ async function seedAdminSections(): Promise<void> {
       icon: 'Settings',
       category: 'management',
       order_index: 8,
-      description: 'Site-wide settings and configuration'
-    }
+      description: 'Site-wide settings and configuration',
+    },
   ];
 
   // Insert admin sections
@@ -313,7 +314,7 @@ async function seedAdminSections(): Promise<void> {
     { role: 'viewer', section_slug: 'team', can_view: true, can_edit: false, can_publish: false, can_delete: false },
     { role: 'viewer', section_slug: 'gallery', can_view: true, can_edit: false, can_publish: false, can_delete: false },
     { role: 'viewer', section_slug: 'partners', can_view: true, can_edit: false, can_publish: false, can_delete: false },
-    { role: 'viewer', section_slug: 'settings', can_view: false, can_edit: false, can_publish: false, can_delete: false }
+    { role: 'viewer', section_slug: 'settings', can_view: false, can_edit: false, can_publish: false, can_delete: false },
   ];
 
   // Insert role permissions
@@ -343,7 +344,7 @@ async function seedAdminSections(): Promise<void> {
           totalPartners: 0,
           activePartners: 0,
           totalAttendees: 0,
-          avgAttendanceRate: 0
+          avgAttendanceRate: 0,
         },
         recentActivity: [],
         charts: {
@@ -353,10 +354,10 @@ async function seedAdminSections(): Promise<void> {
             { month: 'Mar', events: 18, attendees: 720 },
             { month: 'Apr', events: 22, attendees: 890 },
             { month: 'May', events: 25, attendees: 1050 },
-            { month: 'Jun', events: 20, attendees: 820 }
-          ]
-        }
-      }
+            { month: 'Jun', events: 20, attendees: 820 },
+          ],
+        },
+      },
     },
     {
       section_slug: 'events',
@@ -365,8 +366,8 @@ async function seedAdminSections(): Promise<void> {
         eventStatuses: ['draft', 'published', 'cancelled', 'archived'],
         defaultCapacity: 100,
         maxFileSize: 5242880,
-        allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp']
-      }
+        allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
+      },
     },
     {
       section_slug: 'team',
@@ -375,8 +376,8 @@ async function seedAdminSections(): Promise<void> {
         maxBioLength: 500,
         maxFileSize: 2097152,
         allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
-        socialPlatforms: ['linkedin', 'twitter', 'instagram', 'facebook']
-      }
+        socialPlatforms: ['linkedin', 'twitter', 'instagram', 'facebook'],
+      },
     },
     {
       section_slug: 'gallery',
@@ -386,8 +387,8 @@ async function seedAdminSections(): Promise<void> {
         maxFileSize: 10485760,
         allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
         thumbnailSizes: [150, 300, 600],
-        compressionQuality: 0.8
-      }
+        compressionQuality: 0.8,
+      },
     },
     {
       section_slug: 'partners',
@@ -396,8 +397,8 @@ async function seedAdminSections(): Promise<void> {
         statuses: ['active', 'inactive', 'pending'],
         maxFileSize: 2097152,
         allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
-        socialPlatforms: ['website', 'email', 'phone', 'facebook', 'twitter', 'instagram', 'linkedin']
-      }
+        socialPlatforms: ['website', 'email', 'phone', 'facebook', 'twitter', 'instagram', 'linkedin'],
+      },
     },
     {
       section_slug: 'settings',
@@ -406,10 +407,10 @@ async function seedAdminSections(): Promise<void> {
         contactFields: ['email', 'phone', 'address'],
         validationRules: {
           email: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$',
-          phone: '^[+]?[\\d\\s\\-\\(\\)]{10,}$'
-        }
-      }
-    }
+          phone: '^[+]?[\\d\\s\\-\\(\\)]{10,}$',
+        },
+      },
+    },
   ];
 
   // Insert section content
@@ -428,7 +429,7 @@ async function seedAdminSections(): Promise<void> {
           section_id: section.id,
           payload: content.payload,
           version: 1,
-          is_active: true
+          is_active: true,
         }, { onConflict: 'section_id,version' });
 
       if (error) {
@@ -469,7 +470,7 @@ async function importContent(): Promise<void> {
       importHeroContent(hero),
       importAboutContent(about),
       importSiteSettings(settings),
-      seedAdminSections()
+      seedAdminSections(),
     ]);
 
     console.log('\n🎉 Content import completed successfully!');

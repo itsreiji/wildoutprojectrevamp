@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useAuth } from '@/providers/auth-provider';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+import { useAuth } from '@/providers/auth-provider';
 
 export default function LogoutPage() {
   const { signOut, loading } = useAuth();
@@ -24,7 +25,7 @@ export default function LogoutPage() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4" />
         <p className="text-lg text-gray-600">Signing out...</p>
       </div>
     </div>

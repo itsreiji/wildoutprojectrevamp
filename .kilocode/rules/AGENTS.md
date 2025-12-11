@@ -38,19 +38,19 @@ WildOut! is a media digital nightlife and event multi-platform connecting artist
 
 ## System Architecture
 
-- **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI
+- **Frontend**: Next.js 16 (App Router), React, TypeScript, Tailwind CSS, Shadcn UI
 - **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
 - **State Management**: React Context (migrating to TanStack Query)
-- **Routing**: Custom Router (migrating to React Router or TanStack Router recommended)
+- **Routing**: Next.js File-based Routing (App Router)
 
 ## Tech Stack
 
 ### Frontend
-- **Framework**: React 19
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript 5.9
 - **Styling**: Tailwind CSS 4.1
 - **UI Components**: Shadcn UI
-- **Build Tool**: Vite 7.2
+- **Build Tool**: Next.js Compiler
 - **Package Manager**: pnpm 10.24
 
 ### Backend

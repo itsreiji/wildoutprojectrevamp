@@ -1,9 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+
 import { supabaseClient } from '../lib/supabase/client';
 import { auditService } from '../services/auditService';
-import { validateEmail } from '../utils/authValidation';
 import { validatePasswordComplexity as validatePassword, checkRateLimit, recordRateLimitAttempt, clearRateLimit as clearLoginAttempts, generateCSRFToken, verifyCSRFToken, sanitizeInput, validateSecureEmail } from '../utils/security';
 
 // AuthContext and hook
@@ -46,8 +46,8 @@ export function useAuth() {
 export interface User {
   id: string;
   email?: string;
-  app_metadata?: { role?: string; provider?: string;[key: string]: any };
-  user_metadata?: { role?: string;[key: string]: any };
+  app_metadata?: { role?: string; provider?: string; [key: string]: unknown };
+  user_metadata?: { role?: string; [key: string]: unknown };
 }
 
 export interface Session {
@@ -138,7 +138,7 @@ const getUserRoleWithCache = async (userId: string): Promise<AuthRole> => {
   }
 };
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // State definitions
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<AuthRole>('anonymous');
@@ -186,7 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { message: 'Only Google authentication is supported' } as AuthError;
       }
 
-      const redirectUrl = typeof window !== 'undefined' 
+      const redirectUrl = typeof window !== 'undefined'
         ? `${window.location.origin}/auth/callback`
         : `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/auth/callback`;
 
@@ -393,32 +393,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }, []);
 
+  const value = React.useMemo(() => ({
+    user,
+    role,
+    loading,
+    error,
+    setUser,
+    setRole,
+    signInWithOAuth,
+    signInWithEmailPassword,
+    signOut,
+    clearError,
+    signUp,
+    resetPassword,
+    updateProfile,
+    refreshSession,
+    checkSession,
+    validateSession, // Add validateSession to context
+    isInitialized,
+    getRememberedEmail,
+    isAuthenticated,
+    csrfToken,
+    csrfTimestamp,
+    csrfSignature,
+  }), [user, role, loading, error, signInWithEmailPassword, validateSession, isAuthenticated, csrfToken, csrfTimestamp, csrfSignature]);
+
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        role,
-        loading,
-        error,
-        setUser,
-        setRole,
-        signInWithOAuth,
-        signInWithEmailPassword,
-        signOut,
-        clearError,
-        signUp,
-        resetPassword,
-        updateProfile,
-        refreshSession,
-        checkSession,
-        validateSession, // Add validateSession to context
-        isInitialized,
-        getRememberedEmail,
-        isAuthenticated,
-        csrfToken,
-        csrfTimestamp,
-        csrfSignature,
-      }}
+      value={value}
     >
       {children}
     </AuthContext.Provider>

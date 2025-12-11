@@ -1,12 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { supabaseClient } from '../lib/supabase/client';
-import { useAuth } from './auth-provider';
-import type { AuthRole } from './auth-provider';
-import type { Json, TablesInsert, TablesUpdate } from '../types/supabase';
 
-import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
+import { supabaseClient } from '../lib/supabase/client';
 import type {
   TeamMember,
   Partner,
@@ -14,14 +10,18 @@ import type {
   AboutContent,
   GalleryImage,
   SiteSettings,
-  PublicEventsViewRow,
   ContentContextType,
   AdminSection,
   SectionContent,
   SectionPermissions,
   LandingEvent,
-  EventArtist
+  EventArtist,
 } from '../types/content';
+import type { Database, Json, TablesInsert, TablesUpdate } from '../types/supabase';
+import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
+
+import { useAuth } from './auth-provider';
+
 
 const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> => {
   if (!value || typeof value === 'string') return {};
@@ -37,7 +37,7 @@ const normalizeSocialLinks = (value: Json | undefined): Record<string, string | 
       }
       return acc;
     },
-    {}
+    {},
   );
 };
 
@@ -50,7 +50,7 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
 };
 
 // Initial data aligned with new types
-const INITIAL_EVENTS: any[] = [];
+const INITIAL_EVENTS: LandingEvent[] = [];
 const INITIAL_PARTNERS: Partner[] = [];
 const INITIAL_GALLERY: GalleryImage[] = [];
 const INITIAL_TEAM: TeamMember[] = [];
@@ -200,7 +200,7 @@ const fetchEvents = async (): Promise<LandingEvent[]> => {
       console.error('Error fetching events:', error);
       return [];
     }
-    return (data || []).map((row: any): LandingEvent => {
+    return (data || []).map((row: Database['public']['Views']['public_events_view']['Row']): LandingEvent => {
       // Map database status to LandingEvent status
       let status: LandingEvent['status'] = 'upcoming';
       if (row.status === 'published') {
@@ -268,7 +268,7 @@ const fetchTeamMembers = async (): Promise<TeamMember[]> => {
       console.error('Error fetching team members:', error);
       return INITIAL_TEAM;
     }
-    return (data || []).map((row: any): TeamMember => ({
+    return (data || []).map((row: Database['public']['Tables']['team_members']['Row']): TeamMember => ({
       id: row.id,
       name: row.name || '',
       title: row.title || row.role || undefined,
@@ -299,7 +299,8 @@ const fetchPartners = async (): Promise<Partner[]> => {
       console.error('Error fetching partners:', error);
       return INITIAL_PARTNERS;
     }
-    return (data || []).map((row: any): Partner => ({
+    // Map database rows to our Partner type
+    return (data || []).map((row: Database['public']['Tables']['partners']['Row']): Partner => ({
       id: row.id,
       name: row.name || '',
       description: row.description || undefined,
@@ -334,7 +335,7 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
       console.error('Error fetching gallery:', error);
       return INITIAL_GALLERY;
     }
-    return (data || []).map((row: any): GalleryImage => ({
+    return (data || []).map((row: Database['public']['Tables']['gallery_items']['Row']): GalleryImage => ({
       id: row.id,
       title: row.title || undefined,
       description: row.description || undefined,
@@ -362,7 +363,7 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
 // Content context implementation
 const ContentContext = createContext<ContentContextType | null>(null);
 
-export function ContentProvider({ children }: { children: ReactNode }) {
+export const ContentProvider = ({ children }: { children: ReactNode }) => {
   const { user, role: userRole } = useAuth();
   const [events, setEvents] = useState<LandingEvent[]>(INITIAL_EVENTS);
   const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
@@ -432,7 +433,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        const sections = (data || []).map((row: any) => ({
+        const sections = (data || []).map((row: Database['public']['Functions']['get_admin_sections_for_user']['Returns'][number]) => ({
           id: row.id,
           slug: row.slug,
           label: row.label,
@@ -451,11 +452,11 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         setAdminSections(sections);
 
         // Fetch section content using RPC
-        const contentPromises = sections.map(async (section: any) => {
+        const contentPromises = sections.map(async (section: AdminSection) => {
           const { data, error } = await supabaseClient
             .rpc('get_section_content', {
               p_section_slug: section.slug,
-              p_user_id: user.id
+              p_user_id: user.id,
             });
 
           if (error) {
@@ -475,7 +476,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
         const contentResults = await Promise.all(contentPromises);
         const newSectionContent: Record<string, SectionContent> = {};
-        contentResults.forEach(({ sectionSlug, content }) => {
+        contentResults.forEach(({ sectionSlug, content }: { sectionSlug: string; content: SectionContent | null }) => {
           if (content && sectionSlug) {
             newSectionContent[sectionSlug] = content;
           }
@@ -723,7 +724,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      return (data || []).map((row: any) => ({
+      return (data || []).map((row: Database['public']['Tables']['event_artists']['Row']) => ({
         id: row.id,
         event_id: row.event_id,
         name: row.name,
@@ -739,7 +740,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const addEventArtist = async (artist: any) => {
+  const addEventArtist = async (artist: Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('event_artists')
@@ -756,7 +757,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateEventArtist = async (id: string, updates: any) => {
+  const updateEventArtist = async (id: string, updates: Partial<Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>>) => {
     try {
       const { data, error } = await supabaseClient
         .from('event_artists')
@@ -791,7 +792,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         .from('hero_content')
         .upsert({
           ...content,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -812,7 +813,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         .from('about_content')
         .upsert({
           ...content,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -833,7 +834,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         .from('site_settings')
         .upsert({
           ...settings,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -853,8 +854,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     return sectionContent[sectionId] || null;
   };
 
-  const getSectionPermissions = (sectionId: string): SectionPermissions[] => {
-    const section = adminSections.find((s) => s.id === sectionId);
+  const getSectionPermissions = (): SectionPermissions[] => {
     // TODO: Add permissions field to AdminSection type in types/content.ts
     return [];
   };
@@ -866,7 +866,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         .upsert({
           ...content,
           section_id: sectionId,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -885,10 +885,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value: any = {
+  const value = React.useMemo(() => ({
     // Content data
     // TODO: Map LandingEvent[] to the expected interface with all required fields
-    events: events as any,
+    events: events as LandingEvent[],
     partners,
     gallery,
     team,
@@ -932,7 +932,11 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     getSectionContent,
     getSectionPermissions,
     updateSectionContent,
-  };
+  }), [
+    events, partners, gallery, team, hero, about, settings, loading, error,
+    adminSections, sectionContent, adminSectionsLoading,
+    deleteEvent, deleteGalleryImage, deletePartner, deleteTeamMember, getSectionContent, getSectionPermissions,
+  ]);
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;
 }

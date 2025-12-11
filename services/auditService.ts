@@ -13,13 +13,13 @@ export const auditService = {
     console.log(`Login failure for ${email}: ${errorMessage}`);
     // In a real implementation, log to database
   },
-  
+
   async logAction(log: AuditLog) {
     console.log(`Audit action: ${log.action}`, {
       userId: log.userId,
       ipAddress: log.ipAddress,
-      userAgent: log.userAgent
+      userAgent: log.userAgent,
     });
     // In a real implementation, log to database
-  }
+  },
 };
