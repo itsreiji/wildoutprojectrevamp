@@ -75,7 +75,8 @@ coverage/
 # pnpm-lock.yaml
 
 
-
+# Next.js
+.next 
 
 
 logs

@@ -7,15 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Toaster, toast } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function TestComponents() {
   const [checkboxChecked, setCheckboxChecked] = useState(false);
   const [inputValue, setInputValue] = useState('');
-
-  const showToast = () => {
-    toast.success('This is a test toast notification!');
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -36,7 +32,6 @@ export default function TestComponents() {
               <Button variant="outline">Outline</Button>
               <Button variant="ghost">Ghost</Button>
               <Button variant="link">Link</Button>
-              <Button onClick={showToast}>Show Toast</Button>
             </CardContent>
           </Card>
 
