@@ -1,5 +1,5 @@
-import { supabaseClient } from '../src/supabase/client';
-import type { Database } from '../src/supabase/types';
+import { supabaseClient } from '../lib/supabase/client';
+import type { Database } from '../types/supabase';
 
 // Seed hero, about, settings into public_content from existing singletons
 async function seedPublicContent() {

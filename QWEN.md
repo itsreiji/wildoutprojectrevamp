@@ -70,6 +70,11 @@ src/
 - `pnpm test:ui`: Run tests with UI
 - `pnpm test:coverage`: Run tests with coverage report
 - `pnpm type-check`: Type check without emitting
+- `pnpm format`: Format all files with Prettier
+- `pnpm format:check`: Check if files are formatted with Prettier
+- `pnpm lint`: Run ESLint on TypeScript and TSX files
+- `pnpm lint:parallel`: Run ESLint, type checking, and format checking in parallel
+- `pnpm lint:all`: Run ESLint, type checking, and format in sequence
 
 ### Database Setup
 1. Apply Supabase migrations to create all necessary tables
