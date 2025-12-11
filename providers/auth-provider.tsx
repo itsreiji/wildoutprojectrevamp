@@ -1,12 +1,29 @@
 'use client';
 
-import React, { useCallback, ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { supabaseClient } from '../lib/supabase/client';
 import { auditService } from '../services/auditService';
-import { checkRateLimit, clearRateLimit as clearLoginAttempts, generateCSRFToken, recordRateLimitAttempt, sanitizeInput, validatePasswordComplexity as validatePassword, validateSecureEmail, verifyCSRFToken } from '../utils/security';
+import {
+  checkRateLimit,
+  clearRateLimit as clearLoginAttempts,
+  generateCSRFToken,
+  recordRateLimitAttempt,
+  sanitizeInput,
+  validatePasswordComplexity as validatePassword,
+  validateSecureEmail,
+  verifyCSRFToken,
+} from '../utils/security';
 
-import { AuthContext, AuthError, AuthRole, OAuthProvider, Session, User } from './auth-context';
+import {
+  AuthContext,
+  AuthError,
+  AuthRole,
+  OAuthProvider,
+  Session,
+  User,
+  useAuth,
+} from './auth-context';
 
 // Cache for user profile data to avoid repeated database calls
 interface CachedProfile {
@@ -42,7 +59,10 @@ const getUserRoleWithCache = async (userId: string): Promise<AuthRole> => {
 
   try {
     // Use RPC to get profile role safely
-    const { data: profiles, error } = await supabaseClient.rpc('get_user_profile', { user_uuid: userId });
+    const { data: profiles, error } = await supabaseClient.rpc(
+      'get_user_profile',
+      { user_uuid: userId },
+    );
 
     if (error) {
       console.warn('RPC error fetching user profile:', error);
@@ -67,7 +87,9 @@ const getUserRoleWithCache = async (userId: string): Promise<AuthRole> => {
 
   // Fallback to user metadata from auth
   try {
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
     const fallbackRole = getRoleFromUser(user);
     profileCache.set(userId, {
       id: userId,
@@ -96,10 +118,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Session validation function
   const validateSession = useCallback(async (): Promise<boolean> => {
     try {
-      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      const {
+        data: { session },
+        error,
+      } = await supabaseClient.auth.getSession();
 
       if (error || !session) {
-        console.warn('Session validation failed:', error?.message || 'No active session');
+        console.warn(
+          'Session validation failed:',
+          error?.message || 'No active session',
+        );
         return false;
       }
 
@@ -128,12 +156,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signInWithOAuth = async (provider: OAuthProvider) => {
     try {
       if (provider !== 'google') {
-        return { message: 'Only Google authentication is supported' } as AuthError;
+        return {
+          message: 'Only Google authentication is supported',
+        } as AuthError;
       }
 
-      const redirectUrl = typeof window !== 'undefined'
-        ? `${window.location.origin}/auth/callback`
-        : `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/auth/callback`;
+      const redirectUrl =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/auth/callback`
+          : `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/auth/callback`;
 
       const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
@@ -168,23 +199,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const clearError = () => setError(null);
-  const signUp = async () => { return { message: 'SignUp not implemented' } as AuthError; };
-  const resetPassword = async () => { return { message: 'ResetPassword not implemented' } as AuthError; };
-  const updateProfile = async () => { return; };
+  const signUp = async () => {
+    return { message: 'SignUp not implemented' } as AuthError;
+  };
+  const resetPassword = async () => {
+    return { message: 'ResetPassword not implemented' } as AuthError;
+  };
+  const updateProfile = async () => {
+    return;
+  };
   const refreshSession = async () => {
     const { data, error } = await supabaseClient.auth.refreshSession();
     if (error) throw error;
     return data.session;
   };
   const checkSession = async () => {
-    const { data: { session } } = await supabaseClient.auth.getSession();
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
     return session;
   };
   const isInitialized = true;
 
   // Get remembered email from localStorage
   const getRememberedEmail = (): string => {
-    if (typeof window !== 'undefined' && localStorage.getItem('remember_me') === 'true') {
+    if (
+      typeof window !== 'undefined' &&
+      localStorage.getItem('remember_me') === 'true'
+    ) {
       return localStorage.getItem('remembered_email') || '';
     }
     return '';
@@ -202,7 +244,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const role = await getUserRoleWithCache(session.user.id);
           setUser(session.user);
           setRole(role);
-          console.log('Session state updated for user:', session.user.email, 'with role:', role);
+          console.log(
+            'Session state updated for user:',
+            session.user.email,
+            'with role:',
+            role,
+          );
         } catch (error) {
           console.error('Error getting user role:', error);
           // If we can't get the role, still set the user but with 'user' role as fallback
@@ -233,7 +280,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Fetch initial session on mount
     const initializeAuth = async () => {
       try {
-        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        const {
+          data: { session },
+          error,
+        } = await supabaseClient.auth.getSession();
         if (error) {
           console.error('Error fetching initial session:', error);
           setLoading(false);
@@ -249,126 +299,161 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initializeAuth();
 
     // Listen to auth state changes
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event: string, session: Session | null) => {
-      updateSessionState(session);
-    });
+    const {
+      data: { subscription },
+    } = supabaseClient.auth.onAuthStateChange(
+      (_event: string, session: Session | null) => {
+        updateSessionState(session);
+      },
+    );
 
     return () => {
       subscription?.unsubscribe();
     };
   }, []);
 
-  const signInWithEmailPassword = useCallback(async (email: string, password: string, rememberMe: boolean = false) => {
-    // Input sanitization
-    const sanitizedEmail = sanitizeInput(email);
-    const sanitizedPassword = sanitizeInput(password);
+  const signInWithEmailPassword = useCallback(
+    async (email: string, password: string, rememberMe: boolean = false) => {
+      // Input sanitization
+      const sanitizedEmail = sanitizeInput(email);
+      const sanitizedPassword = sanitizeInput(password);
 
-    // Email validation
-    const emailValidation = validateSecureEmail(sanitizedEmail);
-    if (!emailValidation.isValid) {
-      setError(emailValidation.errors[0] || 'Invalid email format');
-      return { message: emailValidation.errors[0] || 'Invalid email format' } as AuthError;
-    }
-
-    // Password validation
-    const passwordValidation = validatePassword(sanitizedPassword);
-    if (!passwordValidation.isValid) {
-      setError(passwordValidation.feedback[0] || 'Invalid password format');
-      return { message: passwordValidation.feedback[0] || 'Invalid password format' } as AuthError;
-    }
-
-    // Rate limiting check
-    const rateLimitCheck = checkRateLimit(`login_${sanitizedEmail}`);
-    if (!rateLimitCheck.allowed) {
-      const minutes = Math.ceil((rateLimitCheck.timeRemaining || 0) / 60000);
-      setError(`Too many login attempts. Please try again in ${minutes} minute(s).`);
-      return { message: `Too many login attempts. Please try again in ${minutes} minute(s).` } as AuthError;
-    }
-
-    // CSRF protection
-    const csrfData = generateCSRFToken('wildout-secret');
-    setCsrfToken(csrfData.token);
-    setCsrfTimestamp(csrfData.timestamp);
-    setCsrfSignature(csrfData.signature);
-    if (!verifyCSRFToken(csrfData.token, csrfData.timestamp, csrfData.signature, 'wildout-secret')) {
-      setError('Security validation failed. Please refresh the page and try again.');
-      return { message: 'Security validation failed' } as AuthError;
-    }
-
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email: sanitizedEmail,
-      password: sanitizedPassword,
-    });
-
-    if (error) {
-      // Handle specific error cases
-      let errorMessage = error.message;
-
-      if (error.message.includes('invalid_credentials')) {
-        errorMessage = 'Invalid email or password. Please try again.';
-        recordFailedLogin(sanitizedEmail);
-        recordRateLimitAttempt(`login_${sanitizedEmail}`);
-      } else if (error.message.includes('user_not_found')) {
-        errorMessage = 'No account found with this email. Please check your email or create a new account.';
-      } else if (error.message.includes('too_many_requests')) {
-        errorMessage = 'Too many login attempts. Please try again later.';
+      // Email validation
+      const emailValidation = validateSecureEmail(sanitizedEmail);
+      if (!emailValidation.isValid) {
+        setError(emailValidation.errors[0] || 'Invalid email format');
+        return {
+          message: emailValidation.errors[0] || 'Invalid email format',
+        } as AuthError;
       }
 
-      await auditService.logLoginFailure(sanitizedEmail, errorMessage);
-      setError(errorMessage);
-      return { message: errorMessage } as AuthError;
-    }
+      // Password validation
+      const passwordValidation = validatePassword(sanitizedPassword);
+      if (!passwordValidation.isValid) {
+        setError(passwordValidation.feedback[0] || 'Invalid password format');
+        return {
+          message: passwordValidation.feedback[0] || 'Invalid password format',
+        } as AuthError;
+      }
 
-    // Clear failed login attempts on successful login
-    clearLoginAttempts(`login_${sanitizedEmail}`);
+      // Rate limiting check
+      const rateLimitCheck = checkRateLimit(`login_${sanitizedEmail}`);
+      if (!rateLimitCheck.allowed) {
+        const minutes = Math.ceil((rateLimitCheck.timeRemaining || 0) / 60000);
+        setError(
+          `Too many login attempts. Please try again in ${minutes} minute(s).`,
+        );
+        return {
+          message: `Too many login attempts. Please try again in ${minutes} minute(s).`,
+        } as AuthError;
+      }
 
-    // Set remember me if enabled
-    if (rememberMe && typeof window !== 'undefined') {
-      localStorage.setItem('remember_me', 'true');
-      localStorage.setItem('remembered_email', sanitizedEmail);
-    } else {
-      localStorage.removeItem('remember_me');
-      localStorage.removeItem('remembered_email');
-    }
+      // CSRF protection
+      const csrfData = generateCSRFToken('wildout-secret');
+      setCsrfToken(csrfData.token);
+      setCsrfTimestamp(csrfData.timestamp);
+      setCsrfSignature(csrfData.signature);
+      if (
+        !verifyCSRFToken(
+          csrfData.token,
+          csrfData.timestamp,
+          csrfData.signature,
+          'wildout-secret',
+        )
+      ) {
+        setError(
+          'Security validation failed. Please refresh the page and try again.',
+        );
+        return { message: 'Security validation failed' } as AuthError;
+      }
 
-    console.log('✅ Email/password sign-in successful');
-    // Note: Login success is logged in onAuthStateChange
-    await updateSessionState(data.session);
-    setLoading(false);
-    return null;
-  }, []);
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: sanitizedEmail,
+        password: sanitizedPassword,
+      });
 
-  const value = React.useMemo(() => ({
-    user,
-    role,
-    loading,
-    error,
-    setUser,
-    setRole,
-    signInWithOAuth,
-    signInWithEmailPassword,
-    signOut,
-    clearError,
-    signUp,
-    resetPassword,
-    updateProfile,
-    refreshSession,
-    checkSession,
-    validateSession, // Add validateSession to context
-    isInitialized,
-    getRememberedEmail,
-    isAuthenticated,
-    csrfToken,
-    csrfTimestamp,
-    csrfSignature,
-  }), [user, role, loading, error, signInWithEmailPassword, validateSession, isAuthenticated, csrfToken, csrfTimestamp, csrfSignature, isInitialized]);
+      if (error) {
+        // Handle specific error cases
+        let errorMessage = error.message;
 
-  return (
-    <AuthContext.Provider
-      value={value}
-    >
-      {children}
-    </AuthContext.Provider>
+        if (error.message.includes('invalid_credentials')) {
+          errorMessage = 'Invalid email or password. Please try again.';
+          recordFailedLogin(sanitizedEmail);
+          recordRateLimitAttempt(`login_${sanitizedEmail}`);
+        } else if (error.message.includes('user_not_found')) {
+          errorMessage =
+            'No account found with this email. Please check your email or create a new account.';
+        } else if (error.message.includes('too_many_requests')) {
+          errorMessage = 'Too many login attempts. Please try again later.';
+        }
+
+        await auditService.logLoginFailure(sanitizedEmail, errorMessage);
+        setError(errorMessage);
+        return { message: errorMessage } as AuthError;
+      }
+
+      // Clear failed login attempts on successful login
+      clearLoginAttempts(`login_${sanitizedEmail}`);
+
+      // Set remember me if enabled
+      if (rememberMe && typeof window !== 'undefined') {
+        localStorage.setItem('remember_me', 'true');
+        localStorage.setItem('remembered_email', sanitizedEmail);
+      } else {
+        localStorage.removeItem('remember_me');
+        localStorage.removeItem('remembered_email');
+      }
+
+      console.log('✅ Email/password sign-in successful');
+      // Note: Login success is logged in onAuthStateChange
+      await updateSessionState(data.session);
+      setLoading(false);
+      return null;
+    },
+    [],
   );
-}
 
+  const value = React.useMemo(
+    () => ({
+      user,
+      role,
+      loading,
+      error,
+      setUser,
+      setRole,
+      signInWithOAuth,
+      signInWithEmailPassword,
+      signOut,
+      clearError,
+      signUp,
+      resetPassword,
+      updateProfile,
+      refreshSession,
+      checkSession,
+      validateSession, // Add validateSession to context
+      isInitialized,
+      getRememberedEmail,
+      isAuthenticated,
+      csrfToken,
+      csrfTimestamp,
+      csrfSignature,
+    }),
+    [
+      user,
+      role,
+      loading,
+      error,
+      signInWithEmailPassword,
+      validateSession,
+      isAuthenticated,
+      csrfToken,
+      csrfTimestamp,
+      csrfSignature,
+      isInitialized,
+    ],
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export { useAuth };

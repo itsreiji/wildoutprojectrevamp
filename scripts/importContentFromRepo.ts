@@ -91,7 +91,7 @@ function extractContentFromFile(): {
     } catch (error) {
       console.warn(`⚠️ Could not parse JS object, using eval as fallback: ${error}`);
       // Fallback to eval for complex cases (use with caution)
-      return eval(`(${jsString})`);
+      return eval(`(${jsString})`) as HeroContent | AboutContent | SiteSettings;
     }
   };
 

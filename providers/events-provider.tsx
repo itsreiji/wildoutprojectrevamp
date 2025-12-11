@@ -2,15 +2,12 @@
 
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
-
-
 import { supabaseClient } from '../lib/supabase/client';
 import type { LandingEvent } from '../types/content';
 import type { Database, TablesInsert, TablesUpdate } from '../types/supabase';
 
 import { useAuth } from './auth-context';
-import { EventsContext } from './events-context';
-
+import { EventsContext, useEvents } from './events-context';
 
 export const EventsProvider = ({ children }: { children: ReactNode }) => {
   const [events, setEvents] = useState<LandingEvent[]>([]);
@@ -31,54 +28,62 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
 
-      const eventsData = (data || []).map((row: Database['public']['Views']['public_events_view']['Row']): LandingEvent => {
-        // Map database status to LandingEvent status
-        let status: LandingEvent['status'] = 'upcoming';
-        if (row.status === 'published') {
-          // Check if event is ongoing or upcoming based on dates
-          const now = new Date();
-          const startDate = row.start_date ? new Date(row.start_date) : null;
-          const endDate = row.end_date ? new Date(row.end_date) : null;
-          if (startDate && endDate && now >= startDate && now <= endDate) {
+      const eventsData = (data || []).map(
+        (
+          row: Database['public']['Views']['public_events_view']['Row'],
+        ): LandingEvent => {
+          // Map database status to LandingEvent status
+          let status: LandingEvent['status'] = 'upcoming';
+          if (row.status === 'published') {
+            // Check if event is ongoing or upcoming based on dates
+            const now = new Date();
+            const startDate = row.start_date ? new Date(row.start_date) : null;
+            const endDate = row.end_date ? new Date(row.end_date) : null;
+            if (startDate && endDate && now >= startDate && now <= endDate) {
+              status = 'ongoing';
+            } else if (endDate && now > endDate) {
+              status = 'completed';
+            } else {
+              status = 'upcoming';
+            }
+          } else if (row.status === 'ongoing') {
             status = 'ongoing';
-          } else if (endDate && now > endDate) {
+          } else if (
+            row.status === 'completed' ||
+            row.status === 'cancelled' ||
+            row.status === 'archived'
+          ) {
             status = 'completed';
-          } else {
-            status = 'upcoming';
           }
-        } else if (row.status === 'ongoing') {
-          status = 'ongoing';
-        } else if (row.status === 'completed' || row.status === 'cancelled' || row.status === 'archived') {
-          status = 'completed';
-        }
 
-        return {
-          id: row.id ?? '',
-          title: row.title ?? '',
-          description: row.description ?? null,
-          start_date: row.start_date ?? '',
-          end_date: row.end_date ?? '',
-          time: row.time ?? '',
-          location: row.location ?? '',
-          category: row.category ?? null,
-          status,
-          capacity: row.capacity || row.max_attendees || null,
-          attendees: row.attendees || row.current_attendees || null,
-          currency: row.currency || 'IDR',
-          price: row.price || null,
-          price_range: row.price_range || null,
-          artists: row.artists || [],
-          gallery: row.gallery || [],
-          highlights: row.highlights || [],
-          metadata: row.metadata ?? {},
-          created_at: row.created_at,
-          updated_at: row.updated_at,
-          tags: row.tags || [],
-          image_url: row.image_url || '',
-          partner_name: row.partner_name || '',
-          partner_logo_url: row.partner_logo_url || '',
-        };
-      }) as LandingEvent[];
+          return {
+            id: row.id ?? '',
+            title: row.title ?? '',
+            description: row.description ?? null,
+            start_date: row.start_date ?? '',
+            end_date: row.end_date ?? '',
+            time: row.time ?? '',
+            location: row.location ?? '',
+            category: row.category ?? null,
+            status,
+            capacity: row.capacity || row.max_attendees || null,
+            attendees: row.attendees || row.current_attendees || null,
+            currency: row.currency || 'IDR',
+            price: row.price || null,
+            price_range: row.price_range || null,
+            artists: row.artists || [],
+            gallery: row.gallery || [],
+            highlights: row.highlights || [],
+            metadata: row.metadata ?? {},
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            tags: row.tags || [],
+            image_url: row.image_url || '',
+            partner_name: row.partner_name || '',
+            partner_logo_url: row.partner_logo_url || '',
+          };
+        },
+      ) as LandingEvent[];
 
       setEvents(eventsData);
       return eventsData;
@@ -100,7 +105,7 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) throw error;
 
-      setEvents((prev) => [...prev, data as LandingEvent]);
+      setEvents(prev => [...prev, data as LandingEvent]);
       return data as LandingEvent;
     } catch (err) {
       console.error('Error adding event:', err);
@@ -110,33 +115,41 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Update an existing event
-  const updateEvent = useCallback(async (id: string, updates: TablesUpdate<'events'>) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from('events')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
+  const updateEvent = useCallback(
+    async (id: string, updates: TablesUpdate<'events'>) => {
+      try {
+        const { data, error } = await supabaseClient
+          .from('events')
+          .update(updates)
+          .eq('id', id)
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      setEvents((prev) => prev.map((event) => (event.id === id ? (data as LandingEvent) : event)));
-      return data as LandingEvent;
-    } catch (err) {
-      console.error('Error updating event:', err);
-      setError('Failed to update event');
-      throw err;
-    }
-  }, []);
+        setEvents(prev =>
+          prev.map(event => (event.id === id ? (data as LandingEvent) : event)),
+        );
+        return data as LandingEvent;
+      } catch (err) {
+        console.error('Error updating event:', err);
+        setError('Failed to update event');
+        throw err;
+      }
+    },
+    [],
+  );
 
   // Delete an event
   const deleteEvent = useCallback(async (id: string) => {
     try {
-      const { error } = await supabaseClient.from('events').delete().eq('id', id);
+      const { error } = await supabaseClient
+        .from('events')
+        .delete()
+        .eq('id', id);
       if (error) throw error;
 
-      setEvents((prev) => prev.filter((event) => event.id !== id));
+      setEvents(prev => prev.filter(event => event.id !== id));
     } catch (err) {
       console.error('Error deleting event:', err);
       setError('Failed to delete event');
@@ -159,16 +172,22 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, fetchEvents]);
 
-  const value = React.useMemo(() => ({
-    events,
-    loading,
-    error,
-    addEvent,
-    updateEvent,
-    deleteEvent,
-    fetchEvents,
-  }), [events, loading, error, addEvent, updateEvent, deleteEvent, fetchEvents]);
+  const value = React.useMemo(
+    () => ({
+      events,
+      loading,
+      error,
+      addEvent,
+      updateEvent,
+      deleteEvent,
+      fetchEvents,
+    }),
+    [events, loading, error, addEvent, updateEvent, deleteEvent, fetchEvents],
+  );
 
-  return <EventsContext.Provider value={value}>{children}</EventsContext.Provider>;
-}
+  return (
+    <EventsContext.Provider value={value}>{children}</EventsContext.Provider>
+  );
+};
 
+export { useEvents };
