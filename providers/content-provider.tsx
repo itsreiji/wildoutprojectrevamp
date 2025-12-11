@@ -1,26 +1,28 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+
+
 
 import { supabaseClient } from '../lib/supabase/client';
 import type {
-  TeamMember,
-  Partner,
-  HeroContent,
   AboutContent,
-  GalleryImage,
-  SiteSettings,
-  ContentContextType,
   AdminSection,
+  EventArtist,
+  GalleryImage,
+  HeroContent,
+  LandingEvent,
+  Partner,
   SectionContent,
   SectionPermissions,
-  LandingEvent,
-  EventArtist,
+  SiteSettings,
+  TeamMember,
 } from '../types/content';
 import type { Database, Json, TablesInsert, TablesUpdate } from '../types/supabase';
-import { cleanupEventAssets, cleanupTeamMemberAsset, cleanupPartnerAsset, cleanupGalleryAsset } from '../utils/storageHelpers';
+import { cleanupEventAssets, cleanupGalleryAsset, cleanupPartnerAsset, cleanupTeamMemberAsset } from '../utils/storageHelpers';
 
-import { useAuth } from './auth-provider';
+import { useAuth } from './auth-context';
+import { ContentContext } from './content-context';
 
 
 const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> => {
@@ -360,9 +362,6 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
   }
 };
 
-// Content context implementation
-const ContentContext = createContext<ContentContextType | null>(null);
-
 export const ContentProvider = ({ children }: { children: ReactNode }) => {
   const { user, role: userRole } = useAuth();
   const [events, setEvents] = useState<LandingEvent[]>(INITIAL_EVENTS);
@@ -494,7 +493,7 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
   }, [user, userRole]);
 
   // Event mutations
-  const addEvent = async (event: TablesInsert<'events'>) => {
+  const addEvent = useCallback(async (event: TablesInsert<'events'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('events')
@@ -510,9 +509,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error adding event:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const updateEvent = async (id: string, updates: TablesUpdate<'events'>) => {
+  const updateEvent = useCallback(async (id: string, updates: TablesUpdate<'events'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('events')
@@ -529,9 +528,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error updating event:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const deleteEvent = async (id: string) => {
+  const deleteEvent = useCallback(async (id: string) => {
     try {
       const itemToDelete = events.find((event) => event.id === id);
       if (itemToDelete?.image_url) {
@@ -546,10 +545,10 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error deleting event:', err);
       throw err;
     }
-  };
+  }, [events]);
 
   // Team member mutations
-  const addTeamMember = async (member: TablesInsert<'team_members'>) => {
+  const addTeamMember = useCallback(async (member: TablesInsert<'team_members'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('team_members')
@@ -565,9 +564,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error adding team member:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>) => {
+  const updateTeamMember = useCallback(async (id: string, updates: TablesUpdate<'team_members'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('team_members')
@@ -584,9 +583,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error updating team member:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const deleteTeamMember = async (id: string) => {
+  const deleteTeamMember = useCallback(async (id: string) => {
     try {
       const itemToDelete = team.find((member) => member.id === id);
       if (itemToDelete?.avatar_url) {
@@ -601,10 +600,10 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error deleting team member:', err);
       throw err;
     }
-  };
+  }, [team]);
 
   // Partner mutations
-  const addPartner = async (partner: TablesInsert<'partners'>) => {
+  const addPartner = useCallback(async (partner: TablesInsert<'partners'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('partners')
@@ -620,9 +619,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error adding partner:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const updatePartner = async (id: string, updates: TablesUpdate<'partners'>) => {
+  const updatePartner = useCallback(async (id: string, updates: TablesUpdate<'partners'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('partners')
@@ -639,9 +638,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error updating partner:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const deletePartner = async (id: string) => {
+  const deletePartner = useCallback(async (id: string) => {
     try {
       const itemToDelete = partners.find((partner) => partner.id === id);
       if (itemToDelete?.logo_url) {
@@ -656,10 +655,10 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error deleting partner:', err);
       throw err;
     }
-  };
+  }, [partners]);
 
   // Gallery mutations
-  const addGalleryImage = async (image: TablesInsert<'gallery_items'>) => {
+  const addGalleryImage = useCallback(async (image: TablesInsert<'gallery_items'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('gallery_items')
@@ -675,9 +674,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error adding gallery image:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const updateGalleryImage = async (id: string, updates: TablesUpdate<'gallery_items'>) => {
+  const updateGalleryImage = useCallback(async (id: string, updates: TablesUpdate<'gallery_items'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('gallery_items')
@@ -694,9 +693,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error updating gallery image:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const deleteGalleryImage = async (id: string) => {
+  const deleteGalleryImage = useCallback(async (id: string) => {
     try {
       const itemToDelete = gallery.find((image) => image.id === id);
       if (itemToDelete?.image_url) {
@@ -711,10 +710,10 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error deleting gallery image:', err);
       throw err;
     }
-  };
+  }, [gallery]);
 
   // Event Artists mutations
-  const fetchEventArtists = async (eventId: string): Promise<EventArtist[]> => {
+  const fetchEventArtists = useCallback(async (eventId: string): Promise<EventArtist[]> => {
     try {
       const { data, error } = await supabaseClient
         .from('event_artists')
@@ -738,9 +737,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error fetching event artists:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const addEventArtist = async (artist: Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>) => {
+  const addEventArtist = useCallback(async (artist: Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('event_artists')
@@ -755,9 +754,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error adding event artist:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const updateEventArtist = async (id: string, updates: Partial<Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>>) => {
+  const updateEventArtist = useCallback(async (id: string, updates: Partial<Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>>) => {
     try {
       const { data, error } = await supabaseClient
         .from('event_artists')
@@ -773,9 +772,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error updating event artist:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const deleteEventArtist = async (id: string) => {
+  const deleteEventArtist = useCallback(async (id: string) => {
     try {
       const { error } = await supabaseClient.from('event_artists').delete().eq('id', id);
       if (error) throw error;
@@ -783,10 +782,10 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error deleting event artist:', err);
       throw err;
     }
-  };
+  }, []);
 
   // Content mutations
-  const saveHeroContent = async (content: HeroContent) => {
+  const saveHeroContent = useCallback(async (content: HeroContent) => {
     try {
       const { data, error } = await supabaseClient
         .from('hero_content')
@@ -805,9 +804,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error saving hero content:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const saveAboutContent = async (content: AboutContent) => {
+  const saveAboutContent = useCallback(async (content: AboutContent) => {
     try {
       const { data, error } = await supabaseClient
         .from('about_content')
@@ -826,9 +825,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error saving about content:', err);
       throw err;
     }
-  };
+  }, []);
 
-  const saveSiteSettings = async (settings: SiteSettings) => {
+  const saveSiteSettings = useCallback(async (settings: SiteSettings) => {
     try {
       const { data, error } = await supabaseClient
         .from('site_settings')
@@ -847,19 +846,19 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error saving site settings:', err);
       throw err;
     }
-  };
+  }, []);
 
   // Admin sections methods
-  const getSectionContent = (sectionId: string): SectionContent | null => {
+  const getSectionContent = useCallback((sectionId: string): SectionContent | null => {
     return sectionContent[sectionId] || null;
-  };
+  }, [sectionContent]);
 
-  const getSectionPermissions = (): SectionPermissions[] => {
+  const getSectionPermissions = useCallback((): SectionPermissions[] => {
     // TODO: Add permissions field to AdminSection type in types/content.ts
     return [];
-  };
+  }, []);
 
-  const updateSectionContent = async (sectionId: string, content: SectionContent) => {
+  const updateSectionContent = useCallback(async (sectionId: string, content: SectionContent) => {
     try {
       const { data, error } = await supabaseClient
         .from('section_content')
@@ -883,7 +882,7 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error updating section content:', err);
       throw err;
     }
-  };
+  }, []);
 
   const value = React.useMemo(() => ({
     // Content data
@@ -934,15 +933,10 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     updateSectionContent,
   }), [
     events, partners, gallery, team, hero, about, settings, loading, error,
-    adminSections, sectionContent, adminSectionsLoading,
-    deleteEvent, deleteGalleryImage, deletePartner, deleteTeamMember, getSectionContent, getSectionPermissions,
+    adminSections, sectionContent, adminSectionsLoading, addEvent, addEventArtist, addGalleryImage, addPartner, addTeamMember,
+    deleteEvent, deleteEventArtist, deleteGalleryImage, deletePartner, deleteTeamMember, fetchEventArtists, getSectionContent, getSectionPermissions, saveAboutContent, saveHeroContent, saveSiteSettings, updateEvent, updateEventArtist, updateGalleryImage, updatePartner, updateSectionContent, updateTeamMember,
   ]);
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;
 }
 
-export function useContent() {
-  const context = useContext(ContentContext);
-  if (!context) throw new Error('useContent must be within ContentProvider');
-  return context;
-}

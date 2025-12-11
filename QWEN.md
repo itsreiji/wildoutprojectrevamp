@@ -1,164 +1,59 @@
-# WildOut! Landing Page and Dashboard - Project Context
+# WildOut! Project - AGENTS.md
 
-## Project Overview
+> **AI Context**: This is the root context file. Read specific sub-folder `AGENTS.md` files for detailed patterns.
 
-WildOut! is a comprehensive event management platform featuring a public landing page and a sophisticated admin dashboard. The application has been migrated to Next.js 16 with the App Router architecture, with Supabase serving as the backend for data management and authentication. The platform enables real-time synchronization between the public landing page and admin dashboard, with all content managed through Supabase as the single source of truth.
+## 1. Project Snapshot
 
-### Key Technologies
-- **Frontend**: Next.js 16 (App Router), React 19, TypeScript
-- **Styling**: Tailwind CSS with Radix UI components
-- **Database/Backend**: Supabase (PostgreSQL, Auth, Storage)
-- **State Management**: React Context API with custom providers
-- **Data Fetching**: TanStack Query (React Query)
-- **UI Components**: Radix UI primitives, Lucide React icons
-- **Build Tool**: Next.js Compiler
-- **Package Manager**: pnpm
+- **Type**: Single Next.js 16 Application (App Router)
+- **Stack**: TypeScript, Tailwind CSS 4, Supabase, TanStack Query, Shadcn UI
+- **Key Directories**: `app/` (routes), `components/` (UI), `lib/` (core), `supabase/` (db), `services/` (logic)
 
-### Architecture Highlights
-- **Supabase-Driven Architecture**: All content (events, partners, team, gallery, hero, about content) is stored in and retrieved from Supabase
-- **Real-time Synchronization**: Changes made in the admin dashboard are immediately reflected on the public landing page
-- **Role-Based Access Control (RBAC)**: Three-tier system (admin, editor, user) with section-level permissions
-- **Dynamic Admin Menu**: Admin navigation items are loaded from Supabase `admin_sections` table
-- **Configurable Admin Path**: Default admin dashboard at `/sadmin` with legacy support for `/admin`
+## 2. Root Setup & Commands
 
-## Directory Structure
+- **Install**: `pnpm install`
+- **Dev Server**: `pnpm dev`
+- **Build**: `pnpm build`
+- **Test**: `pnpm test` (Vitest)
+- **Lint/Check**: `pnpm lint:all` (runs lint, type-check, format)
 
-```
-app/
-├── api/                      # Next.js API routes
-├── sadmin/                   # Admin dashboard pages
-├── login/                    # Login page
-├── register/                 # Registration page
-├── events/                   # Events page
-├── test-ui/                  # UI test page
-├── 404/                      # Not found page
-├── layout.tsx               # Root layout with providers
-├── page.tsx                 # Landing page
-└── globals.css              # Global styles
-components/
-├── ui/                      # Shadcn UI components
-├── admin/                   # Admin-specific components
-├── LandingPage.tsx          # Landing page component
-├── Dashboard.tsx            # Dashboard component
-├── router.tsx               # Router components (placeholder)
-└── ...                      # Other UI components
-providers/
-├── auth-provider.tsx        # Authentication provider
-├── content-provider.tsx     # Content provider
-├── events-provider.tsx      # Events provider
-├── partners-provider.tsx    # Partners provider
-├── static-content-provider.tsx # Static content provider
-├── team-provider.tsx        # Team provider
-└── query-provider.tsx       # Query provider
-lib/
-├── supabase/                # Supabase client
-├── utils.ts                 # Utility functions
-└── ...                      # Other utility modules
-types/                       # Type definitions
-├── content.ts               # Content-related types
-├── supabase.ts              # Supabase-generated types
-└── ...                      # Other type definitions
-services/                    # Service implementations
-utils/                       # Utility functions
-```
+## 3. Universal Conventions
 
-## Building and Running
+- **Style**: Strict TypeScript (`tsconfig.json`), Prettier for formatting.
+- **Imports**: Use `@/` alias for root (e.g., `import { cn } from '@/lib/utils'`).
+- **Env**: Access via `process.env.NEXT_PUBLIC_*`. Validate availability before use.
+- **Async**: Prefer `async/await`. Handle errors with `try/catch` or boundary components.
 
-### Prerequisites
-- Node.js (latest stable)
-- pnpm package manager
-- Supabase project (URL and anon key)
+## 4. Security & Secrets
 
-### Setup and Installation
-1. Install dependencies: `pnpm install`
-2. Set up environment variables (copy from `.env.example`):
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   ```
-3. Optional configuration:
-   - `NEXT_PUBLIC_ADMIN_BASE_PATH` to customize admin URL (default: `/sadmin`)
-   - `NEXT_PUBLIC_USE_DUMMY_DATA` for development with mock data
+- **NEVER** commit `.env` files or real tokens.
+- **Client-side**: Only expose `NEXT_PUBLIC_` variables if safe for public.
+- **Supabase**: Use RLS (Row Level Security) for all tables.
 
-### Development Commands
-- `pnpm dev`: Start development server
-- `pnpm build`: Build for production
-- `pnpm start`: Start production server
-- `pnpm lint`: Run Next.js linting
-- `pnpm type-check`: Type check without emitting
-- `pnpm test`: Run tests
-- `pnpm test:ui`: Run tests with UI
-- `pnpm test:coverage`: Run tests with coverage report
-- `pnpm format`: Format all files with Prettier
-- `pnpm format:check`: Check if files are formatted with Prettier
-- `pnpm lint:parallel`: Run all linting tools in parallel (ESLint, TypeScript, Prettier)
-- `pnpm lint:all`: Run all linting sequentially
+## 5. JIT Index - Directory Map
 
-### Database Setup
-1. Apply Supabase migrations to create all necessary tables
-2. Content tables are automatically seeded with initial data from the repository
-3. Key Supabase tables include:
-   - Content tables: `hero_content`, `about_content`, `site_settings`
-   - Event management: `events`, `gallery_items`, `partners`, `team_members`
-   - Authentication: Extended `profiles` table with roles
-   - Admin system: `admin_sections`, `section_content`, `role_permissions`, `user_permissions`
-   - Audit logging: `audit_log`, `user_sessions`
+### Core Application
 
-## Development Conventions
+- **Routes & Pages**: `app/` → [see app/AGENTS.md](app/AGENTS.md)
+- **UI Components**: `components/` → [see components/AGENTS.md](components/AGENTS.md)
+- **Business Logic**: `services/` → [see services/AGENTS.md](services/AGENTS.md)
 
-### Authentication System
-- Role-based access control with admin/editor/user roles
-- OAuth (Google) and email/password authentication
-- Session validation and security measures
-- Remember me functionality with Next.js cookies
-- Server-side authentication handling through Next.js API routes
+### Infrastructure & Utils
 
-### State Management
-- React Context API for global state (AuthContext, ContentContext, etc.)
-- TanStack Query for server state management
-- Custom hooks for accessing context values
-- Provider pattern for component composition
+- **Utilities & Config**: `lib/` → [see lib/AGENTS.md](lib/AGENTS.md)
+- **Database & Auth**: `supabase/` → [see supabase/AGENTS.md](supabase/AGENTS.md)
+- **Hooks**: `hooks/` → [see hooks/AGENTS.md](hooks/AGENTS.md)
+- **Providers**: `providers/` → [see providers/AGENTS.md](providers/AGENTS.md)
 
-### UI Components
-- Radix UI primitives for accessible components
-- Tailwind CSS with custom configuration for styling
-- Component-based architecture with clear separation of concerns
-- Reusable UI components in the `components/ui` directory
+### Quick Find Commands
 
-### Security Measures
-- Input sanitization and validation
-- CSRF protection
-- Rate limiting for authentication attempts
-- Role-based access control at both UI and API levels
-- Secure session management with Supabase
+- Find Page: `glob "app/**/page.tsx"`
+- Find Component: `glob "components/**/*.tsx"`
+- Find Service: `glob "services/*.ts"`
+- Search Content: `search_file_content pattern="<term>"`
 
-### Content Management
-- Supabase as the single source of truth
-- Real-time synchronization between admin and public views
-- Audit logging for content changes
-- Versioned content management in some sections
+## 6. Definition of Done
 
-## Key Features
-
-### Landing Page ↔ Admin Dashboard Sync
-- Real-time synchronization between public landing page and admin dashboard
-- Admin content management for hero section, about content, and site settings
-- Supabase as the source of truth for dynamic and static content
-- Import tool for seeding repository data into Supabase
-
-### Authentication & User Management
-- Complete user authentication system with role-based access
-- User registration and automatic 'user' role assignment
-- Admin login with Supabase session validation
-- Role management with admin/editor/user permissions
-
-### Supabase-Driven Admin Menu & RBAC
-- Dynamic admin menu loaded from Supabase `admin_sections` table
-- Role-based access control with configurable permissions
-- Section-level access control for viewing, editing, publishing, and deleting
-- Permission inheritance with optional user-specific overrides
-
-### Configurable Admin Base Path
-- Default admin dashboard accessible at `/sadmin`
-- Configurable via `NEXT_PUBLIC_ADMIN_BASE_PATH` environment variable
-- Automatic link generation based on configured base path
+1.  Code compiles (`pnpm type-check`).
+2.  Linter passes (`pnpm lint`).
+3.  Tests pass (`pnpm test`).
+4.  No console errors in DevTools.

@@ -1,24 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { supabaseClient } from '../lib/supabase/client';
 import type { Partner } from '../types/content';
-import type { TablesInsert, TablesUpdate } from '../types/supabase';
+import type { Database, Json, TablesInsert, TablesUpdate } from '../types/supabase';
 
-import { useAuth } from './auth-provider';
+import { useAuth } from './auth-context';
+import { PartnersContext } from './partners-context';
 
-
-interface PartnersContextType {
-  partners: Partner[];
-  loading: boolean;
-  error: string | null;
-  addPartner: (partner: TablesInsert<'partners'>) => Promise<any>;
-  updatePartner: (id: string, updates: TablesUpdate<'partners'>) => Promise<any>;
-  deletePartner: (id: string) => Promise<void>;
-}
-
-const PartnersContext = createContext<PartnersContextType | null>(null);
 
 export const PartnersProvider = ({ children }: { children: ReactNode }) => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -27,10 +17,10 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
 
   // Helper function to normalize social links
-  const normalizeSocialLinks = (value: any): Record<string, string | null> => {
+  const normalizeSocialLinks = (value: Json): Record<string, string | null> => {
     if (!value || typeof value === 'string') return {};
     if (Array.isArray(value)) return {};
-    return Object.entries(value as Record<string, any>).reduce<Record<string, string | null>>(
+    return Object.entries(value as Record<string, Json>).reduce<Record<string, string | null>>(
       (acc, [key, entry]) => {
         if (typeof entry === 'string') {
           acc[key] = entry;
@@ -46,7 +36,7 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Fetch partners from Supabase
-  const fetchPartners = async () => {
+  const fetchPartners = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabaseClient
@@ -60,7 +50,7 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
 
-      const partnersData = (data || []).map((row: any) => ({
+      const partnersData = (data || []).map((row: Database['public']['Tables']['partners']['Row']) => ({
         id: row.id,
         name: row.name || '',
         description: row.description || undefined,
@@ -85,10 +75,10 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Add a new partner
-  const addPartner = async (partner: TablesInsert<'partners'>) => {
+  const addPartner = useCallback(async (partner: TablesInsert<'partners'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('partners')
@@ -99,16 +89,16 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       setPartners((prev) => [...prev, data as Partner]);
-      return data;
+      return data as Partner;
     } catch (err) {
       console.error('Error adding partner:', err);
       setError('Failed to add partner');
       throw err;
     }
-  };
+  }, []);
 
   // Update an existing partner
-  const updatePartner = async (id: string, updates: TablesUpdate<'partners'>) => {
+  const updatePartner = useCallback(async (id: string, updates: TablesUpdate<'partners'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('partners')
@@ -120,16 +110,16 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       setPartners((prev) => prev.map((partner) => (partner.id === id ? (data as Partner) : partner)));
-      return data;
+      return data as Partner;
     } catch (err) {
       console.error('Error updating partner:', err);
       setError('Failed to update partner');
       throw err;
     }
-  };
+  }, []);
 
   // Delete a partner
-  const deletePartner = async (id: string) => {
+  const deletePartner = useCallback(async (id: string) => {
     try {
       const { error } = await supabaseClient.from('partners').delete().eq('id', id);
       if (error) throw error;
@@ -140,7 +130,7 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
       setError('Failed to delete partner');
       throw err;
     }
-  };
+  }, []);
 
   // Load partners on initial render if user is authenticated
   useEffect(() => {
@@ -150,7 +140,7 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
       setPartners([]);
       setLoading(false);
     }
-  }, [user]);
+  }, [user, fetchPartners]);
 
   const value = React.useMemo(() => ({
     partners,
@@ -159,15 +149,8 @@ export const PartnersProvider = ({ children }: { children: ReactNode }) => {
     addPartner,
     updatePartner,
     deletePartner,
-  }), [partners, loading, error]);
+  }), [partners, loading, error, addPartner, updatePartner, deletePartner]);
 
   return <PartnersContext.Provider value={value}>{children}</PartnersContext.Provider>;
 }
 
-export function usePartners() {
-  const context = useContext(PartnersContext);
-  if (!context) {
-    throw new Error('usePartners must be used within a PartnersProvider');
-  }
-  return context;
-}

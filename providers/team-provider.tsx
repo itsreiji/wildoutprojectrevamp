@@ -1,24 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { useState, ReactNode, useEffect, useCallback } from 'react';
 
 import { supabaseClient } from '../lib/supabase/client';
 import type { TeamMember } from '../types/content';
-import type { TablesInsert, TablesUpdate } from '../types/supabase';
+import type { Database, Json, TablesInsert, TablesUpdate } from '../types/supabase';
 
-import { useAuth } from './auth-provider';
+import { useAuth } from './auth-context';
+import { TeamContext } from './team-context';
 
-
-interface TeamContextType {
-  team: TeamMember[];
-  loading: boolean;
-  error: string | null;
-  addTeamMember: (member: TablesInsert<'team_members'>) => Promise<any>;
-  updateTeamMember: (id: string, updates: TablesUpdate<'team_members'>) => Promise<any>;
-  deleteTeamMember: (id: string) => Promise<void>;
-}
-
-const TeamContext = createContext<TeamContextType | null>(null);
 
 export const TeamProvider = ({ children }: { children: ReactNode }) => {
   const [team, setTeam] = useState<TeamMember[]>([]);
@@ -27,10 +17,10 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
 
   // Helper function to normalize social links
-  const normalizeSocialLinks = (value: any): Record<string, string | null> => {
+  const normalizeSocialLinks = (value: Json): Record<string, string | null> => {
     if (!value || typeof value === 'string') return {};
     if (Array.isArray(value)) return {};
-    return Object.entries(value as Record<string, any>).reduce<Record<string, string | null>>(
+    return Object.entries(value as Record<string, Json>).reduce<Record<string, string | null>>(
       (acc, [key, entry]) => {
         if (typeof entry === 'string') {
           acc[key] = entry;
@@ -46,7 +36,7 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Fetch team members from Supabase
-  const fetchTeamMembers = async () => {
+  const fetchTeamMembers = useCallback(async () => {
     try {
       setLoading(true);
       const { data, error } = await supabaseClient
@@ -61,7 +51,7 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
 
-      const teamData = (data || []).map((row: any) => ({
+      const teamData = (data || []).map((row: Database['public']['Tables']['team_members']['Row']) => ({
         id: row.id,
         name: row.name || '',
         title: row.title || row.role || undefined,
@@ -83,10 +73,10 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Add a new team member
-  const addTeamMember = async (member: TablesInsert<'team_members'>) => {
+  const addTeamMember = useCallback(async (member: TablesInsert<'team_members'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('team_members')
@@ -97,16 +87,16 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       setTeam((prev) => [...prev, data as TeamMember]);
-      return data;
+      return data as TeamMember;
     } catch (err) {
       console.error('Error adding team member:', err);
       setError('Failed to add team member');
       throw err;
     }
-  };
+  }, []);
 
   // Update an existing team member
-  const updateTeamMember = async (id: string, updates: TablesUpdate<'team_members'>) => {
+  const updateTeamMember = useCallback(async (id: string, updates: TablesUpdate<'team_members'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('team_members')
@@ -118,16 +108,16 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       setTeam((prev) => prev.map((member) => (member.id === id ? (data as TeamMember) : member)));
-      return data;
+      return data as TeamMember;
     } catch (err) {
       console.error('Error updating team member:', err);
       setError('Failed to update team member');
       throw err;
     }
-  };
+  }, []);
 
   // Delete a team member
-  const deleteTeamMember = async (id: string) => {
+  const deleteTeamMember = useCallback(async (id: string) => {
     try {
       const { error } = await supabaseClient.from('team_members').delete().eq('id', id);
       if (error) throw error;
@@ -138,7 +128,7 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
       setError('Failed to delete team member');
       throw err;
     }
-  };
+  }, []);
 
   // Load team members on initial render if user is authenticated
   useEffect(() => {
@@ -148,7 +138,7 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
       setTeam([]);
       setLoading(false);
     }
-  }, [user]);
+  }, [user, fetchTeamMembers]);
 
   const value = React.useMemo(() => ({
     team,
@@ -157,15 +147,7 @@ export const TeamProvider = ({ children }: { children: ReactNode }) => {
     addTeamMember,
     updateTeamMember,
     deleteTeamMember,
-  }), [team, loading, error]);
+  }), [team, loading, error, addTeamMember, updateTeamMember, deleteTeamMember]);
 
   return <TeamContext.Provider value={value}>{children}</TeamContext.Provider>;
-}
-
-export function useTeam() {
-  const context = useContext(TeamContext);
-  if (!context) {
-    throw new Error('useTeam must be used within a TeamProvider');
-  }
-  return context;
 }

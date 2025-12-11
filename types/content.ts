@@ -1,76 +1,78 @@
 // Content types for the WildOut! project
 
+import { Json, TablesInsert, TablesUpdate } from './supabase';
+
 export interface TeamMember {
   id: string;
   name: string;
-  title?: string;
-  bio?: string;
-  avatar_url?: string;
-  email?: string;
-  linkedin_url?: string | null;
-  status: 'active' | 'inactive';
-  social_links?: Record<string, string | null>;
-  display_order?: number;
-  created_at: string;
-  updated_at: string;
+  title: string | null;
+  bio: string | null;
+  avatar_url: string | null;
+  email: string | null;
+  linkedin_url: string | null;
+  status: string; // Adjusted to string to match DB more closely, will map to 'active' | 'inactive' in provider
+  social_links: Json | null; // Use Json type
+  display_order: number | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export interface Partner {
   id: string;
   name: string;
-  description?: string;
-  logo_url?: string;
-  website_url?: string;
-  category?: string;
-  status: 'active' | 'inactive';
-  contact_email?: string;
-  contact_phone?: string;
-  social_links?: Record<string, string | null>;
-  created_at: string;
-  updated_at: string;
-  address?: string | null;
-  city?: string | null;
-  country?: string | null;
+  description: string | null;
+  logo_url: string | null;
+  website_url: string | null;
+  category: string | null;
+  status: string; // Adjusted to string to match DB more closely
+  contact_email: string | null;
+  contact_phone: string | null;
+  social_links: Json | null; // Use Json type
+  created_at: string | null;
+  updated_at: string | null;
+  address: string | null;
+  city: string | null;
+  country: string | null;
 }
 
 export interface HeroContent {
   id: string;
   title: string;
-  subtitle: string;
-  description: string;
-  stats: { events: string; members: string; partners: string };
-  cta_text?: string;
-  cta_link?: string;
-  created_at: string;
-  updated_at: string;
+  subtitle: string | null;
+  description: string | null;
+  stats: Json | null; // Use Json type for stats
+  cta_text: string | null;
+  cta_link: string | null;
+  created_at: string | null;
+  updated_at: string | null;
   updated_by: string | null;
 }
 
 export interface AboutContent {
   id: string;
   title: string;
-  subtitle: string;
-  founded_year: string;
-  story: string[];
-  features: { title: string; description: string }[];
-  created_at: string;
-  updated_at: string;
+  subtitle: string | null;
+  founded_year: string | null;
+  story: string[] | null;
+  features: Json | null; // Use Json type for features
+  created_at: string | null;
+  updated_at: string | null;
   updated_by: string | null;
 }
 
 export interface GalleryImage {
   id: string;
-  title?: string;
-  description?: string;
-  image_url?: string;
-  category?: string;
-  status?: string;
-  tags?: string[];
-  created_at?: string;
-  updated_at?: string;
+  title: string | null;
+  description: string | null;
+  image_url: string | null;
+  category: string | null;
+  status: string | null;
+  tags: string[] | null;
+  created_at: string | null;
+  updated_at: string | null;
   display_order: number | null;
   event_id: string | null;
-  metadata: Record<string, any>;
+  metadata: Json | null; // Use Json type
   partner_id: string | null;
   thumbnail_url: string | null;
 }
@@ -78,14 +80,14 @@ export interface GalleryImage {
 export interface SiteSettings {
   id: string;
   site_name: string;
-  site_description: string;
-  tagline: string;
-  email: string;
-  phone: string;
-  address: string;
-  social_media: Record<string, string>;
-  created_at: string;
-  updated_at: string;
+  site_description: string | null;
+  tagline: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  social_media: Json | null; // Use Json type
+  created_at: string | null;
+  updated_at: string | null;
   updated_by: string | null;
 }
 
@@ -100,20 +102,20 @@ export interface ContentContextType {
   loading: boolean;
   error: string | null;
   // Event mutations
-  addEvent: (event: any) => Promise<any>;
-  updateEvent: (id: string, updates: any) => Promise<any>;
+  addEvent: (event: TablesInsert<'events'>) => Promise<LandingEvent>;
+  updateEvent: (id: string, updates: TablesUpdate<'events'>) => Promise<LandingEvent>;
   deleteEvent: (id: string) => Promise<void>;
   // Team member mutations
-  addTeamMember: (member: any) => Promise<any>;
-  updateTeamMember: (id: string, updates: any) => Promise<any>;
+  addTeamMember: (member: TablesInsert<'team_members'>) => Promise<TeamMember>;
+  updateTeamMember: (id: string, updates: TablesUpdate<'team_members'>) => Promise<TeamMember>;
   deleteTeamMember: (id: string) => Promise<void>;
   // Partner mutations
-  addPartner: (partner: any) => Promise<any>;
-  updatePartner: (id: string, updates: any) => Promise<any>;
+  addPartner: (partner: TablesInsert<'partners'>) => Promise<Partner>;
+  updatePartner: (id: string, updates: TablesUpdate<'partners'>) => Promise<Partner>;
   deletePartner: (id: string) => Promise<void>;
   // Gallery mutations
-  addGalleryImage: (image: any) => Promise<any>;
-  updateGalleryImage: (id: string, updates: any) => Promise<any>;
+  addGalleryImage: (image: TablesInsert<'gallery_items'>) => Promise<GalleryImage>;
+  updateGalleryImage: (id: string, updates: TablesUpdate<'gallery_items'>) => Promise<GalleryImage>;
   deleteGalleryImage: (id: string) => Promise<void>;
   // Event Artists mutations
   fetchEventArtists: (eventId: string) => Promise<EventArtist[]>;
@@ -121,88 +123,86 @@ export interface ContentContextType {
   updateEventArtist: (id: string, updates: Partial<Omit<EventArtist, 'id' | 'created_at' | 'updated_at'>>) => Promise<EventArtist>;
   deleteEventArtist: (id: string) => Promise<void>;
   // Content mutations
-  saveHeroContent: (content: HeroContent) => Promise<any>;
-  saveAboutContent: (content: AboutContent) => Promise<any>;
-  saveSiteSettings: (settings: SiteSettings) => Promise<any>;
+  saveHeroContent: (content: HeroContent) => Promise<HeroContent>;
+  saveAboutContent: (content: AboutContent) => Promise<AboutContent>;
+  saveSiteSettings: (settings: SiteSettings) => Promise<SiteSettings>;
   // Admin sections
   adminSections: AdminSection[];
   sectionContent: Record<string, SectionContent>;
   adminSectionsLoading: boolean;
   getSectionContent: (sectionId: string) => SectionContent | null;
   getSectionPermissions: (sectionId: string) => SectionPermissions[];
-  updateSectionContent: (sectionId: string, content: SectionContent) => Promise<any>;
+  updateSectionContent: (sectionId: string, content: SectionContent) => Promise<SectionContent>;
 }
 
 export interface AdminSection {
   id: string;
   slug: string;
   label: string;
-  display_name: string;
-  name: string;
-  description?: string;
-  display_order?: number;
-  icon?: string;
-  category?: string;
-  enabled: boolean;
-  created_at: string;
-  updated_at: string;
-  permissions: string[];
+  description: string | null;
+  order_index: number;
+  icon: string;
+  category: string;
+  // Removed display_name, name, enabled, created_at, updated_at, permissions as they are not directly from RPC
 }
 
 export interface SectionContent {
-  payload: any;
-  updated_at: string;
-  updated_by: string;
+  payload: Json | null; // Changed to Json | null
+  updated_at: string | null;
+  updated_by: string | null;
   version: number;
 }
 
 export interface SectionPermissions {
-  can_view: boolean;
-  can_edit: boolean;
-  can_publish: boolean;
-  can_delete: boolean;
+  can_view: boolean | null;
+  can_edit: boolean | null;
+  can_publish: boolean | null;
+  can_delete: boolean | null;
 }
 
 export interface LandingEvent {
-  id: string;
-  title: string;
+  id: string | null;
+  title: string | null;
   description: string | null;
-  start_date: string;
-  end_date: string;
-  time: string;
-  location: string;
+  start_date: string | null;
+  end_date: string | null;
+  time: string | null; // Added time
+  location: string | null;
   category: string | null;
-  status: 'upcoming' | 'ongoing' | 'completed';
+  status: string | null; // Adjusted to string to match DB
   capacity: number | null;
   attendees: number | null;
-  currency: string;
+  currency: string | null;
   price: number | null;
   price_range: string | null;
-  artists: any[];
-  gallery: any[];
-  highlights: any[];
-  metadata: Record<string, any>;
-  created_at: string;
-  updated_at: string;
-  tags: string[];
-  image_url: string;
-  partner_name: string;
-  partner_logo_url: string;
+  artists: Json | null; // Use Json type
+  gallery: Json | null; // Use Json type
+  highlights: Json | null; // Use Json type
+  metadata: Json | null; // Use Json type
+  created_at: string | null;
+  updated_at: string | null;
+  tags: string[] | null;
+  image_url: string | null;
+  partner_name: string | null;
+  partner_logo_url: string | null;
+  ticket_url: string | null; // Added ticket_url
+  image: string | null; // Added image (from public_events_view)
 }
 
 export interface EventArtist {
   id: string;
   event_id: string;
   name: string;
-  role?: string;
-  image?: string;
-  display_order: number;
-  created_at: string;
-  updated_at: string;
+  role: string | null;
+  image: string | null;
+  display_order: number | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
+// Keeping PublicEventsViewRow for reference if needed, but the LandingEvent type will be used for mapping.
 export interface PublicEventsViewRow {
-  artists: Record<string, any> | null;
+  artists: Json | null;
   attendees: number | null;
   capacity: number | null;
   category: string | null;
@@ -210,13 +210,13 @@ export interface PublicEventsViewRow {
   currency: string | null;
   description: string | null;
   end_date: string | null;
-  gallery: Record<string, any> | null;
-  highlights: Record<string, any> | null;
+  gallery: Json | null;
+  highlights: Json | null;
   id: string | null;
   image: string | null;
   image_url: string | null;
   location: string | null;
-  metadata: Record<string, any> | null;
+  metadata: Json | null;
   partner_logo_url: string | null;
   partner_name: string | null;
   price: number | null;

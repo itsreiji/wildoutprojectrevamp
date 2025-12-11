@@ -11,14 +11,14 @@
       "page": "/",
       "matchers": [
         {
-          "regexp": "/:nextData(_next/data/[^/]{1,})?/((?!api|_next/static|_next/image|favicon.ico).*){(\\\\.json)}?",
-          "originalSource": "/((?!api|_next/static|_next/image|favicon.ico).*)"
+          "regexp": "^/.*$",
+          "originalSource": "/:path*"
         }
       ],
       "wasm": [],
       "assets": [],
       "env": {
-        "__NEXT_BUILD_ID": "Ozg76sLQgz4k0ju5ZxfPL",
+        "__NEXT_BUILD_ID": "C2i5fgb_V4WYKuvjyL-lm",
         "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "Hmmmzs73nV9KlsaiBFWQXpKkxrzEgcuWyYsCNfYtGgU=",
         "__NEXT_PREVIEW_MODE_ID": "3c0ae17fbb8fb1de13178137e5dfee70",
         "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "ed6818874111cf85cef7edc60ca0a4cd7a06254953b73f1cdaa3098819d3b1d4",

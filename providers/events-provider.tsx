@@ -1,25 +1,16 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+
+
 
 import { supabaseClient } from '../lib/supabase/client';
 import type { LandingEvent } from '../types/content';
-import type { TablesInsert, TablesUpdate } from '../types/supabase';
+import type { Database, TablesInsert, TablesUpdate } from '../types/supabase';
 
-import { useAuth } from './auth-provider';
+import { useAuth } from './auth-context';
+import { EventsContext } from './events-context';
 
-
-interface EventsContextType {
-  events: LandingEvent[];
-  loading: boolean;
-  error: string | null;
-  addEvent: (event: TablesInsert<'events'>) => Promise<any>;
-  updateEvent: (id: string, updates: TablesUpdate<'events'>) => Promise<any>;
-  deleteEvent: (id: string) => Promise<void>;
-  fetchEvents: () => Promise<LandingEvent[]>;
-}
-
-const EventsContext = createContext<EventsContextType | null>(null);
 
 export const EventsProvider = ({ children }: { children: ReactNode }) => {
   const [events, setEvents] = useState<LandingEvent[]>([]);
@@ -28,7 +19,7 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
 
   // Fetch events from Supabase
-  const fetchEvents = async (): Promise<LandingEvent[]> => {
+  const fetchEvents = useCallback(async (): Promise<LandingEvent[]> => {
     try {
       const { data, error } = await supabaseClient
         .from('public_events_view')
@@ -40,7 +31,7 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
 
-      const eventsData = (data || []).map((row: any): LandingEvent => {
+      const eventsData = (data || []).map((row: Database['public']['Views']['public_events_view']['Row']): LandingEvent => {
         // Map database status to LandingEvent status
         let status: LandingEvent['status'] = 'upcoming';
         if (row.status === 'published') {
@@ -96,10 +87,10 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       setError('Failed to fetch events');
       return [];
     }
-  };
+  }, []);
 
   // Add a new event
-  const addEvent = async (event: TablesInsert<'events'>) => {
+  const addEvent = useCallback(async (event: TablesInsert<'events'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('events')
@@ -110,16 +101,16 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       setEvents((prev) => [...prev, data as LandingEvent]);
-      return data;
+      return data as LandingEvent;
     } catch (err) {
       console.error('Error adding event:', err);
       setError('Failed to add event');
       throw err;
     }
-  };
+  }, []);
 
   // Update an existing event
-  const updateEvent = async (id: string, updates: TablesUpdate<'events'>) => {
+  const updateEvent = useCallback(async (id: string, updates: TablesUpdate<'events'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('events')
@@ -131,16 +122,16 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
 
       setEvents((prev) => prev.map((event) => (event.id === id ? (data as LandingEvent) : event)));
-      return data;
+      return data as LandingEvent;
     } catch (err) {
       console.error('Error updating event:', err);
       setError('Failed to update event');
       throw err;
     }
-  };
+  }, []);
 
   // Delete an event
-  const deleteEvent = async (id: string) => {
+  const deleteEvent = useCallback(async (id: string) => {
     try {
       const { error } = await supabaseClient.from('events').delete().eq('id', id);
       if (error) throw error;
@@ -151,7 +142,7 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       setError('Failed to delete event');
       throw err;
     }
-  };
+  }, []);
 
   // Load events on initial render if user is authenticated
   useEffect(() => {
@@ -166,7 +157,7 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
       setEvents([]);
       setLoading(false);
     }
-  }, [user]);
+  }, [user, fetchEvents]);
 
   const value = React.useMemo(() => ({
     events,
@@ -176,15 +167,8 @@ export const EventsProvider = ({ children }: { children: ReactNode }) => {
     updateEvent,
     deleteEvent,
     fetchEvents,
-  }), [events, loading, error]);
+  }), [events, loading, error, addEvent, updateEvent, deleteEvent, fetchEvents]);
 
   return <EventsContext.Provider value={value}>{children}</EventsContext.Provider>;
 }
 
-export function useEvents() {
-  const context = useContext(EventsContext);
-  if (!context) {
-    throw new Error('useEvents must be used within an EventsProvider');
-  }
-  return context;
-}

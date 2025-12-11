@@ -3,11 +3,8 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from 'next-themes';
 
 import { CombinedProviders } from '../providers/CombinedProviders';
-import { metadata } from './metadata';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export { metadata };
 
 export default function RootLayout({
   children,

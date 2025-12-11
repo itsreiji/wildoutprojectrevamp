@@ -18,6 +18,9 @@ import * as path from 'path';
 
 import { createClient } from '@jsr/supabase__supabase-js';
 
+import type { AboutContent, HeroContent, SiteSettings } from '../types/content';
+import type { TablesInsert } from '../types/supabase';
+
 // Configuration
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
@@ -46,9 +49,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
  * This parses the TypeScript file to extract the INITIAL_* constants
  */
 function extractContentFromFile(): {
-  hero: any;
-  about: any;
-  settings: any;
+  hero: HeroContent;
+  about: AboutContent;
+  settings: SiteSettings;
 } {
   const contentContextPath = path.join(process.cwd(), 'src/contexts/ContentContext.tsx');
 
@@ -77,7 +80,7 @@ function extractContentFromFile(): {
   }
 
   // Parse the extracted JavaScript objects
-  const parseJSObject = (jsString: string): any => {
+  const parseJSObject = (jsString: string): HeroContent | AboutContent | SiteSettings => {
     // Simple parsing - replace single quotes with double quotes and handle arrays
     const parsed = jsString
       .replace(/'/g, '"')  // Single quotes to double quotes
@@ -102,7 +105,7 @@ function extractContentFromFile(): {
 /**
  * Import hero content into Supabase
  */
-async function importHeroContent(heroData: any): Promise<void> {
+async function importHeroContent(heroData: TablesInsert<'hero_content'>): Promise<void> {
   console.log('🎨 Importing hero content...');
 
   const { error } = await supabase
@@ -129,7 +132,7 @@ async function importHeroContent(heroData: any): Promise<void> {
 /**
  * Import about content into Supabase
  */
-async function importAboutContent(aboutData: any): Promise<void> {
+async function importAboutContent(aboutData: TablesInsert<'about_content'>): Promise<void> {
   console.log('📖 Importing about content...');
 
   const { error } = await supabase
@@ -155,7 +158,7 @@ async function importAboutContent(aboutData: any): Promise<void> {
 /**
  * Import site settings into Supabase
  */
-async function importSiteSettings(settingsData: any): Promise<void> {
+async function importSiteSettings(settingsData: TablesInsert<'site_settings'>): Promise<void> {
   console.log('⚙️ Importing site settings...');
 
   const { error } = await supabase

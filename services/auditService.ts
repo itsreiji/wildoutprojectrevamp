@@ -4,8 +4,8 @@ interface AuditLog {
   userId?: string;
   ipAddress?: string;
   userAgent?: string;
-  oldData?: any;
-  newData?: any;
+  oldData?: Record<string, unknown>;
+  newData?: Record<string, unknown>;
 }
 
 export const auditService = {

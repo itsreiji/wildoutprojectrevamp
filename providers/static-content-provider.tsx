@@ -1,12 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 
 import { supabaseClient } from '../lib/supabase/client';
 import type { HeroContent, AboutContent, SiteSettings } from '../types/content';
 import type { Json } from '../types/supabase';
 
-import { useAuth } from './auth-provider';
+import { useAuth } from './auth-context';
+import { StaticContentContext } from './static-content-context';
 
 
 // Helper functions for data normalization
@@ -36,19 +37,6 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
   return undefined;
 };
 
-interface StaticContentContextType {
-  hero: HeroContent | null;
-  about: AboutContent | null;
-  settings: SiteSettings | null;
-  loading: boolean;
-  error: string | null;
-  saveHeroContent: (content: HeroContent) => Promise<any>;
-  saveAboutContent: (content: AboutContent) => Promise<any>;
-  saveSiteSettings: (settings: SiteSettings) => Promise<any>;
-}
-
-const StaticContentContext = createContext<StaticContentContextType | null>(null);
-
 export const StaticContentProvider = ({ children }: { children: ReactNode }) => {
   const [hero, setHero] = useState<HeroContent | null>(null);
   const [about, setAbout] = useState<AboutContent | null>(null);
@@ -58,7 +46,7 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
   const { user } = useAuth();
 
   // Fetch hero content from Supabase
-  const fetchHeroContent = async (): Promise<HeroContent> => {
+  const fetchHeroContent = useCallback(async (): Promise<HeroContent> => {
     try {
       const { data, error } = await supabaseClient.rpc('get_hero_content');
       if (error) {
@@ -120,10 +108,10 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
         updated_by: null,
       };
     }
-  };
+  }, []);
 
   // Fetch about content from Supabase
-  const fetchAboutContent = async (): Promise<AboutContent> => {
+  const fetchAboutContent = useCallback(async (): Promise<AboutContent> => {
     try {
       const { data, error } = await supabaseClient.rpc('get_about_content');
       if (error) {
@@ -208,10 +196,10 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
         updated_by: null,
       };
     }
-  };
+  }, []);
 
   // Fetch site settings from Supabase
-  const fetchSiteSettings = async (): Promise<SiteSettings> => {
+  const fetchSiteSettings = useCallback(async (): Promise<SiteSettings> => {
     try {
       const { data, error } = await supabaseClient.rpc('get_site_settings');
       if (error) {
@@ -290,10 +278,10 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
         updated_by: null,
       };
     }
-  };
+  }, []);
 
   // Save hero content to Supabase
-  const saveHeroContent = async (content: HeroContent) => {
+  const saveHeroContent = useCallback(async (content: TablesInsert<'hero_content'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('hero_content')
@@ -306,17 +294,17 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
 
       if (error) throw error;
 
-      setHero(data);
-      return data;
+      setHero(data as HeroContent);
+      return data as HeroContent;
     } catch (err) {
       console.error('Error saving hero content:', err);
       setError('Failed to save hero content');
       throw err;
     }
-  };
+  }, []);
 
   // Save about content to Supabase
-  const saveAboutContent = async (content: AboutContent) => {
+  const saveAboutContent = useCallback(async (content: TablesInsert<'about_content'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('about_content')
@@ -329,17 +317,17 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
 
       if (error) throw error;
 
-      setAbout(data);
-      return data;
+      setAbout(data as AboutContent);
+      return data as AboutContent;
     } catch (err) {
       console.error('Error saving about content:', err);
       setError('Failed to save about content');
       throw err;
     }
-  };
+  }, []);
 
   // Save site settings to Supabase
-  const saveSiteSettings = async (settings: SiteSettings) => {
+  const saveSiteSettings = useCallback(async (settings: TablesInsert<'site_settings'>) => {
     try {
       const { data, error } = await supabaseClient
         .from('site_settings')
@@ -352,14 +340,14 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
 
       if (error) throw error;
 
-      setSettings(data);
-      return data;
+      setSettings(data as SiteSettings);
+      return data as SiteSettings;
     } catch (err) {
       console.error('Error saving site settings:', err);
       setError('Failed to save site settings');
       throw err;
     }
-  };
+  }, []);
 
   // Load static content on initial render if user is authenticated
   useEffect(() => {
@@ -391,7 +379,7 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
       setSettings(null);
       setLoading(false);
     }
-  }, [user]);
+  }, [user, fetchHeroContent, fetchAboutContent, fetchSiteSettings]);
 
   const value = React.useMemo(() => ({
     hero,
@@ -402,15 +390,7 @@ export const StaticContentProvider = ({ children }: { children: ReactNode }) => 
     saveHeroContent,
     saveAboutContent,
     saveSiteSettings,
-  }), [hero, about, settings, loading, error]);
+  }), [hero, about, settings, loading, error, saveHeroContent, saveAboutContent, saveSiteSettings]);
 
   return <StaticContentContext.Provider value={value}>{children}</StaticContentContext.Provider>;
-}
-
-export function useStaticContent() {
-  const context = useContext(StaticContentContext);
-  if (!context) {
-    throw new Error('useStaticContent must be used within a StaticContentProvider');
-  }
-  return context;
 }
