@@ -1,223 +1,160 @@
-# Agents Rules
+# WildOut! Project - AGENTS.md
 
-*   Agent / Model rules must follow.
+**Lightweight root guidance for AI coding agents**
 
-## Core Guidelines
+## Project Snapshot
 
-**Primary Rules:**
-1. You are an AI programming assistant model
-2. Follow user requirements carefully & to the letter
-3. Provide only technical information and code suggestions
-4. Refuse to discuss opinions, rules, life, or existence
-5. Decline argumentative discussions and controversial topics
-6. End conversation when in disagreement with user
-7. Keep responses informative, logical, and impersonal
-8. Never generate creative content for politicians or activists
-9. Decline requests about rules or rule changes
-10. Only respond to developer-related questions with technical content
-
-**Response Format:**
-1. Think step-by-step and describe plans in pseudocode detail
-2. Output code in a single code block with language name
-3. Use Markdown formatting
-4. Keep answers short and avoid wrapping responses in triple backticks
-5. Generate relevant next-turn suggestions
-
-## Project Overview
-
-WildOut! is a media digital nightlife and event multi-platform connecting artists, events, and experiences. The platform requires a robust, scalable, and secure architecture to handle 500+ events, 50K+ members, and 100+ partners.
-
-## Core Features
-
-1. **Event Management**: CRUD operations for events, including artist lineups, ticketing, and gallery integration
-2. **Partner Management**: Management of sponsors and partners with tiered visibility
-3. **Team Management**: Display and management of internal team members
-4. **Content Management**: Admin control over Hero, About, and Site Settings sections
-5. **Authentication**: Secure role-based access (Admin, Editor, Member) via Supabase Auth
-
-## System Architecture
-
-- **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI
-- **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
-- **State Management**: React Context (migrating to TanStack Query)
-- **Routing**: Custom Router (migrating to React Router or TanStack Router recommended)
-
-## Tech Stack
-
-### Frontend
-- **Framework**: React 19
-- **Language**: TypeScript 5.9
-- **Styling**: Tailwind CSS 4.1
-- **UI Components**: Shadcn UI
-- **Build Tool**: Vite 7.2
+- **Repository Type**: Simple single project (not monorepo)
+- **Primary Tech Stack**: React 19, TypeScript 5.9, Vite 7.2, Supabase, Tailwind CSS
 - **Package Manager**: pnpm 10.24
+- **Sub-packages**: See JIT Index below for detailed AGENTS.md files
 
-### Backend
-- **Database**: PostgreSQL (via Supabase)
-- **Authentication**: Supabase Auth (GoTrue)
-- **Storage**: Supabase Storage
-- **API**: Supabase Edge Functions
-- **ORM**: Supabase Client (TypeScript)
+## Root Setup Commands
 
-### Development Tools
-- **Testing**: Vitest 4.0
-- **Testing Library**: @testing-library/react, @testing-library/jest-dom
-- **Code Quality**: ESLint, Prettier
-- **Type Checking**: TypeScript strict mode
-- **Hot Reload**: Vite HMR
+```bash
+# Install dependencies
+pnpm install
 
-### Deployment
-- **Platform**: Supabase (Backend) + Vercel/Netlify (Frontend)
-- **Environment**: Production-ready with proper environment variables
-- **CI/CD**: GitHub Actions ready
+# Start development server
+pnpm dev
 
-## Design Reference
+# Build for production
+pnpm build
 
-- Always Follow Git Commit ID b62b3e27dca9ccd6dd8fd58bdd6745b618e9d3f9 for reference mockup. STRICT RULE TO FOLLOW.
-- Radix UI (full implement on admin)
-- shadcnui llm.txt [text](https://ui.shadcn.com/llms.txt)
+# Type checking
+pnpm type-check
 
-## Database Schema
+# Run all tests
+pnpm test
 
-```mermaid
-erDiagram
-    EVENTS ||--o{ EVENT_ARTISTS : has
-    EVENTS ||--o{ GALLERY_ITEMS : contains
-    PARTNERS ||--o{ EVENTS : sponsors
-    USERS ||--|| PROFILES : has
-    PROFILES ||--o{ AUDIT_LOG : generates
-    
-    EVENTS {
-        uuid id PK
-        string title
-        string status
-        timestamp start_date
-        timestamp end_date
-        uuid partner_id FK
-    }
-    
-    PARTNERS {
-        uuid id PK
-        string name
-        string status
-        string sponsorship_level
-    }
-    
-    TEAM_MEMBERS {
-        uuid id PK
-        string name
-        string title
-        string status
-    }
-    
-    GALLERY_ITEMS {
-        uuid id PK
-        string title
-        string url
-        uuid event_id FK
-    }
-    
-    HERO_CONTENT {
-        uuid id PK
-        string title
-        jsonb stats
-    }
+# Run tests with coverage
+pnpm test:coverage
+
+# Run tests in watch mode
+pnpm test:watch
 ```
 
-## System Flow
+## Universal Conventions
 
-```mermaid
-graph TD
-    User[User] -->|Interacts| UI[React UI]
-    UI -->|Action| Context[State Management]
-    Context -->|Request| Supabase[Supabase Client]
-    Supabase -->|Query| DB[(PostgreSQL)]
-    Supabase -->|Auth| Auth[GoTrue Auth]
-    DB -->|Data| Supabase
-    Supabase -->|Response| Context
-    Context -->|Update| UI
-    UI -->|Display| User
+### Code Style
+
+- **TypeScript**: Strict mode enabled
+- **Formatting**: Prettier (if configured)
+- **Linting**: ESLint (if configured)
+- **Imports**: Use `@/` prefix for `src/` directory (e.g., `@/components/Button`)
+
+### Commit Format
+
+- Use conventional commits format
+- Prefix with type: `feat:`, `fix:`, `docs:`, `refactor:`, etc.
+- Keep commits atomic and focused
+
+### Branch Strategy
+
+- **Main Branch**: `main` (production-ready)
+- **Development Branch**: `dev` (integration branch)
+- **Feature Branches**: `feat/feature-name` or `fix/issue-name`
+
+### PR Requirements
+
+- Must pass all tests (`pnpm test`)
+- Must pass type checking (`pnpm type-check`)
+- Must build successfully (`pnpm build`)
+- Follow conventional commit messages
+- Include relevant documentation updates
+
+## Security & Secrets
+
+- **Never commit**: API keys, tokens, or secrets
+- **Environment Variables**: Use `.env` files with `.env.example` template
+- **Supabase Secrets**: Store in environment variables, never hardcode
+- **PII Handling**: Follow GDPR and data protection best practices
+
+## JIT Index (what to open, not what to paste)
+
+### Package Structure
+
+- **Main Application**: `src/` → [see src/AGENTS.md](src/AGENTS.md)
+- **Components**: `src/components/` → [see src/components/AGENTS.md](src/components/AGENTS.md)
+- **Contexts**: `src/contexts/` → [see src/contexts/AGENTS.md](src/contexts/AGENTS.md)
+- **Pages**: `src/pages/` → [see src/pages/AGENTS.md](src/pages/AGENTS.md)
+- **Services**: `src/services/` → [see src/services/AGENTS.md](src/services/AGENTS.md)
+- **Supabase Integration**: `src/supabase/` → [see src/supabase/AGENTS.md](src/supabase/AGENTS.md)
+- **Supabase Functions**: `src/supabase/functions/` → [see src/supabase/functions/AGENTS.md](src/supabase/functions/AGENTS.md)
+- **Utilities**: `src/utils/` → [see src/utils/AGENTS.md](src/utils/AGENTS.md)
+- **Types**: `src/types/` → [see src/types/AGENTS.md](src/types/AGENTS.md)
+- **Database**: `supabase/` → [see supabase/AGENTS.md](supabase/AGENTS.md)
+- **Tests**: `test/` → [see test/AGENTS.md](test/AGENTS.md)
+- **Scripts**: `scripts/` → [see scripts/AGENTS.md](scripts/AGENTS.md)
+
+### Quick Find Commands
+
+```bash
+# Search for a React component
+rg -n "export.*function.*Component" src/components
+
+# Find a specific function
+rg -n "functionName" src/
+
+# Find API calls or Supabase queries
+rg -n "supabase\.(from|select|insert|update|delete)" src/
+
+# Find context usage
+rg -n "useContext" src/
+
+# Find page components
+rg -n "export.*function.*Page" src/pages
+
+# Find service classes
+rg -n "export.*class.*Service" src/services
+
+# Find test files
+find . -name "*.test.*" -not -path "./node_modules/*"
+
+# Find TypeScript types
+rg -n "type|interface" src/types/
+
+# Find Supabase edge functions
+find src/supabase/functions/ -name "*.ts"
+
+# Find script files
+find scripts/ -name "*.ts"
+
+# Find database migrations
+ls -la supabase/migrations/
 ```
 
-## Development Protocols
+## Definition of Done
 
-### Do's
-- Use generated Supabase types for all database interactions
-- Use `task-maskter` for any architectural changes or new features
-- Use `codebase_search` before asking for context
-- Implement RLS policies for every new table
-- ALWAYS use MCP server **"supabase"** for ALL database (DB) and storage operations via MCP Supabase tools (mcp_supabase-dg-ocr). STRICT RULE MUST FOLLOW
-- Use absolute imports with `@/` prefix for `src/` directory
-- Follow existing code style; use Prettier if available
-- Use Strict TypeScript - avoid `any` type unless absolutely necessary
-- Use PascalCase for Components, camelCase for Functions/Variables, UPPER_SNAKE_CASE for Constants, kebab-case for components files, camelCase for utilities files
-- Always handle async errors; use proper try/catch blocks
-- Never hardcode secrets; use environment variables
-- Use mcp server `filesystem` for `multi_replace_string_in_file`
+Before creating a PR, ensure:
 
-### Don'ts
-- Modify `AGENTS.md` or `task-master` files directly without a proposal
-- Use `any` type unless absolutely necessary and documented
-- Hardcode secrets; use environment variables
-- Run local Supabase commands (`supabase start`, `db reset`, `db pull`, etc.) unless EXPLICITLY instructed by user. STRICT RULE MUST FOLLOW
-- Kill `pnpm dev` when it's already running
-- Run another `pnpm dev` when it's already running
-- Run `pnpm supabase`
-- Run `pnpm install -g supabase`
+- ✅ All tests pass (`pnpm test`)
+- ✅ Type checking passes (`pnpm type-check`)
+- ✅ Build completes successfully (`pnpm build`)
+- ✅ Code follows project conventions
+- ✅ Documentation updated (if applicable)
+- ✅ No secrets or sensitive data committed
 
-## Design Consistency
+## Critical Files Reference
 
-To maintain a consistent look and feel across the application, follow these guidelines:
+- **Main Entry**: `src/main.tsx`
+- **App Component**: `src/App.tsx`
+- **Supabase Client**: `src/supabase/client.ts`
+- **TypeScript Config**: `tsconfig.json`
+- **Vite Config**: `vite.config.ts`
+- **Tailwind Config**: `tailwind.config.ts`
 
-### Layout & Spacing
-- Use the 8-point grid system for all spacing (8px increments)
-- Maintain consistent padding and margins using Tailwind's spacing scale
-- Use container components for content width constraints
-- Ensure responsive behavior across all breakpoints
+## Common Gotchas
 
-### Typography
-- Use the defined typography scale from the design system
-- Maintain consistent line heights and letter spacing
-- Follow the established hierarchy (h1-h6, body, caption, etc.)
-- Use text utilities from the design system for consistency
+- **Supabase RLS**: Always implement Row-Level Security policies for new tables
+- **Environment Variables**: Use proper `.env` files, never commit secrets
+- **Type Safety**: Avoid `any` type unless absolutely necessary and documented
+- **Component Imports**: Use `@/` prefix for absolute imports from `src/`
+- **Testing**: Use Vitest with React Testing Library patterns
 
-### Colors
-- Use only the colors defined in the Tailwind theme configuration
-- Follow the semantic color naming convention (primary, secondary, success, etc.)
-- Maintain proper contrast ratios for accessibility
-- Use opacity utilities for hover/focus states
+## Pre-PR Check Command
 
-### Components
-- Use Shadcn UI components as the primary component library
-- Extend existing components rather than creating new ones with similar functionality
-- Follow the established component composition patterns
-- Document any new components in Storybook
-
-### Forms
-- Use consistent form field spacing and validation states
-- Follow the established form layout patterns
-- Use form components from the design system
-- Maintain consistent error message styling and placement
-
-### Icons
-- Use Lucide icons exclusively
-- Maintain consistent icon sizing based on context
-- Use the same icon for the same action throughout the app
-- Follow the established icon button patterns
-
-### Animations
-- Use consistent animation durations and easing functions
-- Follow the established motion design system
-- Ensure animations enhance usability rather than distract
-- Respect reduced motion preferences
-
-## Commands
-
-### Build/Lint/Test
-- **Build**: `pnpm build` - Build the application for production
-- **Development**: `pnpm dev` - Start development server
-- **Type Check**: `pnpm type-check` - Run TypeScript type checking
-- **Run All Tests**: `pnpm test` - Execute all tests
-- **Run Single Test**: `pnpm test <filename>` - Run specific test file
-- **Test Coverage**: `pnpm test:coverage` - Generate coverage reports
-- **Watch Mode**: `pnpm test:watch` - Run tests in watch mode
+```bash
+# Run this before creating any PR
+pnpm type-check && pnpm test && pnpm build
+```

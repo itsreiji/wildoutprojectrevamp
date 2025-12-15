@@ -1,23 +1,40 @@
 {
-	"mcpServers": {
-		"task-master-ai": {
-			"type": "stdio",
-			"command": "npx",
-			"args": [
-				"-y",
-				"task-master-ai"
-			],
-			"env": {
-				"ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",
-				"PERPLEXITY_API_KEY": "YOUR_PERPLEXITY_API_KEY_HERE",
-				"OPENAI_API_KEY": "YOUR_OPENAI_KEY_HERE",
-				"GOOGLE_API_KEY": "YOUR_GOOGLE_KEY_HERE",
-				"XAI_API_KEY": "YOUR_XAI_KEY_HERE",
-				"OPENROUTER_API_KEY": "YOUR_OPENROUTER_KEY_HERE",
-				"MISTRAL_API_KEY": "YOUR_MISTRAL_KEY_HERE",
-				"AZURE_OPENAI_API_KEY": "YOUR_AZURE_KEY_HERE",
-				"OLLAMA_API_KEY": "YOUR_OLLAMA_API_KEY_HERE"
-			}
-		}
-	}
+  "mcpServers": {
+    "github": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "GitHub integration for issue/PR management and repository operations"
+    },
+    "supabase": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["@modelcontextprotocol/server-supabase"],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_KEY": "${SUPABASE_KEY}"
+      },
+      "description": "Supabase database access and schema management"
+    },
+    "context7": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["context7-mcp"],
+      "description": "Web search and documentation lookup"
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["@modelcontextprotocol/server-sequential-thinking"],
+      "description": "Sequential thinking for complex decisions and workflows"
+    }
+  },
+  "mcpServerGroups": {
+    "development": ["github", "context7", "sequential-thinking"],
+    "production": ["github", "supabase"],
+    "full": ["github", "supabase", "context7", "sequential-thinking"]
+  }
 }

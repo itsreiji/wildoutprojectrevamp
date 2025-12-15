@@ -1,140 +1,186 @@
-# WildOut! Landing Page and Dashboard - Project Context
+# WildOut! Project - QWEN.md
 
-## Project Overview
+> **AI Context**: This file provides specific guidance for the Qwen AI model when working with the WildOut! project. It extends the general project documentation with Qwen-specific instructions.
 
-WildOut! is a comprehensive event management platform featuring a public landing page and a sophisticated admin dashboard. The application is built with React, TypeScript, and Vite, with Supabase serving as the backend for data management and authentication. The platform enables real-time synchronization between the public landing page and admin dashboard, with all content managed through Supabase as the single source of truth.
+## 1. Project Identity
 
-### Key Technologies
-- **Frontend**: React 19, TypeScript, Vite
-- **Styling**: Tailwind CSS with Radix UI components
-- **Database/Backend**: Supabase (PostgreSQL, Auth, Storage)
-- **State Management**: React Context API with custom providers
-- **Data Fetching**: TanStack Query (React Query)
-- **UI Components**: Radix UI primitives, Lucide React icons
-- **Build Tool**: Vite with Turbo for monorepo support
-- **Package Manager**: pnpm
+### Overview
 
-### Architecture Highlights
-- **Supabase-Driven Architecture**: All content (events, partners, team, gallery, hero, about content) is stored in and retrieved from Supabase
-- **Real-time Synchronization**: Changes made in the admin dashboard are immediately reflected on the public landing page
-- **Role-Based Access Control (RBAC)**: Three-tier system (admin, editor, user) with section-level permissions
-- **Dynamic Admin Menu**: Admin navigation items are loaded from Supabase `admin_sections` table
-- **Configurable Admin Path**: Default admin dashboard at `/sadmin` with legacy support for `/admin`
+- **Type**: Single React 19 Application with Vite 7.2
+- **Stack**: TypeScript 5.9, Tailwind CSS 4.1, Supabase, TanStack Query, Shadcn UI
+- **Architecture**: React frontend with Supabase backend (PostgreSQL, Auth, Storage)
+- **Team Size**: Multi-developer with Admin/Editor/Member roles
 
-## Directory Structure
+This QWEN.md provides **Qwen-specific guidance** for working with the WildOut! codebase, complementing the general project documentation.
 
+## 2. Qwen-Specific Rules
+
+### Code Generation (MUST)
+
+- **MUST** use TypeScript with strict mode enabled
+- **MUST** follow the existing code patterns and conventions
+- **MUST** use `@/` alias for imports (e.g., `import { Button } from '@/components/ui/button'`)
+- **MUST** use TanStack Query for data fetching and state management
+- **MUST** use Shadcn UI components for consistent styling
+
+### Best Practices (SHOULD)
+
+- **SHOULD** prefer functional components with hooks over class components
+- **SHOULD** use descriptive variable names (no single letters except in loops)
+- **SHOULD** keep functions under 50 lines of code
+- **SHOULD** extract complex logic into separate utility functions
+- **SHOULD** use Tailwind CSS utility classes for styling
+
+### Anti-Patterns (MUST NOT)
+
+- **MUST NOT** use `any` type without explicit justification in comments
+- **MUST NOT** bypass TypeScript errors with `@ts-ignore`
+- **MUST NOT** push directly to `main` branch (use feature branches)
+- **MUST NOT** hardcode API URLs or database credentials
+- **MUST NOT** use direct DOM manipulation (use React state instead)
+
+## 3. Core Commands
+
+### Development
+
+```bash
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Run tests
+pnpm test
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Type checking
+pnpm type-check
 ```
-src/
-├── admin/                    # Admin-specific components
-├── assets/                   # Static assets
-├── components/               # UI components (LandingPage, Dashboard, sections)
-├── contexts/                 # React Context providers
-├── data/                     # Static data and content
-├── guidelines/               # Development guidelines
-├── lib/                      # Utility libraries
-├── pages/                    # Page components
-├── scripts/                  # Utility scripts
-├── services/                 # Service layer (audit service)
-├── styles/                   # CSS styles
-├── supabase/                 # Supabase client and types
-├── test/                     # Test utilities
-├── types/                    # Type definitions
-├── utils/                    # Utility functions
-├── App.tsx                   # Main application router
-├── main.tsx                  # Application entry point
-└── index.css                 # Global styles
+
+### Supabase
+
+```bash
+# Generate TypeScript types from Supabase
+pnpm supabase gen types typescript --project-id $VITE_SUPABASE_PROJECT_ID > src/supabase/types.ts
+
+# Apply database migrations
+pnpm supabase migration up
 ```
 
-## Building and Running
+## 4. Architecture Patterns
 
-### Prerequisites
-- Node.js (latest stable)
-- pnpm package manager
-- Supabase project (URL and anon key)
+### Supabase Integration
 
-### Setup and Installation
-1. Install dependencies: `pnpm install`
-2. Set up environment variables (copy from `.env.example`):
-   ```
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key
-   ```
-3. Optional configuration:
-   - `VITE_ADMIN_BASE_PATH` to customize admin URL (default: `/sadmin`)
-   - `VITE_USE_DUMMY_DATA` for development with mock data
-
-### Development Commands
-- `pnpm dev`: Start development server
-- `pnpm build`: Build for production
-- `pnpm test`: Run tests
-- `pnpm test:ui`: Run tests with UI
-- `pnpm test:coverage`: Run tests with coverage report
-- `pnpm type-check`: Type check without emitting
-
-### Database Setup
-1. Apply Supabase migrations to create all necessary tables
-2. Content tables are automatically seeded with initial data from the repository
-3. Key Supabase tables include:
-   - Content tables: `hero_content`, `about_content`, `site_settings`
-   - Event management: `events`, `gallery_items`, `partners`, `team_members`
-   - Authentication: Extended `profiles` table with roles
-   - Admin system: `admin_sections`, `section_content`, `role_permissions`, `user_permissions`
-   - Audit logging: `audit_log`, `user_sessions`
-
-## Development Conventions
-
-### Authentication System
-- Role-based access control with admin/editor/user roles
-- OAuth (Google) and email/password authentication
-- Session validation and security measures
-- Remember me functionality with local storage
+- **Client**: Use the singleton client from `src/supabase/client.ts`
+- **Types**: Use generated types from `src/supabase/types.ts`
+- **RLS**: Always consider Row Level Security policies when writing queries
+- **Error Handling**: Wrap Supabase calls in try/catch blocks
 
 ### State Management
-- React Context API for global state (AuthContext, ContentContext, etc.)
-- TanStack Query for server state management
-- Custom hooks for accessing context values
-- Provider pattern for component composition
+
+- **Global State**: Use React Context API (AuthContext, ContentContext, etc.)
+- **Server State**: Use TanStack Query for data fetching and caching
+- **Local State**: Use React hooks (useState, useReducer)
 
 ### UI Components
-- Radix UI primitives for accessible components
-- Tailwind CSS with custom configuration for styling
-- Component-based architecture with clear separation of concerns
-- Reusable UI components in the `components/ui` directory
 
-### Security Measures
-- Input sanitization and validation
-- CSRF protection
-- Rate limiting for authentication attempts
-- Role-based access control at both UI and API levels
-- Secure session management with Supabase
+- **Component Library**: Shadcn UI with Radix UI primitives
+- **Styling**: Tailwind CSS with custom theme configuration
+- **Icons**: Lucide React icons
 
-### Content Management
-- Supabase as the single source of truth
-- Real-time synchronization between admin and public views
-- Audit logging for content changes
-- Versioned content management in some sections
+## 5. Development Workflow
 
-## Key Features
+### Information Gathering
 
-### Landing Page ↔ Admin Dashboard Sync
-- Real-time synchronization between public landing page and admin dashboard
-- Admin content management for hero section, about content, and site settings
-- Supabase as the source of truth for dynamic and static content
-- Import tool for seeding repository data into Supabase
+1. **Analyze**: Understand the user's request and current project state
+2. **Explore**: Use codebase search tools to find relevant files
+3. **Verify**: Read relevant files to confirm assumptions
 
-### Authentication & User Management
-- Complete user authentication system with role-based access
-- User registration and automatic 'user' role assignment
-- Admin login with Supabase session validation
-- Role management with admin/editor/user permissions
+### Code Implementation
 
-### Supabase-Driven Admin Menu & RBAC
-- Dynamic admin menu loaded from Supabase `admin_sections` table
-- Role-based access control with configurable permissions
-- Section-level access control for viewing, editing, publishing, and deleting
-- Permission inheritance with optional user-specific overrides
+1. **Plan**: Create a step-by-step implementation plan
+2. **Generate**: Write code following established patterns
+3. **Test**: Verify changes work as expected
+4. **Document**: Update relevant documentation
 
-### Configurable Admin Base Path
-- Default admin dashboard accessible at `/sadmin` 
-- Configurable via `VITE_ADMIN_BASE_PATH` environment variable
-- Automatic link generation based on configured base path
+### Quality Assurance
+
+1. **Type Checking**: Run `pnpm type-check`
+2. **Testing**: Run `pnpm test`
+3. **Linting**: Run `pnpm lint`
+4. **Build**: Run `pnpm build`
+
+## 6. Key Files Reference
+
+### Main Application
+
+- **Entry Point**: `src/main.tsx`
+- **App Component**: `src/App.tsx`
+- **Supabase Client**: `src/supabase/client.ts`
+- **TypeScript Config**: `tsconfig.json`
+- **Vite Config**: `vite.config.ts`
+
+### Contexts
+
+- **Auth Context**: `src/contexts/AuthContext.tsx`
+- **Content Context**: `src/contexts/ContentContext.tsx`
+- **Events Context**: `src/contexts/EventsContext.tsx`
+
+### Services
+
+- **Audit Service**: `src/services/auditService.ts`
+
+### Components
+
+- **Landing Page**: `src/components/LandingPage.tsx`
+- **Dashboard**: `src/components/Dashboard.tsx`
+- **Navigation**: `src/components/Navigation.tsx`
+
+## 7. Common Gotchas
+
+### Supabase
+
+- **RLS Policies**: Always implement Row-Level Security policies for new tables
+- **Environment Variables**: Use proper `.env` files, never commit secrets
+- **Type Safety**: Avoid `any` type unless absolutely necessary and documented
+
+### Component Imports
+
+- **Import Paths**: Use `@/` prefix for absolute imports from `src/`
+- **Component Structure**: Follow existing component patterns
+
+### Testing
+
+- **Test Framework**: Vitest with React Testing Library patterns
+- **Test Files**: Use `.test.tsx` extension
+- **Test Coverage**: Aim for >80% coverage
+
+## 8. Pre-PR Check Command
+
+```bash
+# Run this before creating any PR
+pnpm type-check && pnpm test && pnpm build
+```
+
+## 9. Qwen-Specific Tips
+
+### Code Generation
+
+- **Context Awareness**: Always read the surrounding code context before making changes
+- **Pattern Matching**: Follow existing code patterns and conventions
+- **Error Handling**: Implement proper error handling for all operations
+
+### Documentation
+
+- **Comments**: Write clear, concise comments for complex logic
+- **Documentation**: Update relevant documentation when making changes
+- **Examples**: Provide code examples when documenting new features
+
+### Collaboration
+
+- **Communication**: Be clear and concise in your responses
+- **Explanation**: Provide explanations for your code changes
+- **Verification**: Always verify your changes work as expected
