@@ -104,31 +104,16 @@ const NavigationComponent = () => {
                 className="group ml-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#E93370] border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] hover:text-white rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 active:scale-95"
                 data-testid="desktop-admin-button"
                 id="desktop-admin-button"
-                onClick={async () => {
-                  console.log('🔵 Admin button clicked - Desktop');
-                  console.log('🔵 Current path before navigation:', window.location.pathname);
-
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   // Close mobile menu if open
                   setIsMobileMenuOpen(false);
 
-                  try {
-                    const adminPath = getAdminPath();
-                    console.log('🔵 Navigating to admin path:', adminPath);
-
-                    // First try client-side navigation
-                    navigate(adminPath);
-
-                    // Force a reload after a small delay to ensure context is properly initialized
-                    setTimeout(() => {
-                      console.log('🔄 Forcing page reload to ensure context is fresh');
-                      window.location.reload();
-                    }, 100);
-                  } catch (error) {
-                    console.error('❌ Error during admin navigation:', error);
-                    // Fallback to direct navigation if client-side fails
-                    window.location.href = getAdminPath();
-                  }
+                  // Navigate to login page for admin access
+                  navigate('/login');
                 }}
+                type="button"
               >
                 <LayoutDashboard
                   className="h-4 w-4 group-hover:scale-110 transition-transform duration-300"
@@ -211,30 +196,13 @@ const NavigationComponent = () => {
                       className="w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center gap-3 border border-[#E93370]/20 hover:border-[#E93370] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50"
                       data-testid="mobile-admin-button"
                       id="mobile-admin-button"
-                      onClick={async () => {
-                        console.log('🔵 Admin button clicked - Mobile');
-                        console.log('🔵 Current path before navigation:', window.location.pathname);
-
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         setIsMobileMenuOpen(false);
-
-                        try {
-                          const adminPath = getAdminPath();
-                          console.log('🔵 Navigating to admin path (mobile):', adminPath);
-
-                          // First try client-side navigation
-                          navigate(adminPath);
-
-                          // Force a reload after a small delay to ensure context is properly initialized
-                          setTimeout(() => {
-                            console.log('🔄 Forcing page reload to ensure context is fresh (mobile)');
-                            window.location.reload();
-                          }, 100);
-                        } catch (error) {
-                          console.error('❌ Error during admin navigation (mobile):', error);
-                          // Fallback to direct navigation if client-side fails
-                          window.location.href = getAdminPath();
-                        }
+                        navigate('/login');
                       }}
+                      type="button"
                     >
                       <LayoutDashboard
                         className="h-5 w-5 group-hover:scale-110 transition-transform duration-300"

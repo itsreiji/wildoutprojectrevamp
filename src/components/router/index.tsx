@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext, useContext, memo } from 'react';
 import { AuthCallbackPage } from '../../pages/AuthCallbackPage';
+import { LoginPage } from '../../components/auth/LoginPage';
 import {
   DashboardAbout,
   DashboardEvents,
@@ -32,6 +33,7 @@ const routes = {
   '/partners': MemoDashboardPartners,
   '/team': MemoDashboardTeam,
   '/settings': MemoDashboardSettings,
+  '/login': LoginPage,
   '/auth/callback': AuthCallbackPage,
 };
 

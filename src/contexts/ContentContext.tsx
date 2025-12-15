@@ -375,7 +375,7 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
         // Use RPC to get sections enabled for the user
         const { data, error } = await supabaseClient.rpc(
           "get_admin_sections_for_user",
-          { user_id: user.id }
+          { p_user_id: user.id }
         );
 
         if (error) {
@@ -409,8 +409,8 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
           const { data, error } = await supabaseClient.rpc(
             "get_section_content",
             {
-              section_slug: section.slug,
-              user_id: user.id,
+              p_section_slug: section.slug,
+              p_user_id: user.id,
             }
           );
 

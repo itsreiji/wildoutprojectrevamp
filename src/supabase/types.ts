@@ -1060,7 +1060,7 @@ export type Database = {
         }
       }
       get_admin_sections_for_user: {
-        Args: { user_id: string }
+        Args: { p_user_id: string }
         Returns: {
           category: string
           description: string
@@ -1191,7 +1191,7 @@ export type Database = {
         }[]
       }
       get_section_content: {
-        Args: { section_slug: string; user_id: string }
+        Args: { p_section_slug: string; p_user_id: string }
         Returns: {
           payload: Json
           updated_at: string

@@ -331,7 +331,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
         setAdminSectionsLoading(true);
         const { data: sections, error: sectionsError } =
           await supabaseClient.rpc("get_admin_sections_for_user", {
-            user_id: user?.id,
+            p_user_id: user?.id,
           });
 
         if (sectionsError) {
@@ -482,15 +482,15 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
           try {
             const { data: content, error: contentError } =
               await supabaseClient.rpc("get_section_content", {
-                section_slug: sectionSlug,
-                user_id: user?.id,
+                p_section_slug: sectionSlug,
+                p_user_id: user?.id,
               });
 
             if (!contentError && content && content.length > 0) {
               const contentData = content[0] as any;
               contentMap[sectionSlug] = {
                 ...contentData,
-                section_slug: sectionSlug,
+                p_section_slug: sectionSlug,
                 created_at: contentData.created_at || null,
                 created_by: contentData.created_by || null,
                 id: contentData.id || "",
