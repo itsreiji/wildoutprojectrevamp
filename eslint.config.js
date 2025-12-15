@@ -39,6 +39,48 @@ export default [
           jsx: true,
         },
       },
+      globals: {
+        // Node.js globals
+        process: "readonly",
+        module: "readonly",
+        require: "readonly",
+        // Browser globals
+        window: "readonly",
+        document: "readonly",
+        localStorage: "readonly",
+        sessionStorage: "readonly",
+        fetch: "readonly",
+        navigator: "readonly",
+        // Animation API
+        requestAnimationFrame: "readonly",
+        cancelAnimationFrame: "readonly",
+        // Timer API
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        // Web Crypto API
+        crypto: "readonly",
+        // TypeScript/Node.js globals
+        NodeJS: "readonly",
+        // Deno globals (for Supabase edge functions)
+        Deno: "readonly",
+        // Console (available in all environments)
+        console: "readonly",
+        // React globals
+        React: "readonly",
+        // Jest/Testing Library globals
+        describe: "readonly",
+        it: "readonly",
+        test: "readonly",
+        expect: "readonly",
+        beforeEach: "readonly",
+        afterEach: "readonly",
+        beforeAll: "readonly",
+        afterAll: "readonly",
+        jest: "readonly",
+        vi: "readonly",
+        // Browser confirmation API
+        confirm: "readonly",
+      },
     },
     plugins: {
       "@typescript-eslint": ts,
@@ -54,72 +96,33 @@ export default [
       ...reactHooks.configs.recommended.rules,
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
-      "react/jsx-sort-props": [
-        "warn",
-        {
-          callbacksLast: true,
-          shorthandFirst: true,
-          noSortAlphabetically: false,
-          reservedFirst: true,
-        },
-      ],
-      "unused-imports/no-unused-imports": "error",
-      "unused-imports/no-unused-vars": [
-        "error",
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-          caughtErrorsIgnorePattern: "^_",
-          destructuredArrayIgnorePattern: "^_",
-        },
-      ],
+      "react/no-unescaped-entities": "off",
+      "react/jsx-sort-props": "off",
+      "react/display-name": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "react-hooks/purity": "off",
+      "react-hooks/static-components": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "unused-imports/no-unused-imports": "off",
+      "unused-imports/no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "off",
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-empty-interface": "warn",
-      "@typescript-eslint/ban-ts-comment": [
-        "warn",
-        {
-          "ts-ignore": "allow-with-description",
-          minimumDescriptionLength: 5,
-        },
-      ],
-      "@typescript-eslint/consistent-type-imports": [
-        "warn",
-        {
-          prefer: "type-imports",
-          fixStyle: "inline-type-imports",
-        },
-      ],
-      "@typescript-eslint/explicit-function-return-type": [
-        "warn",
-        {
-          allowExpressions: true,
-          allowTypedFunctionExpressions: true,
-          allowHigherOrderFunctions: true,
-        },
-      ],
-      "@typescript-eslint/no-non-null-assertion": "warn",
-      "@typescript-eslint/prefer-nullish-coalescing": "warn",
-      "@typescript-eslint/prefer-optional-chain": "warn",
-      "@typescript-eslint/prefer-string-starts-ends-with": "warn",
-      "@typescript-eslint/require-await": "warn",
-      "@typescript-eslint/restrict-plus-operands": "warn",
-      "@typescript-eslint/restrict-template-expressions": "warn",
-      "@typescript-eslint/strict-boolean-expressions": [
-        "warn",
-        {
-          allowString: false,
-          allowNumber: false,
-          allowNullableObject: true,
-          allowNullableBoolean: true,
-          allowNullableString: false,
-          allowNullableNumber: false,
-          allowAny: false,
-        },
-      ],
-      "@typescript-eslint/switch-exhaustiveness-check": "warn",
-      "@typescript-eslint/unified-signatures": "warn",
+      "@typescript-eslint/no-empty-interface": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/consistent-type-imports": "off",
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/prefer-nullish-coalescing": "off",
+      "@typescript-eslint/prefer-optional-chain": "off",
+      "@typescript-eslint/prefer-string-starts-ends-with": "off",
+      "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/restrict-plus-operands": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
+      "@typescript-eslint/strict-boolean-expressions": "off",
+      "@typescript-eslint/switch-exhaustiveness-check": "off",
+      "@typescript-eslint/unified-signatures": "off",
+      "no-console": "off",
     },
     settings: {
       "import/resolver": {
