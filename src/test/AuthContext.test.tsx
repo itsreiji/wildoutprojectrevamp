@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useAuth } from '../contexts/AuthContext';
-import { validateEmail, validatePassword, validatePasswordStrength, checkLoginRateLimit, recordFailedLogin, clearLoginAttempts, generateCsrfToken, validateCsrfToken } from '../utils/authValidation';
+import { validateEmail, validatePassword, checkLoginRateLimit, recordFailedLogin, clearLoginAttempts, generateCsrfToken, validateCsrfToken } from '../utils/authValidation';
 import { hashPassword, verifyPassword, sanitizeInput, validateSecureEmail, checkRateLimit, recordRateLimitAttempt, validatePasswordComplexity, generateSecureToken, clearRateLimit } from '../utils/security';
 
 // Mock Supabase client

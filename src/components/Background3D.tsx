@@ -50,9 +50,9 @@ export const Background3D = React.memo(() => {
     <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
       <canvas
         ref={canvasRef}
-        width={width}
-        height={height}
         className="w-full h-full"
+        height={height}
+        width={width}
       />
     </div>
   );

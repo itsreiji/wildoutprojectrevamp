@@ -105,7 +105,7 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
 
   return (
     <Form {...form}>
-      <form id="admin-partner-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form className="space-y-4" id="admin-partner-form" onSubmit={form.handleSubmit(onSubmit)}>
         {/* Name Field */}
         <FormField
           control={form.control}
@@ -132,7 +132,7 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
           render={({ field }) => (
             <FormItem id="admin-partner-form-level-field">
               <FormLabel htmlFor="admin-partner-form-level-select">Sponsorship Level *</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select defaultValue={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger id="admin-partner-form-level-select">
                     <SelectValue placeholder="Select tier" />
@@ -161,8 +161,8 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
               <FormControl>
                 <Input
                   id="admin-partner-form-website-input"
-                  type="url"
                   placeholder="https://example.com"
+                  type="url"
                   {...field}
                   value={field.value || ''}
                 />
@@ -182,9 +182,9 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
               <FormLabel htmlFor="admin-partner-form-description-textarea">Description</FormLabel>
               <FormControl>
                 <Textarea
+                  className="resize-none h-20"
                   id="admin-partner-form-description-textarea"
                   placeholder="Brief description of the partnership"
-                  className="resize-none h-20"
                   {...field}
                   value={field.value || ''}
                 />
@@ -205,8 +205,8 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
               <FormControl>
                 <Input
                   id="admin-partner-form-email-input"
-                  type="email"
                   placeholder="contact@partner.com"
+                  type="email"
                   {...field}
                   value={field.value || ''}
                 />
@@ -246,14 +246,14 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
               <FormControl>
                 <div className="flex items-center gap-2">
                   <Input
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    disabled={isSubmitting}
                     id="admin-partner-form-logo-input"
                     type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       onChange(file);
                     }}
-                    disabled={isSubmitting}
                     {...field}
                   />
                 </div>
@@ -262,7 +262,7 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
                 JPG, PNG, WebP, or GIF format. Max 10MB. {defaultValues?.logo_url && 'Upload a new logo to replace the current one.'}
               </FormDescription>
               {defaultValues?.logo_url && (
-                <div id="admin-partner-form-logo-current" className="mt-2 text-sm text-white/60">
+                <div className="mt-2 text-sm text-white/60" id="admin-partner-form-logo-current">
                   Current logo: {defaultValues.logo_url.split('/').pop()}
                 </div>
               )}
@@ -272,21 +272,21 @@ export function DashboardPartnerForm({ onSubmit, isSubmitting, defaultValues, on
         />
 
         {/* Form Actions */}
-        <div id="admin-partner-form-actions" className="flex gap-2 justify-end pt-4">
+        <div className="flex gap-2 justify-end pt-4" id="admin-partner-form-actions">
           <Button
+            disabled={isSubmitting}
             id="admin-partner-form-cancel-button"
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button
-            id="admin-partner-form-submit-button"
-            type="submit"
             className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
             disabled={isSubmitting}
+            id="admin-partner-form-submit-button"
+            type="submit"
           >
             {isSubmitting ? 'Saving...' : defaultValues?.id ? 'Update' : 'Add'} Partner
           </Button>

@@ -176,16 +176,16 @@ export const DashboardSettings = React.memo(() => {
   };
 
   return (
-    <div id="admin-settings-container" className="space-y-6">
+    <div className="space-y-6" id="admin-settings-container">
       {/* Header */}
       <div id="admin-settings-header">
         <h2
-          id="admin-settings-title"
           className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent"
+          id="admin-settings-title"
         >
           Settings
         </h2>
-        <p id="admin-settings-subtitle" className="text-white/60">
+        <p className="text-white/60" id="admin-settings-subtitle">
           Manage your site configuration - changes sync to landing page
           instantly
         </p>
@@ -193,42 +193,43 @@ export const DashboardSettings = React.memo(() => {
 
       {/* Site Settings */}
       <motion.div
+        animate={{ opacity: 1, y: 0 }}
         id="admin-settings-site-settings"
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
         <Card
-          id="admin-settings-site-card"
           className="bg-white/5 backdrop-blur-xl border-white/10"
+          id="admin-settings-site-card"
         >
           <CardHeader id="admin-settings-site-card-header">
             <CardTitle
-              id="admin-settings-site-card-title"
               className="flex items-center space-x-2"
+              id="admin-settings-site-card-title"
             >
               <Globe
-                id="admin-settings-site-icon"
                 className="h-5 w-5 text-[#E93370]"
+                id="admin-settings-site-icon"
               />
               <span id="admin-settings-site-section-label">
                 Site Information
               </span>
             </CardTitle>
             <CardDescription
-              id="admin-settings-site-card-description"
               className="text-white/60"
+              id="admin-settings-site-card-description"
             >
               Update your site's basic information
             </CardDescription>
           </CardHeader>
           <CardContent
-            id="admin-settings-site-card-content"
             className="space-y-4"
+            id="admin-settings-site-card-content"
           >
             <div className="space-y-2">
               <Label htmlFor="admin-settings-site-name-input">Site Name</Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-site-name-input"
                 value={formData.siteName}
                 onChange={(e) =>
@@ -238,7 +239,6 @@ export const DashboardSettings = React.memo(() => {
                     site_name: e.target.value,
                   })
                 }
-                className="bg-white/5 border-white/10 text-white"
               />
             </div>
 
@@ -247,6 +247,7 @@ export const DashboardSettings = React.memo(() => {
                 Site Description
               </Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-site-description-input"
                 value={formData.siteDescription}
                 onChange={(e) =>
@@ -256,29 +257,28 @@ export const DashboardSettings = React.memo(() => {
                     site_description: e.target.value,
                   })
                 }
-                className="bg-white/5 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="admin-settings-tagline-textarea">Tagline</Label>
               <Textarea
+                className="bg-white/5 border-white/10 text-white min-h-[80px]"
                 id="admin-settings-tagline-textarea"
                 value={formData.tagline || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, tagline: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white min-h-[80px]"
               />
             </div>
 
             <Button
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50"
+              disabled={isSaving}
               id="admin-settings-save-button"
               onClick={handleSave}
-              disabled={isSaving}
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50"
             >
-              <Save id="admin-settings-save-icon" className="mr-2 h-4 w-4" />
+              <Save className="mr-2 h-4 w-4" id="admin-settings-save-icon" />
               {isSaving ? "Saving..." : "Save All Settings"}
             </Button>
           </CardContent>
@@ -287,100 +287,100 @@ export const DashboardSettings = React.memo(() => {
 
       {/* Contact Settings */}
       <motion.div
+        animate={{ opacity: 1, y: 0 }}
         id="admin-settings-contact-settings"
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <Card
-          id="admin-settings-contact-card"
           className="bg-white/5 backdrop-blur-xl border-white/10"
+          id="admin-settings-contact-card"
         >
           <CardHeader id="admin-settings-contact-card-header">
             <CardTitle
-              id="admin-settings-contact-card-title"
               className="flex items-center space-x-2"
+              id="admin-settings-contact-card-title"
             >
               <Mail
-                id="admin-settings-contact-icon"
                 className="h-5 w-5 text-[#E93370]"
+                id="admin-settings-contact-icon"
               />
               <span id="admin-settings-contact-section-label">
                 Contact Information
               </span>
             </CardTitle>
             <CardDescription
-              id="admin-settings-contact-card-description"
               className="text-white/60"
+              id="admin-settings-contact-card-description"
             >
               Manage your contact details
             </CardDescription>
           </CardHeader>
           <CardContent
-            id="admin-settings-contact-card-content"
             className="space-y-4"
+            id="admin-settings-contact-card-content"
           >
             <div className="space-y-2">
               <Label
-                htmlFor="admin-settings-email-input"
                 className="flex items-center space-x-2"
+                htmlFor="admin-settings-email-input"
               >
                 <Mail
-                  id="admin-settings-email-icon"
                   className="h-4 w-4 text-[#E93370]"
+                  id="admin-settings-email-icon"
                 />
                 <span id="admin-settings-email-label">Email Address</span>
               </Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-email-input"
                 type="email"
                 value={formData.email || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
               <Label
-                htmlFor="admin-settings-phone-input"
                 className="flex items-center space-x-2"
+                htmlFor="admin-settings-phone-input"
               >
                 <Phone
-                  id="admin-settings-phone-icon"
                   className="h-4 w-4 text-[#E93370]"
+                  id="admin-settings-phone-icon"
                 />
                 <span id="admin-settings-phone-label">Phone Number</span>
               </Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-phone-input"
                 value={formData.phone || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
               <Label
-                htmlFor="admin-settings-address-input"
                 className="flex items-center space-x-2"
+                htmlFor="admin-settings-address-input"
               >
                 <MapPin
-                  id="admin-settings-address-icon"
                   className="h-4 w-4 text-[#E93370]"
+                  id="admin-settings-address-icon"
                 />
                 <span id="admin-settings-address-label">Address</span>
               </Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-address-input"
                 value={formData.address || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white"
               />
             </div>
           </CardContent>
@@ -389,52 +389,54 @@ export const DashboardSettings = React.memo(() => {
 
       {/* Social Media Settings */}
       <motion.div
+        animate={{ opacity: 1, y: 0 }}
         id="admin-settings-social-settings"
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
         <Card
-          id="admin-settings-social-card"
           className="bg-white/5 backdrop-blur-xl border-white/10"
+          id="admin-settings-social-card"
         >
           <CardHeader id="admin-settings-social-card-header">
             <CardTitle
-              id="admin-settings-social-card-title"
               className="flex items-center space-x-2"
+              id="admin-settings-social-card-title"
             >
               <Instagram
-                id="admin-settings-social-icon"
                 className="h-5 w-5 text-[#E93370]"
+                id="admin-settings-social-icon"
               />
               <span id="admin-settings-social-section-label">
                 Social Media Links
               </span>
             </CardTitle>
             <CardDescription
-              id="admin-settings-social-card-description"
               className="text-white/60"
+              id="admin-settings-social-card-description"
             >
               Update your social media profiles
             </CardDescription>
           </CardHeader>
           <CardContent
-            id="admin-settings-social-card-content"
             className="space-y-4"
+            id="admin-settings-social-card-content"
           >
             <div className="space-y-2">
               <Label
-                htmlFor="admin-settings-instagram-input"
                 className="flex items-center space-x-2"
+                htmlFor="admin-settings-instagram-input"
               >
                 <Instagram
-                  id="admin-settings-instagram-icon"
                   className="h-4 w-4 text-[#E93370]"
+                  id="admin-settings-instagram-icon"
                 />
                 <span id="admin-settings-instagram-label">Instagram</span>
               </Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-instagram-input"
+                placeholder="https://instagram.com/username"
                 value={
                   typeof formData.socialMedia === "object" &&
                   formData.socialMedia !== null &&
@@ -468,24 +470,24 @@ export const DashboardSettings = React.memo(() => {
                     },
                   });
                 }}
-                className="bg-white/5 border-white/10 text-white"
-                placeholder="https://instagram.com/username"
               />
             </div>
 
             <div className="space-y-2">
               <Label
-                htmlFor="admin-settings-twitter-input"
                 className="flex items-center space-x-2"
+                htmlFor="admin-settings-twitter-input"
               >
                 <Twitter
-                  id="admin-settings-twitter-icon"
                   className="h-4 w-4 text-[#E93370]"
+                  id="admin-settings-twitter-icon"
                 />
                 <span id="admin-settings-twitter-label">Twitter</span>
               </Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-twitter-input"
+                placeholder="https://twitter.com/username"
                 value={
                   typeof formData.socialMedia === "object" &&
                   formData.socialMedia !== null &&
@@ -519,24 +521,24 @@ export const DashboardSettings = React.memo(() => {
                     },
                   });
                 }}
-                className="bg-white/5 border-white/10 text-white"
-                placeholder="https://twitter.com/username"
               />
             </div>
 
             <div className="space-y-2">
               <Label
-                htmlFor="admin-settings-facebook-input"
                 className="flex items-center space-x-2"
+                htmlFor="admin-settings-facebook-input"
               >
                 <Facebook
-                  id="admin-settings-facebook-icon"
                   className="h-4 w-4 text-[#E93370]"
+                  id="admin-settings-facebook-icon"
                 />
                 <span id="admin-settings-facebook-label">Facebook</span>
               </Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-facebook-input"
+                placeholder="https://facebook.com/page"
                 value={
                   typeof formData.socialMedia === "object" &&
                   formData.socialMedia !== null &&
@@ -570,24 +572,24 @@ export const DashboardSettings = React.memo(() => {
                     },
                   });
                 }}
-                className="bg-white/5 border-white/10 text-white"
-                placeholder="https://facebook.com/page"
               />
             </div>
 
             <div className="space-y-2">
               <Label
-                htmlFor="admin-settings-youtube-input"
                 className="flex items-center space-x-2"
+                htmlFor="admin-settings-youtube-input"
               >
                 <Youtube
-                  id="admin-settings-youtube-icon"
                   className="h-4 w-4 text-[#E93370]"
+                  id="admin-settings-youtube-icon"
                 />
                 <span id="admin-settings-youtube-label">YouTube</span>
               </Label>
               <Input
+                className="bg-white/5 border-white/10 text-white"
                 id="admin-settings-youtube-input"
+                placeholder="https://youtube.com/@channel"
                 value={
                   typeof formData.socialMedia === "object" &&
                   formData.socialMedia !== null &&
@@ -621,8 +623,6 @@ export const DashboardSettings = React.memo(() => {
                     },
                   });
                 }}
-                className="bg-white/5 border-white/10 text-white"
-                placeholder="https://youtube.com/@channel"
               />
             </div>
           </CardContent>
@@ -631,22 +631,22 @@ export const DashboardSettings = React.memo(() => {
 
       {/* Brand Colors */}
       <motion.div
+        animate={{ opacity: 1, y: 0 }}
         id="admin-settings-brand-colors"
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.3 }}
       >
         <Card
-          id="admin-settings-brand-colors-card"
           className="bg-white/5 backdrop-blur-xl border-white/10"
+          id="admin-settings-brand-colors-card"
         >
           <CardHeader id="admin-settings-brand-colors-card-header">
             <CardTitle id="admin-settings-brand-colors-title">
               Brand Colors
             </CardTitle>
             <CardDescription
-              id="admin-settings-brand-colors-description"
               className="text-white/60"
+              id="admin-settings-brand-colors-description"
             >
               Your brand color scheme
             </CardDescription>
@@ -659,19 +659,19 @@ export const DashboardSettings = React.memo(() => {
                 </Label>
                 <div className="flex items-center space-x-3 mt-2">
                   <div
-                    id="admin-settings-primary-color-swatch"
                     className="w-12 h-12 rounded-xl bg-[#E93370] border-2 border-white/10"
+                    id="admin-settings-primary-color-swatch"
                   />
                   <div>
                     <div
-                      id="admin-settings-primary-color-value"
                       className="text-white"
+                      id="admin-settings-primary-color-value"
                     >
                       #E93370
                     </div>
                     <div
-                      id="admin-settings-primary-color-name"
                       className="text-sm text-white/60"
+                      id="admin-settings-primary-color-name"
                     >
                       WildOut Pink
                     </div>
@@ -679,9 +679,9 @@ export const DashboardSettings = React.memo(() => {
                 </div>
               </div>
               <Separator
+                className="h-16"
                 id="admin-settings-brand-colors-separator"
                 orientation="vertical"
-                className="h-16"
               />
               <div className="flex-1">
                 <Label id="admin-settings-background-color-label">
@@ -689,19 +689,19 @@ export const DashboardSettings = React.memo(() => {
                 </Label>
                 <div className="flex items-center space-x-3 mt-2">
                   <div
-                    id="admin-settings-background-color-swatch"
                     className="w-12 h-12 rounded-xl bg-[#0a0a0a] border-2 border-white/10"
+                    id="admin-settings-background-color-swatch"
                   />
                   <div>
                     <div
-                      id="admin-settings-background-color-value"
                       className="text-white"
+                      id="admin-settings-background-color-value"
                     >
                       #0a0a0a
                     </div>
                     <div
-                      id="admin-settings-background-color-name"
                       className="text-sm text-white/60"
+                      id="admin-settings-background-color-name"
                     >
                       Dark Background
                     </div>
@@ -716,97 +716,97 @@ export const DashboardSettings = React.memo(() => {
       {/* User Management */}
       {currentUserRole === "admin" && (
         <motion.div
+          animate={{ opacity: 1, y: 0 }}
           id="admin-settings-users"
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.4 }}
         >
           <Card
-            id="admin-settings-users-card"
             className="bg-white/5 backdrop-blur-xl border-white/10"
+            id="admin-settings-users-card"
           >
             <CardHeader id="admin-settings-users-card-header">
               <CardTitle
-                id="admin-settings-users-card-title"
                 className="flex items-center space-x-2"
+                id="admin-settings-users-card-title"
               >
                 <Users
-                  id="admin-settings-users-icon"
                   className="h-5 w-5 text-[#E93370]"
+                  id="admin-settings-users-icon"
                 />
                 <span id="admin-settings-users-section-label">
                   User Management
                 </span>
               </CardTitle>
               <CardDescription
-                id="admin-settings-users-card-description"
                 className="text-white/60"
+                id="admin-settings-users-card-description"
               >
                 Manage user roles and permissions for your platform
               </CardDescription>
             </CardHeader>
             <CardContent
-              id="admin-settings-users-card-content"
               className="space-y-4"
+              id="admin-settings-users-card-content"
             >
               {usersLoading ? (
                 <div
-                  id="admin-settings-users-loading"
                   className="text-center py-8 text-white/60"
+                  id="admin-settings-users-loading"
                 >
                   Loading users...
                 </div>
               ) : users.length === 0 ? (
                 <div
-                  id="admin-settings-users-empty"
                   className="text-sm text-white/60 p-4 bg-white/5 rounded-lg border border-white/10"
+                  id="admin-settings-users-empty"
                 >
                   <p id="admin-settings-users-empty-text">No users found.</p>
                 </div>
               ) : (
-                <div id="admin-settings-users-list" className="space-y-3">
+                <div className="space-y-3" id="admin-settings-users-list">
                   {users.map((user) => (
                     <div
-                      id={`admin-settings-user-${user.id}`}
                       key={user.id}
                       className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
+                      id={`admin-settings-user-${user.id}`}
                     >
                       <div className="flex-1">
                         <div className="flex items-center space-x-3">
                           {user.role === "admin" ? (
                             <Shield
-                              id={`admin-settings-user-${user.id}-admin-icon`}
                               className="h-5 w-5 text-[#E93370]"
+                              id={`admin-settings-user-${user.id}-admin-icon`}
                             />
                           ) : user.role === "editor" ? (
                             <UserCheck
-                              id={`admin-settings-user-${user.id}-editor-icon`}
                               className="h-5 w-5 text-blue-400"
+                              id={`admin-settings-user-${user.id}-editor-icon`}
                             />
                           ) : (
                             <UserX
-                              id={`admin-settings-user-${user.id}-user-icon`}
                               className="h-5 w-5 text-white/40"
+                              id={`admin-settings-user-${user.id}-user-icon`}
                             />
                           )}
                           <div>
                             <div
-                              id={`admin-settings-user-${user.id}-name`}
                               className="font-medium text-white"
+                              id={`admin-settings-user-${user.id}-name`}
                             >
                               {user.full_name ||
                                 user.username ||
                                 "Unknown User"}
                             </div>
                             <div
-                              id={`admin-settings-user-${user.id}-email`}
                               className="text-sm text-white/60"
+                              id={`admin-settings-user-${user.id}-email`}
                             >
                               {user.email || "No email"}
                             </div>
                             <div
-                              id={`admin-settings-user-${user.id}-joined`}
                               className="text-xs text-white/40 mt-1"
+                              id={`admin-settings-user-${user.id}-joined`}
                             >
                               Joined:{" "}
                               {new Date(user.created_at).toLocaleDateString()}
@@ -816,15 +816,15 @@ export const DashboardSettings = React.memo(() => {
                       </div>
                       <div className="flex items-center space-x-3">
                         <Select
+                          disabled={updatingUserId === user.id}
                           value={user.role}
                           onValueChange={(value: "admin" | "editor" | "user") =>
                             handleRoleUpdate(user.id, value)
                           }
-                          disabled={updatingUserId === user.id}
                         >
                           <SelectTrigger
-                            id={`admin-settings-user-${user.id}-role-select`}
                             className="w-32 bg-white/5 border-white/10 text-white"
+                            id={`admin-settings-user-${user.id}-role-select`}
                           >
                             <SelectValue />
                           </SelectTrigger>
@@ -851,8 +851,8 @@ export const DashboardSettings = React.memo(() => {
                         </Select>
                         {updatingUserId === user.id && (
                           <div
-                            id={`admin-settings-user-${user.id}-updating`}
                             className="text-xs text-white/60"
+                            id={`admin-settings-user-${user.id}-updating`}
                           >
                             Updating...
                           </div>

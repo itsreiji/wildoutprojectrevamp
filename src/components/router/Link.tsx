@@ -26,8 +26,8 @@ const LinkComponent = ({ to, className, children, onClick }: LinkProps) => {
 
   return (
     <a
-      href={to}
       className={className}
+      href={to}
       onClick={handleClick}
     >
       {children}

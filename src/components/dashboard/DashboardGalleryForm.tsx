@@ -142,7 +142,7 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
 
   return (
     <Form {...form}>
-      <form id="admin-gallery-form" onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+      <form className="space-y-4" id="admin-gallery-form" onSubmit={form.handleSubmit(handleFormSubmit)}>
         {/* Title Field */}
         <FormField
           control={form.control}
@@ -171,9 +171,9 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
               <FormLabel htmlFor="admin-gallery-form-description-textarea">Description</FormLabel>
               <FormControl>
                 <Textarea
+                  className="resize-none h-20"
                   id="admin-gallery-form-description-textarea"
                   placeholder="Brief description of the gallery"
-                  className="resize-none h-20"
                   {...field}
                   value={field.value || ''}
                 />
@@ -211,7 +211,7 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
             <FormItem id="admin-gallery-form-event-field">
               <FormLabel htmlFor="admin-gallery-form-event-select">Link to Event (optional)</FormLabel>
               <FormControl>
-                <Select onValueChange={field.onChange} value={field.value || undefined}>
+                <Select value={field.value || undefined} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger id="admin-gallery-form-event-select">
                       <SelectValue placeholder="Select an event..." />
@@ -220,7 +220,7 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
                   <SelectContent>
                     <SelectItem id="admin-gallery-form-event-select-none" value="none">No event</SelectItem>
                     {events.map((event) => (
-                      <SelectItem id={`admin-gallery-form-event-select-${event.id}`} key={event.id} value={event.id || ''}>
+                      <SelectItem key={event.id} id={`admin-gallery-form-event-select-${event.id}`} value={event.id || ''}>
                         {event.title || 'Untitled Event'}
                       </SelectItem>
                     ))}
@@ -242,13 +242,13 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
               <FormControl>
                 <div className="flex flex-col gap-2">
                   <Input
+                    multiple
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="cursor-pointer"
+                    disabled={isSubmitting}
                     id="admin-gallery-form-images-input"
                     type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    multiple
                     onChange={handleFileChange}
-                    disabled={isSubmitting}
-                    className="cursor-pointer"
                   />
                 </div>
               </FormControl>
@@ -263,25 +263,25 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
         {/* Image Previews */}
         {previewUrls.length > 0 && (
           <div id="admin-gallery-form-previews">
-            <FormLabel id="admin-gallery-form-previews-title" className="mb-2 block">Selected Images ({previewUrls.length})</FormLabel>
-            <div id="admin-gallery-form-previews-grid" className="grid grid-cols-3 gap-2">
+            <FormLabel className="mb-2 block" id="admin-gallery-form-previews-title">Selected Images ({previewUrls.length})</FormLabel>
+            <div className="grid grid-cols-3 gap-2" id="admin-gallery-form-previews-grid">
               {previewUrls.map((url, index) => (
-                <div key={`admin-gallery-form-preview-${index}`} id={`admin-gallery-form-preview-${index}`} className="relative group">
+                <div key={`admin-gallery-form-preview-${index}`} className="relative group" id={`admin-gallery-form-preview-${index}`}>
                   <img
-                    id={`admin-gallery-form-preview-image-${index}`}
-                    src={url}
                     alt={`Preview ${index + 1}`}
                     className="w-full h-24 object-cover rounded-lg"
+                    id={`admin-gallery-form-preview-image-${index}`}
+                    src={url}
                   />
                   <Button
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                     id={`admin-gallery-form-preview-remove-${index}`}
+                    size="icon"
                     type="button"
                     variant="destructive"
-                    size="icon"
                     onClick={() => removeFile(index)}
-                    className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X id={`admin-gallery-form-preview-remove-icon-${index}`} className="h-3 w-3" />
+                    <X className="h-3 w-3" id={`admin-gallery-form-preview-remove-icon-${index}`} />
                   </Button>
                 </div>
               ))}
@@ -290,21 +290,21 @@ export function DashboardGalleryForm({ onSubmit, isSubmitting, defaultValues, on
         )}
 
         {/* Form Actions */}
-        <div id="admin-gallery-form-actions" className="flex gap-2 justify-end pt-4">
+        <div className="flex gap-2 justify-end pt-4" id="admin-gallery-form-actions">
           <Button
+            disabled={isSubmitting}
             id="admin-gallery-form-cancel-button"
             type="button"
             variant="outline"
             onClick={onCancel}
-            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button
-            id="admin-gallery-form-submit-button"
-            type="submit"
             className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
             disabled={isSubmitting}
+            id="admin-gallery-form-submit-button"
+            type="submit"
           >
             {isSubmitting ? 'Saving...' : defaultValues?.id ? 'Update' : 'Add'} Gallery
           </Button>

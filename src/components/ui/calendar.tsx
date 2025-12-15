@@ -15,7 +15,6 @@ function Calendar({
 }: React.ComponentProps<typeof DayPicker>) {
   return (
     <DayPicker
-      showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row gap-2",
@@ -67,6 +66,7 @@ function Calendar({
           <ChevronRight className={cn("size-4", props.className)} {...props} />
         ),
       } as any)}
+      showOutsideDays={showOutsideDays}
       {...props}
     />
   );

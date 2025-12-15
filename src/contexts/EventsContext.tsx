@@ -1,7 +1,7 @@
 /* @refresh reset */
 import type { LandingEvent } from "@/types/content";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { createContext, ReactNode, useContext } from "react";
+import React, { createContext, type ReactNode, useContext } from "react";
 import { supabaseClient } from "../supabase/client";
 import type { TablesInsert, TablesUpdate } from "../supabase/types";
 import {

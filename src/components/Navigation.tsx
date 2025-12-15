@@ -67,23 +67,23 @@ const NavigationComponent = () => {
     <div id="navigation-container">
       {/* Desktop & Mobile Header */}
       <motion.header
-        initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled
           ? 'bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20'
           : 'bg-transparent'
           }`}
+        initial={{ y: -100 }}
       >
         <div className="container mx-auto max-w-7xl px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link to="/">
               <motion.div
+                className="cursor-pointer h-10 md:h-12"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="cursor-pointer h-10 md:h-12"
               >
-                <img src={logo} alt="WildOut!" className="h-full w-auto object-contain" />
+                <img alt="WildOut!" className="h-full w-auto object-contain" src={logo} />
               </motion.div>
             </Link>
 
@@ -92,17 +92,18 @@ const NavigationComponent = () => {
               {NAV_ITEMS.map((item) => (
                 <Button
                   key={item.id}
+                  className="text-white/80 hover:text-white hover:bg-white/10"
                   variant="ghost"
                   onClick={() => handleNavClick(item)}
-                  className="text-white/80 hover:text-white hover:bg-white/10"
                 >
                   {item.label}
                 </Button>
               ))}
               <button
-                id="desktop-admin-button"
-                data-testid="desktop-admin-button"
                 aria-label="Admin Dashboard"
+                className="group ml-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#E93370] border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] hover:text-white rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 active:scale-95"
+                data-testid="desktop-admin-button"
+                id="desktop-admin-button"
                 onClick={async () => {
                   console.log('🔵 Admin button clicked - Desktop');
                   console.log('🔵 Current path before navigation:', window.location.pathname);
@@ -128,23 +129,22 @@ const NavigationComponent = () => {
                     window.location.href = getAdminPath();
                   }
                 }}
-                className="group ml-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#E93370] border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] hover:text-white rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 active:scale-95"
               >
                 <LayoutDashboard
-                  id="desktop-admin-icon"
                   className="h-4 w-4 group-hover:scale-110 transition-transform duration-300"
                   data-testid="desktop-admin-icon"
+                  id="desktop-admin-icon"
                 />
-                <span id="desktop-admin-label" data-testid="desktop-admin-label">Admin</span>
+                <span data-testid="desktop-admin-label" id="desktop-admin-label">Admin</span>
               </button>
             </nav>
 
             {/* Mobile Menu Button */}
             <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden border-white/10 text-white hover:bg-white/10 rounded-xl"
+              size="icon"
+              variant="outline"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -158,30 +158,30 @@ const NavigationComponent = () => {
           <>
             {/* Backdrop */}
             <motion.div
-              initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsMobileMenuOpen(false)}
               className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden"
+              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
             />
 
             {/* Menu Panel */}
             <motion.div
-              initial={{ x: '100%' }}
               animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-black/95 backdrop-blur-2xl border-l border-white/10 z-50 md:hidden"
+              exit={{ x: '100%' }}
+              initial={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
               <div className="flex flex-col h-full">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/10">
-                  <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
+                  <img alt="WildOut!" className="h-10 w-auto object-contain" src={logo} />
                   <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setIsMobileMenuOpen(false)}
                     className="border-white/10 text-white hover:bg-white/10 rounded-xl"
+                    size="icon"
+                    variant="outline"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <X className="h-5 w-5" />
                   </Button>
@@ -193,23 +193,24 @@ const NavigationComponent = () => {
                     {NAV_ITEMS.map((item, index) => (
                       <motion.div
                         key={item.id}
-                        initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, x: 20 }}
                         transition={{ delay: index * 0.05 }}
                       >
                         <Button
+                          className="w-full justify-start text-lg h-auto py-3 text-white/80 hover:text-white hover:bg-white/10"
                           variant="ghost"
                           onClick={() => handleNavClick(item)}
-                          className="w-full justify-start text-lg h-auto py-3 text-white/80 hover:text-white hover:bg-white/10"
                         >
                           {item.label}
                         </Button>
                       </motion.div>
                     ))}
                     <button
-                      id="mobile-admin-button"
-                      data-testid="mobile-admin-button"
                       aria-label="Admin Dashboard"
+                      className="w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center gap-3 border border-[#E93370]/20 hover:border-[#E93370] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50"
+                      data-testid="mobile-admin-button"
+                      id="mobile-admin-button"
                       onClick={async () => {
                         console.log('🔵 Admin button clicked - Mobile');
                         console.log('🔵 Current path before navigation:', window.location.pathname);
@@ -234,14 +235,13 @@ const NavigationComponent = () => {
                           window.location.href = getAdminPath();
                         }
                       }}
-                      className="w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center gap-3 border border-[#E93370]/20 hover:border-[#E93370] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50"
                     >
                       <LayoutDashboard
-                        id="mobile-admin-icon"
                         className="h-5 w-5 group-hover:scale-110 transition-transform duration-300"
                         data-testid="mobile-admin-icon"
+                        id="mobile-admin-icon"
                       />
-                      <span id="mobile-admin-label" className="font-medium" data-testid="mobile-admin-label">Admin Dashboard</span>
+                      <span className="font-medium" data-testid="mobile-admin-label" id="mobile-admin-label">Admin Dashboard</span>
                     </button>
                   </div>
                 </nav>

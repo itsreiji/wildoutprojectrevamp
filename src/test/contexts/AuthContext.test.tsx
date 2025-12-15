@@ -1,10 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
 import { AuthProvider, useAuth } from '../../contexts/AuthContext';
 import { supabaseClient } from '../../supabase/client';
 import { auditService } from '../../services/auditService';
 import * as securityUtils from '../../utils/security';
-import * as authValidationUtils from '../../utils/authValidation';
 
 // Mock dependencies
 vi.mock('../../supabase/client', () => ({

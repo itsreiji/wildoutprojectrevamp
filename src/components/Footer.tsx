@@ -58,7 +58,7 @@ export const Footer = React.memo(() => {
     .filter(Boolean) as Array<{ icon: any; href: string; label: string }>;
 
   return (
-    <footer id="footer-section" className="relative pt-20 pb-8 px-4 z-20">
+    <footer className="relative pt-20 pb-8 px-4 z-20" id="footer-section">
       <div className="container mx-auto max-w-7xl">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
@@ -66,12 +66,12 @@ export const Footer = React.memo(() => {
           <div className="lg:col-span-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
               transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              whileInView={{ opacity: 1, y: 0 }}
             >
               <div className="mb-4">
-                <img src={logo} alt={settings.site_name ?? 'WildOut!'} className="h-12 w-auto object-contain" />
+                <img alt={settings.site_name ?? 'WildOut!'} className="h-12 w-auto object-contain" src={logo} />
               </div>
               <p className="text-white/60 mb-6 leading-relaxed">
                 {settings.tagline ?? ''}
@@ -81,13 +81,13 @@ export const Footer = React.memo(() => {
               <div className="space-y-3 text-sm text-white/60">
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a id="footer-email-link" href={`mailto:${settings.email ?? ''}`} className="hover:text-[#E93370] transition-colors">
+                  <a className="hover:text-[#E93370] transition-colors" href={`mailto:${settings.email ?? ''}`} id="footer-email-link">
                     {settings.email ?? 'contact@wildoutproject.com'}
                   </a>
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a id="footer-phone-link" href={`tel:${(settings.phone ?? '').replace(/\s/g, '')}`} className="hover:text-[#E93370] transition-colors">
+                  <a className="hover:text-[#E93370] transition-colors" href={`tel:${(settings.phone ?? '').replace(/\s/g, '')}`} id="footer-phone-link">
                     {settings.phone ?? '+62 21 1234 567'}
                   </a>
                 </div>
@@ -104,9 +104,9 @@ export const Footer = React.memo(() => {
             <motion.div
               key={category}
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              whileInView={{ opacity: 1, y: 0 }}
             >
               <h4 className="text-white mb-4 capitalize">
                 {category}
@@ -115,8 +115,8 @@ export const Footer = React.memo(() => {
                 {links.map((link, linkIndex) => (
                   <li key={linkIndex}>
                     <a
-                      href={link.href}
                       className="text-white/60 hover:text-[#E93370] transition-colors text-sm"
+                      href={link.href}
                     >
                       {link.label}
                     </a>
@@ -129,11 +129,11 @@ export const Footer = React.memo(() => {
 
         {/* Newsletter Section - unchanged */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
         >
           <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
             <div className="max-w-2xl mx-auto text-center">
@@ -145,12 +145,12 @@ export const Footer = React.memo(() => {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
-                  id="footer-newsletter-email-input"
-                  type="email"
-                  placeholder="Enter your email"
                   className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-[#E93370]/50 transition-colors"
+                  id="footer-newsletter-email-input"
+                  placeholder="Enter your email"
+                  type="email"
                 />
-                <button id="footer-newsletter-subscribe-button" className="px-8 py-3 rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white transition-colors duration-300 whitespace-nowrap">
+                <button className="px-8 py-3 rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white transition-colors duration-300 whitespace-nowrap" id="footer-newsletter-subscribe-button">
                   Subscribe
                 </button>
               </div>
@@ -160,11 +160,11 @@ export const Footer = React.memo(() => {
 
         {/* Bottom Bar - SAFE */}
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="pt-8 border-t border-white/10"
+          initial={{ opacity: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1 }}
         >
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             {/* Copyright */}
@@ -175,10 +175,10 @@ export const Footer = React.memo(() => {
               <p className="text-white text-sm">
                 Made by{' '}
                 <a
-                  href="https://instagram.com/itsreiji"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="font-bold text-[#E93370] border border-[#E93370]/60 bg-[#E93370]/15 hover:bg-[#E93370]/25 hover:border-[#E93370] hover:text-white px-2 py-0.5 rounded transition-all duration-300 drop-shadow-sm"
+                  href="https://instagram.com/itsreiji"
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   EJI
                 </a>
@@ -191,11 +191,11 @@ export const Footer = React.memo(() => {
                 const Icon = social.icon;
                 return (
                   <a
-                    id={`footer-${social.label.toLowerCase()}-link`}
                     key={index}
-                    href={social.href}
                     aria-label={social.label}
                     className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 hover:bg-[#E93370]/10 flex items-center justify-center text-white/60 hover:text-[#E93370] transition-all duration-300"
+                    href={social.href}
+                    id={`footer-${social.label.toLowerCase()}-link`}
                   >
                     <Icon className="h-5 w-5" />
                   </a>
@@ -205,15 +205,15 @@ export const Footer = React.memo(() => {
 
             {/* Additional Links - unchanged */}
             <div className="flex items-center gap-4 text-sm text-white/40">
-              <a id="footer-privacy-link" href="#" className="hover:text-[#E93370] transition-colors">
+              <a className="hover:text-[#E93370] transition-colors" href="#" id="footer-privacy-link">
                 Privacy
               </a>
               <span>•</span>
-              <a id="footer-terms-link" href="#" className="hover:text-[#E93370] transition-colors">
+              <a className="hover:text-[#E93370] transition-colors" href="#" id="footer-terms-link">
                 Terms
               </a>
               <span>•</span>
-              <a id="footer-cookies-link" href="#" className="hover:text-[#E93370] transition-colors">
+              <a className="hover:text-[#E93370] transition-colors" href="#" id="footer-cookies-link">
                 Cookies
               </a>
             </div>

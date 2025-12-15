@@ -8,7 +8,6 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
   FormItem,
   FormLabel,
   FormControl,
@@ -48,10 +47,10 @@ export default function TestComponents() {
         </CardHeader>
         <CardContent>
           <Input
+            className="w-full"
+            placeholder="Enter text here..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Enter text here..."
-            className="w-full"
           />
           <p className="mt-2 text-sm text-muted-foreground">Current value: {inputValue}</p>
         </CardContent>
@@ -87,8 +86,8 @@ export default function TestComponents() {
         <CardContent>
           <div className="flex items-center space-x-2">
             <Checkbox
-              id="test-checkbox"
-                  checked={checkboxValue}
+              checked={checkboxValue}
+                  id="test-checkbox"
                   onCheckedChange={(checked: boolean | "indeterminate") =>
                     setCheckboxValue(checked === "indeterminate" ? true : checked)
                   }
@@ -110,7 +109,7 @@ export default function TestComponents() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="Enter your email" />
+                <Input placeholder="Enter your email" type="email" />
               </FormControl>
               <FormDescription>Enter your email address</FormDescription>
               <FormMessage />

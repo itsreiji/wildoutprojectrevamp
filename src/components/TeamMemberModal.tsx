@@ -56,21 +56,21 @@ const TeamMemberModal = ({
             {member ? "Edit Team Member" : "Add Team Member"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">
+              <label className="text-sm font-medium" htmlFor="name">
                 Name *
               </label>
               <Input
+                required
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                required
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">
+              <label className="text-sm font-medium" htmlFor="title">
                 Title
               </label>
               <Input
@@ -81,19 +81,19 @@ const TeamMemberModal = ({
             </div>
           </div>
           <div className="space-y-2">
-            <label htmlFor="bio" className="text-sm font-medium">
+            <label className="text-sm font-medium" htmlFor="bio">
               Bio
             </label>
             <Textarea
               id="bio"
+              rows={4}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              rows={4}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label htmlFor="avatarUrl" className="text-sm font-medium">
+              <label className="text-sm font-medium" htmlFor="avatarUrl">
                 Avatar URL
               </label>
               <Input
@@ -103,7 +103,7 @@ const TeamMemberModal = ({
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
+              <label className="text-sm font-medium" htmlFor="email">
                 Email
               </label>
               <Input

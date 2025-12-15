@@ -31,7 +31,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { usePartners } from '../../contexts/PartnersContext';
 import { toast } from 'sonner';
-import { DashboardPartnerForm, PartnerFormValues } from './DashboardPartnerForm';
+import { DashboardPartnerForm, type PartnerFormValues } from './DashboardPartnerForm';
 import { supabaseClient } from '@/supabase/client';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
@@ -195,7 +195,7 @@ export const DashboardPartners = React.memo(() => {
           </h2>
           <p className="text-white/60">Manage brand partnerships - changes sync to landing page instantly</p>
         </div>
-        <Button onClick={handleCreate} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl">
+        <Button className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl" onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Add Partner
         </Button>
@@ -205,11 +205,11 @@ export const DashboardPartners = React.memo(() => {
       <div className="relative">
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
         <Input
-          type="text"
+          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
           placeholder="Search partners..."
+          type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
         />
       </div>
 
@@ -218,10 +218,10 @@ export const DashboardPartners = React.memo(() => {
         {filteredPartners.map((partner, index) => (
           <motion.div
             key={partner.id}
-            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
             className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 relative"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
           >
             {/* Featured Badge */}
             {partner.featured && (
@@ -241,9 +241,9 @@ export const DashboardPartners = React.memo(() => {
             {partner.logo_url ? (
               <div className="w-full h-24 rounded-lg overflow-hidden border border-white/10 mb-4 bg-white/5 flex items-center justify-center">
                 <ImageWithFallback
-                  src={partner.logo_url}
                   alt={partner.name}
                   className="w-full h-full object-contain p-2"
+                  src={partner.logo_url}
                 />
               </div>
             ) : (
@@ -263,7 +263,7 @@ export const DashboardPartners = React.memo(() => {
               {partner.contact_email && (
                 <div>
                   <span className="text-white/40">Email:</span>{' '}
-                  <a href={`mailto:${partner.contact_email}`} className="text-[#E93370] hover:text-[#E93370]/80">
+                  <a className="text-[#E93370] hover:text-[#E93370]/80" href={`mailto:${partner.contact_email}`}>
                     {partner.contact_email}
                   </a>
                 </div>
@@ -271,7 +271,7 @@ export const DashboardPartners = React.memo(() => {
               {partner.website_url && (
                 <div>
                   <span className="text-white/40">Website:</span>{' '}
-                  <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="text-[#E93370] hover:text-[#E93370]/80 inline-flex items-center gap-1">
+                  <a className="text-[#E93370] hover:text-[#E93370]/80 inline-flex items-center gap-1" href={partner.website_url} rel="noopener noreferrer" target="_blank">
                     Visit <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
@@ -281,10 +281,10 @@ export const DashboardPartners = React.memo(() => {
             {/* Actions */}
             <div className="flex space-x-2 mt-6">
               <Button
+                className="flex-1 border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
                 size="sm"
                 variant="outline"
                 onClick={() => handleEdit(partner)}
-                className="flex-1 border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
@@ -295,10 +295,10 @@ export const DashboardPartners = React.memo(() => {
               }}>
                 <AlertDialogTrigger asChild>
                   <Button
+                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
                     size="sm"
                     variant="outline"
                     onClick={() => setDeletingPartnerId(partner.id)}
-                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -315,9 +315,9 @@ export const DashboardPartners = React.memo(() => {
                       Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => handleDelete(partner.id)}
-                      disabled={isDeleting}
                       className="bg-red-600 hover:bg-red-700 text-white"
+                      disabled={isDeleting}
+                      onClick={() => handleDelete(partner.id)}
                     >
                       {isDeleting ? 'Deleting...' : 'Delete'}
                     </AlertDialogAction>
@@ -346,10 +346,10 @@ export const DashboardPartners = React.memo(() => {
 
           <div className="max-h-[60vh] overflow-y-auto">
             <DashboardPartnerForm
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
               defaultValues={editingPartner || undefined}
+              isSubmitting={isSubmitting}
               onCancel={() => setIsDialogOpen(false)}
+              onSubmit={handleSubmit}
             />
           </div>
         </DialogContent>

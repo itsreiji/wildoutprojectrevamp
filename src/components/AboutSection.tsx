@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, Zap, Users, Sparkles } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
-import { AboutData, Feature } from '../types/content';
+import { type AboutData, type Feature } from '../types/content';
 
 const ICON_MAP: Record<number, React.ComponentType> = {
   0: Heart,
@@ -22,15 +22,15 @@ export const AboutSection = React.memo(() => {
   };
 
   return (
-    <section id="about" className="relative py-20 px-4">
+    <section className="relative py-20 px-4" id="about">
       <div className="container mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4">
             <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
@@ -49,11 +49,11 @@ export const AboutSection = React.memo(() => {
             return (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="relative group"
+                initial={{ opacity: 0, y: 30 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileInView={{ opacity: 1, y: 0 }}
               >
                 <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500 h-full">
                   {/* Icon */}
@@ -81,11 +81,11 @@ export const AboutSection = React.memo(() => {
 
         {/* Story Section */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="relative"
+          initial={{ opacity: 0, y: 30 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
         >
           <div className="p-8 md:p-12 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
             {/* Background Decoration */}

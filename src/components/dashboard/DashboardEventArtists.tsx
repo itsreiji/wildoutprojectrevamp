@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit, MoreHorizontal } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import {
   DropdownMenu,
@@ -22,8 +22,6 @@ import {
 import { useContent } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import type { EventArtist } from '@/types/content';
-import type { TablesInsert, TablesUpdate } from '@/supabase/types';
-import { supabaseClient } from '@/supabase/client';
 
 interface EventArtistFormData {
   event_id: string;
@@ -123,16 +121,16 @@ export const DashboardEventArtists = () => {
               <SelectValue placeholder="Select Event" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all" className="cursor-pointer">All Events</SelectItem>
+              <SelectItem className="cursor-pointer" value="all">All Events</SelectItem>
               {events.map((event) => (
-                <SelectItem key={event.id} value={event.id!} className="cursor-pointer">
+                <SelectItem key={event.id} className="cursor-pointer" value={event.id!}>
                   {event.title || 'Untitled Event'}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)} className="bg-[#E93370] hover:bg-[#E93370]/90">
+        <Button className="bg-[#E93370] hover:bg-[#E93370]/90" onClick={() => setIsDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Add Artist
         </Button>
       </div>
@@ -156,7 +154,7 @@ export const DashboardEventArtists = () => {
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
+                    <Button className="h-8 w-8 p-0" variant="ghost">
                       <span className="sr-only">Open menu</span>
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
@@ -164,16 +162,16 @@ export const DashboardEventArtists = () => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuItem
-                      onClick={() => handleEdit(artist)}
                       className="cursor-pointer"
+                      onClick={() => handleEdit(artist)}
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onClick={() => handleDelete(artist.id!)}
                       className="text-red-500 cursor-pointer"
+                      onClick={() => handleDelete(artist.id!)}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
@@ -201,7 +199,7 @@ export const DashboardEventArtists = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {events.map((event) => (
-                      <SelectItem key={event.id} value={event.id!} className="cursor-pointer">
+                      <SelectItem key={event.id} className="cursor-pointer" value={event.id!}>
                         {event.title || 'Untitled Event'}
                       </SelectItem>
                     ))}
@@ -214,7 +212,7 @@ export const DashboardEventArtists = () => {
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Saving...' : 'Save'}</Button>
+              <Button disabled={isSubmitting} type="submit">{isSubmitting ? 'Saving...' : 'Save'}</Button>
             </div>
           </form>
         </DialogContent>

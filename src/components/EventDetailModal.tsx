@@ -22,10 +22,10 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
         <>
           {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
             onClick={onClose}
           />
 
@@ -33,17 +33,17 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
           <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4 md:p-8">
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                transition={{ duration: 0.3 }}
                 className="relative w-full max-w-6xl bg-black/95 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden my-8 max-h-[90vh] flex flex-col"
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.3 }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Close Button - Fixed Position */}
                 <button
-                  onClick={onClose}
                   className="sticky top-4 right-4 z-20 ml-auto mr-4 mt-4 w-12 h-12 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-[#E93370] hover:border-[#E93370] transition-all duration-300 shadow-lg"
+                  onClick={onClose}
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -54,9 +54,9 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                   {/* Hero Image */}
                   <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
                     <ImageWithFallback
-                      src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : undefined) || undefined}
                       alt={event.title || 'Event'}
                       className="w-full h-full object-cover"
+                      src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : undefined) || undefined}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
@@ -107,10 +107,10 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                             : Number(event.price)
                         ) : 'Free'}
                       </Button>
-                      <Button variant="outline" className="border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl">
+                      <Button className="border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl" variant="outline">
                         <Heart className="h-5 w-5" />
                       </Button>
-                      <Button variant="outline" className="border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl">
+                      <Button className="border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl" variant="outline">
                         <Share2 className="h-5 w-5" />
                       </Button>
                     </div>
@@ -153,9 +153,9 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                               >
                                 <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                                   <ImageWithFallback
-                                    src={artist.image}
                                     alt={artist.name}
                                     className="w-full h-full object-cover"
+                                    src={artist.image}
                                   />
                                 </div>
                                 <div>
@@ -178,9 +178,9 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                                   className="aspect-square rounded-2xl overflow-hidden border border-white/10"
                                 >
                                   <ImageWithFallback
-                                    src={String(image)}
                                     alt={`Gallery ${index + 1}`}
                                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                                    src={String(image)}
                                   />
                                 </div>
                               ))}
@@ -202,8 +202,8 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
                             <div className="text-sm text-white/60">{event.venueAddress}</div>
                           </div>
                           <Button
-                            variant="outline"
                             className="w-full border-[#E93370]/50 text-white hover:bg-[#E93370]/10 rounded-xl"
+                            variant="outline"
                           >
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Get Directions

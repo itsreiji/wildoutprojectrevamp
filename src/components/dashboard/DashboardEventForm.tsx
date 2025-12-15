@@ -180,18 +180,18 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
 
   return (
     <Form {...form}>
-      <form id="admin-event-form" onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+      <form className="space-y-6" id="admin-event-form" onSubmit={form.handleSubmit(handleFormSubmit)}>
         <div className="space-y-6">
           {/* Basic Info */}
-          <div id="admin-event-form-basic-info" className="space-y-4">
-            <h3 id="admin-event-form-basic-info-title" className="text-lg font-medium text-white/90">Basic Information</h3>
+          <div className="space-y-4" id="admin-event-form-basic-info">
+            <h3 className="text-lg font-medium text-white/90" id="admin-event-form-basic-info-title">Basic Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
               <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem id="admin-event-form-title-field">
-                    <FormLabel htmlFor="admin-event-form-title-input" className="text-white/80 text-sm font-medium">
+                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-title-input">
                       Event Title <span className="text-[#E93370]">*</span>
                     </FormLabel>
                     <FormControl>
@@ -202,7 +202,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
                       />
                     </FormControl>
-                    <FormMessage id="admin-event-form-title-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-title-error" />
                   </FormItem>
                 )}
               />
@@ -211,16 +211,16 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="category"
                 render={({ field }) => (
                   <FormItem id="admin-event-form-category-field">
-                    <FormLabel htmlFor="admin-event-form-category-select" className="text-white/80 text-sm font-medium">
+                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-category-select">
                       Category <span className="text-[#E93370]">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select defaultValue={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger id="admin-event-form-category-select" className="h-11 w-full relative z-10">
-                          <SelectValue placeholder="Select a category" className="capitalize" />
+                        <SelectTrigger className="h-11 w-full relative z-10" id="admin-event-form-category-select">
+                          <SelectValue className="capitalize" placeholder="Select a category" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent position="popper" className="z-50">
+                      <SelectContent className="z-50" position="popper">
                         <SelectItem value="music">Music</SelectItem>
                         <SelectItem value="sports">Sports</SelectItem>
                         <SelectItem value="arts">Arts</SelectItem>
@@ -234,7 +234,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage id="admin-event-form-category-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-category-error" />
                   </FormItem>
                 )}
               />
@@ -244,18 +244,18 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem id="admin-event-form-description-field" className="md:col-span-2">
-                  <FormLabel htmlFor="admin-event-form-description-input" className="text-white/80 text-sm font-medium">Description</FormLabel>
+                <FormItem className="md:col-span-2" id="admin-event-form-description-field">
+                  <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-description-input">Description</FormLabel>
                   <FormControl>
                     <Textarea
                       id="admin-event-form-description-input"
                       placeholder="Enter event description"
                       {...field}
-                      value={field.value ?? ''}
                       className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                      value={field.value ?? ''}
                     />
                   </FormControl>
-                  <FormMessage id="admin-event-form-description-error" className="text-[#E93370] text-sm mt-1" />
+                  <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-description-error" />
                 </FormItem>
               )}
             />
@@ -265,19 +265,19 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="featured_image_file"
                 render={({ field }) => (
                   <FormItem id="admin-event-form-featured-image-field">
-                    <FormLabel htmlFor="admin-event-form-featured-image-input" className="text-white/80 text-sm font-medium">Featured Image</FormLabel>
+                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-featured-image-input">Featured Image</FormLabel>
                     <FormControl>
                       <div className="relative z-0">
                         <Input
+                          accept="image/*"
+                          className="h-11 w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors file:bg-white/5 file:border-white/10 file:text-white/80 file:hover:bg-white/10 file:hover:border-white/20 file:focus:outline-none file:focus:ring-1 file:focus:ring-[#E93370]/50 file:transition-colors file:cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-white/10 file:text-sm file:font-medium"
                           id="admin-event-form-featured-image-input"
                           type="file"
-                          accept="image/*"
                           onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
-                          className="h-11 w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors file:bg-white/5 file:border-white/10 file:text-white/80 file:hover:bg-white/10 file:hover:border-white/20 file:focus:outline-none file:focus:ring-1 file:focus:ring-[#E93370]/50 file:transition-colors file:cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-white/10 file:text-sm file:font-medium"
                         />
                       </div>
                     </FormControl>
-                    <FormMessage id="admin-event-form-featured-image-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-featured-image-error" />
                   </FormItem>
                 )}
               />
@@ -286,20 +286,20 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="gallery_images_files"
                 render={({ field }) => (
                   <FormItem id="admin-event-form-gallery-images-field">
-                    <FormLabel htmlFor="admin-event-form-gallery-images-input" className="text-white/80 text-sm font-medium">Gallery Images</FormLabel>
+                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-gallery-images-input">Gallery Images</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
+                          multiple
+                          accept="image/*"
+                          className="h-11 w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors file:bg-white/5 file:border-white/10 file:text-white/80 file:hover:bg-white/10 file:hover:border-white/20 file:focus:outline-none file:focus:ring-1 file:focus:ring-[#E93370]/50 file:transition-colors file:cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-white/10 file:text-sm file:font-medium"
                           id="admin-event-form-gallery-images-input"
                           type="file"
-                          accept="image/*"
-                          multiple
                           onChange={(e) => field.onChange(e.target.files)}
-                          className="h-11 w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors file:bg-white/5 file:border-white/10 file:text-white/80 file:hover:bg-white/10 file:hover:border-white/20 file:focus:outline-none file:focus:ring-1 file:focus:ring-[#E93370]/50 file:transition-colors file:cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-white/10 file:text-sm file:font-medium"
                         />
                       </div>
                     </FormControl>
-                    <FormMessage id="admin-event-form-gallery-images-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-gallery-images-error" />
                   </FormItem>
                 )}
               />
@@ -307,15 +307,15 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
           </div>
 
           {/* Date & Time */}
-          <div id="admin-event-form-date-time" className="space-y-4">
-            <h3 id="admin-event-form-date-time-title" className="text-lg font-medium text-white/90">Date & Time</h3>
+          <div className="space-y-4" id="admin-event-form-date-time">
+            <h3 className="text-lg font-medium text-white/90" id="admin-event-form-date-time-title">Date & Time</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="start_date"
                 render={({ field }) => (
                   <FormItem id="admin-event-form-start-date-field">
-                    <FormLabel htmlFor="admin-event-form-start-date-input" className="text-white/80 text-sm font-medium">
+                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-start-date-input">
                       Start Date <span className="text-[#E93370]">*</span>
                     </FormLabel>
                     <FormControl>
@@ -324,16 +324,16 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                           id="admin-event-form-start-date-input"
                           type="date"
                           {...field}
-                          value={field.value || ''}
-                          min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
                           className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+                          min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
+                          value={field.value || ''}
                         />
                       </div>
                     </FormControl>
-                    <FormDescription id="admin-event-form-start-date-description" className="text-white/60 text-xs mt-1">
+                    <FormDescription className="text-white/60 text-xs mt-1" id="admin-event-form-start-date-description">
                       Event start date (local timezone)
                     </FormDescription>
-                    <FormMessage id="admin-event-form-start-date-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-start-date-error" />
                   </FormItem>
                 )}
               />
@@ -342,7 +342,7 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="end_date"
                 render={({ field }) => (
                   <FormItem id="admin-event-form-end-date-field">
-                    <FormLabel htmlFor="admin-event-form-end-date-input" className="text-white/80 text-sm font-medium">
+                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-end-date-input">
                       End Date <span className="text-[#E93370]">*</span>
                     </FormLabel>
                     <FormControl>
@@ -351,16 +351,16 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                           id="admin-event-form-end-date-input"
                           type="date"
                           {...field}
-                          value={field.value || ''}
-                          min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
                           className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+                          min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
+                          value={field.value || ''}
                         />
                       </div>
                     </FormControl>
-                    <FormDescription id="admin-event-form-end-date-description" className="text-white/60 text-xs mt-1">
+                    <FormDescription className="text-white/60 text-xs mt-1" id="admin-event-form-end-date-description">
                       Event end date (local timezone)
                     </FormDescription>
-                    <FormMessage id="admin-event-form-end-date-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-end-date-error" />
                   </FormItem>
                 )}
               />
@@ -371,19 +371,19 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
               control={form.control}
               name="status"
               render={({ field }) => (
-                <FormItem id="admin-event-form-status-field" className="w-full">
-                  <FormLabel htmlFor="admin-event-form-status-select" className="text-white/80 text-sm font-medium">
+                <FormItem className="w-full" id="admin-event-form-status-field">
+                  <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-status-select">
                     Status <span className="text-[#E93370]">*</span>
                   </FormLabel>
                   <div className="w-full">
                     <Select
+                      defaultValue={field.value}
                       value={field.value}
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger id="admin-event-form-status-select" className="h-11 w-full">
-                          <SelectValue placeholder="Select status" className="capitalize" />
+                        <SelectTrigger className="h-11 w-full" id="admin-event-form-status-select">
+                          <SelectValue className="capitalize" placeholder="Select status" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent position="popper">
@@ -398,32 +398,32 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                       </SelectContent>
                     </Select>
                   </div>
-                  <FormMessage id="admin-event-form-status-error" className="text-[#E93370] text-sm mt-1" />
+                  <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-status-error" />
                 </FormItem>
               )}
             />
           </div>
 
           {/* Venue */}
-          <div id="admin-event-form-venue" className="space-y-4">
-            <h3 id="admin-event-form-venue-title" className="text-lg font-medium text-white/90">Venue Information</h3>
+          <div className="space-y-4" id="admin-event-form-venue">
+            <h3 className="text-lg font-medium text-white/90" id="admin-event-form-venue-title">Venue Information</h3>
             <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="location"
                 render={({ field }) => (
                   <FormItem id="admin-event-form-location-field">
-                    <FormLabel htmlFor="admin-event-form-location-input" className="text-white/80 text-sm font-medium">Venue Name</FormLabel>
+                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="admin-event-form-location-input">Venue Name</FormLabel>
                     <FormControl>
                       <Input
                         id="admin-event-form-location-input"
                         placeholder="Enter venue name"
                         {...field}
-                        value={field.value ?? ''}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                        value={field.value ?? ''}
                       />
                     </FormControl>
-                    <FormMessage id="admin-event-form-location-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-location-error" />
                   </FormItem>
                 )}
               />
@@ -431,8 +431,8 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
           </div>
 
           {/* Capacity & Pricing */}
-          <div id="admin-event-form-capacity" className="space-y-4">
-            <h3 id="admin-event-form-capacity-title" className="text-lg font-medium text-white/90">Capacity & Pricing</h3>
+          <div className="space-y-4" id="admin-event-form-capacity">
+            <h3 className="text-lg font-medium text-white/90" id="admin-event-form-capacity-title">Capacity & Pricing</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -442,19 +442,19 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                     <FormLabel className="text-white/80 text-sm font-medium">Capacity</FormLabel>
                     <FormControl>
                       <Input
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         id="admin-event-form-capacity-input"
-                        type="number"
                         min="0"
                         placeholder="e.g., 500"
+                        type="number"
                         value={field.value ?? ''}
                         onChange={(e) => {
                           const nextValue = e.target.value === '' ? null : Number(e.target.value);
                           field.onChange(nextValue);
                         }}
-                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                     </FormControl>
-                    <FormMessage id="admin-event-form-capacity-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-capacity-error" />
                   </FormItem>
                 )}
               />
@@ -469,11 +469,11 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                         id="admin-event-form-price-input"
                         placeholder="e.g., IDR 250K - 500K"
                         {...field}
-                        value={field.value ?? ''}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                        value={field.value ?? ''}
                       />
                     </FormControl>
-                    <FormMessage id="admin-event-form-price-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-price-error" />
                   </FormItem>
                 )}
               />
@@ -481,18 +481,18 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 control={form.control}
                 name="ticket_url"
                 render={({ field }) => (
-                  <FormItem id="admin-event-form-ticket-field" className="md:col-span-2">
+                  <FormItem className="md:col-span-2" id="admin-event-form-ticket-field">
                     <FormLabel className="text-white/80 text-sm font-medium">Ticket URL</FormLabel>
                     <FormControl>
                       <Input
                         id="admin-event-form-ticket-input"
                         placeholder="https://example.com/tickets"
                         {...field}
-                        value={field.value ?? ''}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                        value={field.value ?? ''}
                       />
                     </FormControl>
-                    <FormMessage id="admin-event-form-ticket-error" className="text-[#E93370] text-sm mt-1" />
+                    <FormMessage className="text-[#E93370] text-sm mt-1" id="admin-event-form-ticket-error" />
                   </FormItem>
                 )}
               />
@@ -501,33 +501,33 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
 
         </div>
 
-        <div id="admin-event-form-actions" className="flex justify-end space-x-3 pt-4 border-t border-white/10">
+        <div className="flex justify-end space-x-3 pt-4 border-t border-white/10" id="admin-event-form-actions">
           <Button
+            className="h-11 px-6 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
+            disabled={isSubmitting}
             id="admin-event-form-cancel-button"
+            size="lg"
             type="button"
             variant="outline"
-            size="lg"
             onClick={() => {
               form.reset(getDefaultValues());
               onCancel?.();
             }}
-            disabled={isSubmitting}
-            className="h-11 px-6 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
           >
             Cancel
           </Button>
           <Button
-            id="admin-event-form-submit-button"
-            type="submit"
-            size="lg"
-            disabled={isSubmitting}
             className="h-11 px-6 bg-[#E93370] hover:bg-[#E93370]/90 text-white font-medium transition-colors"
+            disabled={isSubmitting}
+            id="admin-event-form-submit-button"
+            size="lg"
+            type="submit"
           >
             {isSubmitting ? (
               <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <path className="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
                 </svg>
                 Saving...
               </>

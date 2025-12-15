@@ -16,15 +16,15 @@ export const EventsSection = React.memo(() => {
 
   return (
     <>
-      <section id="events" className="relative py-20 px-4">
+      <section className="relative py-20 px-4" id="events">
         <div className="container mx-auto max-w-7xl">
           {/* Section Header */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
             className="text-center mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            whileInView={{ opacity: 1, y: 0 }}
           >
             <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4">
               <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
@@ -35,9 +35,9 @@ export const EventsSection = React.memo(() => {
               Discover the hottest events in Indonesia's creative scene
             </p>
             <Button
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
               id="events-view-all-button"
               onClick={() => navigate('/events')}
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
             >
               View All Events
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -45,43 +45,43 @@ export const EventsSection = React.memo(() => {
           </motion.div>
 
           {/* Events Grid */}
-          <div id="events-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8" id="events-grid">
             {events.filter(e => e.status === 'upcoming').slice(0, 4).map((event, index) => (
               <motion.div
-                id={`events-item-${event.id}`}
                 key={event.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="group relative"
+                id={`events-item-${event.id}`}
+                initial={{ opacity: 0, y: 30 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileInView={{ opacity: 1, y: 0 }}
               >
-                <div id={`events-item-${event.id}-card`} className="relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500">
+                <div className="relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500" id={`events-item-${event.id}-card`}>
                   {/* Event Image */}
                   <div className="relative h-64 overflow-hidden">
                     <ImageWithFallback
-                      id={`events-item-${event.id}-image`}
-                      src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : undefined) || undefined}
                       alt={event.title || 'Event'}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      id={`events-item-${event.id}-image`}
+                      src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : undefined) || undefined}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
                     {/* Category Badge */}
-                    <Badge id={`events-item-${event.id}-category-badge`} className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0">
+                    <Badge className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0" id={`events-item-${event.id}-category-badge`}>
                       {event.category}
                     </Badge>
 
                     {/* Capacity Indicator */}
-                    <div id={`events-item-${event.id}-capacity-indicator`} className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90">
+                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90" id={`events-item-${event.id}-capacity-indicator`}>
                       <Users className="inline h-4 w-4 mr-1" />
                       {event.attendees}/{event.capacity}
                     </div>
                   </div>
 
                   {/* Event Info */}
-                  <div id={`events-item-${event.id}-info`} className="p-6 space-y-4">
-                    <h3 id={`events-item-${event.id}-title`} className="text-2xl text-white group-hover:text-[#E93370] transition-colors duration-300">
+                  <div className="p-6 space-y-4" id={`events-item-${event.id}-info`}>
+                    <h3 className="text-2xl text-white group-hover:text-[#E93370] transition-colors duration-300" id={`events-item-${event.id}-title`}>
                       {event.title}
                     </h3>
 
@@ -131,9 +131,9 @@ export const EventsSection = React.memo(() => {
                               className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
                             >
                               <ImageWithFallback
-                                src={artist?.image || undefined}
                                 alt={artist?.name || 'Artist'}
                                 className="w-full h-full object-cover"
+                                src={artist?.image || undefined}
                               />
                             </div>
                           ))}
@@ -146,8 +146,8 @@ export const EventsSection = React.memo(() => {
 
                     {/* CTA Button */}
                     <Button
-                      id={`events-item-${event.id}-details-button`}
                       className="w-full bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
+                      id={`events-item-${event.id}-details-button`}
                       onClick={() => setSelectedEvent(event as LandingEvent)}
                     >
                       View Details

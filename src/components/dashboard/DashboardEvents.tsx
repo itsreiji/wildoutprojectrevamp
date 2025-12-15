@@ -68,7 +68,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { DashboardEventForm, EventFormValues } from "./DashboardEventForm";
+import { DashboardEventForm, type EventFormValues } from "./DashboardEventForm";
 
 /**
  * DashboardEvents component for managing event CRUD operations
@@ -446,23 +446,23 @@ export const DashboardEvents = () => {
 
   return (
     <div
-      id="admin-events-container"
       className="space-y-6"
       data-testid="dashboard-events"
+      id="admin-events-container"
     >
       <div className="flex flex-col space-y-4">
         <div id="admin-events-header">
           <h2
-            id="admin-events-title"
             className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent"
             data-testid="events-page-title"
+            id="admin-events-title"
           >
             Event Management
           </h2>
           <p
-            id="admin-events-subtitle"
             className="text-white/60"
             data-testid="events-page-subtitle"
+            id="admin-events-subtitle"
           >
             Create and manage events - changes sync to landing page instantly
           </p>
@@ -470,29 +470,29 @@ export const DashboardEvents = () => {
 
         {/* Header with Bulk Actions */}
         <div
-          id="admin-events-actions-header"
           className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+          id="admin-events-actions-header"
         >
           <div
-            id="admin-events-actions-container"
             className="flex items-center gap-3"
+            id="admin-events-actions-container"
           >
             {selectedEvents.size > 0 && (
               <Button
-                id="admin-events-bulk-delete-button"
-                onClick={handleBulkDelete}
-                disabled={isDeleting}
                 className="bg-[#E9370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
                 data-testid="events-bulk-delete-button"
+                disabled={isDeleting}
+                id="admin-events-bulk-delete-button"
+                onClick={handleBulkDelete}
               >
                 <Trash2
-                  id="admin-events-bulk-delete-icon"
                   className="mr-2 h-4 w-4"
                   data-testid="events-bulk-delete-icon"
+                  id="admin-events-bulk-delete-icon"
                 />
                 <span
-                  id="admin-events-bulk-delete-text"
                   data-testid="events-bulk-delete-text"
+                  id="admin-events-bulk-delete-text"
                 >
                   Delete {selectedEvents.size}{" "}
                   {selectedEvents.size === 1 ? "Event" : "Events"}
@@ -500,19 +500,19 @@ export const DashboardEvents = () => {
               </Button>
             )}
             <Button
-              id="admin-events-create-event-button"
-              onClick={handleCreate}
               className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
               data-testid="events-create-event-button"
+              id="admin-events-create-event-button"
+              onClick={handleCreate}
             >
               <Plus
-                id="admin-events-create-event-icon"
                 className="mr-2 h-4 w-4"
                 data-testid="events-create-event-icon"
+                id="admin-events-create-event-icon"
               />
               <span
-                id="admin-events-create-event-text"
                 data-testid="events-create-event-text"
+                id="admin-events-create-event-text"
               >
                 Create Event
               </span>
@@ -522,25 +522,25 @@ export const DashboardEvents = () => {
 
         {/* Search Bar */}
         <div
-          id="admin-events-search-container"
           className="relative"
           data-testid="events-search-container"
+          id="admin-events-search-container"
         >
           <Search
-            id="admin-events-search-icon"
             className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40"
             data-testid="events-search-icon"
+            id="admin-events-search-icon"
           />
           <Input
-            id="admin-events-search-input"
-            type="text"
+            className="pl-12 pr-4 py-6 bg-white/5 border-white/10 focus-visible:ring-[#E9370] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             data-testid="events-event-search-input"
+            id="admin-events-search-input"
             placeholder="Search events by name or category..."
+            type="text"
             value={searchQuery}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setSearchQuery(e.target.value)
             }
-            className="pl-12 pr-4 py-6 bg-white/5 border-white/10 focus-visible:ring-[#E9370] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           />
         </div>
 
@@ -565,9 +565,9 @@ export const DashboardEvents = () => {
                         paginatedEvents.length > 0 &&
                         selectedEvents.size === paginatedEvents.length
                       }
-                      onCheckedChange={handleSelectAll}
                       className="border-white/30 h-4 w-4 flex-shrink-0"
                       data-testid="events-select-all-checkbox"
+                      onCheckedChange={handleSelectAll}
                     />
                   </div>
                 </TableHead>
@@ -576,11 +576,11 @@ export const DashboardEvents = () => {
                   data-testid="events-event-name-header"
                 >
                   <Button
-                    variant="ghost"
-                    size="sm"
                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                    onClick={() => handleSort("title")}
                     data-testid="events-sort-by-title-button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleSort("title")}
                   >
                     <span data-testid="events-title-header-text">
                       Event Name
@@ -596,11 +596,11 @@ export const DashboardEvents = () => {
                   data-testid="events-date-time-header"
                 >
                   <Button
-                    variant="ghost"
-                    size="sm"
                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                    onClick={() => handleSort("start_date")}
                     data-testid="events-sort-by-date-button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleSort("start_date")}
                   >
                     <span data-testid="events-date-header-text">
                       Date & Time
@@ -616,11 +616,11 @@ export const DashboardEvents = () => {
                   data-testid="events-venue-header"
                 >
                   <Button
-                    variant="ghost"
-                    size="sm"
                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                    onClick={() => handleSort("location")}
                     data-testid="events-sort-by-location-button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleSort("location")}
                   >
                     <span data-testid="events-venue-header-text">Venue</span>
                     <ArrowUpDown
@@ -634,11 +634,11 @@ export const DashboardEvents = () => {
                   data-testid="events-category-header"
                 >
                   <Button
-                    variant="ghost"
-                    size="sm"
                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                    onClick={() => handleSort("category")}
                     data-testid="events-sort-by-category-button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleSort("category")}
                   >
                     <span data-testid="events-category-header-text">
                       Category
@@ -662,11 +662,11 @@ export const DashboardEvents = () => {
                   data-testid="events-status-header"
                 >
                   <Button
-                    variant="ghost"
-                    size="sm"
                     className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
-                    onClick={() => handleSort("status")}
                     data-testid="events-sort-by-status-button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleSort("status")}
                   >
                     <span data-testid="events-status-header-text">Status</span>
                     <ArrowUpDown
@@ -688,8 +688,8 @@ export const DashboardEvents = () => {
                 <TableRow
                   key={event.id}
                   className="border-white/10 hover:bg-white/5"
-                  data-testid={`events-event-row-${event.id}`}
                   data-event-id={event.id}
+                  data-testid={`events-event-row-${event.id}`}
                 >
                   <TableCell
                     className="py-3 pl-5 pr-0"
@@ -698,11 +698,11 @@ export const DashboardEvents = () => {
                     <div className="flex items-center justify-start w-4">
                       <Checkbox
                         checked={selectedEvents.has(event.id)}
+                        className="border-white/30 h-4 w-4 flex-shrink-0"
+                        data-testid={`events-select-event-checkbox-${event.id}`}
                         onCheckedChange={(checked) =>
                           handleSelectEvent(event.id, checked as boolean)
                         }
-                        className="border-white/30 h-4 w-4 flex-shrink-0"
-                        data-testid={`events-select-event-checkbox-${event.id}`}
                       />
                     </div>
                   </TableCell>
@@ -846,10 +846,10 @@ export const DashboardEvents = () => {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          variant="ghost"
-                          size="icon"
                           className="h-8 w-8 p-0 hover:bg-white/10"
                           data-testid={`events-event-actions-button-${event.id}`}
+                          size="icon"
+                          variant="ghost"
                         >
                           <MoreHorizontal
                             className="h-4 w-4 text-white/60"
@@ -863,9 +863,9 @@ export const DashboardEvents = () => {
                         data-testid={`events-event-actions-menu-${event.id}`}
                       >
                         <DropdownMenuItem
-                          onClick={() => handleEdit(event)}
                           className="cursor-pointer hover:bg-gray-80"
                           data-testid="events-edit-event-action"
+                          onClick={() => handleEdit(event)}
                         >
                           <Edit
                             className="mr-2 h-4 w-4"
@@ -874,9 +874,9 @@ export const DashboardEvents = () => {
                           <span data-testid="events-edit-text">Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDelete(event.id)}
                           className="cursor-pointer text-red-400 hover:bg-red-500/10"
                           data-testid="events-delete-event-action"
+                          onClick={() => handleDelete(event.id)}
                         >
                           <Trash2
                             className="mr-2 h-4 w-4"
@@ -933,12 +933,12 @@ export const DashboardEvents = () => {
             data-testid="events-pagination-controls"
           >
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
               className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
               data-testid="events-previous-page-button"
+              disabled={currentPage === 1}
+              size="sm"
+              variant="outline"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             >
               Previous
             </Button>
@@ -952,24 +952,27 @@ export const DashboardEvents = () => {
               ).map((page) => (
                 <Button
                   key={page}
-                  variant={currentPage === page ? "outline" : "ghost"}
-                  size="sm"
                   className={`h-8 w-8 p-0 ${
                     currentPage === page
                       ? "bg-white/10 border-white/20 text-white"
                       : "text-white/60 hover:bg-white/5"
                   }`}
-                  onClick={() => setCurrentPage(page)}
-                  data-testid={`events-page-button-${page}`}
                   data-active={currentPage === page}
+                  data-testid={`events-page-button-${page}`}
+                  size="sm"
+                  variant={currentPage === page ? "outline" : "ghost"}
+                  onClick={() => setCurrentPage(page)}
                 >
                   {page}
                 </Button>
               ))}
             </div>
             <Button
-              variant="outline"
+              className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
+              data-testid="events-next-page-button"
+              disabled={currentPage * itemsPerPage >= filteredEvents.length}
               size="sm"
+              variant="outline"
               onClick={() =>
                 setCurrentPage((p) =>
                   Math.min(
@@ -978,9 +981,6 @@ export const DashboardEvents = () => {
                   )
                 )
               }
-              disabled={currentPage * itemsPerPage >= filteredEvents.length}
-              className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
-              data-testid="events-next-page-button"
             >
               Next
             </Button>
@@ -1002,11 +1002,11 @@ export const DashboardEvents = () => {
               </DialogTitle>
             </DialogHeader>
             <DashboardEventForm
-              defaultValues={editingEvent || undefined}
-              onSubmit={handleSubmit}
-              onCancel={() => setIsDialogOpen(false)}
-              isSubmitting={isSubmitting}
               data-testid="events-dashboard-event-form"
+              defaultValues={editingEvent || undefined}
+              isSubmitting={isSubmitting}
+              onCancel={() => setIsDialogOpen(false)}
+              onSubmit={handleSubmit}
             />
           </DialogContent>
         </Dialog>
@@ -1035,16 +1035,16 @@ export const DashboardEvents = () => {
             <AlertDialogFooter>
               <AlertDialogCancel
                 className="bg-transparent border-gray-700 text-white hover:bg-gray-800"
-                disabled={isDeleting}
                 data-testid="events-cancel-delete-button"
+                disabled={isDeleting}
               >
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
                 className="bg-red-600 hover:bg-red-70 text-white"
-                onClick={() => deletingEventId && handleDelete(deletingEventId)}
-                disabled={isDeleting}
                 data-testid="events-confirm-delete-button"
+                disabled={isDeleting}
+                onClick={() => deletingEventId && handleDelete(deletingEventId)}
               >
                 {isDeleting ? "Deleting..." : "Delete"}
               </AlertDialogAction>

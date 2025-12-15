@@ -97,7 +97,7 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
                 control={form.control}
                 name="email"
@@ -124,8 +124,8 @@ export const RegisterPage: React.FC = () => {
                     <FormLabel className="text-white/90">{copy.passwordLabel}</FormLabel>
                     <FormControl>
                       <Input
-                        type="password"
                         placeholder="••••••••"
+                        type="password"
                         {...field}
                         className="rounded-2xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
                       />
@@ -143,8 +143,8 @@ export const RegisterPage: React.FC = () => {
                     <FormLabel className="text-white/90">{copy.confirmPasswordLabel}</FormLabel>
                     <FormControl>
                       <Input
-                        type="password"
                         placeholder="••••••••"
+                        type="password"
                         {...field}
                         className="rounded-2xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
                       />
@@ -173,9 +173,9 @@ export const RegisterPage: React.FC = () => {
               )}
 
               <Button
-                type="submit"
-                disabled={loading}
                 className="w-full rounded-2xl bg-[#E93370] hover:bg-[#E93370]/90 text-white h-auto py-4 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-xl"
+                disabled={loading}
+                type="submit"
               >
                 {loading ? (
                   <>
@@ -199,10 +199,10 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           <Button
+            className="w-full rounded-2xl border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] text-white h-auto py-4 text-sm font-medium transition-all duration-300 backdrop-blur-xl"
             type="button"
             variant="outline"
             onClick={handleSignIn}
-            className="w-full rounded-2xl border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] text-white h-auto py-4 text-sm font-medium transition-all duration-300 backdrop-blur-xl"
           >
             {copy.signIn}
           </Button>

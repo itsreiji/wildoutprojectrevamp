@@ -30,15 +30,15 @@ export const GallerySection = React.memo(() => {
 
   const displayImages = filteredGallery.slice(0, 6);
   return (
-    <section id="gallery-section" className="relative py-20 px-4">
+    <section className="relative py-20 px-4" id="gallery-section">
       <div className="container mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4">
             <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
@@ -72,17 +72,17 @@ export const GallerySection = React.memo(() => {
           {displayImages.map((image, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
               className={`${SPAN_PATTERNS[index % SPAN_PATTERNS.length]} group relative overflow-hidden rounded-2xl`}
+              initial={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
+              viewport={{ once: true }}
+              whileInView={{ opacity: 1, scale: 1 }}
             >
               <div className="relative w-full h-full">
                 <ImageWithFallback
-                  src={image.image_url}
                   alt={image.title || image.description || 'Gallery image'}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  src={image.image_url}
                 />
 
                 {/* Overlay */}
@@ -104,31 +104,31 @@ export const GallerySection = React.memo(() => {
 
         {/* View More CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="text-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
         >
           <p className="text-white/60 mb-4">
             Want to see more? Follow us on social media for daily updates
           </p>
           <div className="flex justify-center gap-4">
             <a
-              href="#"
               className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
+              href="#"
             >
               Instagram
             </a>
             <a
-              href="#"
               className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
+              href="#"
             >
               TikTok
             </a>
             <a
-              href="#"
               className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
+              href="#"
             >
               Twitter
             </a>

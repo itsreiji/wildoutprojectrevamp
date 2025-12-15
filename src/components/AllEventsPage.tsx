@@ -22,11 +22,11 @@ const AllEventsPage = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">All Events</h1>
       <Input
-        type="text"
+        className="mb-6 max-w-md"
         placeholder="Search events..."
+        type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-6 max-w-md"
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEvents.map((event) => (

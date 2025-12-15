@@ -35,7 +35,7 @@ import {
   PaginationPrevious,
 } from '../ui/pagination';
 import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent } from '../ui/card';
 import { useAudit } from '../../contexts/AuditContext';
 import type { AuditLog } from '../../contexts/AuditContext';
 
@@ -44,8 +44,8 @@ const ACTIONS = ['INSERT', 'UPDATE', 'DELETE'] as const;
 
 const getActionBadge = (action: string) => {
   switch (action) {
-    case 'INSERT': return <Badge variant="default" className="bg-green-500/20 border-green-500/30 text-green-400"><Zap className="h-3 w-3 mr-1" />{action}</Badge>;
-    case 'UPDATE': return <Badge variant="default" className="bg-blue-500/20 border-blue-500/30 text-blue-400"><Edit3 className="h-3 w-3 mr-1" />{action}</Badge>;
+    case 'INSERT': return <Badge className="bg-green-500/20 border-green-500/30 text-green-400" variant="default"><Zap className="h-3 w-3 mr-1" />{action}</Badge>;
+    case 'UPDATE': return <Badge className="bg-blue-500/20 border-blue-500/30 text-blue-400" variant="default"><Edit3 className="h-3 w-3 mr-1" />{action}</Badge>;
     case 'DELETE': return <Badge variant="destructive"><Trash2 className="h-3 w-3 mr-1" />{action}</Badge>;
     default: return <Badge>{action}</Badge>;
   }
@@ -128,12 +128,12 @@ export const DashboardAuditLog = () => {
             </SelectContent>
           </Select>
           <Input
+            className="w-[160px]"
             placeholder="User ID"
             value={filters.user_id || ''}
             onChange={(e) => setFilters({ ...filters, user_id: e.target.value || undefined })}
-            className="w-[160px]"
           />
-          <Button variant="outline" onClick={handleFetch} size="sm">
+          <Button size="sm" variant="outline" onClick={handleFetch}>
             Filter
           </Button>
         </div>
@@ -176,7 +176,7 @@ export const DashboardAuditLog = () => {
             ))}
             {auditLogs.length === 0 && !loading && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-16 text-white/40 h-32">
+                <TableCell className="text-center py-16 text-white/40 h-32" colSpan={5}>
                   No audit logs match the current filters
                 </TableCell>
               </TableRow>
@@ -189,9 +189,9 @@ export const DashboardAuditLog = () => {
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious 
+              className={pageIndex === 0 ? 'pointer-events-none opacity-50' : ''}
               href="#"
               onClick={() => handlePageChange(Math.max(0, pageIndex - 1))}
-              className={pageIndex === 0 ? 'pointer-events-none opacity-50' : ''}
             />
           </PaginationItem>
           {Array.from({ length: Math.min(pageCount, 7) }, (_, i) => {
@@ -214,9 +214,9 @@ export const DashboardAuditLog = () => {
           {pageCount > 7 && <PaginationItem><PaginationEllipsis /></PaginationItem>}
           <PaginationItem>
             <PaginationNext 
+              className={pageIndex === pageCount - 1 ? 'pointer-events-none opacity-50' : ''}
               href="#"
               onClick={() => handlePageChange(Math.min(pageCount - 1, pageIndex + 1))}
-              className={pageIndex === pageCount - 1 ? 'pointer-events-none opacity-50' : ''}
             />
           </PaginationItem>
         </PaginationContent>
