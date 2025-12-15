@@ -12,6 +12,13 @@ CREATE TABLE kv_store_41a567c3 (
 // This file provides a simple key-value interface for storing Figma Make data. It should be adequate for most small-scale use cases.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+type KvRecord = {
+  key: string;
+  value: JsonValue;
+};
+
 const client = () => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -28,7 +35,7 @@ const client = () => {
 };
 
 // Set stores a key-value pair in the database.
-export const set = async (key: string, value: any): Promise<void> => {
+export const set = async (key: string, value: JsonValue): Promise<void> => {
   try {
     const supabase = client();
     const { error } = await supabase.from('kv_store_41a567c3').upsert({
@@ -47,7 +54,7 @@ export const set = async (key: string, value: any): Promise<void> => {
 };
 
 // Get retrieves a key-value pair from the database.
-export const get = async (key: string): Promise<any> => {
+export const get = async (key: string): Promise<JsonValue | null> => {
   try {
     const supabase = client();
     const { data, error } = await supabase.from('kv_store_41a567c3').select('value').eq('key', key).maybeSingle();
@@ -57,7 +64,7 @@ export const get = async (key: string): Promise<any> => {
       throw new Error(`Failed to retrieve key-value pair: ${error.message}`);
     }
 
-    return data?.value;
+    return data?.value ?? null;
   } catch (err) {
     console.error('Unexpected error in get operation:', err);
     throw err;
@@ -81,7 +88,7 @@ export const del = async (key: string): Promise<void> => {
 };
 
 // Sets multiple key-value pairs in the database.
-export const mset = async (keys: string[], values: any[]): Promise<void> => {
+export const mset = async (keys: string[], values: JsonValue[]): Promise<void> => {
   try {
     if (keys.length !== values.length) {
       throw new Error('Keys and values arrays must have the same length');
@@ -102,7 +109,7 @@ export const mset = async (keys: string[], values: any[]): Promise<void> => {
 };
 
 // Gets multiple key-value pairs from the database.
-export const mget = async (keys: string[]): Promise<any[]> => {
+export const mget = async (keys: string[]): Promise<(JsonValue | null)[]> => {
   try {
     if (keys.length === 0) return [];
 
@@ -115,13 +122,13 @@ export const mget = async (keys: string[]): Promise<any[]> => {
     }
 
     // Create a map of key to value for efficient lookup
-    const keyValueMap: Record<string, any> = {};
-    data?.forEach((item) => {
+    const keyValueMap: Record<string, JsonValue> = {};
+    (data || []).forEach((item: KvRecord) => {
       keyValueMap[item.key] = item.value;
     });
 
     // Return values in the same order as requested keys
-    return keys.map(key => keyValueMap[key]);
+    return keys.map(key => keyValueMap[key] ?? null);
   } catch (err) {
     console.error('Unexpected error in mget operation:', err);
     throw err;
@@ -147,7 +154,7 @@ export const mdel = async (keys: string[]): Promise<void> => {
 };
 
 // Search for key-value pairs by prefix.
-export const getByPrefix = async (prefix: string): Promise<any[]> => {
+export const getByPrefix = async (prefix: string): Promise<JsonValue[]> => {
   try {
     const supabase = client();
     const { data, error } = await supabase.from('kv_store_41a567c3').select('key, value').ilike('key', `${prefix}%`);
@@ -157,7 +164,7 @@ export const getByPrefix = async (prefix: string): Promise<any[]> => {
       throw new Error(`Failed to search by prefix: ${error.message}`);
     }
 
-    return data?.map((d) => d.value) ?? [];
+    return (data || []).map((d: KvRecord) => d.value);
   } catch (err) {
     console.error('Unexpected error in getByPrefix operation:', err);
     throw err;

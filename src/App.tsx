@@ -1,76 +1,93 @@
-import React from 'react';
-import { ThemeProvider } from 'next-themes';
-import { AuthProvider } from './contexts/AuthContext';
-import { ContentProvider } from './contexts/ContentContext';
-import { EventsProvider } from './contexts/EventsContext';
-import { PartnersProvider } from './contexts/PartnersContext';
-import { TeamProvider } from './contexts/TeamContext';
-import { StaticContentProvider } from './contexts/StaticContentContext';
-import { Router, RouterProvider } from './components/router';
-import { LandingPage } from './components/LandingPage';
-import { Dashboard } from './components/Dashboard';
-import { AllEventsPage } from './components/AllEventsPage';
-import { LoginPage } from './components/auth/LoginPage';
-import { RegisterPage } from './components/auth/RegisterPage';
-import { AdminGuard } from './components/admin/AdminGuard';
-import { Toaster } from './components/ui/sonner';
-import TestComponents from './components/ui/test-components';
+/* @refresh reset */
+import { useEffect, useState } from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AdminGuard } from "./admin/AdminGuard";
+import { LandingPage } from "./components/LandingPage";
+import { LoginPage } from "./components/auth/LoginPage";
+import { RegisterPage } from "./components/auth/RegisterPage";
+import { DashboardAbout } from "./components/dashboard/DashboardAbout";
+import { DashboardAuditLog } from "./components/dashboard/DashboardAuditLog";
+import { DashboardEvents } from "./components/dashboard/DashboardEvents";
+import { DashboardGallery } from "./components/dashboard/DashboardGallery";
+import { DashboardHero } from "./components/dashboard/DashboardHero";
+import { DashboardHome } from "./components/dashboard/DashboardHome";
+import { DashboardLayout } from "./components/dashboard/DashboardLayout";
+import { DashboardPartners } from "./components/dashboard/DashboardPartners";
+import { DashboardSettings } from "./components/dashboard/DashboardSettings";
+import { DashboardTeam } from "./components/dashboard/DashboardTeam";
+import { useAuth } from "./contexts/AuthContext";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
+import { supabaseClient } from "./supabase/client";
 
-function NotFoundPage() {
-  return <div className="p-8 text-center text-white">Page not found</div>;
-}
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LandingPage />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/auth/callback",
+    element: <AuthCallbackPage />,
+  },
+  {
+    path: "/admin",
+    element: <AdminGuard />,
+    children: [
+      {
+        path: "",
+        element: <DashboardLayout>children</DashboardLayout>,
+        children: [
+          { path: "home", element: <DashboardHome /> },
+          { path: "events", element: <DashboardEvents /> },
+          { path: "events/new", element: <DashboardEvents /> },
+          { path: "events/:id/edit", element: <DashboardEvents /> },
+          { path: "partners", element: <DashboardPartners /> },
+          { path: "partners/new", element: <DashboardPartners /> },
+          { path: "partners/:id/edit", element: <DashboardPartners /> },
+          { path: "team", element: <DashboardTeam /> },
+          { path: "team/new", element: <DashboardTeam /> },
+          { path: "team/:id/edit", element: <DashboardTeam /> },
+          { path: "gallery", element: <DashboardGallery /> },
+          { path: "gallery/new", element: <DashboardGallery /> },
+          { path: "gallery/:id/edit", element: <DashboardGallery /> },
+          { path: "hero", element: <DashboardHero /> },
+          { path: "about", element: <DashboardAbout /> },
+          { path: "settings", element: <DashboardSettings /> },
+          { path: "audit-log", element: <DashboardAuditLog /> },
+        ],
+      },
+    ],
+  },
+]);
 
-function App() {
-  const isDevelopment = import.meta.env.DEV;
-  // Use Supabase data by default, even in development
-  // Set VITE_USE_DUMMY_DATA=true in .env to use dummy data for testing
-  const adminBasePath = import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin';
+const App = () => {
+  const { session, isLoading } = useAuth();
+  const [_isDevelopment, _setIsDevelopment] = useState(false);
 
-  const AdminRoute: React.FC = () => (
-    <AdminGuard>
-      <Dashboard />
-    </AdminGuard>
-  );
+  useEffect(() => {
+    const checkEnv = async () => {
+      const {
+        data: { session },
+      } = await supabaseClient.auth.getSession();
+      if (session) {
+        // Session exists
+      }
+    };
+    checkEnv();
+  }, []);
 
-  const routes = {
-    '/': LandingPage,
-    '/events': AllEventsPage,
-    '/register': RegisterPage,
-    '/login': LoginPage,
-    '/admin/login': LoginPage, // Keep legacy /admin/login for backward compatibility
-    [adminBasePath]: AdminRoute,
-    [`${adminBasePath}/login`]: LoginPage,
-    [`${adminBasePath}/login?redirect=:redirect`]: LoginPage,
-    [`${adminBasePath}/*`]: AdminRoute,
-    '/test-ui': TestComponents,
-    '/404': NotFoundPage,
-  };
+  if (isLoading) {
+    return <div className="min-h-screen bg-black">Loading...</div>;
+  }
 
-  const handleAdminLogin = (defaultRedirect: string) => {
-    const path = new URLSearchParams(window.location.search).get('redirect');
-    return () => <LoginPage />;
-  };
-
-  return (
-    <ThemeProvider defaultTheme="system" attribute="class">
-      <AuthProvider>
-        <ContentProvider>
-          <EventsProvider>
-            <PartnersProvider>
-              <TeamProvider>
-                <StaticContentProvider>
-                  <RouterProvider>
-                    <Router routes={routes} />
-                  </RouterProvider>
-                  <Toaster />
-                </StaticContentProvider>
-              </TeamProvider>
-            </PartnersProvider>
-          </EventsProvider>
-        </ContentProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  );
-}
+  return <RouterProvider router={router} />;
+};
 
 export default App;

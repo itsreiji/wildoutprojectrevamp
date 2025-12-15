@@ -1,18 +1,25 @@
-// This component needs proper implementation
-// Currently commented out due to missing dependencies
-/*
-import { useAuth } from '@supabase/auth-helpers-react'
-import { useRouter } from 'next/router'
+// AdminGuard component for protecting admin routes
+import { useAuth } from "@/contexts/AuthContext";
+import { ReactNode } from "react";
+import { Navigate, Outlet } from "react-router-dom";
 
-export const AdminGuard = ({ children }: { children: React.ReactNode }) => {
-    const { data, error } = useAuth()
-    const router = useRouter()
+export const AdminGuard = ({ children }: { children?: ReactNode }) => {
+  const { session, isLoading } = useAuth();
 
-    if (!data?.user?.role?.includes('admin')) {
-        router.push('/login')
-        return null
-    }
+  if (isLoading) {
+    return <div className="min-h-screen bg-black">Loading...</div>;
+  }
 
-    return children
-}
-*/
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Check if user has admin role
+  const isAdmin = session.user?.user_metadata?.role?.includes("admin");
+
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children ? <>{children}</> : <Outlet />;
+};

@@ -1,66 +1,73 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabaseClient } from '../supabase/client';
-import type { TablesInsert, TablesUpdate, Json } from '../supabase/types';
-import { cleanupPartnerAsset } from '../utils/storageHelpers';
-import type { Partner } from '@/types/content';
+import type { Partner } from "@/types/content";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { createContext, ReactNode, useContext } from "react";
+import { supabaseClient } from "../supabase/client";
+import type { TablesInsert, TablesUpdate } from "../supabase/types";
 
 interface PartnersContextType {
   partners: Partner[];
   loading: boolean;
   error: string | null;
-  addPartner: (partner: TablesInsert<'partners'>) => Promise<Partner>;
-  updatePartner: (id: string, updates: TablesUpdate<'partners'>, oldLogoUrl?: string | null) => Promise<Partner>;
+  addPartner: (partner: TablesInsert<"partners">) => Promise<Partner>;
+  updatePartner: (
+    id: string,
+    updates: TablesUpdate<"partners">,
+    oldLogoUrl?: string | null
+  ) => Promise<Partner>;
   deletePartner: (id: string) => Promise<void>;
   refreshPartners: () => Promise<void>;
 }
 
-const PartnersContext = createContext<PartnersContextType | undefined>(undefined);
+const PartnersContext = createContext<PartnersContextType | undefined>(
+  undefined
+);
 
-const normalizeSocialLinks = (value: Json | undefined): Record<string, string | null> => {
-  if (!value || typeof value === 'string') return {};
+const normalizeSocialLinks = (value: any): Record<string, string | null> => {
+  if (!value || typeof value === "string") return {};
   if (Array.isArray(value)) return {};
-  return Object.entries(value as Record<string, Json | undefined>).reduce<Record<string, string | null>>(
-    (acc, [key, entry]) => {
-      if (typeof entry === 'string') {
-        acc[key] = entry;
-      } else if (typeof entry === 'number' || typeof entry === 'boolean') {
-        acc[key] = String(entry);
-      } else if (entry === null || entry === undefined) {
-        acc[key] = null;
-      }
-      return acc;
-    },
-    {}
-  );
+  return Object.entries(value as Record<string, any>).reduce<
+    Record<string, string | null>
+  >((acc, [key, entry]) => {
+    if (typeof entry === "string") {
+      acc[key] = entry;
+    } else if (typeof entry === "number" || typeof entry === "boolean") {
+      acc[key] = String(entry);
+    } else if (entry === null || entry === undefined) {
+      acc[key] = null;
+    }
+    return acc;
+  }, {});
 };
 
 export const PartnersProvider: React.FC<{ children: ReactNode }> = ({
-  children
+  children,
 }) => {
   const queryClient = useQueryClient();
 
   const fetchPartners = async (): Promise<Partner[]> => {
-
     const { data, error } = await supabaseClient
-      .from('partners')
-      .select('*')
-      .eq('status', 'active')
-      .order('name');
+      .from("partners")
+      .select("*")
+      .eq("status", "active")
+      .order("name");
 
     if (error) throw error;
 
     return (data || []).map((row: any): Partner => {
-      const category: string = row.category && typeof row.category === 'string' ? row.category : 'general';
+      const category: string =
+        row.category && typeof row.category === "string"
+          ? row.category
+          : "general";
       return {
         id: row.id,
-        name: row.name || '',
+        name: row.name || "",
         description: row.description || undefined,
         logo_url: row.logo_url || undefined,
         website_url: row.website_url || undefined,
         category,
-        status: (row.status && typeof row.status === 'string' ? row.status : 'active') as string,
-        featured: row.featured || undefined,
+        status: (row.status && typeof row.status === "string"
+          ? row.status
+          : "active") as string,
         contact_email: row.contact_email || undefined,
         contact_phone: row.contact_phone || undefined,
         social_links: normalizeSocialLinks(row.social_links),
@@ -70,31 +77,36 @@ export const PartnersProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
 
-  const { data: partners = [], isLoading: loading, error: queryError, refetch } = useQuery({
-    queryKey: ['partners'],
+  const {
+    data: partners = [],
+    isLoading: loading,
+    error: queryError,
+    refetch,
+  } = useQuery({
+    queryKey: ["partners"],
     queryFn: fetchPartners,
   });
 
   const addPartnerMutation = useMutation({
-    mutationFn: async (partner: TablesInsert<'partners'>) => {
+    mutationFn: async (partner: TablesInsert<"partners">) => {
       const { data, error } = await supabaseClient
-        .from('partners')
+        .from("partners")
         .insert(partner)
         .select()
         .single();
 
       if (error) throw error;
-      if (!data) throw new Error('No data returned from insert operation');
+      if (!data) throw new Error("No data returned from insert operation");
 
       return {
         id: data.id,
-        name: data.name || '',
+        name: data.name || "",
         description: data.description || undefined,
         logo_url: data.logo_url || undefined,
         website_url: data.website_url || undefined,
-        category: data.category || 'general',
-        status: data.status as 'active' | 'inactive' | undefined || undefined,
-        featured: data.featured || undefined,
+        category: data.category || "general",
+        status: (data.status as "active" | "inactive" | undefined) || undefined,
+        // featured: data.featured || undefined, // REMOVED - doesn't exist in database
         contact_email: data.contact_email || undefined,
         contact_phone: data.contact_phone || undefined,
         social_links: normalizeSocialLinks(data.social_links),
@@ -103,35 +115,43 @@ export const PartnersProvider: React.FC<{ children: ReactNode }> = ({
       } as Partner;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['partners'] });
+      queryClient.invalidateQueries({ queryKey: ["partners"] });
     },
   });
 
   const updatePartnerMutation = useMutation({
-    mutationFn: async ({ id, updates, oldLogoUrl }: { id: string; updates: TablesUpdate<'partners'>; oldLogoUrl?: string | null }) => {
+    mutationFn: async ({
+      id,
+      updates,
+      oldLogoUrl,
+    }: {
+      id: string;
+      updates: TablesUpdate<"partners">;
+      oldLogoUrl?: string | null;
+    }) => {
       const { data, error } = await supabaseClient
-        .from('partners')
+        .from("partners")
         .update(updates)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
 
       if (error) throw error;
-      if (!data) throw new Error('No data returned from update operation');
+      if (!data) throw new Error("No data returned from update operation");
 
       if (oldLogoUrl && updates.logo_url && oldLogoUrl !== updates.logo_url) {
-        await cleanupPartnerAsset(oldLogoUrl);
+        // await cleanupPartnerAsset(oldLogoUrl);
       }
 
       return {
         id: data.id,
-        name: data.name || '',
+        name: data.name || "",
         description: data.description || undefined,
         logo_url: data.logo_url || undefined,
         website_url: data.website_url || undefined,
-        category: data.category || 'general',
-        status: data.status as 'active' | 'inactive' | undefined || undefined,
-        featured: data.featured || undefined,
+        category: data.category || "general",
+        status: (data.status as "active" | "inactive" | undefined) || undefined,
+        // featured: data.featured || undefined, // REMOVED - doesn't exist in database
         contact_email: data.contact_email || undefined,
         contact_phone: data.contact_phone || undefined,
         social_links: normalizeSocialLinks(data.social_links),
@@ -140,27 +160,27 @@ export const PartnersProvider: React.FC<{ children: ReactNode }> = ({
       } as Partner;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['partners'] });
+      queryClient.invalidateQueries({ queryKey: ["partners"] });
     },
   });
 
   const deletePartnerMutation = useMutation({
     mutationFn: async (id: string) => {
-      const partnerToDelete = partners.find(partner => partner.id === id);
+      const partnerToDelete = partners.find((partner) => partner.id === id);
 
       const { error } = await supabaseClient
-        .from('partners')
+        .from("partners")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
 
       if (partnerToDelete?.logo_url) {
-        await cleanupPartnerAsset(partnerToDelete.logo_url);
+        // await cleanupPartnerAsset(partnerToDelete.logo_url);
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['partners'] });
+      queryClient.invalidateQueries({ queryKey: ["partners"] });
     },
   });
 
@@ -168,25 +188,39 @@ export const PartnersProvider: React.FC<{ children: ReactNode }> = ({
     partners,
     loading,
     error: queryError ? (queryError as Error).message : null,
-    addPartner: async (partner: TablesInsert<'partners'>) => {
+    addPartner: async (partner: TablesInsert<"partners">) => {
       return await addPartnerMutation.mutateAsync(partner);
     },
-    updatePartner: async (id: string, updates: TablesUpdate<'partners'>, oldLogoUrl?: string | null) => {
-      return await updatePartnerMutation.mutateAsync({ id, updates, oldLogoUrl });
+    updatePartner: async (
+      id: string,
+      updates: TablesUpdate<"partners">,
+      oldLogoUrl?: string | null
+    ) => {
+      return await updatePartnerMutation.mutateAsync({
+        id,
+        updates,
+        oldLogoUrl,
+      });
     },
     deletePartner: async (id: string) => {
       await deletePartnerMutation.mutateAsync(id);
     },
     refreshPartners: async () => {
       await refetch();
-    }
+    },
   };
 
-  return <PartnersContext.Provider value={value} > {children}</PartnersContext.Provider >;
+  return (
+    <PartnersContext.Provider value={value}>
+      {" "}
+      {children}
+    </PartnersContext.Provider>
+  );
 };
 
 export const usePartners = () => {
   const context = useContext(PartnersContext);
-  if (!context) throw new Error('usePartners must be used within PartnersProvider');
+  if (!context)
+    throw new Error("usePartners must be used within PartnersProvider");
   return context;
 };

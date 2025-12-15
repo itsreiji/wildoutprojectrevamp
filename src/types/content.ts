@@ -34,7 +34,7 @@ export interface SocialLinks {
 
 export interface TeamMemberMetadata {
   social_links?: SocialLinks;
-  [key: string]: any;
+  [key: string]: string | null | undefined | SocialLinks | undefined;
 }
 
 export interface TeamMember {

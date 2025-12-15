@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2020", "ES2020.Promise", "Deno.ns"]
+  },
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.49.8"
+  }
+}
