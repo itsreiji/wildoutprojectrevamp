@@ -1,40 +1,39 @@
 /* @refresh reset */
 import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
+    createContext,
+    type ReactNode,
+    useContext,
+    useEffect,
+    useState,
 } from "react";
-import { supabaseClient } from "../supabase/client";
+import supabaseClient from "../supabase/client";
 import type {
-  Database,
-  Json,
-  TablesInsert,
-  TablesUpdate,
+    Database,
+    Json,
+    TablesInsert,
+    TablesUpdate,
 } from "../supabase/types";
 import { useAuth } from "./AuthContext";
 
 import type {
-  AboutContent,
-  AdminSection,
-  ContentContextType,
-  EventArtist,
-  GalleryImage,
-  HeroContent,
-  LandingEvent,
-  Partner,
-  PublicEventView,
-  SectionContent,
-  SectionPermissions,
-  SiteSettings,
-  TeamMember,
+    AboutContent,
+    AdminSection,
+    ContentContextType,
+    EventArtist,
+    GalleryImage,
+    HeroContent,
+    Partner,
+    PublicEventView,
+    SectionContent,
+    SectionPermissions,
+    SiteSettings,
+    TeamMember
 } from "@/types/content";
 import {
-  cleanupEventAssets,
-  cleanupGalleryAsset,
-  cleanupPartnerAsset,
-  cleanupTeamMemberAsset,
+    cleanupEventAssets,
+    cleanupGalleryAsset,
+    cleanupPartnerAsset,
+    cleanupTeamMemberAsset,
 } from "../utils/storageHelpers";
 
 const normalizeSocialLinks = (
@@ -65,7 +64,7 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
 };
 
 // Initial data aligned with new types
-const INITIAL_EVENTS: LandingEvent[] = [];
+const INITIAL_EVENTS: PublicEventView[] = [];
 const INITIAL_PARTNERS: Partner[] = [];
 const INITIAL_GALLERY: GalleryImage[] = [];
 const INITIAL_TEAM: TeamMember[] = [];
@@ -108,13 +107,13 @@ const INITIAL_SETTINGS: SiteSettings = {
   site_name: "WildOut!",
   site_description: "Indonesia's premier creative community platform",
   tagline: "Indonesia's premier creative community platform",
-  email: "contact@wildout.id",
+  email: "contact@wildoutproject.com",
   phone: "+62 21 1234 567",
   address: "Jakarta, Indonesia",
   social_media: {
-    instagram: "https://instagram.com/wildout.id",
+    instagram: "https://instagram.com/wildoutproject.com",
     twitter: "https://twitter.com/wildout_id",
-    facebook: "https://facebook.com/wildout.id",
+    facebook: "https://facebook.com/wildoutproject.com",
     youtube: "https://youtube.com/@wildout",
   },
   created_at: new Date().toISOString(),
@@ -312,6 +311,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Check if we should use dummy data
+  const useDummyData = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
 
   // Admin sections data
   const [adminSections, setAdminSections] = useState<AdminSection[]>([]);
@@ -325,6 +327,21 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     const initializeData = async () => {
       setLoading(true);
       setError(null);
+      
+      // If using dummy data, skip Supabase calls
+      if (useDummyData) {
+        console.log("Using dummy data instead of Supabase");
+        setEvents(INITIAL_EVENTS);
+        setPartners(INITIAL_PARTNERS);
+        setGallery(INITIAL_GALLERY);
+        setTeam(INITIAL_TEAM);
+        setHero(INITIAL_HERO);
+        setAbout(INITIAL_ABOUT);
+        setSettings(INITIAL_SETTINGS);
+        setLoading(false);
+        return;
+      }
+      
       try {
         const [
           eventsData,
@@ -439,9 +456,9 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
 
         const contentResults = await Promise.all(contentPromises);
         const newSectionContent: Record<string, SectionContent> = {};
-        contentResults.forEach(({ sectionSlug, content }) => {
-          if (content && sectionSlug) {
-            newSectionContent[sectionSlug] = content;
+        contentResults.forEach((result: { sectionSlug?: string; content: SectionContent | null }) => {
+          if (result.content && result.sectionSlug) {
+            newSectionContent[result.sectionSlug] = result.content;
           }
         });
 
@@ -878,6 +895,7 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     hero,
     about,
     settings,
+    loading,
     fetchEvents: async () => {},
     fetchPartners: async () => {},
     fetchGallery: async () => {},

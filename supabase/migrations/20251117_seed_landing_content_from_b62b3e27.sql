@@ -56,10 +56,10 @@ INSERT INTO public.site_settings (
   'WildOut!',
   'Media Digital Nightlife & Event Multi-Platform',
   'Indonesia''s premier creative community platform',
-  'contact@wildout.id',
+  'contact@wildoutproject.com',
   '+62 21 1234 567',
   'Jakarta, Indonesia',
-  '{"instagram": "https://instagram.com/wildout.id", "twitter": "https://twitter.com/wildout_id", "facebook": "https://facebook.com/wildout.id", "youtube": "https://youtube.com/@wildout"}'::jsonb,
+  '{"instagram": "https://instagram.com/wildoutproject.com", "twitter": "https://twitter.com/wildout_id", "facebook": "https://facebook.com/wildoutproject.com", "youtube": "https://youtube.com/@wildout"}'::jsonb,
   now()
 ) ON CONFLICT (id) DO UPDATE SET
   site_name = EXCLUDED.site_name,

@@ -45,13 +45,13 @@ CREATE TABLE public.site_settings (
     site_name text NOT NULL DEFAULT 'WildOut!',
     site_description text DEFAULT 'Media Digital Nightlife & Event Multi-Platform',
     tagline text DEFAULT 'Indonesia''s premier creative community platform',
-    email text DEFAULT 'contact@wildout.id',
+    email text DEFAULT 'contact@wildoutproject.com',
     phone text DEFAULT '+62 21 1234 567',
     address text DEFAULT 'Jakarta, Indonesia',
     social_media jsonb DEFAULT '{
-        "instagram": "https://instagram.com/wildout.id",
+        "instagram": "https://instagram.com/wildoutproject.com",
         "twitter": "https://twitter.com/wildout_id",
-        "facebook": "https://facebook.com/wildout.id",
+        "facebook": "https://facebook.com/wildoutproject.com",
         "youtube": "https://youtube.com/@wildout"
     }'::jsonb,
     created_at timestamptz DEFAULT now(),

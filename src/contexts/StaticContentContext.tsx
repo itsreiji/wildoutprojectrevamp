@@ -1,25 +1,25 @@
 import type {
-  AboutContent,
-  AdminSection,
-  GalleryImage,
-  HeroContent,
-  SectionContent,
-  SectionPermissions,
-  SiteSettings,
+    AboutContent,
+    AdminSection,
+    GalleryImage,
+    HeroContent,
+    SectionContent,
+    SectionPermissions,
+    SiteSettings,
 } from "@/types/content";
 import React, {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
+    createContext,
+    type ReactNode,
+    useContext,
+    useEffect,
+    useState,
 } from "react";
 import { supabaseClient } from "../supabase/client";
 import type {
-  Database,
-  Json,
-  TablesInsert,
-  TablesUpdate,
+    Database,
+    Json,
+    TablesInsert,
+    TablesUpdate,
 } from "../supabase/types";
 import { cleanupGalleryAsset } from "../utils/storageHelpers";
 import type { AuthRole } from "./AuthContext";
@@ -65,13 +65,13 @@ const INITIAL_SETTINGS: SiteSettings = {
   site_name: "WildOut!",
   site_description: "Indonesia's premier creative community platform",
   tagline: "Indonesia's premier creative community platform",
-  email: "contact@wildout.id",
+  email: "contact@wildoutproject.com",
   phone: "+62 21 1234 567",
   address: "Jakarta, Indonesia",
   social_media: {
-    instagram: "https://instagram.com/wildout.id",
+    instagram: "https://instagram.com/wildoutproject.com",
     twitter: "https://twitter.com/wildout_id",
-    facebook: "https://facebook.com/wildout.id",
+    facebook: "https://facebook.com/wildoutproject.com",
     youtube: "https://youtube.com/@wildout",
   },
   created_at: new Date().toISOString(),

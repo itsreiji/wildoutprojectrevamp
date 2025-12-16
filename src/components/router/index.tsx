@@ -35,6 +35,16 @@ const routes = {
   '/settings': MemoDashboardSettings,
   '/login': LoginPage,
   '/auth/callback': AuthCallbackPage,
+  // Admin routes - these will be wrapped by AdminGuard in App.tsx
+  '/admin': MemoDashboardHome,
+  '/admin/home': MemoDashboardHome,
+  '/admin/about': MemoDashboardAbout,
+  '/admin/events': MemoDashboardEvents,
+  '/admin/gallery': MemoDashboardGallery,
+  '/admin/hero': MemoDashboardHero,
+  '/admin/partners': MemoDashboardPartners,
+  '/admin/team': MemoDashboardTeam,
+  '/admin/settings': MemoDashboardSettings,
 };
 
 export {
@@ -119,6 +129,14 @@ const RouterProviderComponent = ({ children }: { children: React.ReactNode }) =>
     // Scroll to top on navigation
     window.scrollTo(0, 0);
   };
+
+  // Redirect /admin to /admin/home
+  useEffect(() => {
+    const adminBasePath = import.meta.env.VITE_ADMIN_BASE_PATH || '/admin';
+    if (currentPath === adminBasePath) {
+      navigate(`${adminBasePath}/home`);
+    }
+  }, [currentPath, navigate]);
 
   // Function to get sub-path for a given base path
   const getSubPath = (basePath: string): string => {

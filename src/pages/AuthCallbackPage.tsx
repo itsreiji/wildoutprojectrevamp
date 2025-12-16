@@ -5,7 +5,9 @@ import { supabaseClient } from '../supabase/client';
 
 export const AuthCallbackPage = () => {
   const router = useRouter();
-  const { setUser, setRole } = useAuth();
+  const auth = useAuth();
+  const setUser = auth?.setUser;
+ const setRole = auth?.setRole;
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -42,7 +44,7 @@ export const AuthCallbackPage = () => {
     };
 
     handleAuthCallback();
-  }, [router, setUser, setRole]);
+  }, [router, setUser, setRole, auth]);
 
   return (
     <div className="flex h-screen items-center justify-center">

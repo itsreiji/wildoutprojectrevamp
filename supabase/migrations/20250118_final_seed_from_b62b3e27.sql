@@ -129,18 +129,18 @@ ON CONFLICT (name) DO UPDATE SET
 -- =============================================
 INSERT INTO public.team_members (id, name, title, bio, avatar_url, email, status, display_order, metadata, created_at, updated_at)
 VALUES 
-  ('00000000-0000-0000-0000-000000000021'::uuid, 'Sarah Chen', 'CEO & Founder', 'Visionary leader with 10+ years experience in nightlife and entertainment industry', 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400', 'sarah@wildout.id', 'active', 1, '{"phone": "+62 812 3456 7890"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000022'::uuid, 'Michael Rodriguez', 'Creative Director', 'Award-winning creative with passion for innovative event experiences', 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400', 'michael@wildout.id', 'active', 2, '{"phone": "+62 813 7654 3210"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000023'::uuid, 'Aisha Patel', 'Marketing Director', 'Digital marketing strategist specializing in community engagement', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400', 'aisha@wildout.id', 'active', 3, '{"phone": "+62 814 8765 4321"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000024'::uuid, 'David Kim', 'Operations Manager', 'Expert in logistics and operational excellence for large-scale events', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400', 'david@wildout.id', 'active', 4, '{"phone": "+62 815 2468 1357"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000025'::uuid, 'Priya Sharma', 'Event Coordinator', 'Meticulous planner ensuring flawless event execution', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400', 'priya@wildout.id', 'active', 5, '{"phone": "+62 816 9753 8642"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000026'::uuid, 'James Wilson', 'Technical Director', 'Audio-visual expert with cutting-edge production knowledge', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400', 'james@wildout.id', 'active', 6, '{"phone": "+62 817 3698 5274"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000027'::uuid, 'Natasha Williams', 'Social Media Manager', 'Content creator building vibrant online communities', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400', 'natasha@wildout.id', 'active', 7, '{"phone": "+62 818 7531 9864"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000028'::uuid, 'Alex Zhang', 'Sponsorship Manager', 'Building strategic partnerships with leading brands', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400', 'alex@wildout.id', 'active', 8, '{"phone": "+62 819 8524 7136"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000029'::uuid, 'Maria Santos', 'Artist Relations', 'Connecting top talent with incredible event opportunities', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400', 'maria@wildout.id', 'active', 9, '{"phone": "+62 820 1472 5836"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000030'::uuid, 'Ryan Thompson', 'Design Lead', 'Creating stunning visual identities for memorable events', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400', 'ryan@wildout.id', 'active', 10, '{"phone": "+62 821 9517 3648"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000031'::uuid, 'Lily Anderson', 'Customer Experience', 'Ensuring every guest has an unforgettable experience', 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400', 'lily@wildout.id', 'active', 11, '{"phone": "+62 822 7539 5148"}'::jsonb, now(), now()),
-  ('00000000-0000-0000-0000-000000000032'::uuid, 'Omar Hassan', 'Finance Manager', 'Managing financial strategy and sustainable growth', 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400', 'omar@wildout.id', 'active', 12, '{"phone": "+62 823 8642 9753"}'::jsonb, now(), now())
+  ('00000000-0000-0000-0000-000000000021'::uuid, 'Sarah Chen', 'CEO & Founder', 'Visionary leader with 10+ years experience in nightlife and entertainment industry', 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400', 'sarah@wildoutproject.com', 'active', 1, '{"phone": "+62 812 3456 7890"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000022'::uuid, 'Michael Rodriguez', 'Creative Director', 'Award-winning creative with passion for innovative event experiences', 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400', 'michael@wildoutproject.com', 'active', 2, '{"phone": "+62 813 7654 3210"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000023'::uuid, 'Aisha Patel', 'Marketing Director', 'Digital marketing strategist specializing in community engagement', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400', 'aisha@wildoutproject.com', 'active', 3, '{"phone": "+62 814 8765 4321"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000024'::uuid, 'David Kim', 'Operations Manager', 'Expert in logistics and operational excellence for large-scale events', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400', 'david@wildoutproject.com', 'active', 4, '{"phone": "+62 815 2468 1357"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000025'::uuid, 'Priya Sharma', 'Event Coordinator', 'Meticulous planner ensuring flawless event execution', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400', 'priya@wildoutproject.com', 'active', 5, '{"phone": "+62 816 9753 8642"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000026'::uuid, 'James Wilson', 'Technical Director', 'Audio-visual expert with cutting-edge production knowledge', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400', 'james@wildoutproject.com', 'active', 6, '{"phone": "+62 817 3698 5274"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000027'::uuid, 'Natasha Williams', 'Social Media Manager', 'Content creator building vibrant online communities', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400', 'natasha@wildoutproject.com', 'active', 7, '{"phone": "+62 818 7531 9864"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000028'::uuid, 'Alex Zhang', 'Sponsorship Manager', 'Building strategic partnerships with leading brands', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400', 'alex@wildoutproject.com', 'active', 8, '{"phone": "+62 819 8524 7136"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000029'::uuid, 'Maria Santos', 'Artist Relations', 'Connecting top talent with incredible event opportunities', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400', 'maria@wildoutproject.com', 'active', 9, '{"phone": "+62 820 1472 5836"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000030'::uuid, 'Ryan Thompson', 'Design Lead', 'Creating stunning visual identities for memorable events', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400', 'ryan@wildoutproject.com', 'active', 10, '{"phone": "+62 821 9517 3648"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000031'::uuid, 'Lily Anderson', 'Customer Experience', 'Ensuring every guest has an unforgettable experience', 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400', 'lily@wildoutproject.com', 'active', 11, '{"phone": "+62 822 7539 5148"}'::jsonb, now(), now()),
+  ('00000000-0000-0000-0000-000000000032'::uuid, 'Omar Hassan', 'Finance Manager', 'Managing financial strategy and sustainable growth', 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400', 'omar@wildoutproject.com', 'active', 12, '{"phone": "+62 823 8642 9753"}'::jsonb, now(), now())
 ON CONFLICT (id) DO UPDATE SET 
   name = EXCLUDED.name,
   title = EXCLUDED.title,
@@ -361,13 +361,13 @@ VALUES (
   'WildOut!',
   'Media Digital Nightlife & Event Multi-Platform',
   'Indonesia''s premier creative community platform',
-  'contact@wildout.id',
+  'contact@wildoutproject.com',
   '+62 21 1234 567',
   'Jakarta, Indonesia',
   '{
-    "instagram": "https://instagram.com/wildout.id",
+    "instagram": "https://instagram.com/wildoutproject.com",
     "twitter": "https://twitter.com/wildout_id",
-    "facebook": "https://facebook.com/wildout.id",
+    "facebook": "https://facebook.com/wildoutproject.com",
     "youtube": "https://youtube.com/@wildout"
   }'::jsonb,
   now(),

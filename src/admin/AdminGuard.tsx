@@ -1,25 +1,30 @@
 // AdminGuard component for protecting admin routes
 import { useAuth } from "@/contexts/AuthContext";
 import { type ReactNode } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { useRouter } from "@/components/router";
 
 export const AdminGuard = ({ children }: { children?: ReactNode }) => {
-  const { session, isLoading } = useAuth();
+  const { role, isLoading, user } = useAuth();
+  const { navigate } = useRouter();
 
   if (isLoading) {
     return <div className="min-h-screen bg-black">Loading...</div>;
   }
 
-  if (!session) {
-    return <Navigate replace to="/login" />;
+  if (!user) {
+    navigate("/login");
+    return <div className="min-h-screen bg-black">Redirecting...</div>;
   }
 
-  // Check if user has admin role
-  const isAdmin = session.user?.user_metadata?.role?.includes("admin");
+  // Check if user has admin role using the role from AuthContext
+  const isAdmin = role === "admin";
 
   if (!isAdmin) {
-    return <Navigate replace to="/" />;
+    navigate("/");
+    return <div className="min-h-screen bg-black">Redirecting...</div>;
   }
 
-  return children ? <>{children}</> : <Outlet />;
+  // Render children if provided, otherwise return null
+  // The router will handle rendering the appropriate component
+  return children ? <>{children}</> : null;
 };

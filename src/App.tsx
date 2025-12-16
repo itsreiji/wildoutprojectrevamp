@@ -1,9 +1,21 @@
 /* @refresh reset */
 import { useEffect, useState } from "react";
 import { LandingPage } from "./components/LandingPage";
-import { RouterProvider } from "./components/router";
+import { LoginPage } from "./components/auth/LoginPage";
+import { Router, RouterProvider } from "./components/router";
 import { useAuth } from "./contexts/AuthContext";
-import { supabaseClient } from "./supabase/client";
+import { AuthCallbackPage } from "./pages/AuthCallbackPage";
+import { DashboardLayout } from "./components/dashboard/DashboardLayout";
+import { AdminGuard } from "./admin/AdminGuard";
+import supabaseClient from "./supabase/client";
+
+// Define routes for the router
+const routes = {
+  '/': LandingPage,
+  '/login': LoginPage,
+  '/auth/callback': AuthCallbackPage,
+  '/admin/*': AdminGuard,
+};
 
 const App = () => {
   const auth = useAuth();
@@ -28,7 +40,7 @@ const App = () => {
 
   return (
     <RouterProvider>
-      <LandingPage />
+      <Router routes={routes} />
     </RouterProvider>
   );
 };

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, memo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, LayoutDashboard } from 'lucide-react';
-import { Button } from './ui/button';
-import { Link } from './router/Link';
-import { useRouter } from './router';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import { LayoutDashboard, Menu, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { memo, useEffect, useState } from 'react';
+import { useRouter } from './router';
+import { Link } from './router/Link';
+import { Button } from './ui/button';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: '/', hash: '#' },
@@ -110,8 +110,8 @@ const NavigationComponent = () => {
                   // Close mobile menu if open
                   setIsMobileMenuOpen(false);
 
-                  // Navigate to login page for admin access
-                  navigate('/login');
+                  // Redirect to admin login page with full page reload
+                  window.location.href = '/login';
                 }}
                 type="button"
               >
@@ -200,7 +200,8 @@ const NavigationComponent = () => {
                         e.preventDefault();
                         e.stopPropagation();
                         setIsMobileMenuOpen(false);
-                        navigate('/login');
+                        // Redirect to admin login page with full page reload
+                        window.location.href = '/login';
                       }}
                       type="button"
                     >

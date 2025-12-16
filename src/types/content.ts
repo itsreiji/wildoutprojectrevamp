@@ -181,6 +181,7 @@ export interface ContentContextType {
   hero: HeroContent;
   about: AboutContent;
   settings: SiteSettings;
+  loading: boolean;
   publicContent: Record<string, Json>;
   // Methods
   fetchEvents: () => Promise<void>;

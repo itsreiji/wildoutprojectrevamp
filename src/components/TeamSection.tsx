@@ -162,6 +162,7 @@ export const TeamSection = React.memo(() => {
           open={isModalOpen}
           onClose={handleCloseModal}
           onSubmit={() => {}}
+          isAdminMode={false}
         />
 
         {/* CTA */}
