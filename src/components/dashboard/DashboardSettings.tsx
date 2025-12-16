@@ -69,12 +69,11 @@ export const DashboardSettings = React.memo(() => {
 
       setUsersLoading(true);
       try {
-        // Fetch profiles
-        const { data: profilesData, error: profilesError } =
-          await supabaseClient
-            .from("profiles")
-            .select("id, username, full_name, role, created_at")
-            .order("created_at", { ascending: false });
+        // Fetch profiles using RPC function to ensure RLS is properly handled
+        // The get_user_profile function respects the admin_full_access_profiles RLS policy
+        const { data: profilesData, error: profilesError } = await supabaseClient.rpc(
+          "get_user_profile"
+        );
 
         if (profilesError) {
           console.error("Error fetching profiles:", profilesError);
@@ -82,43 +81,18 @@ export const DashboardSettings = React.memo(() => {
           return;
         }
 
-        // Try to get emails via RPC if available, otherwise use profiles only
+        // RPC function returns data with proper RLS handling
         let usersWithEmail: UserProfile[] = [];
 
-        try {
-          const { data: rpcData, error: rpcError } = await supabaseClient.rpc(
-            "get_user_profile"
-          ); // Changed from 'get_users_with_emails' to 'get_user_profile'
-
-          if (!rpcError && rpcData) {
-            usersWithEmail = rpcData.map((user: any) => ({
-              id: user.id,
-              email: user.email || null,
-              username: user.username,
-              full_name: user.full_name,
-              role: user.role || "user",
-              created_at: user.created_at,
-            }));
-          } else {
-            // Fallback: use profiles without email
-            usersWithEmail = (profilesData || []).map((profile: any) => ({
-              id: profile.id,
-              email: null,
-              username: profile.username,
-              full_name: profile.full_name,
-              role: profile.role || "user",
-              created_at: profile.created_at,
-            }));
-          }
-        } catch (rpcErr) {
-          // RPC function doesn't exist yet, use profiles only
-          usersWithEmail = (profilesData || []).map((profile: any) => ({
-            id: profile.id,
-            email: null,
-            username: profile.username,
-            full_name: profile.full_name,
-            role: profile.role || "user",
-            created_at: profile.created_at,
+        if (profilesData && profilesData.length > 0) {
+          // Map the RPC function response to UserProfile format
+          usersWithEmail = profilesData.map((user: any) => ({
+            id: user.id,
+            email: user.email || null,
+            username: user.username || null,
+            full_name: user.full_name || null,
+            role: user.role || "user",
+            created_at: user.created_at,
           }));
         }
 

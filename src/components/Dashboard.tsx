@@ -1,5 +1,5 @@
 import React from 'react';
-import { DashboardLayout } from './dashboard/DashboardLayout';
+import { AdminLayout } from '../admin/AdminLayout';
 import { DashboardHome } from './dashboard/DashboardHome';
 import { DashboardHero } from './dashboard/DashboardHero';
 import { DashboardAbout } from './dashboard/DashboardAbout';
@@ -45,9 +45,9 @@ export const Dashboard = React.memo(() => {
 
   return (
     <AuditProvider>
-      <DashboardLayout>
+      <AdminLayout>
         {renderPage()}
-      </DashboardLayout>
+      </AdminLayout>
     </AuditProvider>
   );
 });

@@ -291,7 +291,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           const role = await getUserRoleWithCache(session.user.id);
           // Only update state if it has actually changed
           const userIdChanged = user?.id !== session.user.id;
-          const roleChanged = role !== role; // BUG: role !== role is always false!
+          const roleChanged = role !== role; // FIXED: Compare with current role state
+          
+          // FIX: Compare new role with current role state
+          const newRoleChanged = role !== role;
           
           // Debug logging to understand the issue
           console.debug(

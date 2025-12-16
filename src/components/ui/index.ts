@@ -72,6 +72,7 @@ export { Badge } from './badge';
 export { Avatar } from './avatar';
 export { Progress } from './progress';
 export { Table, TableHeader, TableBody, TableRow, TableCell, TableHead, TableFooter } from './table';
+export { SplitProvider, SplitPanel, SplitHandle } from './split';
 
 // Utility
 export { cn } from './utils';

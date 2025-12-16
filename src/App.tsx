@@ -5,16 +5,23 @@ import { LoginPage } from "./components/auth/LoginPage";
 import { Router, RouterProvider } from "./components/router";
 import { useAuth } from "./contexts/AuthContext";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
-import { DashboardLayout } from "./components/dashboard/DashboardLayout";
+import { Dashboard } from "./components/Dashboard";
 import { AdminGuard } from "./admin/AdminGuard";
 import supabaseClient from "./supabase/client";
+
+// Admin dashboard component wrapped with guard
+const AdminDashboard = () => (
+  <AdminGuard>
+    <Dashboard />
+  </AdminGuard>
+);
 
 // Define routes for the router
 const routes = {
   '/': LandingPage,
   '/login': LoginPage,
   '/auth/callback': AuthCallbackPage,
-  '/admin/*': AdminGuard,
+  '/admin/*': AdminDashboard,
 };
 
 const App = () => {
