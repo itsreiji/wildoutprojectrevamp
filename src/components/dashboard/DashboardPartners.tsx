@@ -1,44 +1,19 @@
-/**
- * DashboardPartners Component
- *
- * Manages the complete CRUD workflow for partners in the dashboard.
- * Features:
- * - Display partners in a grid with search/filter capabilities
- * - Create new partners with logo uploads
- * - Edit existing partners with logo replacement
- * - Delete partners with confirmation and storage cleanup
- * - Support for featured partners highlighting
- *
- * File Upload Pipeline:
- * - Client-side validation for image type and size (max 10MB)
- * - Logos are stored in Supabase Storage (event-media bucket)
- * - Uploads are validated before database mutations
- * - If mutation fails, uploaded files are automatically cleaned up
- * - Public URLs are stored in partner logo_url field
- *
- * Error Handling:
- * - Delete dialog stays open if deletion fails, allowing user to retry
- * - Granular error messages for each upload/operation
- * - Toast notifications for success and failure states
- */
-
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Plus, Search, Edit, Trash2, ExternalLink } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog';
-import { Badge } from '../ui/badge';
-import { usePartners } from '../../contexts/PartnersContext';
+import { Dialog, DialogOverlay, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { DashboardPartnerForm, type PartnerFormValues } from './DashboardPartnerForm';
 import { supabaseClient } from '@/supabase/client';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
+import { usePartners } from '@/contexts/PartnersContext';
+import { AlertDialog, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, AlertDialogTrigger, AlertDialogContent } from '@/components/ui/alert-dialog';
 import type { Partner } from '@/types/content';
-// partner.contact_email → partner.contact_email || ''
 
-export const DashboardPartners = React.memo(() => {
+export default function DashboardPartners() {
   const { partners = [], addPartner, updatePartner, deletePartner } = usePartners();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -73,7 +48,6 @@ export const DashboardPartners = React.memo(() => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete partner.';
       toast.error(errorMessage);
       console.error('Delete error:', error);
-      // Keep the dialog open on error so user can retry or cancel
     } finally {
       setIsDeleting(false);
     }
@@ -102,39 +76,24 @@ export const DashboardPartners = React.memo(() => {
 
   const handleSubmit = async (values: PartnerFormValues) => {
     setIsSubmitting(true);
+    const newUploadedFiles: string[] = [];
+    let logoUrl: string | undefined = editingPartner?.logo_url ?? undefined;
     try {
-      let logoUrl: string | undefined = editingPartner?.logo_url ?? undefined;
-      const newUploadedFiles: string[] = [];
-
       // Handle logo upload
       if (values.logo_file) {
         const file = values.logo_file as File;
         const validation = validateFile(file);
-
         if (!validation.valid) {
           toast.error(`Logo: ${validation.message}`);
-          setIsSubmitting(false);
           return;
         }
-
-        try {
-          toast.loading('Uploading logo...');
-          const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
-          const { data, error } = await supabaseClient.storage
-            .from('event-media')
-            .upload(uniqueName, file);
-
-          if (error) throw error;
-
-          const { data: { publicUrl } } = supabaseClient.storage.from('event-media').getPublicUrl(data.path);
-          logoUrl = publicUrl;
-          newUploadedFiles.push(data.path);
-          toast.dismiss();
-        } catch (error) {
-          toast.error(`Failed to upload logo: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          setIsSubmitting(false);
-          return;
-        }
+        // Upload logo
+        const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
+        const { data, error } = await supabaseClient.storage.from('event-media').upload(uniqueName, file);
+        if (error) throw error;
+        const { data: { publicUrl } } = supabaseClient.storage.from('event-media').getPublicUrl(data.path);
+        logoUrl = publicUrl;
+        newUploadedFiles.push(data.path);
       }
 
       // Prepare partner data
@@ -149,37 +108,31 @@ export const DashboardPartners = React.memo(() => {
         social_links: values.social_links || {},
       };
 
-      try {
-        if (editingPartner?.id) {
-          // Update existing partner
-          await updatePartner(editingPartner.id, partnerData, editingPartner.logo_url);
-          toast.success('Partner updated successfully!');
-        } else {
-          // Create new partner
-          await addPartner({
-            ...partnerData,
-            status: 'active',
-            category: 'general', // Add required category field
-          });
-          toast.success('Partner added successfully!');
-        }
-        setIsDialogOpen(false);
-      } catch (error) {
-        // If mutation fails and we uploaded files, clean them up
-        if (newUploadedFiles.length > 0) {
-          try {
-            await supabaseClient.storage
-              .from('event-media')
-              .remove(newUploadedFiles);
-          } catch (cleanupError) {
-            console.error('Error cleaning up uploaded files:', cleanupError);
-          }
-        }
-
-        const errorMessage = error instanceof Error ? error.message : 'Failed to save partner';
-        toast.error(errorMessage);
-        console.error('Save error:', error);
+      // Update or create partner
+      if (editingPartner?.id) {
+        await updatePartner(editingPartner.id, partnerData, editingPartner.logo_url);
+        toast.success('Partner updated successfully!');
+      } else {
+        await addPartner({
+          ...partnerData,
+          status: 'active',
+          category: 'general',
+        });
+        toast.success('Partner added successfully!');
       }
+      setIsDialogOpen(false);
+    } catch (error) {
+      // Cleanup uploaded files if mutation failed
+      if (newUploadedFiles.length > 0) {
+        try {
+          await supabaseClient.storage.from('event-media').remove(newUploadedFiles);
+        } catch (cleanupError) {
+          console.error('Error cleaning up uploaded files:', cleanupError);
+        }
+      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save partner';
+      toast.error(errorMessage);
+      console.error('Save error:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -230,7 +183,7 @@ export const DashboardPartners = React.memo(() => {
               <div className="absolute top-4 right-4" id={`dashboard-partner-featured-badge-container-${partner.id}`}>
                 <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30" id={`dashboard-partner-featured-badge-${partner.id}`}>Featured</Badge>
               </div>
-            )}
+            })
 
             {/* Status Badge */}
             <div className="flex items-start justify-between mb-4" id={`dashboard-partner-status-container-${partner.id}`}>
@@ -253,13 +206,13 @@ export const DashboardPartners = React.memo(() => {
               <div className="w-full h-24 rounded-lg overflow-hidden border border-white/10 mb-4 bg-white/5 flex items-center justify-center" id={`dashboard-partner-logo-placeholder-${partner.id}`}>
                 <span className="text-sm text-white/40" id={`dashboard-partner-logo-placeholder-text-${partner.id}`}>No logo</span>
               </div>
-            )}
+            })
 
             {/* Info */}
             <h3 className="text-xl text-white mb-2" id={`dashboard-partner-name-${partner.id}`}>{partner.name}</h3>
             {partner.description && (
               <p className="text-sm text-white/60 mb-4 line-clamp-2" id={`dashboard-partner-description-${partner.id}`}>{partner.description}</p>
-            )}
+            })
 
             {/* Contact Info */}
             <div className="space-y-2 mb-4 text-sm text-white/70" id={`dashboard-partner-contact-container-${partner.id}`}>
@@ -310,7 +263,8 @@ export const DashboardPartners = React.memo(() => {
                 </AlertDialogTrigger>
                 <AlertDialogContent className="bg-black/95 backdrop-blur-xl border-white/10" id={`dashboard-partner-delete-dialog-${partner.id}`}>
                   <AlertDialogHeader id={`dashboard-partner-delete-dialog-header-${partner.id}`}>
-                    <AlertDialogTitle className="text-white" id={`dashboard-partner-delete-dialog-title-${partner.id}`}>Delete Partner?</AlertDialogTitle>
+                    <AlertDialogTitle className="sr-only" id={`dashboard-partner-delete-dialog-title-${partner.id}`}>Delete Partner?</AlertDialogTitle>
+                    <DialogTitle className="sr-only">Delete confirmation dialog</DialogTitle>
                     <AlertDialogDescription className="text-white/70" id={`dashboard-partner-delete-dialog-description-${partner.id}`}>
                       Are you sure you want to delete <span className="font-semibold text-white" id={`dashboard-partner-delete-dialog-name-${partner.id}`}>{partner.name}</span>? This action cannot be undone. Their logo will be removed from storage.
                     </AlertDialogDescription>
@@ -332,7 +286,7 @@ export const DashboardPartners = React.memo(() => {
               </AlertDialog>
             </div>
           </motion.div>
-        ))}
+        ))
       </div>
 
       {filteredPartners.length === 0 && (
@@ -343,25 +297,25 @@ export const DashboardPartners = React.memo(() => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-2xl" id="dashboard-partners-create-edit-dialog">
-          <DialogHeader id="dashboard-partners-create-edit-dialog-header">
-            <DialogTitle className="text-2xl" id="dashboard-partners-create-edit-dialog-title">
-              {editingPartner ? 'Edit Partner' : 'Add Partner'}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="max-h-[60vh] overflow-y-auto" id="dashboard-partners-create-edit-dialog-content">
-            <DashboardPartnerForm
-              defaultValues={editingPartner || undefined}
-              isSubmitting={isSubmitting}
-              onCancel={() => setIsDialogOpen(false)}
-              onSubmit={handleSubmit}
-            />
-          </div>
-        </DialogContent>
+        <DialogOverlay className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" id="dashboard-partners-dialog-overlay">
+          <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-2xl" id="dashboard-partners-create-edit-dialog">
+            <DialogHeader id="dashboard-partners-create-edit-dialog-header">
+              <DialogTitle className="sr-only text-2xl" id="dashboard-partners-create-edit-dialog-title">
+                {editingPartner ? 'Edit Partner' : 'Add Partner'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="max-h-[60vh] overflow-y-auto" id="dashboard-partners-create-edit-dialog-content">
+              <DashboardPartnerForm
+                defaultValues={editingPartner || undefined}
+                isSubmitting={isSubmitting}
+                onCancel={() => setIsDialogOpen(false)}
+                onSubmit={handleSubmit}
+              />
+            </div>
+          </DialogContent>
+        </DialogOverlay>
       </Dialog>
     </div>
   );
-});
 
-DashboardPartners.displayName = 'DashboardPartners';
+}

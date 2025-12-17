@@ -169,7 +169,7 @@ const DashboardWithRightPanel = () => {
                   <DialogTrigger asChild>
                     <Button variant="outline">Create Event</Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 w-full max-w-md mx-auto">
                     <DialogHeader>
                       <DialogTitle>Create New Event</DialogTitle>
                       <DialogDescription>

@@ -23,7 +23,7 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
           {/* Backdrop */}
           <motion.div
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black z-50"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
             onClick={onClose}
@@ -34,7 +34,7 @@ export const EventDetailModal = React.memo(({ event, isOpen, onClose }: EventDet
             <div className="flex min-h-full items-center justify-center p-4 md:p-8">
               <motion.div
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="relative w-full max-w-6xl bg-black/95 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden my-8 max-h-[90vh] flex flex-col"
+                className="relative w-full max-w-5xl bg-black rounded-3xl border border-white/10 overflow-hidden my-8 max-h-[90vh] flex flex-col"
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ duration: 0.3 }}
