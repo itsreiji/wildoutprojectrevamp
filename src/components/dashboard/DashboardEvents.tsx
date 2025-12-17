@@ -896,16 +896,16 @@ export const DashboardEvents = () => {
         {/* Pagination */}
         <div
           className="flex items-center justify-between px-4 py-3 border-t border-white/10"
-          data-testid="events-pagination"
+          id="dashboard-events-pagination"
         >
           <div
             className="text-sm text-white/60"
-            data-testid="events-pagination-info"
+            id="dashboard-events-pagination-info"
           >
             Showing{" "}
             <span
               className="font-medium text-white"
-              data-testid="events-showing-from"
+              id="dashboard-events-showing-from"
             >
               {Math.min(
                 (currentPage - 1) * itemsPerPage + 1,
@@ -915,14 +915,14 @@ export const DashboardEvents = () => {
             to{" "}
             <span
               className="font-medium text-white"
-              data-testid="events-showing-to"
+              id="dashboard-events-showing-to"
             >
               {Math.min(currentPage * itemsPerPage, filteredEvents.length)}
             </span>{" "}
             of{" "}
             <span
               className="font-medium text-white"
-              data-testid="events-total-items"
+              id="dashboard-events-total-items"
             >
               {filteredEvents.length}
             </span>{" "}
@@ -930,11 +930,11 @@ export const DashboardEvents = () => {
           </div>
           <div
             className="flex items-center space-x-2"
-            data-testid="events-pagination-controls"
+            id="dashboard-events-pagination-controls"
           >
             <Button
               className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
-              data-testid="events-previous-page-button"
+              id="dashboard-events-previous-page-button"
               disabled={currentPage === 1}
               size="sm"
               variant="outline"
@@ -944,7 +944,7 @@ export const DashboardEvents = () => {
             </Button>
             <div
               className="flex items-center space-x-1"
-              data-testid="events-page-numbers"
+              id="dashboard-events-page-numbers"
             >
               {Array.from(
                 { length: Math.ceil(filteredEvents.length / itemsPerPage) },
@@ -958,7 +958,7 @@ export const DashboardEvents = () => {
                       : "text-white/60 hover:bg-white/5"
                   }`}
                   data-active={currentPage === page}
-                  data-testid={`events-page-button-${page}`}
+                  id={`dashboard-events-page-button-${page}`}
                   size="sm"
                   variant={currentPage === page ? "outline" : "ghost"}
                   onClick={() => setCurrentPage(page)}
@@ -969,7 +969,7 @@ export const DashboardEvents = () => {
             </div>
             <Button
               className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
-              data-testid="events-next-page-button"
+              id="dashboard-events-next-page-button"
               disabled={currentPage * itemsPerPage >= filteredEvents.length}
               size="sm"
               variant="outline"
@@ -991,18 +991,17 @@ export const DashboardEvents = () => {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
             className="sm:max-w-[600px] bg-gray-900 border-gray-800 text-white"
-            data-testid="events-create-edit-dialog"
+            id="dashboard-events-create-edit-dialog"
           >
-            <DialogHeader>
+            <DialogHeader id="dashboard-events-create-edit-dialog-header">
               <DialogTitle
                 className="text-2xl font-bold text-white"
-                data-testid="events-create-edit-dialog-title"
+                id="dashboard-events-create-edit-dialog-title"
               >
                 {editingEvent ? "Edit Event" : "Create New Event"}
               </DialogTitle>
             </DialogHeader>
             <DashboardEventForm
-              data-testid="events-dashboard-event-form"
               defaultValues={editingEvent || undefined}
               isSubmitting={isSubmitting}
               onCancel={() => setIsDialogOpen(false)}
@@ -1018,31 +1017,31 @@ export const DashboardEvents = () => {
         >
           <AlertDialogContent
             className="bg-gray-900 border-gray-800 text-white"
-            data-testid="events-delete-confirmation-dialog"
+            id="dashboard-events-delete-confirmation-dialog"
           >
-            <AlertDialogHeader>
-              <AlertDialogTitle data-testid="events-delete-confirmation-title">
+            <AlertDialogHeader id="dashboard-events-delete-confirmation-dialog-header">
+              <AlertDialogTitle id="dashboard-events-delete-confirmation-dialog-title">
                 Are you sure?
               </AlertDialogTitle>
               <AlertDialogDescription
                 className="text-gray-400"
-                data-testid="events-delete-confirmation-description"
+                id="dashboard-events-delete-confirmation-dialog-description"
               >
                 This action cannot be undone. This will permanently delete the
                 event and remove all associated data.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
+            <AlertDialogFooter id="dashboard-events-delete-confirmation-dialog-footer">
               <AlertDialogCancel
                 className="bg-transparent border-gray-700 text-white hover:bg-gray-800"
-                data-testid="events-cancel-delete-button"
+                id="dashboard-events-cancel-delete-button"
                 disabled={isDeleting}
               >
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
                 className="bg-red-600 hover:bg-red-70 text-white"
-                data-testid="events-confirm-delete-button"
+                id="dashboard-events-confirm-delete-button"
                 disabled={isDeleting}
                 onClick={() => deletingEventId && handleDelete(deletingEventId)}
               >

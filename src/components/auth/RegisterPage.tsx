@@ -83,7 +83,7 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       <Background3D />
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">

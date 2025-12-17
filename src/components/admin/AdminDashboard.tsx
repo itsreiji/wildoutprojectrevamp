@@ -121,7 +121,7 @@ export const AdminDashboard = React.memo(({ children }: AdminDashboardProps) => 
 
       {/* Sidebar - Fixed on desktop, positionable on mobile */}
       <div
-        className="fixed top-0 left-0 h-full border-r border-border bg-card z-40 transition-all duration-300 ease-in-out md:block"
+        className="fixed top-0 left-0 h-full border-r border-border bg-background z-40 transition-all duration-300 ease-in-out md:block"
         id="admin-sidebar"
         style={
           {
@@ -204,7 +204,7 @@ export const AdminDashboard = React.memo(({ children }: AdminDashboardProps) => 
         </div>
 
         {/* Sidebar Footer */}
-        <div className="border-t border-border p-2 mt-auto" id="admin-sidebar-footer">
+        <div className="border-t border-border p-2 mt-auto bg-background" id="admin-sidebar-footer">
           <div className="space-y-1">
             <button
               id="sidebar-menu-item-back-to-site"
@@ -253,7 +253,7 @@ export const AdminDashboard = React.memo(({ children }: AdminDashboardProps) => 
         }
       >
         {/* Header */}
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card/95 backdrop-blur-sm sticky top-0 z-20 w-full px-4 md:px-6" id="admin-header">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-20 w-full px-4 md:px-6" id="admin-header">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -287,7 +287,7 @@ export const AdminDashboard = React.memo(({ children }: AdminDashboardProps) => 
         </header>
 
         {/* Main Content - Scrollable */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-card relative z-10" id="admin-main">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-background relative z-10" id="admin-main">
           <div className="w-full max-w-[1600px] mx-auto">
             {children}
           </div>

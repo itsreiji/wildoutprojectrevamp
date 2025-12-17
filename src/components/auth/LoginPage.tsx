@@ -205,7 +205,7 @@ export const LoginPage: React.FC = () => {
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
   return (
-    <div className="login-page dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden" id="admin-login-page">
+    <div className="login-page relative min-h-screen bg-background text-foreground overflow-x-hidden" id="admin-login-page">
       <Background3D />
       <div className="login-container relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <div className={`login-card w-full space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl ${isMobile ? 'max-w-xs' : 'max-w-sm'}`} id="admin-login-card">

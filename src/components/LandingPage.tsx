@@ -16,7 +16,7 @@ export const LandingPage = React.memo(() => {
 
   if (loading) {
     return (
-      <div className="dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden" id="landing-page-container">
+      <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden" id="landing-page-container">
         <Background3D />
         <Navigation />
         <div className="relative z-10">
@@ -115,7 +115,7 @@ export const LandingPage = React.memo(() => {
   }
 
   return (
-    <div className="dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden" id="landing-page-container">
+    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden" id="landing-page-container">
       {/* 3D Animated Background */}
       <Background3D />
 

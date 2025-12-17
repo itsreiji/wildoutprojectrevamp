@@ -5,6 +5,7 @@ import { memo, useEffect, useState } from 'react';
 import { useRouter } from './router';
 import { Link } from './router/Link';
 import { Button } from './ui/button';
+import { ThemeToggle } from './ui/theme-toggle';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: '/', hash: '#' },
@@ -99,6 +100,7 @@ const NavigationComponent = () => {
                   {item.label}
                 </Button>
               ))}
+              <ThemeToggle />
               <button
                 aria-label="Admin Dashboard"
                 className="group ml-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#E93370] border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] hover:text-white rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 active:scale-95"
@@ -191,6 +193,9 @@ const NavigationComponent = () => {
                         </Button>
                       </motion.div>
                     ))}
+                    <div className="flex items-center gap-2 py-3">
+                      <ThemeToggle />
+                    </div>
                     <button
                       aria-label="Admin Dashboard"
                       className="w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center gap-3 border border-[#E93370]/20 hover:border-[#E93370] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50"

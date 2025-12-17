@@ -4,6 +4,7 @@ export * from './DashboardGallery';
 export * from './DashboardHero';
 export * from './DashboardHome';
 export * from './DashboardLayout';
+export * from './AdvancedDashboardLayout';
 export * from './DashboardPartnerForm';
 export * from './DashboardPartners';
 export * from './DashboardSettings';

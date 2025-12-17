@@ -9,6 +9,8 @@ import { DashboardGallery } from './dashboard/DashboardGallery';
 import { DashboardPartners } from './dashboard/DashboardPartners';
 import { DashboardSettings } from './dashboard/DashboardSettings';
 import { DashboardAuditLog } from './dashboard/DashboardAuditLog';
+import { DashboardHomeWithRadixNav } from './dashboard/DashboardHomeWithRadixNav';
+import { DashboardWithRightPanel } from './dashboard/DashboardWithRightPanel';
 import { AuditProvider } from '../contexts/AuditContext';
 import { useRouter } from './router';
 
@@ -21,7 +23,7 @@ export const Dashboard = React.memo(() => {
   const renderPage = () => {
     switch (subPath) {
       case 'home':
-        return <DashboardHome />;
+        return <DashboardWithRightPanel />;
       case 'hero':
         return <DashboardHero />;
       case 'about':
@@ -39,7 +41,7 @@ export const Dashboard = React.memo(() => {
       case 'audit':
         return <DashboardAuditLog />;
       default:
-        return <DashboardHome />;
+        return <DashboardWithRightPanel />;
     }
   };
 

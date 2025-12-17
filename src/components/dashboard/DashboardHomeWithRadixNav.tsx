@@ -4,21 +4,23 @@ import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
-import { Skeleton } from '../ui/skeleton';
+import { NavigationMenuLink, NavigationMenuItem, NavigationMenuList } from '../ui/navigation-menu';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from '../router';
 
-const DashboardHome = () => {
+const DashboardHomeWithRadixNav = () => {
   const { user } = useAuth();
+  const { navigate, getAdminPath } = useRouter();
 
   // Sample navigation items
   const navigationItems = [
-    { id: 'dashboard', label: 'Dashboard', href: '/admin', icon: '📊' },
-    { id: 'events', label: 'Events', href: '/admin/events', icon: '📅' },
-    { id: 'team', label: 'Team', href: '/admin/team', icon: '👥' },
-    { id: 'gallery', label: 'Gallery', href: '/admin/gallery', icon: '🖼️' },
-    { id: 'partners', label: 'Partners', href: '/admin/partners', icon: '🤝' },
-    { id: 'settings', label: 'Settings', href: '/admin/settings', icon: '⚙️' },
-    { id: 'audit', label: 'Audit Log', href: '/admin/audit', icon: '📋' },
+    { id: 'dashboard', label: 'Dashboard', href: getAdminPath(''), icon: '📊' },
+    { id: 'events', label: 'Events', href: getAdminPath('events'), icon: '📅' },
+    { id: 'team', label: 'Team', href: getAdminPath('team'), icon: '👥' },
+    { id: 'gallery', label: 'Gallery', href: getAdminPath('gallery'), icon: '🖼️' },
+    { id: 'partners', label: 'Partners', href: getAdminPath('partners'), icon: '🤝' },
+    { id: 'settings', label: 'Settings', href: getAdminPath('settings'), icon: '⚙️' },
+    { id: 'audit', label: 'Audit Log', href: getAdminPath('audit'), icon: '📋' },
   ];
 
   // Stats data
@@ -29,30 +31,45 @@ const DashboardHome = () => {
     { name: 'Content Updates', value: '12', change: '+8.3%', positive: true },
   ];
 
+  // Function to handle navigation
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <DashboardLayout
       sidebarContent={
-        <div className="space-y-1">
+        <NavigationMenuList className="flex flex-col space-y-1">
           {navigationItems.map((item) => (
-            <Button
-              key={item.id}
-              variant="ghost"
-              className="w-full justify-start gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-300"
-              onClick={() => console.log(`Navigating to ${item.href}`)}
-            >
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </Button>
+            <NavigationMenuItem key={item.id}>
+              <NavigationMenuLink
+                to={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavigation(item.href);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-300 text-muted-foreground hover:bg-muted hover:text-foreground data-[active]:bg-accent data-[active]:text-accent-foreground"
+              >
+                <span>{item.icon}</span>
+                <span className="truncate">{item.label}</span>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
           ))}
-        </div>
+        </NavigationMenuList>
       }
       headerContent="Dashboard Home"
       user={{
         name: user?.email?.split('@')[0] || 'Admin User',
         email: user?.email || 'admin@example.com',
       }}
-      onLogout={() => console.log('Logout clicked')}
-      onBackToSite={() => console.log('Back to site clicked')}
+      onLogout={() => {
+        console.log('Logout clicked');
+        // Add actual logout logic here
+      }}
+      onBackToSite={() => {
+        console.log('Back to site clicked');
+        // Add actual back to site navigation here
+      }}
     >
       <div className="space-y-6">
         <div>
@@ -182,4 +199,4 @@ const DashboardHome = () => {
   );
 };
 
-export { DashboardHome };
+export { DashboardHomeWithRadixNav };
