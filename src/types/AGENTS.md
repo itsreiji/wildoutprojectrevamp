@@ -119,3 +119,5 @@ rg -n "IEvent|IPartner|ITeamMember" src/
 # Run type checking to validate all types
 pnpm type-check
 ```
+
+> **Note**: If model cutoff is less than the current date, then research is required to improve knowledge.

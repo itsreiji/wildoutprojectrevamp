@@ -1,44 +1,42 @@
-import React from 'react';
-import { AdminLayout } from '../admin/AdminLayout';
-import { DashboardHome } from './dashboard/DashboardHome';
-import { DashboardHero } from './dashboard/DashboardHero';
-import { DashboardAbout } from './dashboard/DashboardAbout';
-import { DashboardEvents } from './dashboard/DashboardEvents';
-import { DashboardTeam } from './dashboard/DashboardTeam';
-import { DashboardGallery } from './dashboard/DashboardGallery';
-import { DashboardPartners } from './dashboard/DashboardPartners';
-import { DashboardSettings } from './dashboard/DashboardSettings';
-import { DashboardAuditLog } from './dashboard/DashboardAuditLog';
-import { DashboardHomeWithRadixNav } from './dashboard/DashboardHomeWithRadixNav';
-import { DashboardWithRightPanel } from './dashboard/DashboardWithRightPanel';
-import { AuditProvider } from '../contexts/AuditContext';
-import { useRouter } from './router';
+import React from "react";
+import { AuditProvider } from "../contexts/AuditContext";
+import { DashboardAbout } from "./dashboard/DashboardAbout";
+import { DashboardAuditLog } from "./dashboard/DashboardAuditLog";
+import { DashboardEvents } from "./dashboard/DashboardEvents";
+import { DashboardGallery } from "./dashboard/DashboardGallery";
+import { DashboardHero } from "./dashboard/DashboardHero";
+import { DashboardLayout } from "./dashboard/DashboardLayout";
+import { DashboardPartners } from "./dashboard/DashboardPartners";
+import { DashboardSettings } from "./dashboard/DashboardSettings";
+import { DashboardTeam } from "./dashboard/DashboardTeam";
+import { DashboardWithRightPanel } from "./dashboard/DashboardWithRightPanel";
+import { useRouter } from "./router";
 
 export const Dashboard = React.memo(() => {
   const { getCurrentSubPath } = useRouter();
 
   // Extract admin sub-path from URL (e.g., 'events' from '/admin/events')
-  const subPath = getCurrentSubPath() || 'home';
+  const subPath = getCurrentSubPath() || "home";
 
   const renderPage = () => {
     switch (subPath) {
-      case 'home':
+      case "home":
         return <DashboardWithRightPanel />;
-      case 'hero':
+      case "hero":
         return <DashboardHero />;
-      case 'about':
+      case "about":
         return <DashboardAbout />;
-      case 'events':
+      case "events":
         return <DashboardEvents />;
-      case 'team':
+      case "team":
         return <DashboardTeam />;
-      case 'gallery':
+      case "gallery":
         return <DashboardGallery />;
-      case 'partners':
+      case "partners":
         return <DashboardPartners />;
-      case 'settings':
+      case "settings":
         return <DashboardSettings />;
-      case 'audit':
+      case "audit":
         return <DashboardAuditLog />;
       default:
         return <DashboardWithRightPanel />;
@@ -47,11 +45,9 @@ export const Dashboard = React.memo(() => {
 
   return (
     <AuditProvider>
-      <AdminLayout>
-        {renderPage()}
-      </AdminLayout>
+      <DashboardLayout>{renderPage()}</DashboardLayout>
     </AuditProvider>
   );
 });
 
-Dashboard.displayName = 'Dashboard';
+Dashboard.displayName = "Dashboard";

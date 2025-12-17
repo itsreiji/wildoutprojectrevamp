@@ -19,12 +19,14 @@ pnpm test -- src/contexts/**/*.test.*
 ## Patterns & Conventions
 
 ### File Organization Rules
+
 - **Context Files**: One file per context (e.g., `AuthContext.tsx`, `EventsContext.tsx`)
 - **Provider Components**: Export provider component from each context file
 - **Custom Hooks**: Export custom hook for consuming context
 - **Types**: Define context types in the same file
 
 ### Naming Conventions
+
 - **Context Files**: ContextName + "Context.tsx" (e.g., `AuthContext.tsx`)
 - **Provider Components**: ContextName + "Provider" (e.g., `AuthProvider`)
 - **Custom Hooks**: "use" + ContextName (e.g., `useAuth`)
@@ -33,10 +35,11 @@ pnpm test -- src/contexts/**/*.test.*
 ### Preferred Patterns
 
 ✅ **DO**: Use the provider pattern with custom hooks
+
 ```typescript
 // Example: src/contexts/AuthContext.tsx
-import { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/supabase/client';
+import { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/supabase/client";
 
 interface AuthContextType {
   user: User | null;
@@ -53,7 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -62,7 +67,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) throw error;
   };
 
@@ -88,17 +96,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
 ```
 
 ✅ **DO**: Handle authentication state changes properly
+
 ```typescript
 // Example: Supabase auth state handling
 useEffect(() => {
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
     setUser(session?.user ?? null);
     setLoading(false);
   });
@@ -108,20 +119,25 @@ useEffect(() => {
 ```
 
 ✅ **DO**: Provide proper error handling in context methods
+
 ```typescript
 // Example: Error handling in context methods
 const login = async (email: string, password: string) => {
   try {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) throw error;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     throw error;
   }
 };
 ```
 
 ✅ **DO**: Use TypeScript interfaces for context values
+
 ```typescript
 // Example: Well-typed context interface
 interface EventsContextType {
@@ -129,19 +145,21 @@ interface EventsContextType {
   loading: boolean;
   error: Error | null;
   fetchEvents: () => Promise<void>;
-  createEvent: (eventData: Omit<Event, 'id'>) => Promise<Event>;
+  createEvent: (eventData: Omit<Event, "id">) => Promise<Event>;
   updateEvent: (id: string, eventData: Partial<Event>) => Promise<Event>;
   deleteEvent: (id: string) => Promise<void>;
 }
 ```
 
 ❌ **DON'T**: Create contexts that manage local component state
+
 ```typescript
 // Avoid: Context for local state
 const LocalStateContext = createContext(); // ❌ Use useState instead
 ```
 
 ❌ **DON'T**: Forget to provide error boundaries for context consumers
+
 ```typescript
 // Avoid: Missing error handling in custom hooks
 function useContext() {
@@ -206,3 +224,7 @@ pnpm type-check
 # Verify context usage
 rg -n "useContext" src/ | wc -l && echo "Context usage found"
 ```
+
+## Research Requirements
+
+- If model cutoff < current_date then they need to research no matter what to improve their knowledge.

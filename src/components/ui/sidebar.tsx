@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { type VariantProps, cva } from "class-variance-authority";
-import { PanelLeftIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Menu, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { useIsMobile } from "./use-mobile";
 import { cn } from "./utils";
@@ -87,6 +87,7 @@ function SidebarProvider({
 
   // Save state to localStorage when it changes
   React.useEffect(() => {
+    console.log('[SidebarDebug] persisting sidebar state:', open);
     if (openProp === undefined && typeof window !== 'undefined') {
       localStorage.setItem('sidebar-state', JSON.stringify(open));
     }
@@ -289,7 +290,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <PanelLeftIcon />
+      <Menu />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

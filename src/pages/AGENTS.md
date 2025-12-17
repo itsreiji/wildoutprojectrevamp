@@ -19,10 +19,10 @@ No specific setup required beyond the root project setup.
 
 ```tsx
 // ✅ Preferred page structure
-import { useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { EventService } from '@/services/EventService';
-import { Layout } from '@/components/Layout';
+import { useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { EventService } from "@/services/EventService";
+import { Layout } from "@/components/Layout";
 
 export function HomePage() {
   const { user } = useAuth();
@@ -112,3 +112,7 @@ pnpm test
 grep -r "useEffect" src/pages/ | wc -l
 grep -r "useAuth\|useEvents" src/pages/ | wc -l
 ```
+
+## 8. Model Cutoff Research
+
+- If model cutoff < current_date then they need to research no matter what to improve their knowledge.

@@ -28,14 +28,12 @@ export class EventService {
 
   async getEvents(): Promise<Event[]> {
     try {
-      const { data, error } = await this.supabase
-        .from('events')
-        .select('*');
+      const { data, error } = await this.supabase.from("events").select("*");
 
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error("Error fetching events:", error);
       throw error;
     }
   }
@@ -93,3 +91,7 @@ pnpm test
 grep -r "try {" src/services/ | wc -l
 grep -r "catch" src/services/ | wc -l
 ```
+
+## 8. Model Cutoff Research Requirement
+
+- If model cutoff < current_date then they need to research no matter what to improve their knowledge.

@@ -1,6 +1,7 @@
 # WildOut! Project - supabase/ AGENTS.md
 
 **Package Identity**
+
 - This package contains Supabase database configuration and migrations
 - Primary tech/framework: PostgreSQL, Supabase, SQL
 
@@ -20,11 +21,13 @@
 ## Patterns & Conventions
 
 ### File Organization Rules
+
 - **Migrations**: `supabase/migrations/**` - SQL migration files
 - **Configuration**: `supabase/config.toml` - Supabase configuration
 - **Types**: Generated types go to `src/supabase/types.ts`
 
 ### Naming Conventions
+
 - ✅ **Migration files**: Timestamp-based with descriptive names (e.g., `20251107123000_01_database_schema.sql`)
 - ✅ **Tables**: snake_case with plural names (e.g., `events`, `partners`)
 - ✅ **Columns**: snake_case (e.g., `created_at`, `user_id`)
@@ -33,6 +36,7 @@
 ### Preferred Patterns
 
 **Migrations:**
+
 - ✅ DO: Follow pattern from `supabase/migrations/20251107123000_01_database_schema.sql`
 - ✅ DO: Include RLS policies for all tables
 - ✅ DO: Use UUIDs for primary keys
@@ -41,12 +45,14 @@
 - ❌ DON'T: Use serial IDs (use UUIDs instead)
 
 **RLS Policies:**
+
 - ✅ DO: Include public access policies in separate migration
 - ✅ DO: Include authenticated access policies
 - ✅ DO: Include admin access policies
 - ✅ DO: Follow pattern from `supabase/migrations/20251107123400_04_rls_public_access.sql`
 
 **Functions:**
+
 - ✅ DO: Use proper security definer
 - ✅ DO: Include parameter validation
 - ✅ DO: Handle errors appropriately
@@ -100,6 +106,7 @@ rg -n "events\|partners\|team_members" supabase/migrations
 ### Core Tables
 
 **Events**
+
 - `id`: UUID (PK)
 - `title`: string
 - `status`: string
@@ -108,18 +115,21 @@ rg -n "events\|partners\|team_members" supabase/migrations
 - `partner_id`: UUID (FK)
 
 **Partners**
+
 - `id`: UUID (PK)
 - `name`: string
 - `status`: string
 - `sponsorship_level`: string
 
 **Team Members**
+
 - `id`: UUID (PK)
 - `name`: string
 - `title`: string
 - `status`: string
 
 **Gallery Items**
+
 - `id`: UUID (PK)
 - `title`: string
 - `url`: string
@@ -192,3 +202,7 @@ CREATE POLICY "Editor access" ON public.table_name
   TO role('editor')
   WITH CHECK (true);
 ```
+
+## Model Cutoff Research Requirement
+
+if model cutoff < current_date then they need to research no matter what to improve their knowledge.

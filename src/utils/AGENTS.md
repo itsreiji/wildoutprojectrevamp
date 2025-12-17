@@ -19,12 +19,14 @@ pnpm test -- src/utils/**/*.test.*
 ## Patterns & Conventions
 
 ### File Organization Rules
+
 - **Utility Files**: One file per utility domain (e.g., `validation.ts`, `formatting.ts`)
 - **Supabase Utils**: `src/utils/supabase/` - Supabase-specific utilities
 - **API Utils**: `src/utils/api.ts` - API-related utilities
 - **General Utils**: `src/utils/*.ts` - General purpose utilities
 
 ### Naming Conventions
+
 - **Utility Files**: kebab-case (e.g., `validation.ts`, `formatting.ts`)
 - **Utility Functions**: camelCase (e.g., `validateEmail()`, `formatDate()`)
 - **Constants**: UPPER_SNAKE_CASE (e.g., `DATE_FORMAT`, `API_TIMEOUT`)
@@ -33,6 +35,7 @@ pnpm test -- src/utils/**/*.test.*
 ### Preferred Patterns
 
 ✅ **DO**: Create modular utility functions
+
 ```typescript
 // Example: src/utils/validation.ts
 interface ValidationResult {
@@ -43,41 +46,45 @@ interface ValidationResult {
 export function validateEmail(email: string): ValidationResult {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return { isValid: false, error: 'Invalid email format' };
+    return { isValid: false, error: "Invalid email format" };
   }
   return { isValid: true };
 }
 
 export function validatePassword(password: string): ValidationResult {
   if (password.length < 8) {
-    return { isValid: false, error: 'Password must be at least 8 characters' };
+    return { isValid: false, error: "Password must be at least 8 characters" };
   }
   return { isValid: true };
 }
 ```
 
 ✅ **DO**: Use TypeScript interfaces for function parameters
+
 ```typescript
 // Example: src/utils/formatting.ts
 interface FormatDateOptions {
-  format?: 'short' | 'long' | 'full';
+  format?: "short" | "long" | "full";
   locale?: string;
 }
 
-export function formatDate(date: Date, options: FormatDateOptions = {}): string {
-  const { format = 'short', locale = 'en-US' } = options;
+export function formatDate(
+  date: Date,
+  options: FormatDateOptions = {}
+): string {
+  const { format = "short", locale = "en-US" } = options;
 
   switch (format) {
-    case 'short':
+    case "short":
       return date.toLocaleDateString(locale);
-    case 'long':
-      return date.toLocaleDateString(locale, { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+    case "long":
+      return date.toLocaleDateString(locale, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
-    case 'full':
+    case "full":
       return date.toLocaleString(locale);
     default:
       return date.toString();
@@ -86,6 +93,7 @@ export function formatDate(date: Date, options: FormatDateOptions = {}): string 
 ```
 
 ✅ **DO**: Create reusable API utilities
+
 ```typescript
 // Example: src/utils/api.ts
 interface ApiResponse<T> {
@@ -98,11 +106,11 @@ export async function apiGet<T>(url: string): Promise<ApiResponse<T>> {
   try {
     const response = await fetch(url);
     const data = await response.json();
-    
+
     if (!response.ok) {
-      throw new Error(data.message || 'API request failed');
+      throw new Error(data.message || "API request failed");
     }
-    
+
     return { data, status: response.status };
   } catch (error) {
     return { error: error as Error, status: 500 };
@@ -111,15 +119,16 @@ export async function apiGet<T>(url: string): Promise<ApiResponse<T>> {
 ```
 
 ✅ **DO**: Create Supabase-specific utilities
+
 ```typescript
 // Example: src/utils/supabase/info.tsx
-import { supabase } from '@/supabase/client';
+import { supabase } from "@/supabase/client";
 
 export async function getUserProfile(userId: string) {
   const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', userId)
+    .from("profiles")
+    .select("*")
+    .eq("user_id", userId)
     .single();
 
   if (error) throw error;
@@ -128,6 +137,7 @@ export async function getUserProfile(userId: string) {
 ```
 
 ❌ **DON'T**: Create utilities that duplicate existing library functionality
+
 ```typescript
 // Avoid: Reinventing the wheel
 function myCustomMap(array: any[], callback: (item: any) => any) {
@@ -136,6 +146,7 @@ function myCustomMap(array: any[], callback: (item: any) => any) {
 ```
 
 ❌ **DON'T**: Create utilities with side effects
+
 ```typescript
 // Avoid: Utilities with side effects
 let counter = 0;
@@ -200,3 +211,7 @@ pnpm type-check
 # Verify no side effects
 rg -n "let|var" src/utils/ && echo "Found potential side effects!" || echo "No side effects found"
 ```
+
+## Model Cutoff Research
+
+> **Note**: If model cutoff < current_date then they need to research no matter what to improve their knowledge.

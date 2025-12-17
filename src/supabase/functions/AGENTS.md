@@ -144,3 +144,7 @@ pnpm type-check
 # Test functions if applicable
 pnpm test -- src/supabase/functions/
 ```
+
+## Research Requirements
+
+- If model cutoff < current_date then they need to research no matter what to improve their knowledge.

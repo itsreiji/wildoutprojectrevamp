@@ -19,11 +19,13 @@ pnpm supabase gen types typescript --project-id "your-project-id" > src/supabase
 ## Patterns & Conventions
 
 ### File Organization Rules
+
 - **Client**: `src/supabase/client.ts` - Supabase client configuration
 - **Types**: `src/supabase/types.ts` - Generated TypeScript types
 - **Functions**: `src/supabase/functions/` - Edge functions (if any)
 
 ### Naming Conventions
+
 - **Client Instance**: `supabase` (default export)
 - **Type Interfaces**: TableName + "Row" (e.g., `EventsRow`, `UsersRow`)
 - **Query Functions**: TableName + "Query" (e.g., `eventsQuery`, `usersQuery`)
@@ -31,33 +33,35 @@ pnpm supabase gen types typescript --project-id "your-project-id" > src/supabase
 ### Preferred Patterns
 
 ✅ **DO**: Use the configured Supabase client
+
 ```typescript
 // Example: src/supabase/client.ts
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Supabase URL and/or Anon Key are missing!');
+  throw new Error("Supabase URL and/or Anon Key are missing!");
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 ```
 
 ✅ **DO**: Use generated types for all database operations
+
 ```typescript
 // Example: Using generated types
-import { supabase } from '@/supabase/client';
-import type { Database } from '@/supabase/types';
+import { supabase } from "@/supabase/client";
+import type { Database } from "@/supabase/types";
 
-type Event = Database['public']['Tables']['events']['Row'];
+type Event = Database["public"]["Tables"]["events"]["Row"];
 
 async function fetchEvents() {
   const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .order('start_date', { ascending: true });
+    .from("events")
+    .select("*")
+    .order("start_date", { ascending: true });
 
   if (error) throw error;
   return data as Event[];
@@ -65,62 +69,65 @@ async function fetchEvents() {
 ```
 
 ✅ **DO**: Handle errors properly in database operations
+
 ```typescript
 // Example: Error handling in Supabase queries
-async function createEvent(eventData: Omit<Event, 'id'>) {
+async function createEvent(eventData: Omit<Event, "id">) {
   try {
     const { data, error } = await supabase
-      .from('events')
+      .from("events")
       .insert(eventData)
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating event:', error);
+      console.error("Error creating event:", error);
       throw error;
     }
 
     return data as Event;
   } catch (error) {
-    console.error('Database operation failed:', error);
+    console.error("Database operation failed:", error);
     throw error;
   }
 }
 ```
 
 ✅ **DO**: Use RLS (Row-Level Security) policies
+
 ```typescript
 // Example: Query with RLS
 const { data, error } = await supabase
-  .from('events')
-  .select('*')
-  .eq('user_id', currentUser.id) // RLS policy will enforce this
+  .from("events")
+  .select("*")
+  .eq("user_id", currentUser.id); // RLS policy will enforce this
 ```
 
 ✅ **DO**: Use transactions for multiple operations
+
 ```typescript
 // Example: Transaction pattern
 async function createEventWithArtists(eventData: Event, artistIds: string[]) {
   const { data: event, error: eventError } = await supabase
-    .from('events')
+    .from("events")
     .insert(eventData)
     .select()
     .single();
 
   if (eventError) throw eventError;
 
-  const eventArtists = artistIds.map(artistId => ({
+  const eventArtists = artistIds.map((artistId) => ({
     event_id: event.id,
-    artist_id: artistId
+    artist_id: artistId,
   }));
 
   const { error: artistsError } = await supabase
-    .from('event_artists')
+    .from("event_artists")
     .insert(eventArtists);
 
   if (artistsError) {
     // Rollback: delete the event if artists fail
-    await supabase.from('events').delete().eq('id', event.id);
+    await supabase.from("events").delete().eq("id", event.id);
     throw artistsError;
   }
 
@@ -129,18 +136,20 @@ async function createEventWithArtists(eventData: Event, artistIds: string[]) {
 ```
 
 ❌ **DON'T**: Hardcode database URLs or keys
+
 ```typescript
 // Avoid: Hardcoded Supabase credentials
 const supabase = createClient(
-  'https://hardcoded-url.supabase.co',
-  'hardcoded-anon-key'
+  "https://hardcoded-url.supabase.co",
+  "hardcoded-anon-key"
 ); // ❌ Never do this
 ```
 
 ❌ **DON'T**: Use `any` type for database operations
+
 ```typescript
 // Avoid: Untyped database operations
-const { data } = await supabase.from('events').select('*'); // ❌ No type safety
+const { data } = await supabase.from("events").select("*"); // ❌ No type safety
 ```
 
 ## Touch Points / Key Files
@@ -209,3 +218,7 @@ rg -n "supabase.*createClient.*\"http" src/ && echo "Found hardcoded URLs!" || e
 # Verify type usage
 rg -n "Database\['public'\]" src/ && echo "Using generated types" || echo "Check type usage"
 ```
+
+## Model Cutoff Research
+
+> **Note**: If your model cutoff date is earlier than the current date, you need to conduct research to update your knowledge.

@@ -1,6 +1,7 @@
 # WildOut! Project - src/ AGENTS.md
 
 **Package Identity**
+
 - This package contains the main React application code
 - Primary tech/framework: React 19, TypeScript 5.9, Vite 7.2, Tailwind CSS 4.1
 
@@ -23,6 +24,7 @@ pnpm test
 ## Patterns & Conventions
 
 ### File Organization Rules
+
 - **Components**: `src/components/**` - React components organized by feature
 - **Contexts**: `src/contexts/**` - React context providers for state management
 - **Services**: `src/services/**` - API and business logic services
@@ -33,6 +35,7 @@ pnpm test
 - **Auth**: `src/components/auth/**` - Authentication components
 
 ### Naming Conventions
+
 - ✅ **Components**: PascalCase (e.g., `DashboardEvents.tsx`)
 - ✅ **Functions**: camelCase (e.g., `useEventsContext()`)
 - ✅ **Types**: PascalCase (e.g., `EventType`)
@@ -42,22 +45,26 @@ pnpm test
 ### Preferred Patterns
 
 **Components:**
+
 - ✅ DO: Use functional components with hooks like `src/components/dashboard/DashboardEvents.tsx`
 - ✅ DO: Use Shadcn UI components as base, extend when needed
 - ✅ DO: Use TypeScript interfaces for props
 - ❌ DON'T: Use class components
 
 **Contexts:**
+
 - ✅ DO: Follow pattern from `src/contexts/EventsContext.tsx`
 - ✅ DO: Use React.createContext with proper typing
 - ✅ DO: Provide custom hooks for context consumption
 
 **Services:**
+
 - ✅ DO: Use Supabase client wrapper pattern from `src/services/auditService.ts`
 - ✅ DO: Handle errors with try/catch blocks
 - ✅ DO: Use async/await for database operations
 
 **Forms:**
+
 - ✅ DO: Use react-hook-form with zod validation
 - ✅ DO: Follow pattern from `src/components/dashboard/DashboardEventForm.tsx`
 - ✅ DO: Use Shadcn UI form components
@@ -118,12 +125,12 @@ pnpm type-check && pnpm test && pnpm build
 
 ```tsx
 // src/components/ExampleComponent.tsx
-import React from 'react'
-import { Button } from '@/components/ui/button'
+import React from "react";
+import { Button } from "@/components/ui/button";
 
 interface ExampleComponentProps {
-  title: string
-  onClick: () => void
+  title: string;
+  onClick: () => void;
 }
 
 export function ExampleComponent({ title, onClick }: ExampleComponentProps) {
@@ -132,13 +139,14 @@ export function ExampleComponent({ title, onClick }: ExampleComponentProps) {
       <h2 className="text-2xl font-bold">{title}</h2>
       <Button onClick={onClick}>Click me</Button>
     </div>
-  )
+  );
 }
 ```
 
 ### Dashboard Components
 
 Dashboard components follow a specific pattern:
+
 - Use `src/components/dashboard/DashboardLayout.tsx` as base layout
 - Extend Shadcn UI components for consistent styling
 - Use context providers for state management
@@ -150,3 +158,7 @@ Dashboard components follow a specific pattern:
 - Follow pattern from `src/components/dashboard/DashboardEventForm.tsx`
 - Use Shadcn UI form components (`Input`, `Select`, `Checkbox`, etc.)
 - Provide proper error handling and user feedback
+
+## Research Requirements
+
+- If model cutoff < current_date then they need to research no matter what to improve their knowledge.

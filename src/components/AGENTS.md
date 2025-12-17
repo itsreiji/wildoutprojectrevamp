@@ -19,6 +19,7 @@ pnpm test -- src/components/**/*.test.*
 ## Patterns & Conventions
 
 ### File Organization Rules
+
 - **UI Components**: `src/components/ui/` - Shadcn UI primitives
 - **Custom Components**: `src/components/` - Custom application components
 - **Auth Components**: `src/components/auth/` - Authentication components
@@ -26,6 +27,7 @@ pnpm test -- src/components/**/*.test.*
 - **Figma Components**: `src/components/figma/` - Design system components
 
 ### Naming Conventions
+
 - **Component Files**: PascalCase (e.g., `Button.tsx`, `UserCard.tsx`)
 - **Component Functions**: PascalCase (e.g., `export function Button()`)
 - **Props Interfaces**: ComponentName + "Props" (e.g., `ButtonProps`)
@@ -34,6 +36,7 @@ pnpm test -- src/components/**/*.test.*
 ### Preferred Patterns
 
 ✅ **DO**: Use Shadcn UI components as foundation
+
 ```typescript
 // Example: src/components/ui/button.tsx (Shadcn pattern)
 import { cva } from "class-variance-authority";
@@ -44,7 +47,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -60,6 +64,7 @@ const buttonVariants = cva(
 ```
 
 ✅ **DO**: Create custom components that extend Shadcn
+
 ```typescript
 // Example: src/components/CustomButton.tsx
 import { Button } from "./ui/button";
@@ -81,6 +86,7 @@ export function CustomButton({ children, onClick, icon }: CustomButtonProps) {
 ```
 
 ✅ **DO**: Use TypeScript for all component props
+
 ```typescript
 // Example: src/components/UserProfile.tsx
 interface UserProfileProps {
@@ -100,6 +106,7 @@ export function UserProfile({ user, onEdit, onDelete }: UserProfileProps) {
 ```
 
 ✅ **DO**: Use Lucide icons
+
 ```typescript
 // Example: src/components/IconButton.tsx
 import { Button } from "./ui/button";
@@ -121,12 +128,16 @@ export function IconButton({ icon: Icon, onClick, tooltip }: IconButtonProps) {
 ```
 
 ❌ **DON'T**: Create components that duplicate Shadcn functionality
+
 ```typescript
 // Avoid: Creating custom button when Shadcn button exists
-function MyCustomButton() { /* Don't reinvent the wheel */ }
+function MyCustomButton() {
+  /* Don't reinvent the wheel */
+}
 ```
 
 ❌ **DON'T**: Use inline styles or hardcoded colors
+
 ```typescript
 // Avoid: Inline styles
 <div style={{ color: "#3b82f6", padding: "16px" }}>Content</div>
@@ -195,3 +206,7 @@ pnpm type-check
 # Verify no inline styles
 rg -n "style={{|style=\"" src/components/ && echo "Found inline styles!" || echo "No inline styles found"
 ```
+
+## Research Requirements
+
+- If model cutoff < current_date then they need to research no matter what to improve their knowledge.

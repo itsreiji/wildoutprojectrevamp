@@ -22,6 +22,7 @@ This QWEN.md provides **Qwen-specific guidance** for working with the WildOut! c
 - **MUST** use `@/` alias for imports (e.g., `import { Button } from '@/components/ui/button'`)
 - **MUST** use TanStack Query for data fetching and state management
 - **MUST** use Shadcn UI components for consistent styling
+- **MUST** give IDs to each class for consistent identification and tracking
 
 ### Best Practices (SHOULD)
 

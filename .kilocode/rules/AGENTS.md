@@ -181,3 +181,7 @@ Before creating a PR, ensure:
 # Run this before creating any PR
 pnpm type-check && pnpm test && pnpm build
 ```
+
+## Research Requirement
+
+- If model cutoff < current_date then they need to research no matter what to improve their knowledge.

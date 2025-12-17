@@ -1,6 +1,7 @@
 # WildOut! Project - scripts/ AGENTS.md
 
 **Package Identity**
+
 - This package contains utility and migration scripts
 - Primary tech/framework: TypeScript, Node.js
 
@@ -17,11 +18,13 @@ ENV_VAR=value pnpm tsx scripts/script-name.ts
 ## Patterns & Conventions
 
 ### File Organization Rules
+
 - **Utility scripts**: `scripts/**` - Reusable utility scripts
 - **Migration scripts**: `scripts/**` - Data migration and import scripts
 - **Seed scripts**: `scripts/seed-public-content.ts` - Database seeding
 
 ### Naming Conventions
+
 - ✅ **Script files**: kebab-case with `.ts` extension (e.g., `import-content-from-repo.ts`)
 - ✅ **Functions**: camelCase with descriptive names
 - ✅ **Variables**: camelCase or UPPER_SNAKE_CASE for constants
@@ -29,6 +32,7 @@ ENV_VAR=value pnpm tsx scripts/script-name.ts
 ### Preferred Patterns
 
 **Utility Scripts:**
+
 - ✅ DO: Follow pattern from `scripts/importContentFromRepo.ts`
 - ✅ DO: Use proper error handling with try/catch
 - ✅ DO: Use async/await for I/O operations
@@ -36,6 +40,7 @@ ENV_VAR=value pnpm tsx scripts/script-name.ts
 - ✅ DO: Use environment variables for configuration
 
 **Migration Scripts:**
+
 - ✅ DO: Follow pattern from `scripts/seed-public-content.ts`
 - ✅ DO: Use Supabase client for database operations
 - ✅ DO: Batch operations for performance
@@ -43,6 +48,7 @@ ENV_VAR=value pnpm tsx scripts/script-name.ts
 - ✅ DO: Validate data before import
 
 **Error Handling:**
+
 - ✅ DO: Use try/catch blocks for all external operations
 - ✅ DO: Provide meaningful error messages
 - ✅ DO: Exit with proper exit codes
@@ -95,135 +101,133 @@ rg -n "try|catch|error" scripts
 
 ```typescript
 // scripts/example-script.ts
-import { createClient } from '@supabase/supabase-js'
-import dotenv from 'dotenv'
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
 
 // Load environment variables
-dotenv.config()
+dotenv.config();
 
 // Configuration
-const DRY_RUN = process.env.DRY_RUN === 'true'
-const BATCH_SIZE = parseInt(process.env.BATCH_SIZE || '50')
+const DRY_RUN = process.env.DRY_RUN === "true";
+const BATCH_SIZE = parseInt(process.env.BATCH_SIZE || "50");
 
 // Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('Missing Supabase environment variables')
-  process.exit(1)
+  console.error("Missing Supabase environment variables");
+  process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function main() {
   try {
-    console.log('Starting script...')
-    
+    console.log("Starting script...");
+
     if (DRY_RUN) {
-      console.log('🔵 DRY RUN MODE - No changes will be made')
+      console.log("🔵 DRY RUN MODE - No changes will be made");
     }
-    
+
     // Main script logic here
     const { data, error } = await supabase
-      .from('table_name')
-      .select('*')
-      .limit(BATCH_SIZE)
-    
+      .from("table_name")
+      .select("*")
+      .limit(BATCH_SIZE);
+
     if (error) {
-      throw error
+      throw error;
     }
-    
-    console.log(`Processed ${data.length} records`)
-    
+
+    console.log(`Processed ${data.length} records`);
+
     if (!DRY_RUN) {
-      console.log('✅ Script completed successfully')
+      console.log("✅ Script completed successfully");
     } else {
-      console.log('✅ Dry run completed - no changes made')
+      console.log("✅ Dry run completed - no changes made");
     }
-    
   } catch (error) {
-    console.error('❌ Script failed:', error)
-    process.exit(1)
+    console.error("❌ Script failed:", error);
+    process.exit(1);
   }
 }
 
 if (require.main === module) {
-  main()
+  main();
 }
 
 // Export for programmatic use
-export { main }
+export { main };
 ```
 
 ### Recommended Data Import Pattern
 
 ```typescript
 // scripts/import-data.ts
-import { createClient } from '@supabase/supabase-js'
-import dotenv from 'dotenv'
-import { readFileSync } from 'fs'
-import { resolve } from 'path'
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 
 interface ImportData {
-  id: string
-  name: string
+  id: string;
+  name: string;
   // other fields
 }
 
-dotenv.config()
+dotenv.config();
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+);
 
 async function importData(filePath: string) {
   try {
     // Read and parse data
-    const fileContent = readFileSync(resolve(filePath), 'utf-8')
-    const data: ImportData[] = JSON.parse(fileContent)
-    
-    console.log(`Found ${data.length} records to import`)
-    
+    const fileContent = readFileSync(resolve(filePath), "utf-8");
+    const data: ImportData[] = JSON.parse(fileContent);
+
+    console.log(`Found ${data.length} records to import`);
+
     // Validate data
-    const validData = data.filter(item => 
-      item.id && item.name
-    )
-    
-    console.log(`${validData.length} records are valid`)
-    
+    const validData = data.filter((item) => item.id && item.name);
+
+    console.log(`${validData.length} records are valid`);
+
     // Import in batches
-    const batchSize = 50
+    const batchSize = 50;
     for (let i = 0; i < validData.length; i += batchSize) {
-      const batch = validData.slice(i, i + batchSize)
-      
+      const batch = validData.slice(i, i + batchSize);
+
       const { error } = await supabase
-        .from('table_name')
-        .upsert(batch, { onConflict: 'id' })
-      
+        .from("table_name")
+        .upsert(batch, { onConflict: "id" });
+
       if (error) {
-        console.error(`Error importing batch ${i/batchSize + 1}:`, error)
-        continue
+        console.error(`Error importing batch ${i / batchSize + 1}:`, error);
+        continue;
       }
-      
-      console.log(`Imported batch ${i/batchSize + 1} (${batch.length} records)`)
+
+      console.log(
+        `Imported batch ${i / batchSize + 1} (${batch.length} records)`
+      );
     }
-    
-    console.log('✅ Import completed successfully')
-    
+
+    console.log("✅ Import completed successfully");
   } catch (error) {
-    console.error('❌ Import failed:', error)
-    process.exit(1)
+    console.error("❌ Import failed:", error);
+    process.exit(1);
   }
 }
 
 // Command line usage
 if (process.argv[2]) {
-  importData(process.argv[2])
+  importData(process.argv[2]);
 } else {
-  console.log('Usage: pnpm tsx scripts/import-data.ts <file-path>')
-  process.exit(1)
+  console.log("Usage: pnpm tsx scripts/import-data.ts <file-path>");
+  process.exit(1);
 }
 ```
 
@@ -231,78 +235,82 @@ if (process.argv[2]) {
 
 ```typescript
 // scripts/migrate-data.ts
-import { createClient } from '@supabase/supabase-js'
-import dotenv from 'dotenv'
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+);
 
 async function migrateOldToNewFormat() {
   try {
-    console.log('Starting data migration...')
-    
+    console.log("Starting data migration...");
+
     // 1. Fetch old data
     const { data: oldData, error: fetchError } = await supabase
-      .from('old_table')
-      .select('*')
-    
-    if (fetchError) throw fetchError
+      .from("old_table")
+      .select("*");
+
+    if (fetchError) throw fetchError;
     if (!oldData || oldData.length === 0) {
-      console.log('No data to migrate')
-      return
+      console.log("No data to migrate");
+      return;
     }
-    
-    console.log(`Found ${oldData.length} records to migrate`)
-    
+
+    console.log(`Found ${oldData.length} records to migrate`);
+
     // 2. Transform data
-    const newData = oldData.map(item => ({
+    const newData = oldData.map((item) => ({
       id: item.id,
       new_field: item.old_field,
       // other transformations
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }))
-    
+      updated_at: new Date().toISOString(),
+    }));
+
     // 3. Validate transformed data
-    const validData = newData.filter(item => item.id && item.new_field)
-    console.log(`${validData.length} records are valid for migration`)
-    
+    const validData = newData.filter((item) => item.id && item.new_field);
+    console.log(`${validData.length} records are valid for migration`);
+
     // 4. Migrate in batches
-    const batchSize = 25
+    const batchSize = 25;
     for (let i = 0; i < validData.length; i += batchSize) {
-      const batch = validData.slice(i, i + batchSize)
-      
+      const batch = validData.slice(i, i + batchSize);
+
       const { error: insertError } = await supabase
-        .from('new_table')
-        .insert(batch)
-      
+        .from("new_table")
+        .insert(batch);
+
       if (insertError) {
-        console.error(`Error migrating batch ${i/batchSize + 1}:`, insertError)
-        continue
+        console.error(
+          `Error migrating batch ${i / batchSize + 1}:`,
+          insertError
+        );
+        continue;
       }
-      
-      console.log(`Migrated batch ${i/batchSize + 1} (${batch.length} records)`)
+
+      console.log(
+        `Migrated batch ${i / batchSize + 1} (${batch.length} records)`
+      );
     }
-    
-    console.log('✅ Migration completed successfully')
-    
+
+    console.log("✅ Migration completed successfully");
   } catch (error) {
-    console.error('❌ Migration failed:', error)
-    process.exit(1)
+    console.error("❌ Migration failed:", error);
+    process.exit(1);
   }
 }
 
 // Dry run mode
-const DRY_RUN = process.env.DRY_RUN === 'true'
+const DRY_RUN = process.env.DRY_RUN === "true";
 if (DRY_RUN) {
-  console.log('🔵 DRY RUN MODE - No actual migration will occur')
+  console.log("🔵 DRY RUN MODE - No actual migration will occur");
   // In dry run, you would simulate the process without actual database writes
 } else {
-  migrateOldToNewFormat()
+  migrateOldToNewFormat();
 }
 ```
 
@@ -333,59 +341,61 @@ async function robustOperation() {
   try {
     // 1. Input validation
     if (!process.env.REQUIRED_VAR) {
-      throw new Error('Missing required environment variable: REQUIRED_VAR')
+      throw new Error("Missing required environment variable: REQUIRED_VAR");
     }
-    
+
     // 2. Database operation with retry logic
-    let retries = 3
-    let success = false
-    
+    let retries = 3;
+    let success = false;
+
     while (retries > 0 && !success) {
       try {
         const { data, error } = await supabase
-          .from('table')
-          .select('*')
-          .limit(100)
-        
-        if (error) throw error
-        
+          .from("table")
+          .select("*")
+          .limit(100);
+
+        if (error) throw error;
+
         // Process data
-        console.log(`Processed ${data.length} records`)
-        success = true
-        
+        console.log(`Processed ${data.length} records`);
+        success = true;
       } catch (dbError) {
-        retries--
-        if (retries === 0) throw dbError
-        
-        console.warn(`Attempt failed, retrying... (${retries} attempts left)`)
-        await new Promise(resolve => setTimeout(resolve, 1000)) // Wait before retry
+        retries--;
+        if (retries === 0) throw dbError;
+
+        console.warn(`Attempt failed, retrying... (${retries} attempts left)`);
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait before retry
       }
     }
-    
+
     // 3. Post-operation validation
-    const validationResult = await validateResults()
+    const validationResult = await validateResults();
     if (!validationResult.valid) {
-      throw new Error(`Validation failed: ${validationResult.message}`)
+      throw new Error(`Validation failed: ${validationResult.message}`);
     }
-    
-    return { success: true }
-    
+
+    return { success: true };
   } catch (error) {
-    console.error('Operation failed:', error)
-    
+    console.error("Operation failed:", error);
+
     // Different error handling based on error type
     if (error instanceof Error) {
-      if (error.message.includes('network')) {
-        console.log('📡 Network error - check your internet connection')
-      } else if (error.message.includes('permission')) {
-        console.log('🔒 Permission error - check your credentials')
+      if (error.message.includes("network")) {
+        console.log("📡 Network error - check your internet connection");
+      } else if (error.message.includes("permission")) {
+        console.log("🔒 Permission error - check your credentials");
       } else {
-        console.log('❌ Unexpected error occurred')
+        console.log("❌ Unexpected error occurred");
       }
     }
-    
+
     // Exit with appropriate code
-    process.exit(1)
+    process.exit(1);
   }
 }
 ```
+
+## Note
+
+- If model cutoff < current_date then they need to research no matter what to improve their knowledge.
