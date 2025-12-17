@@ -89,11 +89,10 @@ vi.mock('@/components/ui/button', () => ({
 }));
 
 // Import the actual component after mocks
-import { AdminDashboard } from '../components/admin/AdminDashboard';
+import AdminDashboard from '../components/admin/AdminDashboard';
 
-const renderAdminDashboard = (props: { children?: React.ReactNode } = {}) => {
-  const { children = <div data-testid="test-content">Test Content</div> } = props;
-  return render(<AdminDashboard>{children}</AdminDashboard>);
+const renderAdminDashboard = () => {
+  return render(<AdminDashboard />);
 };
 
 describe('AdminDashboard', () => {
@@ -392,6 +391,7 @@ describe('AdminDashboard', () => {
 
   describe('Admin Sections', () => {
     it('should filter sections based on permissions', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { useStaticContent } = require('../contexts/StaticContentContext');
       const mockUseStaticContent = useStaticContent as MockedFunction<any>;
 
@@ -424,6 +424,7 @@ describe('AdminDashboard', () => {
     });
 
     it('should sort sections by order_index', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { useStaticContent } = require('../contexts/StaticContentContext');
       const mockUseStaticContent = useStaticContent as MockedFunction<any>;
 
@@ -454,6 +455,7 @@ describe('AdminDashboard', () => {
 
   describe('Error Handling', () => {
     it('should handle missing user information gracefully', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { useAuth } = require('../contexts/AuthContext');
       const mockUseAuth = useAuth as MockedFunction<any>;
 
@@ -473,6 +475,7 @@ describe('AdminDashboard', () => {
     });
 
     it('should handle missing user metadata gracefully', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { useAuth } = require('../contexts/AuthContext');
       const mockUseAuth = useAuth as MockedFunction<any>;
 

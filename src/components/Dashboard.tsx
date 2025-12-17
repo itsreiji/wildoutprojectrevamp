@@ -6,7 +6,7 @@ import { DashboardEvents } from "./dashboard/DashboardEvents";
 import { DashboardGallery } from "./dashboard/DashboardGallery";
 import { DashboardHero } from "./dashboard/DashboardHero";
 import { DashboardLayout } from "./dashboard/DashboardLayout";
-import DashboardPartners from "./dashboard/DashboardPartners";
+import { DashboardPartners } from "./dashboard/DashboardPartners";
 import { DashboardSettings } from "./dashboard/DashboardSettings";
 import { DashboardTeam } from "./dashboard/DashboardTeam";
 import { DashboardWithRightPanel } from "./dashboard/DashboardWithRightPanel";

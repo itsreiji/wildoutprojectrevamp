@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { AdminGuard } from "./admin/AdminGuard";
 import { LandingPage } from "./components/LandingPage";
-import { AdminDashboard } from "./components/admin/AdminDashboard";
+import AdminDashboard from "./components/admin/AdminDashboard";
 import { LoginPage } from "./components/auth/LoginPage";
 import { Router, RouterProvider } from "./components/router";
 import { useAuth } from "./contexts/AuthContext";

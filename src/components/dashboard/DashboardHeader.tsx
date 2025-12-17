@@ -72,10 +72,12 @@ export const DashboardHeader = React.memo(
 
     // Update time every second
     useEffect(() => {
+      // eslint-disable-next-line no-undef
       const timer = setInterval(() => {
         setCurrentTime(new Date());
       }, 1000);
 
+      // eslint-disable-next-line no-undef
       return () => clearInterval(timer);
     }, []);
 

@@ -13,7 +13,7 @@ import { usePartners } from '@/contexts/PartnersContext';
 import { AlertDialog, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel, AlertDialogTrigger, AlertDialogContent } from '@/components/ui/alert-dialog';
 import type { Partner } from '@/types/content';
 
-export default function DashboardPartners() {
+export const DashboardPartners = () => {
   const { partners = [], addPartner, updatePartner, deletePartner } = usePartners();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -183,7 +183,7 @@ export default function DashboardPartners() {
               <div className="absolute top-4 right-4" id={`dashboard-partner-featured-badge-container-${partner.id}`}>
                 <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30" id={`dashboard-partner-featured-badge-${partner.id}`}>Featured</Badge>
               </div>
-            })
+            )}
 
             {/* Status Badge */}
             <div className="flex items-start justify-between mb-4" id={`dashboard-partner-status-container-${partner.id}`}>
@@ -206,13 +206,13 @@ export default function DashboardPartners() {
               <div className="w-full h-24 rounded-lg overflow-hidden border border-white/10 mb-4 bg-white/5 flex items-center justify-center" id={`dashboard-partner-logo-placeholder-${partner.id}`}>
                 <span className="text-sm text-white/40" id={`dashboard-partner-logo-placeholder-text-${partner.id}`}>No logo</span>
               </div>
-            })
+            )}
 
             {/* Info */}
             <h3 className="text-xl text-white mb-2" id={`dashboard-partner-name-${partner.id}`}>{partner.name}</h3>
             {partner.description && (
               <p className="text-sm text-white/60 mb-4 line-clamp-2" id={`dashboard-partner-description-${partner.id}`}>{partner.description}</p>
-            })
+            )}
 
             {/* Contact Info */}
             <div className="space-y-2 mb-4 text-sm text-white/70" id={`dashboard-partner-contact-container-${partner.id}`}>
@@ -286,7 +286,7 @@ export default function DashboardPartners() {
               </AlertDialog>
             </div>
           </motion.div>
-        ))
+        ))}
       </div>
 
       {filteredPartners.length === 0 && (
@@ -317,5 +317,4 @@ export default function DashboardPartners() {
       </Dialog>
     </div>
   );
-
 }
