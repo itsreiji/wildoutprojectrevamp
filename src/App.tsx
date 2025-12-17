@@ -1,12 +1,12 @@
 /* @refresh reset */
 import { useEffect, useState } from "react";
+import { AdminGuard } from "./admin/AdminGuard";
 import { LandingPage } from "./components/LandingPage";
+import { AdminDashboard } from "./components/admin/AdminDashboard";
 import { LoginPage } from "./components/auth/LoginPage";
 import { Router, RouterProvider } from "./components/router";
 import { useAuth } from "./contexts/AuthContext";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
-import { AdminGuard } from "./admin/AdminGuard";
-import { AdminDashboard } from "./components/admin/AdminDashboard";
 import supabaseClient from "./supabase/client";
 
 // Admin dashboard component wrapped with guard
@@ -18,10 +18,10 @@ const AdminDashboardWrapper = () => (
 
 // Define routes for the router
 const routes = {
-  '/': LandingPage,
-  '/login': LoginPage,
-  '/auth/callback': AuthCallbackPage,
-  '/admin/*': AdminDashboardWrapper,
+  "/": LandingPage,
+  "/login": LoginPage,
+  "/auth/callback": AuthCallbackPage,
+  "/admin/*": AdminDashboardWrapper,
 };
 
 const App = () => {
