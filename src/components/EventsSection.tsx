@@ -30,7 +30,7 @@ export const EventsSection = React.memo(() => {
             viewport={{ once: true }}
             whileInView={{ opacity: 1, y: 0 }}
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 tracking-normal">
               <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
                 Upcoming Events
               </span>

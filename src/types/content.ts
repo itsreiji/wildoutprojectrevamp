@@ -43,6 +43,7 @@ export interface TeamMember {
   title: string | null;
   bio: string | null;
   avatar_url: string | null;
+  photo_url_link?: string | null;
   email: string | null;
   status?: string;
   linkedin_url?: string | null;

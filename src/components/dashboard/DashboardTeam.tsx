@@ -135,10 +135,10 @@ export const DashboardTeam = React.memo(() => {
     setIsSubmitting(true);
     try {
       let avatarUrl: string | undefined =
-        editingMember?.avatar_url ?? undefined;
+        values.photo_url_link || editingMember?.avatar_url || undefined;
       const newUploadedFiles: string[] = [];
 
-      // Handle avatar upload
+      // Handle avatar upload - File upload takes precedence over photo_url_link
       if (values.avatar_file) {
         const file = values.avatar_file as File;
         const validation = validateFile(file);
@@ -205,6 +205,7 @@ export const DashboardTeam = React.memo(() => {
         avatar_url: avatarUrl || null,
         metadata: {
           ...(editingMember?.metadata || {}),
+          photo_url_link: values.photo_url_link || null,
           social_links:
             Object.keys(socialLinks).length > 0 ? socialLinks : null,
         },

@@ -60,7 +60,7 @@ export const PartnersSection = React.memo(() => {
             <Sparkles className="h-4 w-4 text-[#E93370] mr-2" />
             <span className="text-sm text-[#E93370]">Trusted Collaborations</span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 tracking-normal">
             <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
               Our Partners
             </span>

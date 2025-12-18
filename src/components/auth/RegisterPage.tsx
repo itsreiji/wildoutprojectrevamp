@@ -39,7 +39,7 @@ const copy = {
 };
 
 export const RegisterPage: React.FC = () => {
-  const { signInWithOAuth, role, loading } = useAuth();
+  const { role, loading } = useAuth();
   const { navigate, getAdminPath } = useRouter();
   const [formError, setFormError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
@@ -59,12 +59,12 @@ export const RegisterPage: React.FC = () => {
     }
   }, [role, navigate, getAdminPath]);
 
-  const onSubmit = async (values: RegisterFormValues) => {
+  const onSubmit = async (_values: RegisterFormValues) => {
     setFormError(null);
     setInfoMessage(null);
 
-    // Registration is handled via OAuth only in the original code? 
-    // The original code had logic for email/password but then said "Registration is handled via OAuth only" 
+    // Registration is handled via OAuth only in the original code?
+    // The original code had logic for email/password but then said "Registration is handled via OAuth only"
     // and set error = null and then a success message.
     // However, it also checked `if (error)` which was unreachable null.
     // I will preserve the simulated behavior but cleaner.
@@ -88,7 +88,7 @@ export const RegisterPage: React.FC = () => {
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
           <div className="text-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent tracking-normal">
               {copy.title}
             </h1>
             <p className="mt-3 text-sm text-white/60 leading-relaxed max-w-xs mx-auto">

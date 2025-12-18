@@ -44,6 +44,7 @@ const teamFormSchema = z.object({
   email: z.string().email("Email must be a valid email address"),
   bio: z.string().optional().nullable(),
   avatar_file: z.any().optional(),
+  photo_url_link: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   social_links: z
     .record(z.string(), z.string().nullable())
     .optional()
@@ -72,6 +73,7 @@ export function DashboardTeamForm({
         title: "",
         email: "",
         bio: "",
+        photo_url_link: "",
         social_links: {},
       };
     }
@@ -81,6 +83,10 @@ export function DashboardTeamForm({
       title: defaultValues.title || "",
       email: defaultValues.email || "",
       bio: defaultValues.bio || "",
+      photo_url_link:
+        defaultValues.photo_url_link ||
+        (defaultValues.metadata as any)?.photo_url_link ||
+        "",
       social_links:
         (defaultValues.social_links as Record<string, string | null>) || {},
     };
@@ -269,6 +275,36 @@ export function DashboardTeamForm({
                   <FormMessage
                     className="text-[#E93370] text-sm mt-1"
                     id="dashboard-team-form-bio-error"
+                  />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="photo_url_link"
+              render={({ field }) => (
+                <FormItem
+                  id="dashboard-team-form-photo-link-field"
+                  className="space-y-2"
+                >
+                  <FormLabel
+                    className="text-white/80 text-sm font-semibold"
+                    htmlFor="dashboard-team-form-photo-link-input"
+                  >
+                    Photo Link (URL)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="dashboard-team-form-photo-link-input"
+                      placeholder="https://example.com/photo.jpg"
+                      {...field}
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                    />
+                  </FormControl>
+                  <FormMessage
+                    className="text-[#E93370] text-xs mt-1"
+                    id="dashboard-team-form-photo-link-error"
                   />
                 </FormItem>
               )}

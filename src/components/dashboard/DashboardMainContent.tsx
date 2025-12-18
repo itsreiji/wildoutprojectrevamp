@@ -30,7 +30,7 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
       <div className="w-full max-w-[1600px] mx-auto min-w-0 flex flex-col gap-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight italic uppercase">
+            <h1 className="text-3xl font-black text-gray-900 tracking-normal italic uppercase">
               DASHBOARD OVERVIEW
             </h1>
             <p className="text-gray-500 mt-1 font-medium">
@@ -69,7 +69,7 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2 tracking-tight">
+            <h3 className="text-lg font-bold text-gray-900 mb-2 tracking-normal">
               Quick Access
             </h3>
             <p className="text-gray-500 text-sm leading-relaxed">
@@ -94,7 +94,7 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2 tracking-tight">
+            <h3 className="text-lg font-bold text-gray-900 mb-2 tracking-normal">
               Instant Sync
             </h3>
             <p className="text-gray-500 text-sm leading-relaxed">
@@ -119,7 +119,7 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2 tracking-tight">
+            <h3 className="text-lg font-bold text-gray-900 mb-2 tracking-normal">
               Secure & Audited
             </h3>
             <p className="text-gray-500 text-sm leading-relaxed">

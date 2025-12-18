@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -7,7 +6,7 @@ import { useRouter } from '../router';
 
 /**
  * DashboardHome Component
- * 
+ *
  * The default landing view for the admin dashboard.
  * Displays quick stats and recent activity overview.
  */
@@ -28,7 +27,7 @@ const DashboardHome = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold tracking-normal bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
           Dashboard Overview
         </h1>
         <p className="text-white/60 mt-1">
@@ -141,8 +140,8 @@ const DashboardHome = () => {
                       {section.items} {section.items === 1 ? 'item' : 'items'}
                     </p>
                   </div>
-                  <Button 
-                    className="w-full mt-4 bg-white/10 hover:bg-white/20 text-white border-0 h-10 focus-visible:ring-[#E93370] transition-colors" 
+                  <Button
+                    className="w-full mt-4 bg-white/10 hover:bg-white/20 text-white border-0 h-10 focus-visible:ring-[#E93370] transition-colors"
                     variant="outline"
                     onClick={() => navigate(getAdminPath(section.slug))}
                   >

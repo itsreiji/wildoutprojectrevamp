@@ -31,6 +31,9 @@ const TeamMemberModal = ({
   const [title, setTitle] = useState(member?.title || "");
   const [bio, setBio] = useState(member?.bio || "");
   const [avatarUrl, setAvatarUrl] = useState(member?.avatar_url || "");
+  const [photoUrlLink, setPhotoUrlLink] = useState(
+    member?.photo_url_link || (member?.metadata as any)?.photo_url_link || ""
+  );
   const [email, setEmail] = useState(member?.email || "");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -40,11 +43,15 @@ const TeamMemberModal = ({
       name,
       title,
       bio,
-      avatar_url: avatarUrl,
+      avatar_url: avatarUrl || photoUrlLink || null,
+      photo_url_link: photoUrlLink || null,
       email,
       status: member?.status || "active",
       linkedin_url: member?.linkedin_url || null,
-      metadata: member?.metadata || null,
+      metadata: {
+        ...(member?.metadata || {}),
+        photo_url_link: photoUrlLink || null,
+      },
       display_order: member?.display_order || null,
       created_at: member?.created_at || null,
       updated_at: member?.updated_at || null,
@@ -146,6 +153,21 @@ const TeamMemberModal = ({
                       id="avatarUrl"
                       value={avatarUrl}
                       onChange={(e) => setAvatarUrl(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      className="text-white/80 text-sm font-semibold"
+                      htmlFor="photoUrlLink"
+                    >
+                      Photo Link (URL)
+                    </label>
+                    <Input
+                      className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                      id="photoUrlLink"
+                      placeholder="https://example.com/photo.jpg"
+                      value={photoUrlLink}
+                      onChange={(e) => setPhotoUrlLink(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">

@@ -20,20 +20,23 @@ export const HeroSection = React.memo(() => {
             transition={{ duration: 0.8 }}
           >
             <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.5, 0.7, 0.5],
-              }}
-              className="absolute inset-0 blur-3xl opacity-50"
-              id="hero-brand-glow"
-              style={{ background: '#E93370' }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-            <h1 className="relative text-6xl md:text-8xl lg:text-9xl tracking-tight" id="hero-title">
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 0.7, 0.5],
+            }}
+            className="absolute inset-0 opacity-50"
+            id="hero-brand-glow"
+            style={{
+              background: 'radial-gradient(circle, #E93370 0%, transparent 70%)',
+              filter: 'blur(64px)'
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+            <h1 className="relative text-6xl md:text-8xl lg:text-9xl tracking-normal" id="hero-title">
               <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent" id="hero-title-text">
                 {hero.title}
               </span>

@@ -82,8 +82,6 @@ export const DashboardEvents = () => {
     addEvent,
     updateEvent,
     deleteEvent,
-    loading,
-    error,
   } = useEvents();
   const { user, role } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,7 +135,6 @@ export const DashboardEvents = () => {
   });
 
   // Pagination
-  const totalPages = Math.ceil(sortedEvents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedEvents = sortedEvents.slice(
     startIndex,

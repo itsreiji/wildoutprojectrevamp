@@ -210,7 +210,7 @@ export const LoginPage: React.FC = () => {
       <div className="login-container relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <div className={`login-card w-full space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl ${isMobile ? 'max-w-xs' : 'max-w-sm'}`} id="admin-login-card">
           <div className="text-center" id="admin-login-header">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent" id="admin-login-title">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent tracking-normal" id="admin-login-title">
               {copy.title}
             </h1>
             <p className="mt-3 text-sm text-white/60 leading-relaxed max-w-xs mx-auto" id="admin-login-subtitle">

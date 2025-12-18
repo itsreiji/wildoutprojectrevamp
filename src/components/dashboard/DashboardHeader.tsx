@@ -17,8 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Bell, Search, Settings } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import React from "react";
 import { useStaticContent } from "../../contexts/StaticContentContext";
 import { useRouter } from "../router";
 import { cn } from "../ui/utils";
@@ -49,36 +48,10 @@ const mockNotifications = [
   },
 ];
 
-const mockAlerts = [
-  {
-    title: "Storage Warning",
-    desc: "85% storage capacity reached",
-    time: "10 min ago",
-  },
-  {
-    title: "Pending Approvals",
-    desc: "3 events waiting for approval",
-    time: "1 hour ago",
-  },
-];
-
 export const DashboardHeader = React.memo(
   ({ currentPage }: DashboardHeaderProps) => {
-    const { getAdminPath, navigate } = useRouter();
+    const { getAdminPath } = useRouter();
     const { adminSections } = useStaticContent();
-    const { user } = useAuth();
-    const [currentTime, setCurrentTime] = useState(new Date());
-
-    // Update time every second
-    useEffect(() => {
-      // eslint-disable-next-line no-undef
-      const timer = setInterval(() => {
-        setCurrentTime(new Date());
-      }, 1000);
-
-      // eslint-disable-next-line no-undef
-      return () => clearInterval(timer);
-    }, []);
 
     const currentSection = adminSections.find(
       (item) => item.slug === currentPage
@@ -86,27 +59,6 @@ export const DashboardHeader = React.memo(
     const pageTitle =
       currentSection?.label ||
       currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
-
-    const displayName =
-      (user?.user_metadata &&
-      typeof user.user_metadata === "object" &&
-      "full_name" in user.user_metadata
-        ? user.user_metadata.full_name
-        : null) || (user?.email ? user.email.split("@")[0] : "User");
-
-    // Format date and time
-    const dateStr = currentTime.toLocaleDateString("en-US", {
-      weekday: "short",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-
-    const timeStr = currentTime.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
 
     return (
       <header
@@ -142,7 +94,7 @@ export const DashboardHeader = React.memo(
                 <>
                   <BreadcrumbSeparator className="text-gray-300" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage className="text-gray-900 font-bold tracking-tight">
+                    <BreadcrumbPage className="text-gray-900 font-bold tracking-normal">
                       {pageTitle}
                     </BreadcrumbPage>
                   </BreadcrumbItem>

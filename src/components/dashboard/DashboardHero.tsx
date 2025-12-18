@@ -191,7 +191,7 @@ export const DashboardHero = React.memo(() => {
           </CardHeader>
           <CardContent id="admin-hero-preview-card-content">
             <div className="p-8 rounded-xl bg-black/40 border border-white/10 text-center space-y-6" id="admin-hero-preview-content">
-              <h1 className="text-5xl tracking-tight bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent" id="admin-hero-preview-title-display">
+              <h1 className="text-5xl tracking-normal bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent" id="admin-hero-preview-title-display">
                 {formData.title || 'Your Title'}
               </h1>
               <p className="text-xl text-white/80" id="admin-hero-preview-subtitle-display">

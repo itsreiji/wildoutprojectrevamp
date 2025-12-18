@@ -6,7 +6,7 @@
  * Uses AuditContext for data fetching with RLS enforced server-side
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, User, Database, Zap, Edit3, Trash2 } from 'lucide-react';
 import {
   Table,
@@ -188,7 +188,7 @@ export const DashboardAuditLog = () => {
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious 
+            <PaginationPrevious
               className={pageIndex === 0 ? 'pointer-events-none opacity-50' : ''}
               href="#"
               onClick={() => handlePageChange(Math.max(0, pageIndex - 1))}
@@ -213,7 +213,7 @@ export const DashboardAuditLog = () => {
           })}
           {pageCount > 7 && <PaginationItem><PaginationEllipsis /></PaginationItem>}
           <PaginationItem>
-            <PaginationNext 
+            <PaginationNext
               className={pageIndex === pageCount - 1 ? 'pointer-events-none opacity-50' : ''}
               href="#"
               onClick={() => handlePageChange(Math.min(pageCount - 1, pageIndex + 1))}
