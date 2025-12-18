@@ -1,6 +1,6 @@
 /* @refresh reset */
 import { useEffect, useState } from "react";
-import { AdminGuard } from "./admin/AdminGuard";
+import { AdminGuard } from "./components/admin/AdminGuard";
 import { LandingPage } from "./components/LandingPage";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import { LoginPage } from "./components/auth/LoginPage";
