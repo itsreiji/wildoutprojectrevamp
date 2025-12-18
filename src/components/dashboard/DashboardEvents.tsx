@@ -575,7 +575,7 @@ export const DashboardEvents = () => {
             id="admin-events-search-icon"
           />
           <Input
-            className="pl-12 pr-4 h-12 bg-white/5 border-white/10 focus-visible:ring-[#E93370] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl"
+            className="pl-12 pr-4 h-10 bg-white/5 border-white/10 focus-visible:ring-[#E93370] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl"
             data-testid="events-event-search-input"
             id="admin-events-search-input"
             placeholder="Search events by name or category..."

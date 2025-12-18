@@ -61,7 +61,7 @@ export const DashboardHero = React.memo(() => {
             <div className="space-y-2">
               <Label htmlFor="admin-hero-title-input">Site Title</Label>
               <Input
-                className="bg-white/5 border-white/10 text-white text-2xl"
+                className="bg-white/5 border-white/10 text-white text-2xl focus-visible:ring-[#E93370] transition-colors"
                 id="admin-hero-title-input"
                 placeholder="WildOut!"
                 value={formData.title}
@@ -73,7 +73,7 @@ export const DashboardHero = React.memo(() => {
             <div className="space-y-2">
               <Label htmlFor="admin-hero-subtitle-input">Subtitle / Tagline</Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-hero-subtitle-input"
                 placeholder="Media Digital Nightlife & Event Multi-Platform"
                 value={formData.subtitle || ''}
@@ -85,7 +85,7 @@ export const DashboardHero = React.memo(() => {
             <div className="space-y-2">
               <Label htmlFor="admin-hero-description-textarea">Description</Label>
               <Textarea
-                className="bg-white/5 border-white/10 text-white min-h-[100px]"
+                className="bg-white/5 border-white/10 text-white min-h-[100px] focus-visible:ring-[#E93370] transition-colors"
                 id="admin-hero-description-textarea"
                 placeholder="Indonesia's premier creative community..."
                 value={formData.description || ''}
@@ -103,7 +103,7 @@ export const DashboardHero = React.memo(() => {
                 <div className="space-y-2">
                   <Label htmlFor="admin-hero-stats-events-input">Events Count</Label>
                   <Input
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                     id="admin-hero-stats-events-input"
                     placeholder="500+"
                     value={typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'events' in formData.stats ? String(formData.stats.events) : ''}
@@ -122,7 +122,7 @@ export const DashboardHero = React.memo(() => {
                 <div className="space-y-2">
                   <Label htmlFor="admin-hero-stats-members-input">Members Count</Label>
                   <Input
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                     id="admin-hero-stats-members-input"
                     placeholder="50K+"
                     value={typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'members' in formData.stats ? String(formData.stats.members) : ''}
@@ -141,7 +141,7 @@ export const DashboardHero = React.memo(() => {
                 <div className="space-y-2">
                   <Label htmlFor="admin-hero-stats-partners-input">Partners Count</Label>
                   <Input
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                     id="admin-hero-stats-partners-input"
                     placeholder="100+"
                     value={typeof formData.stats === 'object' && formData.stats !== null && !Array.isArray(formData.stats) && 'partners' in formData.stats ? String(formData.stats.partners) : ''}
@@ -163,7 +163,7 @@ export const DashboardHero = React.memo(() => {
             </div>
 
             <Button
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50"
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50 focus-visible:ring-[#E93370] transition-colors"
               disabled={isSaving}
               id="admin-hero-save-button"
               onClick={handleSave}

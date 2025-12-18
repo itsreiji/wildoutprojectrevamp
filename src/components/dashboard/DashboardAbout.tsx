@@ -107,7 +107,7 @@ export const DashboardAbout = React.memo(() => {
             <div className="space-y-2">
               <Label htmlFor="admin-about-section-title-input">Section Title</Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-about-section-title-input"
                 placeholder="About WildOut!"
                 value={formData.title}
@@ -118,7 +118,7 @@ export const DashboardAbout = React.memo(() => {
             <div className="space-y-2">
               <Label htmlFor="admin-about-subtitle-textarea">Subtitle</Label>
               <Textarea
-                className="bg-white/5 border-white/10 text-white min-h-[100px]"
+                className="bg-white/5 border-white/10 text-white min-h-[100px] focus-visible:ring-[#E93370] transition-colors"
                 id="admin-about-subtitle-textarea"
                 placeholder="A brief introduction about your organization..."
                 value={formData.subtitle || ''}
@@ -129,7 +129,7 @@ export const DashboardAbout = React.memo(() => {
             <div className="space-y-2">
               <Label htmlFor="admin-about-founded-year-input">Founded Year</Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-about-founded-year-input"
                 placeholder="2020"
                 value={formData.foundedYear || ''}
@@ -252,7 +252,7 @@ export const DashboardAbout = React.memo(() => {
                 <div className="space-y-2">
                   <Label htmlFor={`admin-about-feature-${index}-desc-textarea`}>Description</Label>
                   <Textarea
-                    className="bg-white/5 border-white/10 text-white min-h-[80px]"
+                    className="bg-white/5 border-white/10 text-white min-h-[80px] focus-visible:ring-[#E93370] transition-colors"
                     id={`admin-about-feature-${index}-desc-textarea`}
                     placeholder="Feature description..."
                     value={featureObj.description}

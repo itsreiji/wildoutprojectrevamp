@@ -349,7 +349,7 @@ export const DashboardGallery = React.memo(() => {
           id="dashboard-gallery-search-icon"
         />
         <Input
-          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
+          className="pl-12 pr-4 h-10 bg-white/5 border-white/10 focus-visible:ring-[#E93370] rounded-xl"
           id="dashboard-gallery-search-input"
           placeholder="Search by title, description or category..."
           type="text"

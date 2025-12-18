@@ -110,7 +110,7 @@ export const DashboardAuditLog = () => {
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
           <Select value={filters.table_name || ''} onValueChange={(v) => setFilters({ ...filters, table_name: v || undefined })}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[180px] h-10 bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors">
               <SelectValue placeholder="All tables" />
             </SelectTrigger>
             <SelectContent>
@@ -119,7 +119,7 @@ export const DashboardAuditLog = () => {
             </SelectContent>
           </Select>
           <Select value={filters.action || ''} onValueChange={(v) => setFilters({ ...filters, action: v || undefined })}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px] h-10 bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors">
               <SelectValue placeholder="All actions" />
             </SelectTrigger>
             <SelectContent>
@@ -128,12 +128,12 @@ export const DashboardAuditLog = () => {
             </SelectContent>
           </Select>
           <Input
-            className="w-[160px]"
+            className="w-[160px] h-10 bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
             placeholder="User ID"
             value={filters.user_id || ''}
             onChange={(e) => setFilters({ ...filters, user_id: e.target.value || undefined })}
           />
-          <Button size="sm" variant="outline" onClick={handleFetch}>
+          <Button size="sm" variant="outline" className="h-10 border-white/10 hover:bg-white/5" onClick={handleFetch}>
             Filter
           </Button>
         </div>

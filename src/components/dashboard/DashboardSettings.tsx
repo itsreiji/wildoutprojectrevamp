@@ -203,7 +203,7 @@ export const DashboardSettings = React.memo(() => {
             <div className="space-y-2">
               <Label htmlFor="admin-settings-site-name-input">Site Name</Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-settings-site-name-input"
                 value={formData.siteName}
                 onChange={(e) =>
@@ -221,7 +221,7 @@ export const DashboardSettings = React.memo(() => {
                 Site Description
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-settings-site-description-input"
                 value={formData.siteDescription}
                 onChange={(e) =>
@@ -237,7 +237,7 @@ export const DashboardSettings = React.memo(() => {
             <div className="space-y-2">
               <Label htmlFor="admin-settings-tagline-textarea">Tagline</Label>
               <Textarea
-                className="bg-white/5 border-white/10 text-white min-h-[80px]"
+                className="bg-white/5 border-white/10 text-white min-h-[80px] focus-visible:ring-[#E93370] transition-colors"
                 id="admin-settings-tagline-textarea"
                 value={formData.tagline || ""}
                 onChange={(e) =>
@@ -247,7 +247,7 @@ export const DashboardSettings = React.memo(() => {
             </div>
 
             <Button
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50"
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50 transition-colors"
               disabled={isSaving}
               id="admin-settings-save-button"
               onClick={handleSave}
@@ -306,7 +306,7 @@ export const DashboardSettings = React.memo(() => {
                 <span id="admin-settings-email-label">Email Address</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-settings-email-input"
                 type="email"
                 value={formData.email || ""}
@@ -328,7 +328,7 @@ export const DashboardSettings = React.memo(() => {
                 <span id="admin-settings-phone-label">Phone Number</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-settings-phone-input"
                 value={formData.phone || ""}
                 onChange={(e) =>
@@ -349,7 +349,7 @@ export const DashboardSettings = React.memo(() => {
                 <span id="admin-settings-address-label">Address</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-settings-address-input"
                 value={formData.address || ""}
                 onChange={(e) =>
@@ -459,7 +459,7 @@ export const DashboardSettings = React.memo(() => {
                 <span id="admin-settings-twitter-label">Twitter</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370]"
                 id="admin-settings-twitter-input"
                 placeholder="https://twitter.com/username"
                 value={

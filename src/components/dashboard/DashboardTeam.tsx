@@ -299,7 +299,7 @@ export const DashboardTeam = React.memo(() => {
       <div className="relative">
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
         <Input
-          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
+          className="pl-12 pr-4 h-10 bg-white/5 border-white/10 focus-visible:ring-[#E93370] rounded-xl"
           placeholder="Search team members..."
           type="text"
           value={searchQuery}

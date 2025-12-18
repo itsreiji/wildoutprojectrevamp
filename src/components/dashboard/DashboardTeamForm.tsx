@@ -103,24 +103,24 @@ export function DashboardTeamForm({
         id="dashboard-team-form"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-20 px-8 py-10 wildout-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-8 px-8 py-10 wildout-scrollbar">
           {/* Basic Info */}
-          <div className="space-y-16" id="dashboard-team-form-basic-info">
+          <div className="space-y-6" id="dashboard-team-form-basic-info">
             <h3
-              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-10"
+              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-4"
               id="dashboard-team-form-basic-info-title"
             >
               <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Personal Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start relative">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-team-form-name-field"
-                    className="space-y-3"
+                    className="space-y-2"
                   >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
@@ -133,7 +133,7 @@ export function DashboardTeamForm({
                         id="dashboard-team-form-name-input"
                         placeholder="e.g. John Doe"
                         {...field}
-                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
                       />
                     </FormControl>
                     <FormMessage
@@ -149,7 +149,7 @@ export function DashboardTeamForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-team-form-title-field"
-                    className="space-y-3"
+                    className="space-y-2"
                   >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
@@ -162,7 +162,7 @@ export function DashboardTeamForm({
                         id="dashboard-team-form-title-input"
                         placeholder="e.g. CEO & Founder"
                         {...field}
-                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
                       />
                     </FormControl>
                     <FormMessage
@@ -178,7 +178,7 @@ export function DashboardTeamForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-team-form-email-field"
-                    className="space-y-3"
+                    className="space-y-2"
                   >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
@@ -192,7 +192,7 @@ export function DashboardTeamForm({
                         placeholder="e.g. john@example.com"
                         type="email"
                         {...field}
-                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -208,7 +208,7 @@ export function DashboardTeamForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-team-form-instagram-field"
-                    className="space-y-3"
+                    className="space-y-2"
                   >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
@@ -230,7 +230,7 @@ export function DashboardTeamForm({
                             const value = e.target.value.replace(/^@/, "");
                             field.onChange(value || null);
                           }}
-                          className="h-11 pl-8 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                          className="pl-8 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
                         />
                       </div>
                     </FormControl>
@@ -249,7 +249,7 @@ export function DashboardTeamForm({
               render={({ field }) => (
                 <FormItem
                   id="dashboard-team-form-bio-field"
-                  className="space-y-3"
+                  className="space-y-2"
                 >
                   <FormLabel
                     className="text-white/80 text-sm font-semibold"
@@ -263,7 +263,7 @@ export function DashboardTeamForm({
                       placeholder="Enter a brief biography..."
                       {...field}
                       value={field.value || ""}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm resize-none"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus-visible:ring-[#E93370] transition-colors resize-none"
                     />
                   </FormControl>
                   <FormMessage
@@ -280,7 +280,7 @@ export function DashboardTeamForm({
               render={({ field: { onChange, value, ...field } }) => (
                 <FormItem
                   id="dashboard-team-form-avatar-field"
-                  className="space-y-3"
+                  className="space-y-2"
                 >
                   <FormLabel
                     className="text-white/80 text-sm font-semibold"

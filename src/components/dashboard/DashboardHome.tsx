@@ -142,7 +142,7 @@ const DashboardHome = () => {
                     </p>
                   </div>
                   <Button 
-                    className="w-full mt-4 bg-white/10 hover:bg-white/20 text-white border-0" 
+                    className="w-full mt-4 bg-white/10 hover:bg-white/20 text-white border-0 h-10 focus-visible:ring-[#E93370] transition-colors" 
                     variant="outline"
                     onClick={() => navigate(getAdminPath(section.slug))}
                   >

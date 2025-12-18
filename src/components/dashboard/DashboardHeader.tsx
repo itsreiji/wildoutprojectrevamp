@@ -158,7 +158,7 @@ export const DashboardHeader = React.memo(
           <div className="relative hidden lg:block group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-[#E93370] transition-colors" />
             <Input
-              className="pl-10 h-10 w-64 lg:w-80 bg-gray-50 border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#E93370]/10 focus:border-[#E93370] transition-all"
+              className="pl-10 h-10 w-64 lg:w-80 bg-gray-50 border-gray-200 rounded-xl focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-[#E93370]/10 focus-visible:border-[#E93370] focus-visible:ring-offset-0 transition-all"
               placeholder="Search anything..."
             />
           </div>
