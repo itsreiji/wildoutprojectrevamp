@@ -89,8 +89,8 @@ export const useRouter = () => {
 
 // Router provider component
 const RouterProviderComponent = ({ children }: { children: React.ReactNode }) => {
-  // Configurable admin base path - defaults to /sadmin
-  const adminBasePath = import.meta.env.VITE_ADMIN_BASE_PATH || '/sadmin';
+  // Configurable admin base path - defaults to /admin
+  const adminBasePath = import.meta.env.VITE_ADMIN_BASE_PATH || '/admin';
 
   const [currentPath, setCurrentPath] = useState<string>(() => {
     // Initialize with current window path

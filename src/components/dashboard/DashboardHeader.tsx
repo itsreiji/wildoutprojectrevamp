@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,7 +9,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { NotificationBadge } from "@/components/ui/badge-enhanced";
 import {
   Popover,
   PopoverContent,
@@ -16,12 +16,11 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, Search, AlertTriangle, Calendar, Clock, Cloud, ChevronDown } from "lucide-react";
+import { Bell, Search, Settings } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { useStaticContent } from "../../contexts/StaticContentContext";
 import { useRouter } from "../router";
-import { useAuth } from "../../contexts/AuthContext";
 import { cn } from "../ui/utils";
 
 interface DashboardHeaderProps {
@@ -109,234 +108,143 @@ export const DashboardHeader = React.memo(
       second: "2-digit",
     });
 
-    // Mock weather data - can be replaced with real API
-    const weatherData = {
-      location: "New York",
-      temp: "72°F",
-      condition: "Sunny",
-      windSpeed: "5 km/h",
-    };
-
     return (
       <header
         className={cn(
-          "flex h-16 shrink-0 items-center justify-between gap-2",
-          "border-b border-border bg-card/95 backdrop-blur-sm",
-          "sticky top-0 z-20 w-full px-4 md:px-6 shadow-sm"
+          "flex h-20 shrink-0 items-center justify-between gap-4",
+          "border-b border-white/5 bg-[#12141a] shadow-lg",
+          "sticky top-0 z-20 w-full px-8 shrink-0"
         )}
         id="dashboard-header"
       >
         {/* Left Section - Sidebar Toggle and Breadcrumbs */}
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="-ml-1" id="sidebar-trigger" />
+        <div className="flex items-center gap-4">
+          <SidebarTrigger
+            className="h-10 w-10 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl"
+            id="sidebar-trigger"
+          />
           <Separator
-            className="mr-2 h-4 bg-border hidden md:block"
+            className="h-6 bg-gray-200"
             id="dashboard-header-separator"
             orientation="vertical"
           />
           <Breadcrumb className="hidden md:flex">
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbLink href={getAdminPath("home")}>
+                <BreadcrumbLink
+                  href={getAdminPath("home")}
+                  className="text-gray-400 hover:text-gray-900 font-medium transition-colors"
+                >
                   Dashboard
                 </BreadcrumbLink>
               </BreadcrumbItem>
               {currentPage !== "home" && (
                 <>
-                  <BreadcrumbSeparator />
+                  <BreadcrumbSeparator className="text-gray-300" />
                   <BreadcrumbItem>
-                    <BreadcrumbPage>{pageTitle}</BreadcrumbPage>
+                    <BreadcrumbPage className="text-gray-900 font-bold tracking-tight">
+                      {pageTitle}
+                    </BreadcrumbPage>
                   </BreadcrumbItem>
                 </>
               )}
             </BreadcrumbList>
           </Breadcrumb>
-
-          {/* Info Panel - Date/Time/Weather */}
-          <div className="hidden lg:flex items-center gap-4 ml-4 px-4 py-2 bg-black/5 dark:bg-white/5 rounded-full border border-white/10">
-            {/* Date */}
-            <div className="flex items-center gap-2 text-xs">
-              <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-foreground">{dateStr}</span>
-            </div>
-
-            <Separator orientation="vertical" className="h-4" />
-
-            {/* Time */}
-            <div className="flex items-center gap-2 text-xs">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-foreground font-mono">{timeStr}</span>
-            </div>
-
-            <Separator orientation="vertical" className="h-4" />
-
-            {/* Weather */}
-            <div className="flex items-center gap-2 text-xs">
-              <Cloud className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="text-foreground">
-                {weatherData.location} <b>{weatherData.temp}</b>, {weatherData.windSpeed}
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* Right Section - Search, Notifications, User */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {/* Global Search */}
-          <div className="relative hidden md:block w-48 lg:w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <div className="relative hidden lg:block group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-[#E93370] transition-colors" />
             <Input
-              className="pl-8 h-9 bg-background border-border rounded-2xl"
-              placeholder="Global search..."
+              className="pl-10 h-10 w-64 lg:w-80 bg-gray-50 border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-[#E93370]/10 focus:border-[#E93370] transition-all"
+              placeholder="Search anything..."
             />
           </div>
 
-          {/* Notifications Popover */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative rounded-full h-10 w-10"
+          <div className="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-200">
+            {/* Notifications Popover */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative rounded-lg h-9 w-9 text-gray-500 hover:bg-white hover:text-[#E93370] hover:shadow-sm transition-all"
+                >
+                  <Bell className="h-5 w-5" />
+                  <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-[#E93370] rounded-full border-2 border-white" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-80 p-0 border-gray-200 shadow-2xl rounded-xl overflow-hidden"
               >
-                <Bell className="h-5 w-5" />
-                <NotificationBadge count={mockNotifications.length} color="red" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0">
-              <div className="px-4 py-3 border-b border-border">
-                <h3 className="font-semibold text-sm">Notifications</h3>
-              </div>
-              <div className="max-h-80 overflow-y-auto p-1">
-                {mockNotifications.map((notif, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 p-3 hover:bg-muted/50 rounded-md transition-colors cursor-pointer"
-                  >
+                <div className="px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-sm text-gray-900">
+                      Notifications
+                    </h3>
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] uppercase tracking-wider text-[#E93370] border-[#E93370]/20 bg-[#E93370]/5"
+                    >
+                      {mockNotifications.length} New
+                    </Badge>
+                  </div>
+                </div>
+                <div className="max-h-[400px] overflow-y-auto p-2">
+                  {mockNotifications.map((notif, i) => (
                     <div
-                      className={cn("mt-1 h-2 w-2 rounded-full", notif.color)}
-                    />
-                    <div className="grid gap-1">
-                      <p className="text-sm font-medium leading-none">
-                        {notif.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {notif.desc}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground/80">
-                        {notif.time}
-                      </p>
+                      key={i}
+                      className="flex items-start gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer group"
+                    >
+                      <div
+                        className={cn(
+                          "mt-1.5 h-2 w-2 rounded-full shrink-0",
+                          notif.color
+                        )}
+                      />
+                      <div className="grid gap-0.5">
+                        <p className="text-sm font-bold text-gray-900 leading-tight group-hover:text-[#E93370] transition-colors">
+                          {notif.title}
+                        </p>
+                        <p className="text-xs text-gray-500 line-clamp-1">
+                          {notif.desc}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-medium mt-1">
+                          {notif.time}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-              <div className="p-2 border-t border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-xs"
-                >
-                  Mark all as read
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          {/* Alerts Popover */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative rounded-full h-10 w-10"
-              >
-                <AlertTriangle className="h-5 w-5" />
-                <NotificationBadge count={mockAlerts.length} color="blue" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0">
-              <div className="px-4 py-3 border-b border-border">
-                <h3 className="font-semibold text-sm">System Alerts</h3>
-              </div>
-              <div className="max-h-80 overflow-y-auto p-1">
-                {mockAlerts.map((alert, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 p-3 hover:bg-muted/50 rounded-md transition-colors cursor-pointer"
+                  ))}
+                </div>
+                <div className="p-2 border-t border-gray-100 bg-gray-50/30">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-xs font-bold text-gray-500 hover:text-[#E93370]"
                   >
-                    <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                    <div className="grid gap-1">
-                      <p className="text-sm font-medium leading-none">
-                        {alert.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {alert.desc}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground/80">
-                        {alert.time}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="p-2 border-t border-border">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-xs"
-                >
-                  View all alerts
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+                    View All Activity
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
 
-          {/* User Profile Dropdown */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-2 h-10 px-2 rounded-full hover:bg-muted/50"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                    {user?.email?.charAt(0).toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="hidden sm:inline text-sm font-medium">
-                  Hi, {displayName}
-                </span>
-                <ChevronDown className="h-3 w-3 hidden sm:inline" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-56 p-2">
-              <div className="flex flex-col gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="justify-start"
-                  onClick={() => navigate(getAdminPath("settings"))}
-                >
-                  Profile Settings
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="justify-start"
-                >
-                  Preferences
-                </Button>
-                <Separator className="my-1" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="justify-start text-destructive hover:text-destructive"
-                >
-                  Sign Out
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+            {/* User Dropdown Shortcut */}
+            <Separator
+              orientation="vertical"
+              className="h-4 mx-1 bg-gray-200"
+            />
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-lg h-9 w-9 text-gray-500 hover:bg-white hover:text-gray-900 hover:shadow-sm transition-all"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </header>
     );

@@ -26,11 +26,13 @@
  * - Edit: Form pre-populated with event data, resets when defaultValues changes
  */
 
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
-import { Button } from '../ui/button';
+import type { LandingEvent } from "@/types/content";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ImagePlus, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
@@ -39,62 +41,73 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/form';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
+} from "../ui/form";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
-import type { LandingEvent } from '@/types/content';
+} from "../ui/select";
+import { Textarea } from "../ui/textarea";
 
-const eventFormSchema = z.object({
-  title: z.string().min(1, 'Event title is required'),
-  description: z.string().optional().nullable(),
-  start_date: z.string().min(1, 'Start date is required').refine(
-    (date) => !isNaN(Date.parse(date)),
-    'Start date must be a valid date'
-  ),
-  end_date: z.string().min(1, 'End date is required').refine(
-    (date) => !isNaN(Date.parse(date)),
-    'End date must be a valid date'
-  ),
-  location: z.string().optional().nullable(),
-  category: z.enum([
-    'music',
-    'sports',
-    'arts',
-    'food',
-    'community',
-    'other',
-    'festival',
-    'concert',
-    'exhibition',
-    'club',
-    'conference',
-  ]),
-  status: z.enum(['upcoming', 'ongoing', 'completed']),
-  capacity: z
-    .union([z.number().min(0, 'Capacity must be 0 or greater'), z.null()])
-    .optional(),
-  price_range: z.string().optional().nullable(),
-  ticket_url: z.string().url('Ticket URL must be a valid URL').optional().nullable(),
-  featured_image_file: z.any().optional(),
-  gallery_images_files: z.any().optional(),
-}).refine(
-  (data) => {
-    const start = new Date(data.start_date);
-    const end = new Date(data.end_date);
-    return start <= end;
-  },
-  {
-    message: 'End date must be after or equal to start date',
-    path: ['end_date'],
-  }
-);
+const eventFormSchema = z
+  .object({
+    title: z.string().min(1, "Event title is required"),
+    description: z.string().optional().nullable(),
+    start_date: z
+      .string()
+      .min(1, "Start date is required")
+      .refine(
+        (date) => !isNaN(Date.parse(date)),
+        "Start date must be a valid date"
+      ),
+    end_date: z
+      .string()
+      .min(1, "End date is required")
+      .refine(
+        (date) => !isNaN(Date.parse(date)),
+        "End date must be a valid date"
+      ),
+    location: z.string().optional().nullable(),
+    category: z.enum([
+      "music",
+      "sports",
+      "arts",
+      "food",
+      "community",
+      "other",
+      "festival",
+      "concert",
+      "exhibition",
+      "club",
+      "conference",
+    ]),
+    status: z.enum(["draft", "published", "cancelled", "archived"]),
+    capacity: z
+      .union([z.number().min(0, "Capacity must be 0 or greater"), z.null()])
+      .optional(),
+    price_range: z.string().optional().nullable(),
+    ticket_url: z
+      .string()
+      .url("Ticket URL must be a valid URL")
+      .optional()
+      .nullable(),
+    featured_image_file: z.any().optional(),
+    gallery_images_files: z.any().optional(),
+  })
+  .refine(
+    (data) => {
+      const start = new Date(data.start_date);
+      const end = new Date(data.end_date);
+      return start <= end;
+    },
+    {
+      message: "End date must be after or equal to start date",
+      path: ["end_date"],
+    }
+  );
 
 export type EventFormValues = z.infer<typeof eventFormSchema>;
 
@@ -105,31 +118,44 @@ interface DashboardEventFormProps {
   onCancel?: () => void;
 }
 
-export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCancel }: DashboardEventFormProps) {
-  const formatDateForInput = (dateString: string | null | undefined): string => {
-    if (!dateString) return '';
+export function DashboardEventForm({
+  onSubmit,
+  isSubmitting,
+  defaultValues,
+  onCancel,
+}: DashboardEventFormProps) {
+  const [featuredImagePreview, setFeaturedImagePreview] = useState<
+    string | null
+  >(null);
+  const [galleryImagesPreviews, setGalleryImagesPreviews] = useState<string[]>(
+    []
+  );
+  const formatDateForInput = (
+    dateString: string | null | undefined
+  ): string => {
+    if (!dateString) return "";
     try {
       const date = new Date(dateString);
       // Ensure we have a valid date
-      if (isNaN(date.getTime())) return '';
+      if (isNaN(date.getTime())) return "";
       // Format as YYYY-MM-DD for date input
-      return date.toISOString().split('T')[0];
+      return date.toISOString().split("T")[0];
     } catch (error) {
-      console.error('Error formatting date:', error);
-      return '';
+      console.error("Error formatting date:", error);
+      return "";
     }
   };
 
   const getDefaultValues = (): EventFormValues => {
     if (!defaultValues) {
       return {
-        title: '',
+        title: "",
         description: null,
-        start_date: '',
-        end_date: '',
+        start_date: "",
+        end_date: "",
         location: null,
         category: undefined as any, // Cast to any to allow undefined initially for required field
-        status: 'upcoming',
+        status: "upcoming",
         capacity: null,
         price_range: null,
         ticket_url: null,
@@ -139,13 +165,18 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
     }
 
     return {
-      title: defaultValues.title || '',
+      title: defaultValues.title || "",
       description: defaultValues.description || null,
       start_date: formatDateForInput(defaultValues.start_date),
       end_date: formatDateForInput(defaultValues.end_date),
       location: defaultValues.location || null,
       category: (defaultValues.category || undefined) as any,
-      status: (defaultValues.status as 'upcoming' | 'ongoing' | 'completed') || 'upcoming',
+      status:
+        (defaultValues.status as
+          | "draft"
+          | "published"
+          | "cancelled"
+          | "archived") || "draft",
       capacity: defaultValues.capacity ?? null,
       price_range: defaultValues.price_range || null,
       ticket_url: defaultValues.ticket_url || null,
@@ -157,8 +188,10 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: getDefaultValues(),
-    mode: 'onBlur', // Validate on blur for better UX
+    mode: "onBlur", // Validate on blur for better UX
   });
+
+  const isEditMode = !!defaultValues?.id;
 
   // Reset form when editing target changes to ensure fresh values
   useEffect(() => {
@@ -173,36 +206,55 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
       location: values.location || null,
       price_range: values.price_range || null,
       ticket_url: values.ticket_url || null,
-      capacity: values.capacity === null || values.capacity === undefined ? null : values.capacity,
+      capacity:
+        values.capacity === null || values.capacity === undefined
+          ? null
+          : values.capacity,
     };
     onSubmit(processedValues);
   };
 
   return (
     <Form {...form}>
-      <form className="space-y-6" id="dashboard-event-form" onSubmit={form.handleSubmit(handleFormSubmit)}>
-        <div className="space-y-6">
+      <form
+        className="flex flex-col h-full max-h-[85vh]"
+        id="dashboard-event-form"
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+      >
+        <div className="flex-1 overflow-y-auto space-y-8 pr-2 custom-scrollbar p-6">
           {/* Basic Info */}
           <div className="space-y-4" id="dashboard-event-form-basic-info">
-            <h3 className="text-lg font-medium text-white/90" id="dashboard-event-form-basic-info-title">Basic Information</h3>
+            <h3
+              className="text-lg font-semibold text-[#E93370] flex items-center gap-2"
+              id="dashboard-event-form-basic-info-title"
+            >
+              <span className="w-1 h-6 bg-[#E93370] rounded-full"></span>
+              Basic Information
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
               <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-title-field">
-                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-title-input">
-                      Event Title <span className="text-[#E93370]">*</span>
+                    <FormLabel
+                      className="text-white/80 text-sm font-medium"
+                      htmlFor="dashboard-event-form-title-input"
+                    >
+                      Event Name <span className="text-[#E93370]">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
                         id="dashboard-event-form-title-input"
-                        placeholder="Enter event title"
+                        placeholder="e.g. Summer Music Festival"
                         {...field}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
                       />
                     </FormControl>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-title-error" />
+                    <FormMessage
+                      className="text-[#E93370] text-sm mt-1"
+                      id="dashboard-event-form-title-error"
+                    />
                   </FormItem>
                 )}
               />
@@ -211,13 +263,25 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="category"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-category-field">
-                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-category-select">
+                    <FormLabel
+                      className="text-white/80 text-sm font-medium"
+                      htmlFor="dashboard-event-form-category-select"
+                    >
                       Category <span className="text-[#E93370]">*</span>
                     </FormLabel>
-                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                    <Select
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                    >
                       <FormControl>
-                        <SelectTrigger className="h-11 w-full relative z-10" id="dashboard-event-form-category-select">
-                          <SelectValue className="capitalize" placeholder="Select a category" />
+                        <SelectTrigger
+                          className="h-11 w-full relative z-10"
+                          id="dashboard-event-form-category-select"
+                        >
+                          <SelectValue
+                            className="capitalize"
+                            placeholder="Select a category"
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="z-50" position="popper">
@@ -234,145 +298,27 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-category-error" />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2" id="dashboard-event-form-description-field">
-                  <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-description-input">Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      id="dashboard-event-form-description-input"
-                      placeholder="Enter event description"
-                      {...field}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
-                      value={field.value ?? ''}
+                    <FormMessage
+                      className="text-[#E93370] text-sm mt-1"
+                      id="dashboard-event-form-category-error"
                     />
-                  </FormControl>
-                  <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-description-error" />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="featured_image_file"
-                render={({ field }) => (
-                  <FormItem id="dashboard-event-form-featured-image-field">
-                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-featured-image-input">Featured Image</FormLabel>
-                    <FormControl>
-                      <div className="relative z-0">
-                        <Input
-                          accept="image/*"
-                          className="h-11 w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors file:bg-white/5 file:border-white/10 file:text-white/80 file:hover:bg-white/10 file:hover:border-white/20 file:focus:outline-none file:focus:ring-1 file:focus:ring-[#E93370]/50 file:transition-colors file:cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-white/10 file:text-sm file:font-medium"
-                          id="dashboard-event-form-featured-image-input"
-                          type="file"
-                          onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-featured-image-error" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="gallery_images_files"
-                render={({ field }) => (
-                  <FormItem id="dashboard-event-form-gallery-images-field">
-                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-gallery-images-input">Gallery Images</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          multiple
-                          accept="image/*"
-                          className="h-11 w-full bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors file:bg-white/5 file:border-white/10 file:text-white/80 file:hover:bg-white/10 file:hover:border-white/20 file:focus:outline-none file:focus:ring-1 file:focus:ring-[#E93370]/50 file:transition-colors file:cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-white/10 file:text-sm file:font-medium"
-                          id="dashboard-event-form-gallery-images-input"
-                          type="file"
-                          onChange={(e) => field.onChange(e.target.files)}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-gallery-images-error" />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Date & Time */}
-          <div className="space-y-4" id="dashboard-event-form-date-time">
-            <h3 className="text-lg font-medium text-white/90" id="dashboard-event-form-date-time-title">Date & Time</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="start_date"
-                render={({ field }) => (
-                  <FormItem id="dashboard-event-form-start-date-field">
-                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-start-date-input">
-                      Start Date <span className="text-[#E93370]">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          id="dashboard-event-form-start-date-input"
-                          type="date"
-                          {...field}
-                          className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
-                          min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
-                          value={field.value || ''}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormDescription className="text-white/60 text-xs mt-1" id="dashboard-event-form-start-date-description">
-                      Event start date (local timezone)
-                    </FormDescription>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-start-date-error" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="end_date"
-                render={({ field }) => (
-                  <FormItem id="dashboard-event-form-end-date-field">
-                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-end-date-input">
-                      End Date <span className="text-[#E93370]">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          id="dashboard-event-form-end-date-input"
-                          type="date"
-                          {...field}
-                          className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
-                          min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
-                          value={field.value || ''}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormDescription className="text-white/60 text-xs mt-1" id="dashboard-event-form-end-date-description">
-                      Event end date (local timezone)
-                    </FormDescription>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-end-date-error" />
                   </FormItem>
                 )}
               />
             </div>
 
-            {/* Status Field - Moved outside the grid to match other form fields */}
             <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
-                <FormItem className="w-full" id="dashboard-event-form-status-field">
-                  <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-status-select">
+                <FormItem
+                  className="w-full"
+                  id="dashboard-event-form-status-field"
+                >
+                  <FormLabel
+                    className="text-white/80 text-sm font-medium"
+                    htmlFor="dashboard-event-form-status-select"
+                  >
                     Status <span className="text-[#E93370]">*</span>
                   </FormLabel>
                   <div className="w-full">
@@ -382,48 +328,340 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                       onValueChange={field.onChange}
                     >
                       <FormControl>
-                        <SelectTrigger className="h-11 w-full" id="dashboard-event-form-status-select">
-                          <SelectValue className="capitalize" placeholder="Select status" />
+                        <SelectTrigger
+                          className="h-11 w-full"
+                          id="dashboard-event-form-status-select"
+                        >
+                          <SelectValue
+                            className="capitalize"
+                            placeholder="Select status"
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent position="popper">
-                        {["upcoming", "ongoing", "completed"].map((status) => (
-                          <SelectItem
-                            key={status}
-                            value={status}
-                          >
-                            <span className="w-full capitalize">{status}</span>
-                          </SelectItem>
-                        ))}
+                        {["draft", "published", "cancelled", "archived"].map(
+                          (status) => (
+                            <SelectItem key={status} value={status}>
+                              <span className="w-full capitalize">
+                                {status}
+                              </span>
+                            </SelectItem>
+                          )
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
-                  <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-status-error" />
+                  <FormMessage
+                    className="text-[#E93370] text-sm mt-1"
+                    id="dashboard-event-form-status-error"
+                  />
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem
+                  className="md:col-span-2"
+                  id="dashboard-event-form-description-field"
+                >
+                  <FormLabel
+                    className="text-white/80 text-sm font-medium"
+                    htmlFor="dashboard-event-form-description-input"
+                  >
+                    Description
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      id="dashboard-event-form-description-input"
+                      placeholder="Enter event description"
+                      {...field}
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage
+                    className="text-[#E93370] text-sm mt-1"
+                    id="dashboard-event-form-description-error"
+                  />
+                </FormItem>
+              )}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="featured_image_file"
+                render={({ field }) => (
+                  <FormItem id="dashboard-event-form-featured-image-field">
+                    <FormLabel className="text-white/80 text-sm font-medium">
+                      Featured Image
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative group">
+                        <Input
+                          accept="image/*"
+                          className="hidden"
+                          id="featured-image-upload"
+                          type="file"
+                          onChange={(e) => {
+                            const file = e.target.files
+                              ? e.target.files[0]
+                              : null;
+                            field.onChange(file);
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () =>
+                                setFeaturedImagePreview(
+                                  reader.result as string
+                                );
+                              reader.readAsDataURL(file);
+                            } else {
+                              setFeaturedImagePreview(null);
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor="featured-image-upload"
+                          className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                            featuredImagePreview
+                              ? "border-transparent"
+                              : "border-white/10 hover:border-[#E93370]/50 hover:bg-white/5"
+                          }`}
+                        >
+                          {featuredImagePreview ? (
+                            <div className="relative w-full h-full rounded-xl overflow-hidden">
+                              <img
+                                src={featuredImagePreview}
+                                alt="Featured Preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <Upload className="h-8 w-8 text-white" />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                              <ImagePlus className="w-8 h-8 mb-3 text-white/40" />
+                              <p className="mb-2 text-sm text-white/60">
+                                Click to upload featured image
+                              </p>
+                              <p className="text-xs text-white/40">
+                                PNG, JPG or WebP (max 10MB)
+                              </p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="gallery_images_files"
+                render={({ field }) => (
+                  <FormItem id="dashboard-event-form-gallery-images-field">
+                    <FormLabel className="text-white/80 text-sm font-medium">
+                      Gallery Images
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          multiple
+                          accept="image/*"
+                          className="hidden"
+                          id="gallery-images-upload"
+                          type="file"
+                          onChange={(e) => {
+                            const files = e.target.files;
+                            field.onChange(files);
+                            if (files && files.length > 0) {
+                              const newPreviews: string[] = [];
+                              Array.from(files).forEach((file) => {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  newPreviews.push(reader.result as string);
+                                  if (newPreviews.length === files.length) {
+                                    setGalleryImagesPreviews(newPreviews);
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              });
+                            } else {
+                              setGalleryImagesPreviews([]);
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor="gallery-images-upload"
+                          className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-[#E93370]/50 hover:bg-white/5 transition-all overflow-hidden"
+                        >
+                          {galleryImagesPreviews.length > 0 ? (
+                            <div className="grid grid-cols-2 gap-1 w-full h-full p-2">
+                              {galleryImagesPreviews
+                                .slice(0, 4)
+                                .map((preview, i) => (
+                                  <div
+                                    key={i}
+                                    className="relative rounded overflow-hidden h-full"
+                                  >
+                                    <img
+                                      src={preview}
+                                      alt={`Gallery ${i}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    {i === 3 &&
+                                      galleryImagesPreviews.length > 4 && (
+                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs font-bold">
+                                          +{galleryImagesPreviews.length - 4}
+                                        </div>
+                                      )}
+                                  </div>
+                                ))}
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                              <Upload className="w-8 h-8 mb-3 text-white/40" />
+                              <p className="mb-2 text-sm text-white/60">
+                                Upload gallery images
+                              </p>
+                              <p className="text-xs text-white/40">
+                                Multiple selection allowed
+                              </p>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[#E93370] text-sm mt-1" />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Date & Time */}
+          <div className="space-y-4" id="dashboard-event-form-date-time">
+            <h3
+              className="text-lg font-semibold text-[#E93370] flex items-center gap-2"
+              id="dashboard-event-form-date-time-title"
+            >
+              <span className="w-1 h-6 bg-[#E93370] rounded-full"></span>
+              Date & Time
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="start_date"
+                render={({ field }) => (
+                  <FormItem id="dashboard-event-form-start-date-field">
+                    <FormLabel
+                      className="text-white/80 text-sm font-medium"
+                      htmlFor="dashboard-event-form-start-date-input"
+                    >
+                      Start Date <span className="text-[#E93370]">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          id="dashboard-event-form-start-date-input"
+                          type="date"
+                          {...field}
+                          className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+                          min={new Date().toISOString().split("T")[0]} // Prevent selecting past dates
+                          value={field.value || ""}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription
+                      className="text-white/60 text-xs mt-1"
+                      id="dashboard-event-form-start-date-description"
+                    >
+                      Event start date (local timezone)
+                    </FormDescription>
+                    <FormMessage
+                      className="text-[#E93370] text-sm mt-1"
+                      id="dashboard-event-form-start-date-error"
+                    />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="end_date"
+                render={({ field }) => (
+                  <FormItem id="dashboard-event-form-end-date-field">
+                    <FormLabel
+                      className="text-white/80 text-sm font-medium"
+                      htmlFor="dashboard-event-form-end-date-input"
+                    >
+                      End Date <span className="text-[#E93370]">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          id="dashboard-event-form-end-date-input"
+                          type="date"
+                          {...field}
+                          className="h-11 w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+                          min={new Date().toISOString().split("T")[0]} // Prevent selecting past dates
+                          value={field.value || ""}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription
+                      className="text-white/60 text-xs mt-1"
+                      id="dashboard-event-form-end-date-description"
+                    >
+                      Event end date (local timezone)
+                    </FormDescription>
+                    <FormMessage
+                      className="text-[#E93370] text-sm mt-1"
+                      id="dashboard-event-form-end-date-error"
+                    />
+                  </FormItem>
+                )}
+              />
+            </div>
           </div>
 
           {/* Venue */}
           <div className="space-y-4" id="dashboard-event-form-venue">
-            <h3 className="text-lg font-medium text-white/90" id="dashboard-event-form-venue-title">Venue Information</h3>
+            <h3
+              className="text-lg font-semibold text-[#E93370] flex items-center gap-2"
+              id="dashboard-event-form-venue-title"
+            >
+              <span className="w-1 h-6 bg-[#E93370] rounded-full"></span>
+              Venue Information
+            </h3>
             <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="location"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-location-field">
-                    <FormLabel className="text-white/80 text-sm font-medium" htmlFor="dashboard-event-form-location-input">Venue Name</FormLabel>
+                    <FormLabel
+                      className="text-white/80 text-sm font-medium"
+                      htmlFor="dashboard-event-form-location-input"
+                    >
+                      Venue Name
+                    </FormLabel>
                     <FormControl>
                       <Input
                         id="dashboard-event-form-location-input"
                         placeholder="Enter venue name"
                         {...field}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
-                        value={field.value ?? ''}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-location-error" />
+                    <FormMessage
+                      className="text-[#E93370] text-sm mt-1"
+                      id="dashboard-event-form-location-error"
+                    />
                   </FormItem>
                 )}
               />
@@ -431,15 +669,23 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
           </div>
 
           {/* Capacity & Pricing */}
-          <div className="space-y-4" id="dashboard-event-form-capacity">
-            <h3 className="text-lg font-medium text-white/90" id="dashboard-event-form-capacity-title">Capacity & Pricing</h3>
+          <div className="space-y-4 pb-4" id="dashboard-event-form-capacity">
+            <h3
+              className="text-lg font-semibold text-[#E93370] flex items-center gap-2"
+              id="dashboard-event-form-capacity-title"
+            >
+              <span className="w-1 h-6 bg-[#E93370] rounded-full"></span>
+              Capacity & Pricing
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="capacity"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-capacity-field">
-                    <FormLabel className="text-white/80 text-sm font-medium">Capacity</FormLabel>
+                    <FormLabel className="text-white/80 text-sm font-medium">
+                      Capacity
+                    </FormLabel>
                     <FormControl>
                       <Input
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -447,14 +693,20 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                         min="0"
                         placeholder="e.g., 500"
                         type="number"
-                        value={field.value ?? ''}
+                        value={field.value ?? ""}
                         onChange={(e) => {
-                          const nextValue = e.target.value === '' ? null : Number(e.target.value);
+                          const nextValue =
+                            e.target.value === ""
+                              ? null
+                              : Number(e.target.value);
                           field.onChange(nextValue);
                         }}
                       />
                     </FormControl>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-capacity-error" />
+                    <FormMessage
+                      className="text-[#E93370] text-sm mt-1"
+                      id="dashboard-event-form-capacity-error"
+                    />
                   </FormItem>
                 )}
               />
@@ -463,17 +715,22 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 name="price_range"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-price-field">
-                    <FormLabel className="text-white/80 text-sm font-medium">Price Range</FormLabel>
+                    <FormLabel className="text-white/80 text-sm font-medium">
+                      Price Range
+                    </FormLabel>
                     <FormControl>
                       <Input
                         id="dashboard-event-form-price-input"
                         placeholder="e.g., IDR 250K - 500K"
                         {...field}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
-                        value={field.value ?? ''}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-price-error" />
+                    <FormMessage
+                      className="text-[#E93370] text-sm mt-1"
+                      id="dashboard-event-form-price-error"
+                    />
                   </FormItem>
                 )}
               />
@@ -481,27 +738,37 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
                 control={form.control}
                 name="ticket_url"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2" id="dashboard-event-form-ticket-field">
-                    <FormLabel className="text-white/80 text-sm font-medium">Ticket URL</FormLabel>
+                  <FormItem
+                    className="md:col-span-2"
+                    id="dashboard-event-form-ticket-field"
+                  >
+                    <FormLabel className="text-white/80 text-sm font-medium">
+                      Ticket URL
+                    </FormLabel>
                     <FormControl>
                       <Input
                         id="dashboard-event-form-ticket-input"
                         placeholder="https://example.com/tickets"
                         {...field}
                         className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors"
-                        value={field.value ?? ''}
+                        value={field.value ?? ""}
                       />
                     </FormControl>
-                    <FormMessage className="text-[#E93370] text-sm mt-1" id="dashboard-event-form-ticket-error" />
+                    <FormMessage
+                      className="text-[#E93370] text-sm mt-1"
+                      id="dashboard-event-form-ticket-error"
+                    />
                   </FormItem>
                 )}
               />
             </div>
           </div>
-
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4 border-t border-white/10" id="dashboard-event-form-actions">
+        <div
+          className="flex justify-end space-x-3 p-6 bg-gray-900/90 backdrop-blur-md border-t border-white/10 rounded-b-lg sticky bottom-0 z-20"
+          id="dashboard-event-form-actions"
+        >
           <Button
             className="h-11 px-6 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
             disabled={isSubmitting}
@@ -525,13 +792,33 @@ export function DashboardEventForm({ onSubmit, isSubmitting, defaultValues, onCa
           >
             {isSubmitting ? (
               <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    fill="currentColor"
+                  ></path>
                 </svg>
-                Saving...
+                {isEditMode ? "Saving Changes..." : "Creating Event..."}
               </>
-            ) : 'Save Changes'}
+            ) : isEditMode ? (
+              "Save Changes"
+            ) : (
+              "Create Event"
+            )}
           </Button>
         </div>
       </form>

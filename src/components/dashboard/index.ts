@@ -15,3 +15,7 @@ export * from './DashboardTeam';
 export * from './DashboardTeamForm';
 export * from './DashboardGalleryForm';
 export * from './DashboardAuditLog';
+export * from './DashboardLeftPanel';
+export * from './DashboardRightPanel';
+export * from './DashboardTwoPanelLayout';
+export * from './DashboardTwoPanelExample';

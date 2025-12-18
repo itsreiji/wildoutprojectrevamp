@@ -39,6 +39,8 @@ import {
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useEvents } from "../../contexts/EventsContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { auditService } from "../../services/auditService";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -83,6 +85,7 @@ export const DashboardEvents = () => {
     loading,
     error,
   } = useEvents();
+  const { user, role } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<LandingEvent | null>(null);
@@ -207,7 +210,21 @@ export const DashboardEvents = () => {
   const handleDelete = async (id: string) => {
     setIsDeleting(true);
     try {
+      const eventToDelete = events.find(e => e.id === id);
       await deleteEvent(id);
+      
+      // Log delete action
+      if (user?.id) {
+        await auditService.logContentAction(
+          user.id,
+          role,
+          'DELETE',
+          'EVENT',
+          id,
+          { title: eventToDelete?.title || 'Unknown' }
+        );
+      }
+      
       toast.success("Event deleted successfully!");
       setIsDeleteDialogOpen(false);
       setDeletingEventId(null);
@@ -382,9 +399,35 @@ export const DashboardEvents = () => {
       try {
         if (editingEvent) {
           await updateEvent(editingEvent.id, eventData);
+          
+          // Log update action
+          if (user?.id) {
+            await auditService.logContentAction(
+              user.id,
+              role,
+              'UPDATE',
+              'EVENT',
+              editingEvent.id,
+              { title: eventData.title }
+            );
+          }
+          
           toast.success("Event updated successfully!");
         } else {
-          await addEvent(eventData);
+          const newEvent = await addEvent(eventData);
+          
+          // Log create action
+          if (user?.id && newEvent) {
+            await auditService.logContentAction(
+              user.id,
+              role,
+              'CREATE',
+              'EVENT',
+              (newEvent as any).id || 'unknown',
+              { title: eventData.title }
+            );
+          }
+          
           toast.success("Event created successfully!");
         }
         setIsDialogOpen(false);

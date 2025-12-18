@@ -235,14 +235,25 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signOut = async () => {
     // If using dummy data, just clear the state
     if (useDummyData) {
+      console.log("Simulating logout");
       setUser(null);
       setRole("anonymous");
       return;
     }
     
-    await supabaseClient.auth.signOut();
-    setUser(null);
-    setRole("anonymous");
+    try {
+      if (user?.id) {
+        await auditService.logLogout(user.id);
+      }
+      await supabaseClient.auth.signOut();
+      setUser(null);
+      setRole("anonymous");
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      // Still clear state even if API call fails
+      setUser(null);
+      setRole("anonymous");
+    }
     return;
   };
   const clearError = () => setError(null);
@@ -288,13 +299,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       if (session?.user) {
         try {
-          const role = await getUserRoleWithCache(session.user.id);
+          const newRole = await getUserRoleWithCache(session.user.id);
           // Only update state if it has actually changed
           const userIdChanged = user?.id !== session.user.id;
-          const roleChanged = role !== role; // FIXED: Compare with current role state
-          
-          // FIX: Compare new role with current role state
-          const newRoleChanged = role !== role;
+          const roleChanged = role !== newRole; 
           
           // Debug logging to understand the issue
           console.debug(
@@ -303,20 +311,26 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             "currentUserId:", user?.id,
             "newUserId:", session.user.id,
             "currentRole:", role,
-            "newRole:", role
+            "newRole:", newRole
           );
           
-          // The bug is here: role !== role is always false!
-          // This means the condition will ALWAYS be true if userIdChanged is true,
-          // causing unnecessary state updates
           if (userIdChanged || roleChanged) {
+            // Log successful login if it's a new user session
+            if (userIdChanged) {
+              await auditService.logLoginSuccess(
+                session.user.id,
+                newRole,
+                session.user.app_metadata?.provider || "email"
+              );
+            }
+
             setUser(session.user);
-            setRole(role);
+            setRole(newRole);
             console.log(
               "Session state updated for user:",
               session.user.email,
               "with role:",
-              role
+              newRole
             );
           } else {
             console.debug("Session state unchanged, skipping update");

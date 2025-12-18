@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -20,44 +20,112 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { ScrollArea } from "../ui/scroll-area";
 import { Separator } from "../ui/separator";
+import {
+  Calendar,
+  Users,
+  FileText,
+  Edit,
+  Plus,
+  Settings,
+  Eye,
+  Cog,
+  Bell,
+  MoreVertical,
+  ChevronLeft,
+  ChevronRight,
+  User,
+  ChartBar,
+} from "lucide-react";
+
+// Type definitions
+interface StatCard {
+  id: string;
+  title: string;
+  value: string | number;
+  change: string;
+  icon: React.ReactNode;
+  positive: boolean;
+}
+
+interface ContentItem {
+  id: string;
+  title: string;
+  type: "Event" | "Team" | "Gallery" | "Partner";
+  status: "Published" | "Draft" | "Pending";
+  date: string;
+}
 
 const DashboardWithRightPanel = () => {
   const { user } = useAuth();
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleSidebarToggle = useCallback(() => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  }, [isSidebarCollapsed]);
 
   // Stats data
-  const stats = [
-    { name: "Total Events", value: "24", change: "+12%", positive: true },
-    { name: "Active Users", value: "1,248", change: "+4.2%", positive: true },
-    { name: "Pending Approvals", value: "3", change: "-2.1%", positive: false },
-    { name: "Content Updates", value: "12", change: "+8.3%", positive: true },
+  const stats: StatCard[] = [
+    {
+      id: "events",
+      title: "Total Events",
+      value: 24,
+      change: "+12%",
+      icon: <Calendar className="h-4 w-4" />,
+      positive: true,
+    },
+    {
+      id: "users",
+      title: "Active Users",
+      value: 1248,
+      change: "+4.2%",
+      icon: <Users className="h-4 w-4" />,
+      positive: true,
+    },
+    {
+      id: "approvals",
+      title: "Pending Approvals",
+      value: 3,
+      change: "-2.1%",
+      icon: <FileText className="h-4 w-4" />,
+      positive: false,
+    },
+    {
+      id: "updates",
+      title: "Content Updates",
+      value: 12,
+      change: "+8.3%",
+      icon: <Edit className="h-4 w-4" />,
+      positive: true,
+    },
   ];
 
   // Content items for selection
-  const contentItems = [
+  const contentItems: ContentItem[] = [
     {
-      id: 1,
+      id: "event-1",
       title: "WildOut Music Festival",
       type: "Event",
       status: "Published",
       date: "2024-06-15",
     },
     {
-      id: 2,
+      id: "team-1",
       title: "Team Member: John Doe",
       type: "Team",
       status: "Draft",
       date: "2024-06-10",
     },
     {
-      id: 3,
+      id: "gallery-1",
       title: "Gallery Item: Sunset",
       type: "Gallery",
       status: "Published",
       date: "2024-06-05",
     },
     {
-      id: 4,
+      id: "partner-1",
       title: "Partner: MusicCorp",
       type: "Partner",
       status: "Pending",
@@ -69,41 +137,30 @@ const DashboardWithRightPanel = () => {
     <div className="flex flex-col xl:flex-row gap-6 w-full min-w-0">
       {/* Main Stats and Activity Column */}
       <div className="flex-1 space-y-6 min-w-0 overflow-hidden">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">
             Dashboard Overview
           </h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.email?.split("@")[0] || "Admin User"}. Here's
-            what's happening today.
+          <p className="text-sm text-gray-500">
+            Welcome back, {user?.email?.split("@")[0] || "Admin User"}
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
-            <Card key={index}>
+          {stats.map((stat) => (
+            <Card key={stat.id} className="bg-white shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.name}
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  {stat.title}
                 </CardTitle>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 text-muted-foreground"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M3 3v18h18" />
-                  <path d="m19 9-5 5-4-4-3 3" />
-                </svg>
+                {stat.icon}
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {stat.value}
+                </div>
                 <p
-                  className={`text-xs ${
+                  className={`text-xs mt-1 font-medium ${
                     stat.positive ? "text-green-600" : "text-red-600"
                   }`}
                 >
@@ -167,7 +224,10 @@ const DashboardWithRightPanel = () => {
               <div className="grid grid-cols-2 gap-2">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline">Create Event</Button>
+                    <Button className="w-full justify-start" aria-label="Create new event">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Event
+                    </Button>
                   </DialogTrigger>
                   <DialogContent className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 w-full max-w-md mx-auto">
                     <DialogHeader>
@@ -176,44 +236,48 @@ const DashboardWithRightPanel = () => {
                         Fill in the details for the new event.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="py-4">
+                    <div className="py-4 space-y-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-sm font-medium text-gray-700">
                           Event Name
                         </label>
                         <input
-                          className="w-full p-2 border rounded"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           placeholder="Enter event name"
+                          aria-label="Event name"
                         />
                       </div>
-                      <div className="space-y-2 mt-4">
-                        <label className="text-sm font-medium">Date</label>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Date</label>
                         <input
-                          className="w-full p-2 border rounded"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           type="date"
+                          aria-label="Event date"
                         />
                       </div>
                     </div>
-                    <Button>Create Event</Button>
+                    <Button className="w-full">Create Event</Button>
                   </DialogContent>
                 </Dialog>
 
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline">Settings</Button>
+                    <Button variant="outline" aria-label="Open settings">
+                      Settings
+                    </Button>
                   </PopoverTrigger>
                   <PopoverContent>
                     <div className="space-y-2">
                       <p className="text-sm font-medium">Quick Settings</p>
                       <div className="flex items-center justify-between">
                         <span>Dark Mode</span>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" aria-label="Toggle dark mode">
                           Toggle
                         </Button>
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Notifications</span>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" variant="outline" aria-label="Toggle notifications">
                           On
                         </Button>
                       </div>
@@ -238,9 +302,9 @@ const DashboardWithRightPanel = () => {
                 {contentItems.map((item) => (
                   <Card
                     key={item.id}
-                    className={`cursor-pointer transition-colors ${
+                    className={`cursor-pointer transition-colors hover:shadow-md ${
                       selectedItem?.id === item.id
-                        ? "ring-2 ring-primary"
+                        ? "ring-2 ring-blue-500 border-blue-500"
                         : "hover:bg-muted"
                     }`}
                     onClick={() => setSelectedItem(item)}
@@ -248,8 +312,10 @@ const DashboardWithRightPanel = () => {
                     <CardContent className="p-4">
                       <div className="flex justify-between items-center">
                         <div>
-                          <h3 className="font-medium">{item.title}</h3>
-                          <p className="text-sm text-muted-foreground">
+                          <h3 className="font-medium text-gray-900">
+                            {item.title}
+                          </h3>
+                          <p className="text-sm text-gray-500">
                             {item.type} • {item.date}
                           </p>
                         </div>
@@ -258,8 +324,8 @@ const DashboardWithRightPanel = () => {
                             item.status === "Published"
                               ? "default"
                               : item.status === "Draft"
-                              ? "secondary"
-                              : "outline"
+                                ? "secondary"
+                                : "outline"
                           }
                         >
                           {item.status}
@@ -276,70 +342,63 @@ const DashboardWithRightPanel = () => {
 
       {/* Right Details Panel Column */}
       <div className="w-full xl:w-80 xl:shrink-0 min-w-0">
-        <Card className="h-full border shadow-sm bg-card">
+        <Card className="h-full border border-gray-200 shadow-sm bg-white">
           <CardHeader>
             <CardTitle>Item Details</CardTitle>
           </CardHeader>
           <CardContent>
             {selectedItem ? (
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Title</span>
-                  <span className="text-sm text-right">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium text-gray-900 mb-2">
                     {selectedItem.title}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Type</span>
-                  <span className="text-sm">{selectedItem.type}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Status</span>
-                  <Badge
-                    variant={
-                      selectedItem.status === "Published"
-                        ? "default"
-                        : selectedItem.status === "Draft"
-                        ? "secondary"
-                        : "outline"
-                    }
-                  >
-                    {selectedItem.status}
-                  </Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Date</span>
-                  <span className="text-sm">{selectedItem.date}</span>
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {selectedItem.type} • {selectedItem.date}
+                  </p>
                 </div>
 
-                <Separator className="my-4" />
+                <Separator />
 
-                <h4 className="font-medium mb-2">Actions</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => console.log("Edit clicked")}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => console.log("Publish clicked")}
-                  >
-                    {selectedItem.status === "Published"
-                      ? "Unpublish"
-                      : "Publish"}
-                  </Button>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-500">Status</span>
+                    <Badge
+                      variant={
+                        selectedItem.status === "Published" ? "default" :
+                        selectedItem.status === "Draft" ? "secondary" : "outline"
+                      }
+                    >
+                      {selectedItem.status}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => console.log("Edit clicked")}
+                    >
+                      <Edit className="h-3.5 w-3.5 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => console.log("Publish clicked")}
+                    >
+                      {selectedItem.status === "Published" ? "Unpublish" : "Publish"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-40 text-muted-foreground text-center">
                 <span className="text-3xl mb-2">👈</span>
                 <p className="text-sm">
-                  Select an item from the Content Management list to view
-                  details
+                  Select an item to view details
                 </p>
               </div>
             )}

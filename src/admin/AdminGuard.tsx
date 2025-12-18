@@ -4,11 +4,11 @@ import { type ReactNode } from "react";
 import { useRouter } from "@/components/router";
 
 export const AdminGuard = ({ children }: { children?: ReactNode }) => {
-  const { role, isLoading, user } = useAuth();
+  const { role, loading, user } = useAuth();
   const { navigate } = useRouter();
 
-  if (isLoading) {
-    return <div className="min-h-screen bg-black">Loading...</div>;
+  if (loading) {
+    return <div className="min-h-screen bg-black text-white flex items-center justify-center">Loading...</div>;
   }
 
   if (!user) {
