@@ -468,11 +468,11 @@ export const DashboardPartners = () => {
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent
-          className="!max-w-[720px] !w-[720px] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+          className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
           id="dashboard-partners-create-edit-dialog"
         >
           <DialogHeader
-            className="p-4 pb-2 border-b border-white/10"
+            className="px-8 py-6 border-b border-white/10"
             id="dashboard-partners-create-edit-dialog-header"
           >
             <DialogTitle

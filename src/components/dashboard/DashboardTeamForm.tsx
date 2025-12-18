@@ -338,7 +338,7 @@ export function DashboardTeamForm({
         </div>
 
         <div
-          className="flex justify-end space-x-3 px-8 py-4 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
+          className="flex justify-end space-x-3 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
           id="dashboard-team-form-actions"
         >
           <Button

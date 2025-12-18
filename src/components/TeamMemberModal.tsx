@@ -60,7 +60,7 @@ const TeamMemberModal = ({
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent
-          className="!max-w-[720px] !w-[720px] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+          className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
           id="team-member-edit-dialog"
         >
           <DialogHeader
@@ -195,7 +195,7 @@ const TeamMemberModal = ({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
-        className="!max-w-[720px] !w-[720px] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+        className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
         id="team-member-view-dialog"
       >
         <DialogHeader
