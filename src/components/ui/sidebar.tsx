@@ -201,7 +201,7 @@ function Sidebar({
         data-slot="sidebar"
         {...props}
       >
-        <div className="relative w-64 bg-transparent" data-slot="sidebar-gap" />
+        <div className="relative w-64 bg-black" data-slot="sidebar-gap" />
         <div
           className={cn(
             "fixed inset-y-0 left-0 z-30 h-svh w-64 flex bg-sidebar"
@@ -257,7 +257,7 @@ function Sidebar({
       {/* This is what handles the sidebar gap on desktop */}
       <div
         className={cn(
-          "relative w-[var(--sidebar-width)] bg-transparent transition-[width] duration-300 ease-in-out",
+          "relative w-[var(--sidebar-width)] bg-black transition-[width] duration-300 ease-in-out",
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[side=right]:rotate-180",
           variant === "floating" || variant === "inset"

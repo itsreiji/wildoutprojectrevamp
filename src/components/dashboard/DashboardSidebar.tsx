@@ -192,11 +192,9 @@ export const DashboardSidebar = React.memo(
           {groupedSections.map((group) => (
             <div key={group.id} className="space-y-2">
               {/* Group Header */}
-              <div className="flex items-center justify-between px-3 mb-4">
-                <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">
-                  {group.label}
-                </span>
-              </div>
+              <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3 block px-3">
+                {group.label}
+              </span>
 
               {/* Group Menu Items */}
               <SidebarMenu className="gap-1">
@@ -251,7 +249,7 @@ export const DashboardSidebar = React.memo(
                           <Badge
                             variant={badge.count ? "count" : "new"}
                             color={badge.color || "blue"}
-                            className="ml-auto scale-90"
+                            className="ml-2 scale-[0.85] origin-right"
                           >
                             {badge.count || badge.label}
                           </Badge>

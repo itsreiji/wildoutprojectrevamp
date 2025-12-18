@@ -71,7 +71,7 @@ const NavigationComponent = () => {
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
           ? 'bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20'
-          : 'bg-transparent'
+          : 'bg-black'
           }`}
         initial={{ y: -100 }}
       >

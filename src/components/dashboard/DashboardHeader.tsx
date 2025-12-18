@@ -1,18 +1,18 @@
 import { Badge } from "@/components/ui/badge";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -113,7 +113,7 @@ export const DashboardHeader = React.memo(
         className={cn(
           "flex h-20 shrink-0 items-center justify-between gap-4",
           "border-b border-white/5 bg-[#12141a] shadow-lg",
-          "sticky top-0 z-20 w-full px-8 shrink-0"
+          "sticky top-0 z-20 w-full px-6 md:px-12 shrink-0"
         )}
         id="dashboard-header"
       >

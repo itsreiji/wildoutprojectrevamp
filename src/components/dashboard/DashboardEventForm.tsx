@@ -240,7 +240,7 @@ export function DashboardEventForm({
                     id="dashboard-event-form-title-field"
                   >
                     <FormLabel
-                      className="text-white/80 text-xs font-medium"
+                      className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-event-form-title-input"
                     >
                       Event Name <span className="text-[#E93370]">*</span>
@@ -264,9 +264,12 @@ export function DashboardEventForm({
                 control={form.control}
                 name="category"
                 render={({ field }) => (
-                  <FormItem id="dashboard-event-form-category-field">
+                  <FormItem
+                    id="dashboard-event-form-category-field"
+                    className="flex-1"
+                  >
                     <FormLabel
-                      className="text-white/80 text-xs font-medium"
+                      className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-event-form-category-select"
                     >
                       Category <span className="text-[#E93370]">*</span>
@@ -316,10 +319,10 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-status-field"
-                    className="self-start"
+                    className="flex-1"
                   >
                     <FormLabel
-                      className="text-white/80 text-xs font-medium"
+                      className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-event-form-status-select"
                     >
                       Status <span className="text-[#E93370]">*</span>
@@ -372,7 +375,7 @@ export function DashboardEventForm({
                   id="dashboard-event-form-description-field"
                 >
                   <FormLabel
-                    className="text-white/80 text-xs font-medium"
+                    className="text-white/80 text-sm font-semibold"
                     htmlFor="dashboard-event-form-description-input"
                   >
                     Description
@@ -399,7 +402,7 @@ export function DashboardEventForm({
                 name="featured_image_file"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-featured-image-field">
-                    <FormLabel className="text-white/80 text-xs font-medium">
+                    <FormLabel className="text-white/80 text-sm font-semibold">
                       Featured Image
                     </FormLabel>
                     <FormControl>
@@ -468,7 +471,7 @@ export function DashboardEventForm({
                 name="gallery_images_files"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-gallery-images-field">
-                    <FormLabel className="text-white/80 text-xs font-medium">
+                    <FormLabel className="text-white/80 text-sm font-semibold">
                       Gallery Images
                     </FormLabel>
                     <FormControl>
@@ -562,7 +565,7 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-start-date-field">
                     <FormLabel
-                      className="text-white/80 text-xs font-medium"
+                      className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-event-form-start-date-input"
                     >
                       Start Date <span className="text-[#E93370]">*</span>
@@ -638,7 +641,7 @@ export function DashboardEventForm({
                     className="self-start"
                   >
                     <FormLabel
-                      className="text-white/80 text-xs font-medium"
+                      className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-event-form-location-input"
                     >
                       Venue Name
@@ -664,7 +667,7 @@ export function DashboardEventForm({
                 name="capacity"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-capacity-field">
-                    <FormLabel className="text-white/80 text-xs font-medium">
+                    <FormLabel className="text-white/80 text-sm font-semibold">
                       Capacity
                     </FormLabel>
                     <FormControl>
@@ -696,7 +699,7 @@ export function DashboardEventForm({
                 name="price_range"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-price-field">
-                    <FormLabel className="text-white/80 text-xs font-medium">
+                    <FormLabel className="text-white/80 text-sm font-semibold">
                       Price Range
                     </FormLabel>
                     <FormControl>
@@ -720,7 +723,7 @@ export function DashboardEventForm({
                 name="ticket_url"
                 render={({ field }) => (
                   <FormItem id="dashboard-event-form-ticket-field">
-                    <FormLabel className="text-white/80 text-xs font-medium">
+                    <FormLabel className="text-white/80 text-sm font-semibold">
                       Ticket URL
                     </FormLabel>
                     <FormControl>
@@ -744,7 +747,7 @@ export function DashboardEventForm({
         </div>
 
         <div
-          className="flex justify-end space-x-3 px-6 py-4 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
+          className="flex justify-end space-x-3 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
           id="dashboard-event-form-actions"
         >
           <Button

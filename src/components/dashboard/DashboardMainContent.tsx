@@ -19,14 +19,14 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
 
   if (children) {
     return (
-      <div className="flex-1 bg-[#12141a] p-8 relative z-10">
+      <div className="flex-1 bg-[#12141a] p-6 md:p-12 relative z-10 transition-all">
         <div className="w-full max-w-[1600px] mx-auto min-w-0">{children}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 bg-[#12141a] p-8" id="main-content">
+    <div className="flex-1 bg-[#12141a] p-6 md:p-12" id="main-content">
       <div className="w-full max-w-[1600px] mx-auto min-w-0 flex flex-col gap-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div>

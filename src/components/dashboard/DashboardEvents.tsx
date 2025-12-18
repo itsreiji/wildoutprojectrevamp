@@ -489,7 +489,7 @@ export const DashboardEvents = () => {
 
   return (
     <div
-      className="space-y-6"
+      className="space-y-4"
       data-testid="dashboard-events"
       id="admin-events-container"
     >
@@ -575,7 +575,7 @@ export const DashboardEvents = () => {
             id="admin-events-search-icon"
           />
           <Input
-            className="pl-12 pr-4 py-6 bg-white/5 border-white/10 focus-visible:ring-[#E9370] focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="pl-12 pr-4 h-12 bg-white/5 border-white/10 focus-visible:ring-[#E93370] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl"
             data-testid="events-event-search-input"
             id="admin-events-search-input"
             placeholder="Search events by name or category..."
@@ -735,7 +735,7 @@ export const DashboardEvents = () => {
                   data-testid={`events-event-row-${event.id}`}
                 >
                   <TableCell
-                    className="py-3 pl-5 pr-0"
+                    className="py-2.5 pl-5 pr-0"
                     data-testid={`events-select-event-${event.id}`}
                   >
                     <div className="flex items-center justify-start w-4">
@@ -1033,11 +1033,11 @@ export const DashboardEvents = () => {
         {/* Create/Edit Event Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
-            className="!max-w-[800px] !w-[800px] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+            className="!max-w-[720px] !w-[720px] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
             id="dashboard-events-create-edit-dialog"
           >
             <DialogHeader
-              className="p-4 pb-2 border-b border-white/10"
+              className="px-8 py-6 border-b border-white/10"
               id="dashboard-events-create-edit-dialog-header"
             >
               <DialogTitle
@@ -1063,36 +1063,39 @@ export const DashboardEvents = () => {
           onOpenChange={setIsDeleteDialogOpen}
         >
           <AlertDialogContent
-            className="bg-[#0a0a0a] border-white/10 text-white"
+            className="bg-[#0a0a0a] border-white/10 text-white max-w-md"
             id="dashboard-events-delete-confirmation-dialog"
           >
             <AlertDialogHeader id="dashboard-events-delete-confirmation-dialog-header">
-              <AlertDialogTitle id="dashboard-events-delete-confirmation-dialog-title">
-                Are you sure?
+              <AlertDialogTitle
+                id="dashboard-events-delete-confirmation-dialog-title"
+                className="text-xl font-bold"
+              >
+                Confirm Deletion
               </AlertDialogTitle>
               <AlertDialogDescription
-                className="text-gray-400"
+                className="text-white/60"
                 id="dashboard-events-delete-confirmation-dialog-description"
               >
                 This action cannot be undone. This will permanently delete the
-                event and remove all associated data.
+                event and remove all associated data from the system.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter id="dashboard-events-delete-confirmation-dialog-footer">
               <AlertDialogCancel
-                className="bg-transparent border-gray-700 text-white hover:bg-gray-800"
+                className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white transition-colors"
                 id="dashboard-events-cancel-delete-button"
                 disabled={isDeleting}
               >
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
-                className="bg-red-600 hover:bg-red-70 text-white"
+                className="bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg shadow-red-600/20"
                 id="dashboard-events-confirm-delete-button"
                 disabled={isDeleting}
                 onClick={() => deletingEventId && handleDelete(deletingEventId)}
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? "Deleting..." : "Delete Event"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -379,7 +379,10 @@ export const DashboardGallery = React.memo(() => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
               {/* Image */}
-              <div className="aspect-square overflow-hidden bg-black/40" id={`dashboard-gallery-item-image-container-${item.id}`}>
+              <div
+                className="aspect-square overflow-hidden bg-black/40"
+                id={`dashboard-gallery-item-image-container-${item.id}`}
+              >
                 {imageUrl ? (
                   <ImageWithFallback
                     alt={item.title}
@@ -388,25 +391,46 @@ export const DashboardGallery = React.memo(() => {
                     src={imageUrl}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center" id={`dashboard-gallery-item-placeholder-${item.id}`}>
-                    <ImageIcon className="h-12 w-12 text-white/20" id={`dashboard-gallery-item-placeholder-icon-${item.id}`} />
+                  <div
+                    className="w-full h-full flex items-center justify-center"
+                    id={`dashboard-gallery-item-placeholder-${item.id}`}
+                  >
+                    <ImageIcon
+                      className="h-12 w-12 text-white/20"
+                      id={`dashboard-gallery-item-placeholder-icon-${item.id}`}
+                    />
                   </div>
                 )}
               </div>
 
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" id={`dashboard-gallery-item-overlay-${item.id}`}>
-                <div className="absolute bottom-0 left-0 right-0 p-4" id={`dashboard-gallery-item-overlay-content-${item.id}`}>
-                  <p className="text-white text-sm mb-1 font-semibold" id={`dashboard-gallery-item-overlay-title-${item.id}`}>
+              <div
+                className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                id={`dashboard-gallery-item-overlay-${item.id}`}
+              >
+                <div
+                  className="absolute bottom-0 left-0 right-0 p-4"
+                  id={`dashboard-gallery-item-overlay-content-${item.id}`}
+                >
+                  <p
+                    className="text-white text-sm mb-1 font-semibold"
+                    id={`dashboard-gallery-item-overlay-title-${item.id}`}
+                  >
                     {item.title}
                   </p>
                   {item.description && (
-                    <p className="text-white/60 text-xs mb-2 line-clamp-2" id={`dashboard-gallery-item-overlay-description-${item.id}`}>
+                    <p
+                      className="text-white/60 text-xs mb-2 line-clamp-2"
+                      id={`dashboard-gallery-item-overlay-description-${item.id}`}
+                    >
                       {item.description}
                     </p>
                   )}
                   {item.category && (
-                    <p className="text-white/40 text-xs" id={`dashboard-gallery-item-overlay-category-${item.id}`}>
+                    <p
+                      className="text-white/40 text-xs"
+                      id={`dashboard-gallery-item-overlay-category-${item.id}`}
+                    >
                       {item.category}
                     </p>
                   )}
@@ -489,46 +513,45 @@ export const DashboardGallery = React.memo(() => {
                     </button>
                   </AlertDialogTrigger>
                   <AlertDialogContent
-                    className="bg-black/95 backdrop-blur-xl border-white/10"
+                    className="bg-[#0a0a0a] border-white/10 text-white max-w-md"
                     id={`dashboard-gallery-delete-dialog-${item.id}`}
                   >
                     <AlertDialogHeader
                       id={`dashboard-gallery-delete-dialog-header-${item.id}`}
                     >
                       <AlertDialogTitle
-                        className="text-white"
+                        className="text-xl font-bold"
                         id={`dashboard-gallery-delete-dialog-title-${item.id}`}
                       >
-                        Delete Gallery Item?
+                        Delete Media Item?
                       </AlertDialogTitle>
                       <AlertDialogDescription
-                        className="text-white/70"
+                        className="text-white/60"
                         id={`dashboard-gallery-delete-dialog-description-${item.id}`}
                       >
-                        Are you sure you want to delete{" "}
-                        <span className="font-semibold text-white" id={`dashboard-gallery-delete-dialog-description-title-${item.id}`}>
-                          "{item.title}"
-                        </span>
-                        ? This action cannot be undone. All associated images
-                        will be removed from storage.
+                        This action cannot be undone. This will permanently
+                        remove this image from the gallery and delete it from
+                        storage.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter
                       id={`dashboard-gallery-delete-dialog-footer-${item.id}`}
                     >
                       <AlertDialogCancel
-                        className="bg-white/10 text-white hover:bg-white/20 border-white/20"
-                        id={`dashboard-gallery-delete-dialog-cancel-${item.id}`}
+                        className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white transition-colors"
+                        id={`dashboard-gallery-cancel-delete-button-${item.id}`}
+                        onClick={() => setDeletingItemId(null)}
                       >
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                        disabled={isDeleting}
-                        id={`dashboard-gallery-delete-dialog-confirm-${item.id}`}
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg shadow-red-600/20"
+                        id={`dashboard-gallery-confirm-delete-button-${item.id}`}
                         onClick={() => handleDelete(item.id)}
                       >
-                        {isDeleting ? "Deleting..." : "Delete"}
+                        {deletingItemId === item.id && isSubmitting
+                          ? "Deleting..."
+                          : "Delete Item"}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -556,21 +579,29 @@ export const DashboardGallery = React.memo(() => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-2xl" id="dashboard-gallery-create-edit-dialog">
-          <DialogHeader id="dashboard-gallery-create-edit-dialog-header">
-            <DialogTitle className="text-2xl" id="dashboard-gallery-create-edit-dialog-title">
+        <DialogContent
+          className="!max-w-[720px] !w-[720px] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+          id="dashboard-gallery-create-edit-dialog"
+        >
+          <DialogHeader
+            className="p-4 pb-2 border-b border-white/10"
+            id="dashboard-gallery-create-edit-dialog-header"
+          >
+            <DialogTitle
+              className="text-xl font-bold text-white flex items-center gap-2"
+              id="dashboard-gallery-create-edit-dialog-title"
+            >
+              <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
               {editingGallery ? "Edit Gallery Item" : "Create New Gallery"}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="max-h-[60vh] overflow-y-auto" id="dashboard-gallery-create-edit-dialog-content">
-            <DashboardGalleryForm
-              defaultValues={editingGallery || undefined}
-              isSubmitting={isSubmitting}
-              onCancel={() => setIsDialogOpen(false)}
-              onSubmit={handleSubmit}
-            />
-          </div>
+          <DashboardGalleryForm
+            defaultValues={editingGallery || undefined}
+            isSubmitting={isSubmitting}
+            onCancel={() => setIsDialogOpen(false)}
+            onSubmit={handleSubmit}
+          />
         </DialogContent>
       </Dialog>
     </div>
