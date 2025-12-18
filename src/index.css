@@ -3879,6 +3879,7 @@
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --border: #ffffff1a;
   --input: #ffffff0d;
+  --input-background: #ffffff0d;
   --ring: oklch(0.439 0 0);
   --font-weight-medium: 500;
   --font-weight-normal: 400;

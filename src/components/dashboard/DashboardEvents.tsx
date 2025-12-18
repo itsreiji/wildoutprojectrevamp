@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import { useAuth } from "../../contexts/AuthContext";
 import { useEvents } from "../../contexts/EventsContext";
 import { auditService } from "../../services/auditService";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,6 +53,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { Badge } from "../ui/badge";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -453,35 +455,23 @@ export const DashboardEvents = () => {
     }
   };
 
-  const getCategoryColor = (category: string): string => {
+  const getCategoryBadgeColor = (category: string) => {
+    // Generate a consistent color based on the category name
     const colors = [
-      "bg-blue-500/20 text-blue-400 border-blue-500/40",
       "bg-purple-500/20 text-purple-400 border-purple-500/40",
+      "bg-blue-500/20 text-blue-400 border-blue-500/40",
       "bg-pink-500/20 text-pink-400 border-pink-500/40",
-      "bg-rose-500/20 text-rose-400 border-rose-500/40",
+      "bg-amber-500/20 text-amber-400 border-amber-500/40",
       "bg-emerald-500/20 text-emerald-400 border-emerald-500/40",
     ];
 
-    // Simple hash function to get consistent colors for the same category
-    const hash = category.split("").reduce((acc: number, char: string) => {
-      return char.charCodeAt(0) + ((acc << 5) - acc);
-    }, 0);
+    let hash = 0;
+    for (let i = 0; i < category.length; i++) {
+      hash = category.charCodeAt(i) + ((hash << 5) - hash);
+    }
 
     const index = Math.abs(hash) % colors.length;
     return `${colors[index]} border rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap`;
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "upcoming":
-        return "bg-blue-500/20 text-blue-400 border border-blue-500/40 rounded-full px-3 py-1 text-xs font-medium";
-      case "ongoing":
-        return "bg-green-500/20 text-green-400 border border-green-500/40 rounded-full px-3 py-1 text-xs font-medium";
-      case "completed":
-        return "bg-gray-500/20 text-gray-400 border border-gray-500/40 rounded-full px-3 py-1 text-xs font-medium";
-      default:
-        return "bg-white/10 text-white/60 rounded-full px-3 py-1 text-xs font-medium";
-    }
   };
 
   return (
@@ -844,12 +834,13 @@ export const DashboardEvents = () => {
                     className="w-32 px-4 py-3"
                     data-testid={`events-event-category-cell-${event.id}`}
                   >
-                    <Badge
-                      className={getCategoryColor(event.category || "")}
-                      data-testid={`events-event-category-${event.id}`}
+                    <StatusBadge
+                      status="update"
+                      showDot={false}
+                      className={cn(getCategoryBadgeColor(event.category || ""), "border-0 shadow-none")}
                     >
-                      {event.category || "Uncategorized"}
-                    </Badge>
+                      {event.category || "UNCATEGORIZED"}
+                    </StatusBadge>
                   </TableCell>
                   <TableCell
                     className="w-36 px-4 py-3"
@@ -872,12 +863,7 @@ export const DashboardEvents = () => {
                     className="w-28 px-4 py-3"
                     data-testid={`events-event-status-cell-${event.id}`}
                   >
-                    <Badge
-                      className={getStatusColor(event.status || "draft")}
-                      data-testid={`events-event-status-${event.id}`}
-                    >
-                      {event.status || "draft"}
-                    </Badge>
+                    <StatusBadge status={event.status || "draft"} />
                   </TableCell>
                   <TableCell
                     className="w-24 px-4 py-3 text-right"

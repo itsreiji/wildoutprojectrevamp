@@ -62,6 +62,7 @@ const partnerFormSchema = z.object({
     .nullable(),
   contact_phone: z.string().optional().nullable(),
   featured: z.boolean().optional().default(false),
+  logo_url: z.string().url("Logo URL must be a valid URL").optional().nullable().or(z.literal("")),
   logo_file: z.any().optional(),
   social_links: z
     .record(z.string(), z.string().nullable())
@@ -94,6 +95,7 @@ export function DashboardPartnerForm({
         contact_email: "",
         contact_phone: "",
         featured: false,
+        logo_url: "",
         social_links: {},
       };
     }
@@ -106,6 +108,7 @@ export function DashboardPartnerForm({
       contact_email: defaultValues.contact_email || "",
       contact_phone: defaultValues.contact_phone || "",
       featured: defaultValues.featured || false,
+      logo_url: defaultValues.logo_url || "",
       social_links: defaultValues.social_links || {},
     };
   };
@@ -194,7 +197,7 @@ export function DashboardPartnerForm({
                           <SelectValue placeholder="Select tier" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-[#1a1a1a] border-white/10">
+                      <SelectContent position="popper">
                         <SelectItem value="bronze">Bronze</SelectItem>
                         <SelectItem value="silver">Silver</SelectItem>
                         <SelectItem value="gold">Gold</SelectItem>
@@ -298,6 +301,38 @@ export function DashboardPartnerForm({
                   <FormMessage
                     className="text-[#E93370] text-xs mt-1"
                     id="dashboard-partner-form-description-error"
+                  />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="logo_url"
+              render={({ field }) => (
+                <FormItem
+                  id="dashboard-partner-form-logo-url-field"
+                  className="space-y-2 mt-6"
+                >
+                  <FormLabel
+                    className="text-white/80 text-sm font-semibold"
+                    htmlFor="dashboard-partner-form-logo-url-input"
+                  >
+                    Partner Logo URL
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="dashboard-partner-form-logo-url-input"
+                      placeholder="https://example.com/logo.png"
+                      type="url"
+                      {...field}
+                      value={field.value || ""}
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                    />
+                  </FormControl>
+                  <FormMessage
+                    className="text-[#E93370] text-xs mt-1"
+                    id="dashboard-partner-form-logo-url-error"
                   />
                 </FormItem>
               )}

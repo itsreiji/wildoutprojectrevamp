@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Crown } from 'lucide-react';
+import { StatusBadge } from './ui/StatusBadge';
 import { Badge } from './ui/badge';
 import {
   Select,
@@ -76,7 +77,7 @@ export const PartnersSection = React.memo(() => {
             <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white">
               <SelectValue placeholder="All Tiers" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent position="popper">
               <SelectItem value="all">All Tiers</SelectItem>
               <SelectItem value="bronze">Bronze</SelectItem>
               <SelectItem value="silver">Silver</SelectItem>
@@ -111,13 +112,13 @@ export const PartnersSection = React.memo(() => {
                     {partner.name}
                   </div>
                   {(partner as any).sponsorship_level && (
-                    <Badge
-                      className="mt-1 text-xs"
-                      variant={getBadgeVariant((partner as any).sponsorship_level)}
+                    <StatusBadge
+                      status="upcoming"
+                      showDot={false}
+                      className="bg-amber-500/15 text-amber-400 border-amber-500/30 shadow-[0_0_8px_rgba(245,158,11,0.1)] mb-4"
                     >
-                      {(partner as any).sponsorship_level === 'platinum' && <Crown className="h-3 w-3 mr-1" />}
                       {(partner as any).sponsorship_level.toUpperCase()}
-                    </Badge>
+                    </StatusBadge>
                   )}
                   <div className="text-xs text-white/50 mt-1">
                     {partner.category}

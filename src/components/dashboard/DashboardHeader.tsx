@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { StatusBadge } from "../ui/StatusBadge";
 import { Bell, Search, Settings } from "lucide-react";
 import React from "react";
 import { useStaticContent } from "../../contexts/StaticContentContext";
@@ -137,12 +138,13 @@ export const DashboardHeader = React.memo(
                     <h3 className="font-bold text-sm text-gray-900">
                       Notifications
                     </h3>
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] uppercase tracking-wider text-[#E93370] border-[#E93370]/20 bg-[#E93370]/5"
+                    <StatusBadge
+                      status="active"
+                      showDot={false}
+                      className="text-[10px] px-1.5 py-0 uppercase tracking-wider text-[#E93370] border-[#E93370]/30 bg-[#E93370]/10"
                     >
-                      {mockNotifications.length} New
-                    </Badge>
+                      {mockNotifications.length} NEW
+                    </StatusBadge>
                   </div>
                 </div>
                 <div className="max-h-[400px] overflow-y-auto p-2">

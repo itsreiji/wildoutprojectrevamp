@@ -88,10 +88,6 @@ export const AboutSection = React.memo(() => {
           whileInView={{ opacity: 1, y: 0 }}
         >
           <div className="p-8 md:p-12 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
-            {/* Background Decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#E93370]/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#E93370]/10 rounded-full blur-3xl" />
-
             <div className="relative z-10 max-w-4xl mx-auto">
               <h3 className="text-3xl md:text-4xl text-white mb-6">
                 Our Story

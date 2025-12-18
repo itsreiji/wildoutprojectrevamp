@@ -802,7 +802,7 @@ export const DashboardSettings = React.memo(() => {
                           >
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent position="popper">
                             <SelectItem
                               id={`admin-settings-user-${user.id}-role-select-user`}
                               value="user"

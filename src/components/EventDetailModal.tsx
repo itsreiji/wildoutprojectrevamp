@@ -3,6 +3,7 @@ import { formatCurrency } from "@/utils/formatting";
 import { Calendar, Clock, Heart, MapPin, Share2, Ticket } from "lucide-react";
 import React from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { StatusBadge } from "./ui/StatusBadge";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
@@ -55,9 +56,13 @@ export const EventDetailModal = React.memo(
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
               <div className="absolute bottom-4 left-6">
-                <Badge className="bg-[#E93370] text-white border-0 px-3 py-1 text-[10px] uppercase font-bold tracking-wider mb-2">
-                  {event.category}
-                </Badge>
+                <StatusBadge
+                  status="active"
+                  showDot={false}
+                  className="bg-[#E93370] text-white border-0 px-3 py-1 text-[10px] uppercase font-bold tracking-wider mb-2 shadow-[0_0_12px_rgba(233,51,112,0.3)]"
+                >
+                  {event.category || "EVENT"}
+                </StatusBadge>
                 <h2 className="text-3xl font-bold text-white shadow-sm">
                   {event.title}
                 </h2>

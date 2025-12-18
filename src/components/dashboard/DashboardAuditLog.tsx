@@ -17,6 +17,7 @@ import {
   TableRow,
 } from '../ui/table';
 import { Badge } from '../ui/badge';
+import { StatusBadge } from '../ui/StatusBadge';
 import {
   Select,
   SelectContent,
@@ -44,10 +45,10 @@ const ACTIONS = ['INSERT', 'UPDATE', 'DELETE'] as const;
 
 const getActionBadge = (action: string) => {
   switch (action) {
-    case 'INSERT': return <Badge className="bg-green-500/20 border-green-500/30 text-green-400" variant="default"><Zap className="h-3 w-3 mr-1" />{action}</Badge>;
-    case 'UPDATE': return <Badge className="bg-blue-500/20 border-blue-500/30 text-blue-400" variant="default"><Edit3 className="h-3 w-3 mr-1" />{action}</Badge>;
-    case 'DELETE': return <Badge variant="destructive"><Trash2 className="h-3 w-3 mr-1" />{action}</Badge>;
-    default: return <Badge>{action}</Badge>;
+    case 'INSERT': return <StatusBadge status="insert" icon={<Zap className="h-3 w-3" />} />;
+    case 'UPDATE': return <StatusBadge status="update" icon={<Edit3 className="h-3 w-3" />} />;
+    case 'DELETE': return <StatusBadge status="delete" icon={<Trash2 className="h-3 w-3" />} />;
+    default: return <StatusBadge status={action} />;
   }
 };
 
@@ -113,7 +114,7 @@ export const DashboardAuditLog = () => {
             <SelectTrigger className="w-[180px] h-10 bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors">
               <SelectValue placeholder="All tables" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent position="popper">
               <SelectItem value="all">All tables</SelectItem>
               {TABLES.map(table => <SelectItem key={table} value={table}>{table}</SelectItem>)}
             </SelectContent>
@@ -122,7 +123,7 @@ export const DashboardAuditLog = () => {
             <SelectTrigger className="w-[140px] h-10 bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors">
               <SelectValue placeholder="All actions" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent position="popper">
               <SelectItem value="all">All actions</SelectItem>
               {ACTIONS.map(action => <SelectItem key={action} value={action}>{action}</SelectItem>)}
             </SelectContent>

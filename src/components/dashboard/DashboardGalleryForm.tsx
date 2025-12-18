@@ -249,7 +249,7 @@ export function DashboardGalleryForm({
                           <SelectValue placeholder="Select an event..." />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-[#1a1a1a] border-white/10 shadow-2xl">
+                      <SelectContent position="popper">
                         <SelectItem value="none">No event</SelectItem>
                         {events.map((event) => (
                           <SelectItem key={event.id} value={event.id || ""}>

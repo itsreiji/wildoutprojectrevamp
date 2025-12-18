@@ -41,6 +41,7 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Badge } from "../ui/badge";
+import { StatusBadge } from "../ui/StatusBadge";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
@@ -337,15 +338,7 @@ export const DashboardTeam = React.memo(() => {
                   </div>
                 )}
               </div>
-              <Badge
-                className={
-                  member.status === "active"
-                    ? "bg-green-500/20 text-green-400 border-green-500/30"
-                    : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-                }
-              >
-                {member.status}
-              </Badge>
+              <StatusBadge status={member.status || "active"} />
             </div>
 
             {/* Info */}

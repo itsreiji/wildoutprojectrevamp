@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge-enhanced";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +18,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import logo from "figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png";
+import { StatusBadge } from "../ui/StatusBadge";
 import {
   Calendar,
   ChevronLeft,
@@ -81,7 +81,7 @@ export const DashboardSidebar = React.memo(
     const { navigate, getAdminPath } = useRouter();
     const { adminSections, getSectionPermissions } = useStaticContent();
     const { user, signOut } = useAuth();
-    const [sidebarSearch, setSidebarSearch] = useState("");
+    const [sidebarSearch] = useState("");
 
     const handleLogout = async () => {
       try {
@@ -246,13 +246,13 @@ export const DashboardSidebar = React.memo(
 
                         {/* Badge - count or label */}
                         {badge && !isActive && (
-                          <Badge
-                            variant={badge.count ? "count" : "new"}
-                            color={badge.color || "blue"}
-                            className="ml-2 scale-[0.85] origin-right"
+                          <StatusBadge
+                            status={badge.count ? "active" : "update"}
+                            showDot={false}
+                            className="ml-2 scale-[0.85] origin-right px-1.5 py-0 min-w-[1.25rem] justify-center"
                           >
                             {badge.count || badge.label}
-                          </Badge>
+                          </StatusBadge>
                         )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -334,7 +334,7 @@ export const DashboardSidebar = React.memo(
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="start"
-                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-xl bg-[#1e2129] border-white/10 text-white shadow-2xl"
+                  className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56"
                   id="user-menu-content"
                   side="right"
                   sideOffset={12}
@@ -356,23 +356,24 @@ export const DashboardSidebar = React.memo(
                       </div>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-white/5" />
-                  <DropdownMenuItem className="py-2.5 px-3 rounded-lg focus:bg-white/5 focus:text-white cursor-pointer transition-colors">
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer">
                     <Sparkles className="mr-3 h-4 w-4 text-[#E93370]" />
                     <span className="text-xs font-medium">Upgrade to Pro</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="py-2.5 px-3 rounded-lg focus:bg-white/5 focus:text-white cursor-pointer transition-colors">
+                  <DropdownMenuItem className="cursor-pointer">
                     <Settings className="mr-3 h-4 w-4 text-white/40" />
                     <span className="text-xs font-medium">
                       Account Settings
                     </span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    className="py-2.5 px-3 rounded-lg text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer transition-colors"
+                    className="cursor-pointer"
                     data-testid="logout-button"
                     id="logout-menu-item"
                     onClick={handleLogout}
+                    variant="destructive"
                   >
                     <LogOut
                       className="mr-3 h-4 w-4"

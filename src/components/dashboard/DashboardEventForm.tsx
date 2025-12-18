@@ -290,7 +290,6 @@ export function DashboardEventForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent
-                        className="z-50 bg-[#1a1a1a] border-white/10"
                         position="popper"
                       >
                         <SelectItem value="music">Music</SelectItem>
@@ -343,7 +342,6 @@ export function DashboardEventForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent
-                        className="z-50 bg-[#1a1a1a] border-white/10"
                         position="popper"
                       >
                         {["draft", "published", "cancelled", "archived"].map(

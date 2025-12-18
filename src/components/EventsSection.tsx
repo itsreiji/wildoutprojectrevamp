@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Calendar, MapPin, Clock, Users, Music, Ticket, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Music, Ticket, ArrowRight, Search } from 'lucide-react';
 import { Button } from './ui/button';
+import { StatusBadge } from './ui/StatusBadge';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
@@ -89,9 +90,14 @@ export const EventsSection = React.memo(() => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
                       {/* Category Badge */}
-                      <Badge className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0" id={`events-item-${event.id}-category-badge`}>
-                        {event.category}
-                      </Badge>
+                      <StatusBadge
+                        status="active"
+                        showDot={false}
+                        className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0 shadow-[0_0_12px_rgba(233,51,112,0.3)]"
+                        id={`events-item-${event.id}-category-badge`}
+                      >
+                        {event.category?.toUpperCase() || "EVENT"}
+                      </StatusBadge>
 
                       {/* Capacity Indicator */}
                       <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90" id={`events-item-${event.id}-capacity-indicator`}>

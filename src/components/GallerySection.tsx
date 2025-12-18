@@ -56,7 +56,7 @@ export const GallerySection = React.memo(() => {
             <SelectTrigger className="w-[280px] bg-white/5 border-white/20 text-white">
               <SelectValue placeholder="Filter by event (optional)" />
             </SelectTrigger>
-            <SelectContent className="bg-black/95 border-white/10 text-white">
+            <SelectContent position="popper" className="bg-black/95 border-white/10 text-white">
               <SelectItem value="all">All Events</SelectItem>
               {events.map((event) => (
                 <SelectItem key={event.id} value={event.id || ''}>

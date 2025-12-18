@@ -9,7 +9,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +25,7 @@ import { toast } from "sonner";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { StatusBadge } from "../ui/StatusBadge";
 import {
   DashboardPartnerForm,
   type PartnerFormValues,
@@ -114,9 +114,10 @@ export const DashboardPartners = () => {
   const handleSubmit = async (values: PartnerFormValues) => {
     setIsSubmitting(true);
     const newUploadedFiles: string[] = [];
-    let logoUrl: string | undefined = editingPartner?.logo_url ?? undefined;
+    // Use the URL from the form field if provided
+    let logoUrl: string | undefined = values.logo_url || undefined;
     try {
-      // Handle logo upload
+      // Handle logo upload (takes precedence over the URL field if a new file is uploaded)
       if (values.logo_file) {
         const file = values.logo_file as File;
         const validation = validateFile(file);
@@ -252,12 +253,14 @@ export const DashboardPartners = () => {
                 className="absolute top-4 right-4"
                 id={`dashboard-partner-featured-badge-container-${partner.id}`}
               >
-                <Badge
-                  className="bg-amber-500/20 text-amber-400 border-amber-500/30"
+                <StatusBadge
+                  status="upcoming"
+                  showDot={false}
+                  className="bg-amber-500/15 text-amber-400 border-amber-500/30 shadow-[0_0_8px_rgba(245,158,11,0.1)]"
                   id={`dashboard-partner-featured-badge-${partner.id}`}
                 >
-                  Featured
-                </Badge>
+                  FEATURED
+                </StatusBadge>
               </div>
             )}
 
@@ -266,16 +269,7 @@ export const DashboardPartners = () => {
               className="flex items-start justify-between mb-4"
               id={`dashboard-partner-status-container-${partner.id}`}
             >
-              <Badge
-                className={
-                  partner.status === "active"
-                    ? "bg-green-500/20 text-green-400 border-green-500/30"
-                    : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-                }
-                id={`dashboard-partner-status-${partner.id}`}
-              >
-                {partner.status}
-              </Badge>
+              <StatusBadge status={partner.status || "active"} />
             </div>
 
             {/* Logo */}

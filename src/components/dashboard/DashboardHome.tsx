@@ -1,6 +1,7 @@
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { StatusBadge } from '../ui/StatusBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from '../router';
 
@@ -82,7 +83,7 @@ const DashboardHome = () => {
                     <p className="text-sm font-medium">{activity.action}</p>
                     <p className="text-xs text-white/40">{activity.user} • {activity.time}</p>
                   </div>
-                  <Badge variant="outline" className="text-[#E93370] border-[#E93370]/30">Completed</Badge>
+                  <StatusBadge status="completed" />
                 </div>
               ))}
             </div>
@@ -98,19 +99,19 @@ const DashboardHome = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-white/5 pb-2">
                 <span className="text-sm">Database</span>
-                <Badge variant="default" className="bg-green-500/20 text-green-400 hover:bg-green-500/20">Operational</Badge>
+                <StatusBadge status="operational" />
               </div>
               <div className="flex items-center justify-between border-b border-white/5 pb-2">
                 <span className="text-sm">API Server</span>
-                <Badge variant="default" className="bg-green-500/20 text-green-400 hover:bg-green-500/20">Operational</Badge>
+                <StatusBadge status="operational" />
               </div>
               <div className="flex items-center justify-between border-b border-white/5 pb-2">
                 <span className="text-sm">CDN</span>
-                <Badge variant="default" className="bg-green-500/20 text-green-400 hover:bg-green-500/20">Operational</Badge>
+                <StatusBadge status="operational" />
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm">Storage</span>
-                <Badge variant="outline" className="text-blue-400 border-blue-400/30">98% free</Badge>
+                <StatusBadge status="update" showDot={false} className="bg-blue-500/15 text-blue-400 border-blue-500/30">98% FREE</StatusBadge>
               </div>
             </div>
           </CardContent>
