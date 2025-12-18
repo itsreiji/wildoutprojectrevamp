@@ -38,8 +38,8 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { useEvents } from "../../contexts/EventsContext";
 import { useAuth } from "../../contexts/AuthContext";
+import { useEvents } from "../../contexts/EventsContext";
 import { auditService } from "../../services/auditService";
 import {
   AlertDialog,
@@ -210,21 +210,21 @@ export const DashboardEvents = () => {
   const handleDelete = async (id: string) => {
     setIsDeleting(true);
     try {
-      const eventToDelete = events.find(e => e.id === id);
+      const eventToDelete = events.find((e) => e.id === id);
       await deleteEvent(id);
-      
+
       // Log delete action
       if (user?.id) {
         await auditService.logContentAction(
           user.id,
           role,
-          'DELETE',
-          'EVENT',
+          "DELETE",
+          "EVENT",
           id,
-          { title: eventToDelete?.title || 'Unknown' }
+          { title: eventToDelete?.title || "Unknown" }
         );
       }
-      
+
       toast.success("Event deleted successfully!");
       setIsDeleteDialogOpen(false);
       setDeletingEventId(null);
@@ -399,35 +399,35 @@ export const DashboardEvents = () => {
       try {
         if (editingEvent) {
           await updateEvent(editingEvent.id, eventData);
-          
+
           // Log update action
           if (user?.id) {
             await auditService.logContentAction(
               user.id,
               role,
-              'UPDATE',
-              'EVENT',
+              "UPDATE",
+              "EVENT",
               editingEvent.id,
               { title: eventData.title }
             );
           }
-          
+
           toast.success("Event updated successfully!");
         } else {
           const newEvent = await addEvent(eventData);
-          
+
           // Log create action
           if (user?.id && newEvent) {
             await auditService.logContentAction(
               user.id,
               role,
-              'CREATE',
-              'EVENT',
-              (newEvent as any).id || 'unknown',
+              "CREATE",
+              "EVENT",
+              (newEvent as any).id || "unknown",
               { title: eventData.title }
             );
           }
-          
+
           toast.success("Event created successfully!");
         }
         setIsDialogOpen(false);
@@ -1033,14 +1033,18 @@ export const DashboardEvents = () => {
         {/* Create/Edit Event Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
-            className="sm:max-w-[600px] bg-gray-900 border-gray-800 text-white"
+            className="!max-w-[800px] !w-[800px] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
             id="dashboard-events-create-edit-dialog"
           >
-            <DialogHeader id="dashboard-events-create-edit-dialog-header">
+            <DialogHeader
+              className="p-4 pb-2 border-b border-white/10"
+              id="dashboard-events-create-edit-dialog-header"
+            >
               <DialogTitle
-                className="text-2xl font-bold text-white"
+                className="text-xl font-bold text-white flex items-center gap-2"
                 id="dashboard-events-create-edit-dialog-title"
               >
+                <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
                 {editingEvent ? "Edit Event" : "Create New Event"}
               </DialogTitle>
             </DialogHeader>
@@ -1059,7 +1063,7 @@ export const DashboardEvents = () => {
           onOpenChange={setIsDeleteDialogOpen}
         >
           <AlertDialogContent
-            className="bg-gray-900 border-gray-800 text-white"
+            className="bg-[#0a0a0a] border-white/10 text-white"
             id="dashboard-events-delete-confirmation-dialog"
           >
             <AlertDialogHeader id="dashboard-events-delete-confirmation-dialog-header">
