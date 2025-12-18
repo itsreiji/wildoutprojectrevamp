@@ -153,23 +153,23 @@ export function DashboardGalleryForm({
         id="admin-gallery-form"
         onSubmit={form.handleSubmit(handleFormSubmit)}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-6 px-8 py-6 wildout-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-20 px-8 py-10 wildout-scrollbar">
           {/* Basic Info */}
-          <div className="space-y-4" id="admin-gallery-form-basic-info">
+          <div className="space-y-16" id="admin-gallery-form-basic-info">
             <h3
-              className="text-sm font-semibold text-[#E93370] flex items-center gap-2"
+              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-10"
               id="admin-gallery-form-basic-info-title"
             >
-              <span className="w-1 h-4 bg-[#E93370] rounded-full"></span>
+              <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Gallery Details
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 items-start relative">
               <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem
-                    className="md:col-span-2"
+                    className="md:col-span-2 space-y-3"
                     id="admin-gallery-form-title-field"
                   >
                     <FormLabel
@@ -183,7 +183,7 @@ export function DashboardGalleryForm({
                         id="admin-gallery-form-title-input"
                         placeholder="e.g. Summer Festival 2025"
                         {...field}
-                        className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -197,7 +197,10 @@ export function DashboardGalleryForm({
                 control={form.control}
                 name="category"
                 render={({ field }) => (
-                  <FormItem id="admin-gallery-form-category-field">
+                  <FormItem
+                    id="admin-gallery-form-category-field"
+                    className="space-y-3"
+                  >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
                       htmlFor="admin-gallery-form-category-input"
@@ -210,7 +213,7 @@ export function DashboardGalleryForm({
                         placeholder="e.g. Events, Behind-the-Scenes"
                         {...field}
                         value={field.value || ""}
-                        className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -224,7 +227,10 @@ export function DashboardGalleryForm({
                 control={form.control}
                 name="event_id"
                 render={({ field }) => (
-                  <FormItem id="admin-gallery-form-event-field">
+                  <FormItem
+                    id="admin-gallery-form-event-field"
+                    className="space-y-3"
+                  >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
                       htmlFor="admin-gallery-form-event-select"
@@ -237,7 +243,7 @@ export function DashboardGalleryForm({
                     >
                       <FormControl>
                         <SelectTrigger
-                          className="h-10 w-full text-sm bg-white/5 border-white/10"
+                          className="h-11 w-full text-sm bg-white/5 border-white/10"
                           id="admin-gallery-form-event-select"
                         >
                           <SelectValue placeholder="Select an event..." />
@@ -265,7 +271,10 @@ export function DashboardGalleryForm({
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem id="admin-gallery-form-description-field">
+                <FormItem
+                  id="admin-gallery-form-description-field"
+                  className="space-y-3"
+                >
                   <FormLabel
                     className="text-white/80 text-sm font-semibold"
                     htmlFor="admin-gallery-form-description-textarea"
@@ -290,12 +299,15 @@ export function DashboardGalleryForm({
             />
 
             {/* Image Upload Area */}
-            <div className="space-y-4">
+            <div className="space-y-8 pt-6">
               <FormField
                 control={form.control}
                 name="image_files"
                 render={() => (
-                  <FormItem id="admin-gallery-form-images-field">
+                  <FormItem
+                    id="admin-gallery-form-images-field"
+                    className="space-y-3 mt-6"
+                  >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
                       htmlFor="admin-gallery-form-images-input"
@@ -356,7 +368,7 @@ export function DashboardGalleryForm({
               {/* Previews Grid */}
               {previewUrls.length > 0 && (
                 <div
-                  className="grid grid-cols-4 gap-3 pt-2"
+                  className="grid grid-cols-4 gap-4 pt-2"
                   id="admin-gallery-form-previews"
                 >
                   {previewUrls.map((url, index) => (

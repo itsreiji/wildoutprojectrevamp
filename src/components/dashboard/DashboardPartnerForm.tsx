@@ -127,22 +127,25 @@ export function DashboardPartnerForm({
         id="dashboard-partner-form"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-6 px-8 py-6 wildout-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-16 px-8 py-10 wildout-scrollbar">
           {/* Basic Info */}
-          <div className="space-y-4" id="dashboard-partner-form-basic-info">
+          <div className="space-y-12" id="dashboard-partner-form-basic-info">
             <h3
-              className="text-sm font-semibold text-[#E93370] flex items-center gap-2"
+              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-8"
               id="dashboard-partner-form-basic-info-title"
             >
-              <span className="w-1 h-4 bg-[#E93370] rounded-full"></span>
+              <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Partner Details
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 items-start relative">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem id="dashboard-partner-form-name-field">
+                  <FormItem
+                    id="dashboard-partner-form-name-field"
+                    className="space-y-3"
+                  >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-partner-form-name-input"
@@ -154,7 +157,7 @@ export function DashboardPartnerForm({
                         id="dashboard-partner-form-name-input"
                         placeholder="e.g. Red Bull, Spotify"
                         {...field}
-                        className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -168,7 +171,10 @@ export function DashboardPartnerForm({
                 control={form.control}
                 name="sponsorship_level"
                 render={({ field }) => (
-                  <FormItem id="dashboard-partner-form-level-field">
+                  <FormItem
+                    id="dashboard-partner-form-level-field"
+                    className="space-y-3"
+                  >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-partner-form-level-select"
@@ -182,7 +188,7 @@ export function DashboardPartnerForm({
                     >
                       <FormControl>
                         <SelectTrigger
-                          className="h-10 w-full text-sm bg-white/5 border-white/10"
+                          className="h-11 w-full text-sm bg-white/5 border-white/10"
                           id="dashboard-partner-form-level-select"
                         >
                           <SelectValue placeholder="Select tier" />
@@ -206,7 +212,10 @@ export function DashboardPartnerForm({
                 control={form.control}
                 name="website_url"
                 render={({ field }) => (
-                  <FormItem id="dashboard-partner-form-website-field">
+                  <FormItem
+                    id="dashboard-partner-form-website-field"
+                    className="space-y-3"
+                  >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-partner-form-website-input"
@@ -220,7 +229,7 @@ export function DashboardPartnerForm({
                         type="url"
                         {...field}
                         value={field.value || ""}
-                        className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -234,7 +243,10 @@ export function DashboardPartnerForm({
                 control={form.control}
                 name="contact_email"
                 render={({ field }) => (
-                  <FormItem id="dashboard-partner-form-email-field">
+                  <FormItem
+                    id="dashboard-partner-form-email-field"
+                    className="space-y-3"
+                  >
                     <FormLabel
                       className="text-white/80 text-sm font-semibold"
                       htmlFor="dashboard-partner-form-email-input"
@@ -248,7 +260,7 @@ export function DashboardPartnerForm({
                         type="email"
                         {...field}
                         value={field.value || ""}
-                        className="h-10 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -264,7 +276,10 @@ export function DashboardPartnerForm({
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem id="dashboard-partner-form-description-field">
+                <FormItem
+                  id="dashboard-partner-form-description-field"
+                  className="space-y-3"
+                >
                   <FormLabel
                     className="text-white/80 text-sm font-semibold"
                     htmlFor="dashboard-partner-form-description-textarea"
@@ -292,7 +307,10 @@ export function DashboardPartnerForm({
               control={form.control}
               name="logo_file"
               render={({ field: { onChange, value, ...field } }) => (
-                <FormItem id="dashboard-partner-form-logo-field">
+                <FormItem
+                  id="dashboard-partner-form-logo-field"
+                  className="space-y-3 mt-6"
+                >
                   <FormLabel
                     className="text-white/80 text-sm font-semibold"
                     htmlFor="dashboard-partner-form-logo-input"
@@ -300,7 +318,7 @@ export function DashboardPartnerForm({
                     Partner Logo
                   </FormLabel>
                   <FormControl>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
                       <div className="flex-1">
                         <Input
                           accept="image/*"
@@ -344,7 +362,7 @@ export function DashboardPartnerForm({
                         </label>
                       </div>
                       {defaultValues?.logo_url && (
-                        <div className="flex flex-col items-center gap-2">
+                        <div className="flex flex-col items-center gap-3">
                           <label className="text-[10px] uppercase tracking-wider text-white/40 font-bold">
                             Current
                           </label>
