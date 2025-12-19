@@ -69,7 +69,10 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({
         time: row.time ?? "",
         venue: row.venue ?? row.location ?? "",
         venueAddress: row.venue_address ?? row.address ?? "",
-        image: row.image ?? row.image_url ?? row.featured_image ?? "",
+        image: (() => {
+          const img = row.image ?? row.image_url ?? row.featured_image ?? "";
+          return img && img.trim().length > 0 ? img : "";
+        })(),
         category: row.category ?? null,
         status,
         end_date: row.end_date ?? "",
@@ -97,7 +100,10 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({
             return metadata.artists.map((artist: any) => ({
               name: artist.name || artist || "",
               role: artist.role || undefined,
-              image: artist.image || undefined,
+              image: (() => {
+                const img = artist.image || undefined;
+                return img && img.trim().length > 0 ? img : undefined;
+              })(),
             }));
           }
           if (row.artists && Array.isArray(row.artists)) {
@@ -137,7 +143,10 @@ export const EventsProvider: React.FC<{ children: ReactNode }> = ({
         created_at: row.created_at,
         updated_at: row.updated_at,
         tags: row.tags || null,
-        image_url: row.image_url || row.image || null,
+        image_url: (() => {
+          const img = row.image_url || row.image || null;
+          return img && img.trim().length > 0 ? img : null;
+        })(),
         currency: row.currency || null,
       };
     }) as LandingEvent[];

@@ -242,7 +242,19 @@ const fetchTeamMembers = async (): Promise<TeamMember[]> => {
       console.error("Error fetching team members:", error);
       return INITIAL_TEAM;
     }
-    return (data || []) as TeamMember[];
+    return (data || []).map((row: any): TeamMember => ({
+      id: row.id,
+      name: row.name || '',
+      title: row.title || row.role || undefined,
+      bio: row.bio || undefined,
+      avatar_url: row.avatar_url && row.avatar_url.trim().length > 0 ? row.avatar_url : null,
+      email: row.email || undefined,
+      status: row.status as 'active' | 'inactive' | undefined || undefined,
+      social_links: normalizeSocialLinks(row.social_links),
+      display_order: row.display_order || undefined,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }));
   } catch (error) {
     console.error("Error in fetchTeamMembers:", error);
     return INITIAL_TEAM;
