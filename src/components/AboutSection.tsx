@@ -22,7 +22,7 @@ export const AboutSection = React.memo(() => {
   };
 
   return (
-    <section className="relative py-20 px-4" id="about">
+    <section className="relative py-20 px-4" id="about-section">
       <div className="container mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div

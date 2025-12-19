@@ -21,7 +21,7 @@ export const EventsSection = React.memo(() => {
 
   return (
     <>
-      <section className="relative py-20 px-4" id="events">
+      <section className="relative py-20 px-4" id="events-section">
         <div className="container mx-auto max-w-7xl">
           {/* Section Header */}
           <motion.div
