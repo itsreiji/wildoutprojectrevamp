@@ -13,8 +13,7 @@
                 "^build"
             ],
             "outputs": [
-                "dist/**",
-                ".next/**"
+                "dist/**"
             ]
         }
     }
