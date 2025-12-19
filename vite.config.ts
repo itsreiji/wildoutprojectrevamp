@@ -64,7 +64,6 @@ export default defineConfig({
     minify: 'esbuild',
     chunkSizeWarningLimit: 1000, // Increase limit to 1000 kB
     rollupOptions: {
-      input: 'src/main.tsx',
       output: {
         manualChunks: (id: string) => {
           if (id.includes('node_modules')) {
