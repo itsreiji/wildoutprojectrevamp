@@ -82,7 +82,7 @@ export const GallerySection = React.memo(() => {
                 <ImageWithFallback
                   alt={image.title || image.description || 'Gallery image'}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  src={image.image_url}
+                  src={image.image_url || "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800"}
                 />
 
                 {/* Overlay */}

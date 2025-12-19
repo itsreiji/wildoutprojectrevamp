@@ -84,7 +84,7 @@ export const EventsSection = React.memo(() => {
                         alt={event.title || 'Event'}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         id={`events-item-${event.id}-image`}
-                        src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : undefined) || undefined}
+                        src={event.image || (event.metadata && typeof event.metadata === 'object' && !Array.isArray(event.metadata) && 'featured_image' in event.metadata ? String(event.metadata.featured_image) : "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800")}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
@@ -159,7 +159,7 @@ export const EventsSection = React.memo(() => {
                                 <ImageWithFallback
                                   alt={artist?.name || 'Artist'}
                                   className="w-full h-full object-cover"
-                                  src={artist?.image || undefined}
+                                  src={artist?.image || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200"}
                                 />
                               </div>
                             ))}

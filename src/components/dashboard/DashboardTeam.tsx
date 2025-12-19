@@ -326,7 +326,7 @@ export const DashboardTeam = React.memo(() => {
                     <ImageWithFallback
                       alt={member.name}
                       className="w-full h-full object-cover"
-                      src={member.avatar_url}
+                      src={member.avatar_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200"}
                     />
                   </div>
                 ) : (

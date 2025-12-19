@@ -282,7 +282,7 @@ export const DashboardPartners = () => {
                   alt={partner.name}
                   className="w-full h-full object-contain p-2"
                   id={`dashboard-partner-logo-${partner.id}`}
-                  src={partner.logo_url}
+                  src={partner.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200"}
                 />
               </div>
             ) : (

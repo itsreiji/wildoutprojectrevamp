@@ -403,7 +403,7 @@ export function DashboardPartnerForm({
                           </label>
                           <div className="w-20 h-20 rounded-xl overflow-hidden border border-white/10 p-2 bg-white/5">
                             <img
-                              src={defaultValues.logo_url}
+                              src={defaultValues.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200"}
                               alt="Current logo"
                               className="w-full h-full object-contain"
                             />

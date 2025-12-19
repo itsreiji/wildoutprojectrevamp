@@ -375,7 +375,7 @@ export function DashboardTeamForm({
                           </label>
                           <div className="w-20 h-20 rounded-xl overflow-hidden border border-white/10">
                             <img
-                              src={defaultValues.avatar_url}
+                              src={defaultValues.avatar_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200"}
                               alt="Current avatar"
                               className="w-full h-full object-cover"
                             />
