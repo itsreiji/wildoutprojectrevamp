@@ -111,5 +111,26 @@ export default defineConfig({
       '0.0.0.0',
       'skypiea-pc.hyakutake-in.ts.net',
     ],
+    proxy: {
+      // Proxy Inngest API requests from Vite to the Inngest dev server
+      // This allows http://localhost:5173/api/inngest to work
+      '/api/inngest': {
+        target: 'http://127.0.0.1:8288',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/inngest/, ''),
+        configure: (proxy, options) => {
+          proxy.on('error', (err, _req, res) => {
+            console.log('Proxy error:', err.message);
+            if ('writeHead' in res && typeof res.writeHead === 'function') {
+              res.writeHead(500, { 'Content-Type': 'text/plain' });
+              res.end('Inngest dev server not running. Start it with: npx inngest dev -u http://localhost:5173');
+            }
+          });
+          proxy.on('proxyReq', (_proxyReq, req, _res) => {
+            console.log('Proxying:', req.method, req.url, '->', options.target);
+          });
+        },
+      },
+    },
   },
 });

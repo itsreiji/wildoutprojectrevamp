@@ -1,6 +1,6 @@
 /**
  * Inngest Integrations with Wildout Project Services
- * 
+ *
  * This file provides integrations between Inngest functions and your existing services.
  */
 
@@ -51,7 +51,7 @@ export const enhancedAuditLogger = inngestClient.createFunction(
         if (recentFailures && recentFailures.length >= 3) {
           // Trigger security alert
           console.log(`SECURITY ALERT: Multiple failed logins for user ${userId}`);
-          
+
           // You could send a security email here
           await step.sendEvent('security-alert', {
             name: 'security/alert',
@@ -104,7 +104,7 @@ export const userRegistrationWorkflow = inngestClient.createFunction(
     await step.run('send-welcome-email', async () => {
       // In production, integrate with SendGrid, Resend, AWS SES, etc.
       console.log(`📧 WELCOME EMAIL: Sending to ${email}`);
-      
+
       // Example integration with a real email service:
       // await emailService.send({
       //   to: email,
@@ -112,7 +112,7 @@ export const userRegistrationWorkflow = inngestClient.createFunction(
       //   template: 'welcome',
       //   data: { userId, email }
       // });
-      
+
       return {
         sent: true,
         provider: 'mock',
@@ -199,13 +199,13 @@ export const eventCreationWorkflow = inngestClient.createFunction(
     await step.run('send-notifications', async () => {
       // Example: Send notifications to admins or subscribers
       console.log(`📢 NEW EVENT: "${title}" created by ${createdBy}`);
-      
+
       // You could:
       // - Send Slack notification
       // - Email subscribers
       // - Update social media
       // - Create calendar events
-      
+
       return {
         notifications: ['admin-dashboard', 'email-list'],
         eventTitle: title,
@@ -235,7 +235,7 @@ export const batchEmailProcessor = inngestClient.createFunction(
   },
   { event: 'email/send' },
   async ({ event, step }) => {
-    const { to, subject, body } = event.data;
+    const { to, subject } = event.data;
 
     // Step 1: Validate email
     await step.run('validate-email', async () => {
@@ -250,11 +250,11 @@ export const batchEmailProcessor = inngestClient.createFunction(
     const result = await step.run('send-email', async () => {
       // Replace with actual email service integration
       console.log(`📧 EMAIL: ${subject} → ${to}`);
-      
+
       // Example with real service:
       // const emailResult = await emailService.send({ to, subject, body });
       // return emailResult;
-      
+
       return {
         sent: true,
         messageId: `email_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

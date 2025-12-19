@@ -56,7 +56,7 @@ export const processNewEvent = inngestClient.createFunction(
     const { eventId, title, createdBy } = event.data;
 
     // Step 1: Validate event data
-    const validatedEvent = await step.run('validate-event', async () => {
+    await step.run('validate-event', async () => {
       const { data, error } = await supabaseClient
         .from('events')
         .select('*')
@@ -155,7 +155,7 @@ export const batchEmailProcessor = inngestClient.createFunction(
   },
   { event: 'email/send' },
   async ({ event, step }) => {
-    const { to, subject, body } = event.data;
+    const { to, subject } = event.data;
 
     // Step 1: Validate email format
     await step.run('validate-email', async () => {

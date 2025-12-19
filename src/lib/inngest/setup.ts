@@ -1,6 +1,6 @@
 /**
  * Inngest Setup Script
- * 
+ *
  * This script helps you set up Inngest in your Wildout project.
  * Run this once to get everything configured.
  */
@@ -12,7 +12,6 @@ console.log('🚀 Setting up Inngest for Wildout Project...\n');
 
 // 1. Check environment variables
 const envPath = join(process.cwd(), '.env');
-const envExamplePath = join(process.cwd(), '.env.example');
 
 let envContent = '';
 if (existsSync(envPath)) {
@@ -43,7 +42,6 @@ console.log('✅ Environment variables updated\n');
 
 // 2. Create API route example
 const apiDir = join(process.cwd(), 'src', 'pages', 'api');
-const apiRoutePath = join(apiDir, 'inngest.ts');
 
 if (!existsSync(apiDir)) {
   console.log('📁 Creating API directory...');

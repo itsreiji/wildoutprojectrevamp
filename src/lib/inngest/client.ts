@@ -3,8 +3,9 @@ import { Inngest } from 'inngest';
 // Create Inngest client
 export const inngest = new Inngest({
   id: 'wildout-project',
-  // You can add your Inngest event key here if you have one
-  // eventKey: process.env.INNGEST_EVENT_KEY,
+  eventKey: import.meta.env.VITE_INNGEST_EVENT_KEY || import.meta.env.INNGEST_EVENT_KEY,
+  // For local development with Inngest dev server
+  baseUrl: import.meta.env.VITE_INNGEST_DEV_SERVER_URL || import.meta.env.INNGEST_DEV_SERVER_URL,
 });
 
 // Define common event types for type safety
@@ -34,4 +35,6 @@ export type WildoutEvents = {
 // Export typed Inngest client
 export const inngestClient = new Inngest({
   id: 'wildout-project',
+  eventKey: import.meta.env.VITE_INNGEST_EVENT_KEY || import.meta.env.INNGEST_EVENT_KEY,
+  baseUrl: import.meta.env.VITE_INNGEST_DEV_SERVER_URL || import.meta.env.INNGEST_DEV_SERVER_URL,
 });
