@@ -47,26 +47,14 @@ interface SplitPanelProps extends React.HTMLAttributes<HTMLDivElement> {
 const SplitPanel = React.forwardRef<HTMLDivElement, SplitPanelProps>(
   ({ className, collapsible = false, minSize = 0, maxSize, defaultSize, onResize, ...props }, ref) => {
     const { direction, onLayout } = React.useContext(SplitContext)
-    const [size, setSize] = React.useState<number | string>(defaultSize || 0)
-    
-    const handleResize = React.useCallback((newSize: number) => {
-      if (size === newSize) return
-      
-      const boundedSize = Math.max(
-        typeof minSize === 'number' ? minSize : 0,
-        Math.min(typeof maxSize === 'number' ? maxSize : Infinity, newSize)
-      )
-      
-      setSize(boundedSize)
-      onResize?.(boundedSize)
-    }, [size, minSize, maxSize, onResize])
-    
+    const [size] = React.useState<number | string>(defaultSize || 0)
+
     React.useEffect(() => {
       if (onLayout) {
         onLayout()
       }
     }, [size, onLayout])
-    
+
     return (
       <div
         ref={ref}
@@ -103,7 +91,7 @@ interface SplitHandleProps extends React.HTMLAttributes<HTMLDivElement> {
 const SplitHandle = React.forwardRef<HTMLDivElement, SplitHandleProps>(
   ({ className, withHandle = true, ...props }, ref) => {
     const { direction } = React.useContext(SplitContext)
-    
+
     return (
       <div
         ref={ref}

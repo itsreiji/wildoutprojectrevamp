@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -73,21 +72,16 @@ const TeamMemberModal = ({
           aria-label={member ? `Edit Team Member: ${member.name}` : "Add Team Member"}
           aria-labelledby="team-member-edit-dialog-title"
         >
-          <DialogHeader
-            className="p-4 pb-2 border-b border-white/10"
-            id="team-member-edit-dialog-header"
+          <DialogTitle
+            className="text-xl font-bold text-white flex items-center gap-2 p-4 pb-2 border-b border-white/10"
+            id="team-member-edit-dialog-title"
           >
-            <DialogTitle
-              className="text-xl font-bold text-white flex items-center gap-2"
-              id="team-member-edit-dialog-title"
-            >
-              <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
-              {member ? "Edit Team Member" : "Add Team Member"}
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              {member ? "Edit team member details" : "Add a new team member to the system"}
-            </DialogDescription>
-          </DialogHeader>
+            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
+            {member ? "Edit Team Member" : "Add Team Member"}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {member ? "Edit team member details" : "Add a new team member to the system"}
+          </DialogDescription>
 
           <form
             className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden"
@@ -226,21 +220,16 @@ const TeamMemberModal = ({
         className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
         id="team-member-view-dialog"
       >
-        <DialogHeader
-          className="p-4 pb-2 border-b border-white/10"
-          id="team-member-view-dialog-header"
+        <DialogTitle
+          className="text-xl font-bold text-white flex items-center gap-2 p-4 pb-2 border-b border-white/10"
+          id="team-member-view-dialog-title"
         >
-          <DialogTitle
-            className="text-xl font-bold text-white flex items-center gap-2"
-            id="team-member-view-dialog-title"
-          >
-            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
-            Team Member Profile
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            Detailed profile information for {member.name}
-          </DialogDescription>
-        </DialogHeader>
+          <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
+          Team Member Profile
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          Detailed profile information for {member.name}
+        </DialogDescription>
 
         <div className="flex-1 overflow-y-auto wildout-scrollbar p-8 space-y-8">
           {/* Avatar & Header */}

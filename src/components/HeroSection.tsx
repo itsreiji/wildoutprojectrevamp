@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { useContent } from '../contexts/ContentContext';
 
 export const HeroSection = React.memo(() => {
-  const { hero, events, partners } = useContent();
+  const { hero } = useContent();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-20" id="hero-section">

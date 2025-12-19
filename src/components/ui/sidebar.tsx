@@ -109,7 +109,6 @@ function SidebarProvider({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [toggleSidebar]);
 
-  // Focus management for accessibility
   React.useEffect(() => {
     if (!isMobile && open) {
       const timer = setTimeout(() => {
@@ -126,6 +125,7 @@ function SidebarProvider({
 
       return () => clearTimeout(timer);
     }
+    return;
   }, [open, isMobile]);
 
   const state = open ? "expanded" : "collapsed";

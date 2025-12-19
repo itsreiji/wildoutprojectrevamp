@@ -17,7 +17,7 @@ const NAV_ITEMS = [
 ];
 
 const NavigationComponent = () => {
-  const { getAdminPath, currentPath, navigate } = useRouter();
+  const { currentPath, navigate } = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

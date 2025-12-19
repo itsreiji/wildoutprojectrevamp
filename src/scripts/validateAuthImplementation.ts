@@ -3,8 +3,6 @@
  * Validates the Google OAuth integration and security features
  */
 
-import { supabaseClient } from '../supabase/client';
-
 /**
  * Validate the authentication configuration
  */
@@ -37,7 +35,6 @@ export async function validateAuthConfiguration() {
     console.log('🔄 Checking security features...');
 
     // Check if we're using PKCE (should be enabled by default in modern Supabase)
-    const authConfig = supabaseClient.auth;
     validationResults.securityFeatures = true; // PKCE is enabled by default
 
     // Check HTTPS requirement
@@ -98,29 +95,11 @@ export async function testAuthFlow() {
   try {
     // Test 1: Mock Google OAuth sign-in
     console.log('🔄 Testing Google OAuth sign-in...');
-    const mockOAuthResponse = {
-      error: null,
-      data: {
-        user: {
-          id: 'test-user-id',
-          email: 'test@example.com',
-          app_metadata: { role: 'user' }
-        },
-        session: {
-          access_token: 'test-token',
-          expires_at: Math.floor(Date.now() / 1000) + 3600 // 1 hour from now
-        }
-      }
-    };
 
     console.log('✅ Google OAuth sign-in test completed');
 
     // Test 2: Mock session validation
     console.log('🔄 Testing session validation...');
-    const mockSessionResponse = {
-      data: { session: mockOAuthResponse.data.session },
-      error: null
-    };
 
     console.log('✅ Session validation test completed');
 
@@ -133,7 +112,6 @@ export async function testAuthFlow() {
     ];
 
     errorScenarios.forEach(scenario => {
-      const mockError = { error: { message: scenario.type } };
       console.log(`  ✅ ${scenario.type} -> ${scenario.expectedMessage}`);
     });
 

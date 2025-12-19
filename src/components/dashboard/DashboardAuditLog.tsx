@@ -16,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from '../ui/table';
-import { Badge } from '../ui/badge';
 import { StatusBadge } from '../ui/StatusBadge';
 import {
   Select,

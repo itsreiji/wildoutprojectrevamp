@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Calendar, MapPin, Clock, Users, Music, Ticket, ArrowRight, Search } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Music, Ticket, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { StatusBadge } from './ui/StatusBadge';
-import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useEvents } from '../contexts/EventsContext';

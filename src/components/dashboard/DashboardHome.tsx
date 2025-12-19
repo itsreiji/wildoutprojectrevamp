@@ -1,6 +1,5 @@
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
 import { StatusBadge } from '../ui/StatusBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from '../router';

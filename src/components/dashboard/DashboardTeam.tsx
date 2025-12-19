@@ -40,10 +40,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { Badge } from "../ui/badge";
 import { StatusBadge } from "../ui/StatusBadge";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { DashboardTeamForm, type TeamFormValues } from "./DashboardTeamForm";
 // member.avatar_url → member.photoUrl || member.avatar_url
@@ -464,21 +463,16 @@ export const DashboardTeam = React.memo(() => {
           aria-label={editingMember ? `Edit Team Member: ${editingMember.name}` : "Add Team Member"}
           aria-labelledby="dashboard-team-create-edit-dialog-title"
         >
-          <DialogHeader
-            className="px-8 py-6 border-b border-white/10"
-            id="dashboard-team-create-edit-dialog-header"
+          <DialogTitle
+            className="text-xl font-bold text-white flex items-center gap-2 px-8 py-6 border-b border-white/10"
+            id="dashboard-team-create-edit-dialog-title"
           >
-            <DialogTitle
-              className="text-xl font-bold text-white flex items-center gap-2"
-              id="dashboard-team-create-edit-dialog-title"
-            >
-              <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
-              {editingMember ? "Edit Team Member" : "Add Team Member"}
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              {editingMember ? "Edit team member details" : "Add a new team member to the system"}
-            </DialogDescription>
-          </DialogHeader>
+            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
+            {editingMember ? "Edit Team Member" : "Add Team Member"}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {editingMember ? "Edit team member details" : "Add a new team member to the system"}
+          </DialogDescription>
 
           <DashboardTeamForm
             defaultValues={editingMember || undefined}

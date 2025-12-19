@@ -4,7 +4,6 @@ import { Calendar, Clock, Heart, MapPin, Share2, Ticket } from "lucide-react";
 import React from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { StatusBadge } from "./ui/StatusBadge";
-import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 

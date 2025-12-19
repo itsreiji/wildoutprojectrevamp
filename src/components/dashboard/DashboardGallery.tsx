@@ -43,7 +43,7 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import {
   DashboardGalleryForm,
@@ -585,21 +585,16 @@ export const DashboardGallery = React.memo(() => {
           aria-label={editingGallery ? `Edit Gallery Item: ${editingGallery.title}` : "Add Gallery Item"}
           aria-labelledby="dashboard-gallery-create-edit-dialog-title"
         >
-          <DialogHeader
-            className="px-8 py-6 border-b border-white/10"
-            id="dashboard-gallery-create-edit-dialog-header"
+          <DialogTitle
+            className="text-xl font-bold text-white flex items-center gap-2 px-8 py-6 border-b border-white/10"
+            id="dashboard-gallery-create-edit-dialog-title"
           >
-            <DialogTitle
-              className="text-xl font-bold text-white flex items-center gap-2"
-              id="dashboard-gallery-create-edit-dialog-title"
-            >
-              <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
-              {editingGallery ? "Edit Gallery Item" : "Create New Gallery"}
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              {editingGallery ? "Edit gallery item details" : "Add a new gallery item to the system"}
-            </DialogDescription>
-          </DialogHeader>
+            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
+            {editingGallery ? "Edit Gallery Item" : "Create New Gallery"}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {editingGallery ? "Edit gallery item details" : "Add a new gallery item to the system"}
+          </DialogDescription>
 
           <DashboardGalleryForm
             defaultValues={editingGallery || undefined}

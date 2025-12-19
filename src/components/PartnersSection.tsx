@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, Crown } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { StatusBadge } from './ui/StatusBadge';
-import { Badge } from './ui/badge';
 import {
   Select,
   SelectContent,
@@ -21,16 +20,6 @@ export const PartnersSection = React.memo(() => {
     gold: 3,
     silver: 2,
     bronze: 1,
-  };
-
-  const getBadgeVariant = (tier: string): 'default' | 'secondary' | 'outline' => {
-    switch (tier) {
-      case 'bronze': return 'secondary';
-      case 'silver': return 'default';
-      case 'gold': return 'outline';
-      case 'platinum': return 'default';
-      default: return 'secondary';
-    }
   };
 
   let filteredPartners = partners.filter(p => p.status === 'active');
