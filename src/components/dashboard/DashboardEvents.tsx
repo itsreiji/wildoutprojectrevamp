@@ -56,7 +56,7 @@ import { Badge } from "../ui/badge";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -1030,6 +1030,9 @@ export const DashboardEvents = () => {
                 <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
                 {editingEvent ? "Edit Event" : "Create New Event"}
               </DialogTitle>
+              <DialogDescription className="sr-only">
+                {editingEvent ? "Edit event details" : "Create a new event in the system"}
+              </DialogDescription>
             </DialogHeader>
             <DashboardEventForm
               defaultValues={editingEvent || undefined}

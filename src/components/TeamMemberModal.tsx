@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -81,6 +82,9 @@ const TeamMemberModal = ({
               <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
               {member ? "Edit Team Member" : "Add Team Member"}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {member ? "Edit team member details" : "Add a new team member to the system"}
+            </DialogDescription>
           </DialogHeader>
 
           <form
@@ -231,6 +235,9 @@ const TeamMemberModal = ({
             <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
             Team Member Profile
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Detailed profile information for {member.name}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto wildout-scrollbar p-8 space-y-8">

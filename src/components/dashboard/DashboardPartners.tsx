@@ -12,6 +12,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -476,6 +477,9 @@ export const DashboardPartners = () => {
               <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
               {editingPartner ? "Edit Partner" : "Add Partner"}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {editingPartner ? "Edit partner details" : "Add a new partner to the system"}
+            </DialogDescription>
           </DialogHeader>
 
           <DashboardPartnerForm

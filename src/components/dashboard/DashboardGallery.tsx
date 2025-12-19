@@ -43,7 +43,7 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import {
   DashboardGalleryForm,
@@ -594,6 +594,9 @@ export const DashboardGallery = React.memo(() => {
               <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
               {editingGallery ? "Edit Gallery Item" : "Create New Gallery"}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {editingGallery ? "Edit gallery item details" : "Add a new gallery item to the system"}
+            </DialogDescription>
           </DialogHeader>
 
           <DashboardGalleryForm

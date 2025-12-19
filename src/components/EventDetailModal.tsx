@@ -6,7 +6,7 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { StatusBadge } from "./ui/StatusBadge";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 
 interface EventDetailModalProps {
   event: Event | null;
@@ -35,6 +35,9 @@ export const EventDetailModal = React.memo(
               <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
               Event Details
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Detailed information about {event.title}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto wildout-scrollbar">

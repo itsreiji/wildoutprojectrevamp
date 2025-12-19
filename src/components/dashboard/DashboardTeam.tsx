@@ -43,7 +43,7 @@ import {
 import { Badge } from "../ui/badge";
 import { StatusBadge } from "../ui/StatusBadge";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { DashboardTeamForm, type TeamFormValues } from "./DashboardTeamForm";
 // member.avatar_url → member.photoUrl || member.avatar_url
@@ -473,6 +473,9 @@ export const DashboardTeam = React.memo(() => {
               <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
               {editingMember ? "Edit Team Member" : "Add Team Member"}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {editingMember ? "Edit team member details" : "Add a new team member to the system"}
+            </DialogDescription>
           </DialogHeader>
 
           <DashboardTeamForm
