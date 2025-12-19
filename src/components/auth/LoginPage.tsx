@@ -21,8 +21,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(1, { message: "Password is required" }),
+  email: z.string().min(1, 'Email is required').email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
   rememberMe: z.boolean().default(false),
 });
 
@@ -204,6 +204,11 @@ export const LoginPage: React.FC = () => {
   // Mobile responsiveness - adjust layout for smaller screens
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
+  // Debug: Log accessibility info if needed
+  // useEffect(() => {
+  //   console.log('LoginPage rendered');
+  // }, []);
+
   return (
     <div className="login-page relative min-h-screen bg-background text-foreground overflow-x-hidden" id="admin-login-page">
       <Background3D />
@@ -289,6 +294,7 @@ export const LoginPage: React.FC = () => {
                         <button
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                           id="admin-login-password-toggle"
+                          data-testid="admin-login-password-toggle"
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                         >
@@ -353,7 +359,6 @@ export const LoginPage: React.FC = () => {
                       <Checkbox
                         checked={field.value}
                         className="border-pink-500 data-[state=checked]:bg-pink-500"
-                        id="admin-login-remember-me-checkbox"
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>

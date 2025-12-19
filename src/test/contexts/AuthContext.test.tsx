@@ -6,8 +6,8 @@ import { auditService } from '../../services/auditService';
 import * as securityUtils from '../../utils/security';
 
 // Mock dependencies
-vi.mock('../../supabase/client', () => ({
-  supabaseClient: {
+vi.mock('../../supabase/client', () => {
+  const mockSupabaseClient = {
     auth: {
       signInWithPassword: vi.fn(),
       signInWithOAuth: vi.fn(),
@@ -15,11 +15,18 @@ vi.mock('../../supabase/client', () => ({
       onAuthStateChange: vi.fn(() => ({
         data: { subscription: { unsubscribe: vi.fn() } }
       })),
-      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null })
+      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+      getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
+      refreshSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null })
     },
     rpc: vi.fn().mockResolvedValue({ data: null, error: null })
-  }
-}));
+  };
+
+  return {
+    supabaseClient: mockSupabaseClient,
+    default: mockSupabaseClient
+  };
+});
 
 vi.mock('../../services/auditService', () => ({
   auditService: {

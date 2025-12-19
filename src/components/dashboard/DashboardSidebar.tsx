@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import logo from "figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png";
+const logo = "";
 import { StatusBadge } from "../ui/StatusBadge";
 import {
   Calendar,
@@ -153,6 +153,7 @@ export const DashboardSidebar = React.memo(
         id="dashboard-sidebar"
         side="left"
         className="border-r border-sidebar-border shadow-2xl"
+        data-testid="admin-sidebar"
       >
         {/* Sidebar Header */}
         <SidebarHeader

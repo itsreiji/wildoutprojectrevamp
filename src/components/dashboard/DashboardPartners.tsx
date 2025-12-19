@@ -465,6 +465,8 @@ export const DashboardPartners = () => {
         <DialogContent
           className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
           id="dashboard-partners-create-edit-dialog"
+          aria-label={editingPartner ? `Edit Partner: ${editingPartner.name}` : "Add Partner"}
+          aria-labelledby="dashboard-partners-create-edit-dialog-title"
         >
           <DialogHeader
             className="px-8 py-6 border-b border-white/10"

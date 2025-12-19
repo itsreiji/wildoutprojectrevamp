@@ -1,4 +1,3 @@
-import React from "react";
 import { AuditProvider } from "../../contexts/AuditContext";
 import { DashboardAbout } from "../dashboard/DashboardAbout";
 import { DashboardEvents } from "../dashboard/DashboardEvents";
@@ -14,7 +13,7 @@ import { useRouter } from "../router";
 
 /**
  * AdminDashboard Component
- * 
+ *
  * The main entry point for the administrative interface.
  * Uses conditional rendering to show the appropriate management section
  * based on the current URL sub-path.

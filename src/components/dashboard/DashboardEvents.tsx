@@ -1018,6 +1018,8 @@ export const DashboardEvents = () => {
           <DialogContent
             className="sm:max-w-3xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
             id="dashboard-events-create-edit-dialog"
+            aria-label={editingEvent ? `Edit Event: ${editingEvent.title}` : "Add Event"}
+            aria-labelledby="dashboard-events-create-edit-dialog-title"
           >
             <DialogHeader
               className="px-8 py-6 border-b border-white/10"

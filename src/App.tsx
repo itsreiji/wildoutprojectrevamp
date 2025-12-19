@@ -1,5 +1,5 @@
 /* @refresh reset */
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AdminGuard } from "./components/admin/AdminGuard";
 import { LandingPage } from "./components/LandingPage";
 import AllEventsPage from "./components/AllEventsPage";
@@ -28,8 +28,7 @@ const routes = {
 
 const App = () => {
   const auth = useAuth();
-  const { user, role, loading, error } = auth || {};
-  const [_isDevelopment, _setIsDevelopment] = useState(false);
+  const { loading } = auth || {};
 
   useEffect(() => {
     const checkEnv = async () => {

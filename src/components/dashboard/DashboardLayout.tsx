@@ -45,6 +45,7 @@ export const DashboardLayout = React.memo(
       <SidebarProvider
         className="w-full bg-background"
         style={{ height: "100dvh", overflow: "hidden" }}
+        data-testid="admin-dashboard-layout"
       >
         {/* Side Menu Panel */}
         <DashboardSidebar currentPage={currentPage} />
@@ -53,6 +54,7 @@ export const DashboardLayout = React.memo(
           id="dashboard-main-content"
           className="flex flex-col min-h-0"
           style={{ height: "100dvh", overflowY: "auto", overflowX: "hidden" }}
+          data-testid="admin-main-content"
         >
           <DashboardHeader currentPage={currentPage} />
           <DashboardMainContent>{children}</DashboardMainContent>

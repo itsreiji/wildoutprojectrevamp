@@ -70,6 +70,8 @@ const TeamMemberModal = ({
         <DialogContent
           className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
           id="team-member-edit-dialog"
+          aria-label={member ? `Edit Team Member: ${member.name}` : "Add Team Member"}
+          aria-labelledby="team-member-edit-dialog-title"
         >
           <DialogHeader
             className="p-4 pb-2 border-b border-white/10"

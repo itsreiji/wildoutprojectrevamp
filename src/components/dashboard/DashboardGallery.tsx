@@ -582,6 +582,8 @@ export const DashboardGallery = React.memo(() => {
         <DialogContent
           className="sm:max-w-3xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
           id="dashboard-gallery-create-edit-dialog"
+          aria-label={editingGallery ? `Edit Gallery Item: ${editingGallery.title}` : "Add Gallery Item"}
+          aria-labelledby="dashboard-gallery-create-edit-dialog-title"
         >
           <DialogHeader
             className="px-8 py-6 border-b border-white/10"

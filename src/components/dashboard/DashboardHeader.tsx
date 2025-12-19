@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -69,19 +68,21 @@ export const DashboardHeader = React.memo(
           "sticky top-0 z-20 w-full px-6 md:px-12 shrink-0"
         )}
         id="dashboard-header"
+        data-testid="admin-header"
       >
         {/* Left Section - Sidebar Toggle and Breadcrumbs */}
         <div className="flex items-center gap-4">
           <SidebarTrigger
             className="h-10 w-10 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl"
             id="sidebar-trigger"
+            data-testid="sidebar-trigger"
           />
           <Separator
             className="h-6 bg-gray-200"
             id="dashboard-header-separator"
             orientation="vertical"
           />
-          <Breadcrumb className="hidden md:flex">
+          <Breadcrumb className="hidden md:flex" data-testid="admin-header-title">
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink

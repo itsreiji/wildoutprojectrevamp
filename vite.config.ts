@@ -85,6 +85,7 @@ export default defineConfig({
           if (id.includes('styles') || id.includes('.css')) {
             return 'styles';
           }
+          return undefined;
         },
         sourcemapExcludeSources: false,
         sourcemapFileNames: '[name].[hash].js.map',

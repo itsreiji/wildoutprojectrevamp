@@ -461,6 +461,8 @@ export const DashboardTeam = React.memo(() => {
         <DialogContent
           className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
           id="dashboard-team-create-edit-dialog"
+          aria-label={editingMember ? `Edit Team Member: ${editingMember.name}` : "Add Team Member"}
+          aria-labelledby="dashboard-team-create-edit-dialog-title"
         >
           <DialogHeader
             className="px-8 py-6 border-b border-white/10"

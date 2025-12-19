@@ -10,32 +10,20 @@ import supabaseClient from "../supabase/client";
 import type {
     Database,
     Json,
-    TablesInsert,
-    TablesUpdate,
 } from "../supabase/types";
 import { useAuth } from "./AuthContext";
 
 import type {
     AboutContent,
-    AdminSection,
     ContentContextType,
     EventArtist,
     GalleryImage,
     HeroContent,
     Partner,
     PublicEventView,
-    SectionContent,
-    SectionPermissions,
     SiteSettings,
     TeamMember
 } from "@/types/content";
-import {
-    cleanupEventAssets,
-    cleanupGalleryAsset,
-    cleanupPartnerAsset,
-    cleanupTeamMemberAsset,
-} from "../utils/storageHelpers";
-
 const normalizeSocialLinks = (
   value: Json | undefined
 ): Record<string, string | null> => {
@@ -301,7 +289,7 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
 export const ContentContext = createContext<ContentContextType | null>(null);
 
 export const ContentProvider = ({ children }: { children: ReactNode }) => {
-  const { user, role: userRole } = useAuth();
+  useAuth();
   const [events, setEvents] = useState<PublicEventView[]>([]);
   const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
   const [gallery, setGallery] = useState<GalleryImage[]>(INITIAL_GALLERY);
@@ -310,24 +298,15 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
   const [about, setAbout] = useState<AboutContent>(INITIAL_ABOUT);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
+
   // Check if we should use dummy data
   const useDummyData = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
-
-  // Admin sections data
-  const [adminSections, setAdminSections] = useState<AdminSection[]>([]);
-  const [sectionContent, setSectionContent] = useState<
-    Record<string, SectionContent>
-  >({});
-  const [adminSectionsLoading, setAdminSectionsLoading] = useState(false);
 
   // Fetch initial data
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
-      setError(null);
-      
+
       // If using dummy data, skip Supabase calls
       if (useDummyData) {
         console.log("Using dummy data instead of Supabase");
@@ -341,7 +320,7 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
         return;
       }
-      
+
       try {
         const [
           eventsData,
@@ -369,7 +348,6 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
         setSettings(settingsData);
       } catch (err) {
         console.error("Error initializing content:", err);
-        setError("Failed to load content");
       } finally {
         setLoading(false);
       }
@@ -378,357 +356,13 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     initializeData();
   }, []);
 
-  // Fetch admin sections
-  useEffect(() => {
-    const initializeAdminSections = async () => {
-      if (!user || userRole !== "admin") {
-        setAdminSections([]);
-        setSectionContent({});
-        return;
-      }
 
-      setAdminSectionsLoading(true);
-      try {
-        // Use RPC to get sections enabled for the user
-        const { data, error } = await supabaseClient.rpc(
-          "get_admin_sections_for_user",
-          { p_user_id: user.id }
-        );
 
-        if (error) {
-          console.error("Error fetching admin sections:", error);
-          return;
-        }
 
-        const sections = (data || []).map(
-          (
-            row: Database["public"]["Functions"]["get_admin_sections_for_user"]["Returns"][number]
-          ) => ({
-            category: row.category,
-            created_at: null,
-            created_by: null,
-            description: row.description ?? null,
-            enabled: true, // RPC doesn't return enabled field
-            icon: row.icon,
-            id: row.id,
-            label: row.label,
-            order_index: row.order_index,
-            slug: row.slug,
-            updated_at: null,
-            updated_by: null,
-          })
-        );
 
-        setAdminSections(sections);
 
-        // Fetch section content using RPC
-        const contentPromises = sections.map(async (section: any) => {
-          const { data, error } = await supabaseClient.rpc(
-            "get_section_content",
-            {
-              p_section_slug: section.slug,
-              p_user_id: user.id,
-            }
-          );
 
-          if (error) {
-            console.error(
-              `Error fetching section content for ${section.slug}:`,
-              error
-            );
-            return {
-              sectionId: section.id,
-              sectionSlug: section.slug,
-              content: null,
-            };
-          }
 
-          // RPC returns an array, take the first item if available
-          const contentData =
-            data && data.length > 0 ? (data[0] as SectionContent) : null;
-
-          return {
-            sectionId: section.id,
-            sectionSlug: section.slug,
-            content: contentData,
-          };
-        });
-
-        const contentResults = await Promise.all(contentPromises);
-        const newSectionContent: Record<string, SectionContent> = {};
-        contentResults.forEach((result: { sectionSlug?: string; content: SectionContent | null }) => {
-          if (result.content && result.sectionSlug) {
-            newSectionContent[result.sectionSlug] = result.content;
-          }
-        });
-
-        setSectionContent(newSectionContent);
-      } catch (err) {
-        console.error("Error initializing admin sections:", err);
-      } finally {
-        setAdminSectionsLoading(false);
-      }
-    };
-
-    initializeAdminSections();
-  }, [user, userRole]);
-
-  // Event mutations
-  const addEvent = async (event: TablesInsert<"events">) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("events")
-        .insert(event)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setEvents((prev) => [...prev, data as unknown as PublicEventView]);
-      return data;
-    } catch (err) {
-      console.error("Error adding event:", err);
-      throw err;
-    }
-  };
-
-  const updateEvent = async (id: string, updates: TablesUpdate<"events">) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("events")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setEvents((prev) =>
-        prev.map((event) =>
-          event.id === id ? (data as unknown as PublicEventView) : event
-        )
-      );
-      return data;
-    } catch (err) {
-      console.error("Error updating event:", err);
-      throw err;
-    }
-  };
-
-  const deleteEvent = async (id: string) => {
-    try {
-      const itemToDelete = events.find((event) => event.id === id);
-      if (itemToDelete?.image_url) {
-        await cleanupEventAssets(itemToDelete.image_url);
-      }
-
-      const { error } = await supabaseClient
-        .from("events")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-
-      setEvents((prev) => prev.filter((event) => event.id !== id));
-    } catch (err) {
-      console.error("Error deleting event:", err);
-      throw err;
-    }
-  };
-
-  // Team member mutations
-  const addTeamMember = async (member: TablesInsert<"team_members">) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("team_members")
-        .insert(member)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setTeam((prev) => [...prev, data as unknown as TeamMember]);
-      return data;
-    } catch (err) {
-      console.error("Error adding team member:", err);
-      throw err;
-    }
-  };
-
-  const updateTeamMember = async (
-    id: string,
-    updates: TablesUpdate<"team_members">
-  ) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("team_members")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setTeam((prev) =>
-        prev.map((member) =>
-          member.id === id ? (data as unknown as TeamMember) : member
-        )
-      );
-      return data;
-    } catch (err) {
-      console.error("Error updating team member:", err);
-      throw err;
-    }
-  };
-
-  const deleteTeamMember = async (id: string) => {
-    try {
-      const itemToDelete = team.find((member) => member.id === id);
-      if (itemToDelete?.avatar_url) {
-        await cleanupTeamMemberAsset(itemToDelete.avatar_url);
-      }
-
-      const { error } = await supabaseClient
-        .from("team_members")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-
-      setTeam((prev) => prev.filter((member) => member.id !== id));
-    } catch (err) {
-      console.error("Error deleting team member:", err);
-      throw err;
-    }
-  };
-
-  // Partner mutations
-  const addPartner = async (partner: TablesInsert<"partners">) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("partners")
-        .insert(partner)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setPartners((prev) => [...prev, data as unknown as Partner]);
-      return data;
-    } catch (err) {
-      console.error("Error adding partner:", err);
-      throw err;
-    }
-  };
-
-  const updatePartner = async (
-    id: string,
-    updates: TablesUpdate<"partners">
-  ) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("partners")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setPartners((prev) =>
-        prev.map((partner) =>
-          partner.id === id ? (data as unknown as Partner) : partner
-        )
-      );
-      return data;
-    } catch (err) {
-      console.error("Error updating partner:", err);
-      throw err;
-    }
-  };
-
-  const deletePartner = async (id: string) => {
-    try {
-      const itemToDelete = partners.find((partner) => partner.id === id);
-      if (itemToDelete?.logo_url) {
-        await cleanupPartnerAsset(itemToDelete.logo_url);
-      }
-
-      const { error } = await supabaseClient
-        .from("partners")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-
-      setPartners((prev) => prev.filter((partner) => partner.id !== id));
-    } catch (err) {
-      console.error("Error deleting partner:", err);
-      throw err;
-    }
-  };
-
-  // Gallery mutations
-  const addGalleryImage = async (image: TablesInsert<"gallery_items">) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("gallery_items")
-        .insert(image)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setGallery((prev) => [...prev, data as unknown as GalleryImage]);
-      return data;
-    } catch (err) {
-      console.error("Error adding gallery image:", err);
-      throw err;
-    }
-  };
-
-  const updateGalleryImage = async (
-    id: string,
-    updates: TablesUpdate<"gallery_items">
-  ) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("gallery_items")
-        .update(updates)
-        .eq("id", id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setGallery((prev) =>
-        prev.map((image) =>
-          image.id === id ? (data as unknown as GalleryImage) : image
-        )
-      );
-      return data;
-    } catch (err) {
-      console.error("Error updating gallery image:", err);
-      throw err;
-    }
-  };
-
-  const deleteGalleryImage = async (id: string) => {
-    try {
-      const itemToDelete = gallery.find((image) => image.id === id);
-      if (itemToDelete?.image_url) {
-        await cleanupGalleryAsset(itemToDelete.image_url);
-      }
-
-      const { error } = await supabaseClient
-        .from("gallery_items")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-
-      setGallery((prev) => prev.filter((image) => image.id !== id));
-    } catch (err) {
-      console.error("Error deleting gallery image:", err);
-      throw err;
-    }
-  };
 
   // Event Artists mutations - placeholder implementation
   const fetchEventArtists = async (eventId: string): Promise<EventArtist[]> => {
@@ -758,133 +392,28 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addEventArtist = async (artist: EventArtist) => {
+  const addEventArtist = async () => {
     console.warn(
       "addEventArtist: Not implemented - artists field not in events table"
     );
     await Promise.resolve();
   };
 
-  const updateEventArtist = async (id: string, artist: EventArtist) => {
+  const updateEventArtist = async () => {
     console.warn(
       "updateEventArtist: Not implemented - artists field not in events table"
     );
     await Promise.resolve();
   };
 
-  const deleteEventArtist = async (id: string) => {
+  const deleteEventArtist = async () => {
     console.warn(
       "deleteEventArtist: Not implemented - artists field not in events table"
     );
     await Promise.resolve();
   };
 
-  // Content mutations
-  const saveHeroContent = async (content: HeroContent) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("hero_content")
-        .upsert({
-          ...content,
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
 
-      if (error) throw error;
-
-      setHero(data);
-      return data;
-    } catch (err) {
-      console.error("Error saving hero content:", err);
-      throw err;
-    }
-  };
-
-  const saveAboutContent = async (content: AboutContent) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("about_content")
-        .upsert({
-          ...content,
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setAbout(data);
-      return data;
-    } catch (err) {
-      console.error("Error saving about content:", err);
-      throw err;
-    }
-  };
-
-  const saveSiteSettings = async (settings: SiteSettings) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("site_settings")
-        .upsert({
-          ...settings,
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setSettings(data);
-      return data;
-    } catch (err) {
-      console.error("Error saving site settings:", err);
-      throw err;
-    }
-  };
-
-  // Admin sections methods
-  const getSectionContent = (sectionId: string): SectionContent | null => {
-    return sectionContent[sectionId] || null;
-  };
-
-  const getSectionPermissions = (sectionId: string): SectionPermissions[] => {
-    const section = adminSections.find((s) => s.id === sectionId);
-    // TODO: Add permissions field to AdminSection type in types/content.ts
-    return [];
-  };
-
-  const updateSectionContent = async (
-    sectionId: string,
-    content: SectionContent
-  ) => {
-    try {
-      const { data, error } = await supabaseClient
-        .from("section_content")
-        .upsert({
-          ...content,
-          section_id: sectionId,
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setSectionContent((prev) => ({
-        ...prev,
-        [sectionId]: {
-          ...data,
-          section_slug: sectionId,
-        },
-      }));
-
-      return data;
-    } catch (err) {
-      console.error("Error updating section content:", err);
-      throw err;
-    }
-  };
 
   const value: ContentContextType = {
     publicContent: {},

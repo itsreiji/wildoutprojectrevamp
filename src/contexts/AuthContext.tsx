@@ -142,6 +142,18 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [csrfTimestamp, setCsrfTimestamp] = useState<number>(0);
   const [csrfSignature, setCsrfSignature] = useState<string>("");
 
+  // Refs to track current state for event listeners (avoiding stale closures)
+  const userRef = React.useRef(user);
+  const roleRef = React.useRef(role);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  useEffect(() => {
+    roleRef.current = role;
+  }, [role]);
+
   // Session validation function
   const validateSession = useCallback(async (): Promise<boolean> => {
     // If using dummy data, simulate a successful session validation
@@ -233,11 +245,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   const signOut = async () => {
+    setLoading(true); // Explicit action, safe to show loading
     // If using dummy data, just clear the state
     if (useDummyData) {
       console.log("Simulating logout");
       setUser(null);
       setRole("anonymous");
+      setLoading(false);
       return;
     }
     
@@ -253,6 +267,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // Still clear state even if API call fails
       setUser(null);
       setRole("anonymous");
+    } finally {
+      setLoading(false);
     }
     return;
   };
@@ -294,23 +310,27 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const isAuthenticated = !!user;
 
   // Update session state helper with improved error handling
-  const updateSessionState = async (session: Session | null) => {
-    setLoading(true);
+  const updateSessionState = useCallback(async (session: Session | null) => {
+    // Don't set loading(true) here to avoid flashing/remounting on background updates
     try {
       if (session?.user) {
         try {
           const newRole = await getUserRoleWithCache(session.user.id);
           // Only update state if it has actually changed
-          const userIdChanged = user?.id !== session.user.id;
-          const roleChanged = role !== newRole; 
+          // Use refs to check against current state to avoid stale closure in listener
+          const currentUser = userRef.current;
+          const currentRole = roleRef.current;
+          
+          const userIdChanged = currentUser?.id !== session.user.id;
+          const roleChanged = currentRole !== newRole; 
           
           // Debug logging to understand the issue
           console.debug(
             "Session update check - userIdChanged:", userIdChanged,
             "roleChanged:", roleChanged,
-            "currentUserId:", user?.id,
+            "currentUserId:", currentUser?.id,
             "newUserId:", session.user.id,
-            "currentRole:", role,
+            "currentRole:", currentRole,
             "newRole:", newRole
           );
           
@@ -342,18 +362,20 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           setRole("user");
         }
       } else {
-        console.log("No active session, setting anonymous user");
-        setUser(null);
-        setRole("anonymous");
+        // Only update if we think we are logged in
+        if (userRef.current !== null) {
+          console.log("No active session, setting anonymous user");
+          setUser(null);
+          setRole("anonymous");
+        }
       }
     } catch (error) {
       console.error("Error updating session state:", error);
       setUser(null);
       setRole("anonymous");
-    } finally {
-      setLoading(false);
     }
-  };
+    // We don't touch setLoading here anymore
+  }, []);
 
   // Listen to auth state changes
   // Define wrapper for failed login recording
@@ -387,7 +409,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         await updateSessionState(session);
       } catch (err) {
         console.error("Failed to initialize auth:", err);
-        setLoading(false);
+      } finally {
+        setLoading(false); // Only unset loading after initial check
       }
     };
 
@@ -410,7 +433,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return () => {
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [updateSessionState]);
 
   const signInWithEmailPassword = useCallback(
     async (email: string, password: string, rememberMe: boolean = false) => {

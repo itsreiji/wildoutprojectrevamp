@@ -5,13 +5,13 @@ import { vi } from 'vitest'
 vi.mock('../supabase/client', () => ({
   supabaseClient: {
     from: vi.fn(() => ({
-      select: vi.fn().mockImplementation((options: { order?: any; single?: any }) => ({
+      select: vi.fn().mockImplementation(() => ({
         order: vi.fn(() => Promise.resolve({ data: [], error: null })),
         single: vi.fn(() => Promise.resolve({ data: null, error: null })),
       })),
-      insert: vi.fn().mockImplementation((data: any) => Promise.resolve({ data: null, error: null })),
-      update: vi.fn().mockImplementation((data: any) => Promise.resolve({ data: null, error: null })),
-      delete: vi.fn().mockImplementation((data: any) => Promise.resolve({ data: null, error: null })),
+      insert: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
+      update: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
+      delete: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
     })),
     auth: {
       getSession: vi.fn(() => Promise.resolve({ data: { session: null }, error: null })),
@@ -23,9 +23,9 @@ vi.mock('../supabase/client', () => ({
     rpc: vi.fn(() => Promise.resolve({ data: null, error: null })),
     storage: {
       from: vi.fn(() => ({
-        upload: vi.fn().mockImplementation((data: any) => Promise.resolve({ data: null, error: null })),
+        upload: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
         getPublicUrl: vi.fn().mockImplementation(() => ({ data: { publicUrl: '' } })),
-        remove: vi.fn().mockImplementation((data: any) => Promise.resolve({ data: null, error: null })),
+        remove: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
       })),
     },
   },
@@ -35,15 +35,14 @@ vi.mock('../supabase/client', () => ({
 
 // Mock TanStack Query - Fix the QueryClient constructor issue
 vi.mock('@tanstack/react-query', () => ({
-  useQuery: vi.fn().mockImplementation((query: any) => ({
+  useQuery: vi.fn().mockImplementation(() => ({
     invalidateQueries: vi.fn(),
   })),
   useMutation: vi.fn(),
-  useQueryClient: vi.fn().mockImplementation((options: any) => ({
+  useQueryClient: vi.fn().mockImplementation(() => ({
     invalidateQueries: vi.fn(),
   })),
-  QueryClient: vi.fn().mockImplementation((options: any) => ({
-    ...options,
+  QueryClient: vi.fn().mockImplementation(() => ({
     queryCache: new Map(),
     mutationCache: new Map(),
   })),
@@ -58,9 +57,9 @@ vi.mock('next-themes', () => ({
 // Mock environment variables
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
+  value: vi.fn().mockImplementation(() => ({
     matches: false,
-    media: query,
+    media: '',
     onchange: null,
     addListener: vi.fn(),
     removeListener: vi.fn(),
@@ -94,3 +93,12 @@ const localStorageMock = (function() {
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
+
+// Mock ResizeObserver
+class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+window.ResizeObserver = ResizeObserver;

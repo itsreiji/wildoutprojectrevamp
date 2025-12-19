@@ -790,26 +790,23 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
     return sectionContent[sectionSlug] || null;
   };
 
-  const getSectionPermissions = (sectionSlug: string): SectionPermissions => {
-    return {
-      canView: true,
-      canEdit: true,
-      canPublish: true,
-      canDelete: true,
-    };
-  };
+  const getSectionPermissions = (_sectionSlug: string): SectionPermissions => {
+     return {
+       canView: true,
+       canEdit: true,
+       canPublish: true,
+       canDelete: true,
+     };
+   };
 
-  const updateSectionContent = async (
-    sectionSlug: string,
-    content: any
-  ): Promise<void> => {
+  const updateSectionContent = async (sectionSlug: string, content: any) => {
     try {
-      setError(null);
-      const { data, error } = await supabaseClient.rpc(
+      const { error } = await supabaseClient.rpc(
         "update_section_content",
         {
-          section_slug: sectionSlug,
-          new_payload: content,
+          p_section_slug: sectionSlug,
+          p_content: content,
+          p_user_id: user?.id,
         }
       );
 

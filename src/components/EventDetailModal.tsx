@@ -6,7 +6,7 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { StatusBadge } from "./ui/StatusBadge";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 
 interface EventDetailModalProps {
   event: Event | null;
@@ -23,23 +23,19 @@ export const EventDetailModal = React.memo(
         <DialogContent
           className="sm:max-w-3xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
           id="event-detail-dialog"
+          aria-label={`Event Details: ${event.title}`}
+          aria-labelledby="event-detail-dialog-title"
         >
-          <DialogHeader
-            className="p-4 pb-2 border-b border-white/10"
-            id="event-detail-dialog-header"
+          <DialogTitle
+            className="text-xl font-bold text-white flex items-center gap-2 p-4 pb-2 border-b border-white/10"
+            id="event-detail-dialog-title"
           >
-            <DialogTitle
-              className="text-xl font-bold text-white flex items-center gap-2"
-              id="event-detail-dialog-title"
-            >
-              <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
-              Event Details
-            </DialogTitle>
-            <DialogDescription className="sr-only">
-              Detailed information about {event.title}
-            </DialogDescription>
-          </DialogHeader>
-
+            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
+            Event Details: {event.title}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            Detailed information about {event.title}
+          </DialogDescription>
           <div className="flex-1 overflow-y-auto wildout-scrollbar">
             {/* Hero Image */}
             <div className="relative h-64 overflow-hidden border-b border-white/10">
