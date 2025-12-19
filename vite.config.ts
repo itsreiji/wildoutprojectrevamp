@@ -59,7 +59,7 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    outDir: 'build',
+    outDir: 'dist',
     sourcemap: true, // Generate source maps for better debugging
     minify: 'esbuild',
     chunkSizeWarningLimit: 1000, // Increase limit to 1000 kB
@@ -89,6 +89,15 @@ export default defineConfig({
         },
         sourcemapExcludeSources: false,
         sourcemapFileNames: '[name].[hash].js.map',
+      },
+      onwarn: (warning, warn) => {
+        // Suppress sourcemap warnings for specific UI components
+        if (warning.code === 'SOURCEMAP_ERROR' &&
+            warning.id &&
+            warning.id.includes('src/components/ui/')) {
+          return;
+        }
+        warn(warning);
       },
     },
   },
