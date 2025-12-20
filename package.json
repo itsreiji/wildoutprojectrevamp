@@ -103,6 +103,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest run --watch",
     "lint": "eslint . --max-warnings=0",
+    "verify:typography": "tsx scripts/verify-typography.ts",
     "inngest:dev": "node scripts/start-inngest-dev.js",
     "inngest:server": "npx inngest dev -u http://localhost:5173",
     "dev:full": "concurrently \"npm run inngest:server\" \"npm run dev\"",

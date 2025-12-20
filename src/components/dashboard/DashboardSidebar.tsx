@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-const logo = "";
+import logo from "figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png";
 import { StatusBadge } from "../ui/StatusBadge";
 import {
   Calendar,
@@ -193,7 +193,7 @@ export const DashboardSidebar = React.memo(
           {groupedSections.map((group) => (
             <div key={group.id} className="space-y-2">
               {/* Group Header */}
-              <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-3 block px-3">
+              <span className="text-2xs font-bold text-white/40 uppercase tracking-[0.2em] mb-3 block px-3">
                 {group.label}
               </span>
 
@@ -308,7 +308,7 @@ export const DashboardSidebar = React.memo(
                         id="user-avatar"
                       >
                         <AvatarFallback
-                          className="rounded-lg bg-[#E93370] text-white text-[10px] font-bold"
+                          className="rounded-lg bg-[#E93370] text-white text-2xs font-bold"
                           data-testid="user-avatar-fallback"
                           id="user-avatar-fallback"
                         >
@@ -325,7 +325,7 @@ export const DashboardSidebar = React.memo(
                         {displayName.toUpperCase()}
                       </span>
                       <span
-                        className="truncate text-white/40 text-[10px] font-medium"
+                        className="truncate text-white/40 text-2xs font-medium"
                         data-testid="user-email"
                       >
                         {displayEmail}

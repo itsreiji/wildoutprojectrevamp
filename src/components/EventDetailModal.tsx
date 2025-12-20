@@ -57,7 +57,7 @@ export const EventDetailModal = React.memo(
                 <StatusBadge
                   status="active"
                   showDot={false}
-                  className="bg-[#E93370] text-white border-0 px-3 py-1 text-[10px] uppercase font-bold tracking-wider mb-2 shadow-[0_0_12px_rgba(233,51,112,0.3)]"
+                  className="bg-[#E93370] text-white border-0 px-3 py-1 text-2xs uppercase font-bold tracking-wider mb-2 shadow-[0_0_12px_rgba(233,51,112,0.3)]"
                 >
                   {event.category || "EVENT"}
                 </StatusBadge>
@@ -73,7 +73,7 @@ export const EventDetailModal = React.memo(
                 <div className="flex items-center p-3 rounded-xl bg-white/5 border border-white/10">
                   <Calendar className="h-5 w-5 text-[#E93370] mr-3" />
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-white/40 font-bold">
+                    <p className="text-2xs uppercase tracking-wider text-white/40 font-bold">
                       Date
                     </p>
                     <p className="text-white/80 text-sm">
@@ -86,7 +86,7 @@ export const EventDetailModal = React.memo(
                 <div className="flex items-center p-3 rounded-xl bg-white/5 border border-white/10">
                   <Clock className="h-5 w-5 text-[#E93370] mr-3" />
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-white/40 font-bold">
+                    <p className="text-2xs uppercase tracking-wider text-white/40 font-bold">
                       Time
                     </p>
                     <p className="text-white/80 text-sm">
@@ -97,7 +97,7 @@ export const EventDetailModal = React.memo(
                 <div className="flex items-center p-3 rounded-xl bg-white/5 border border-white/10">
                   <Ticket className="h-5 w-5 text-[#E93370] mr-3" />
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-white/40 font-bold">
+                    <p className="text-2xs uppercase tracking-wider text-white/40 font-bold">
                       Price
                     </p>
                     <p className="text-white/80 text-sm">

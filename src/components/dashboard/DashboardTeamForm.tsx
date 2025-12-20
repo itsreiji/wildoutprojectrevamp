@@ -370,7 +370,7 @@ export function DashboardTeamForm({
                       </div>
                       {defaultValues?.avatar_url && (
                         <div className="flex flex-col items-center gap-3">
-                          <label className="text-[10px] uppercase tracking-wider text-white/40 font-bold">
+                          <label className="text-2xs uppercase tracking-wider text-white/40 font-bold">
                             Current
                           </label>
                           <div className="w-20 h-20 rounded-xl overflow-hidden border border-white/10">

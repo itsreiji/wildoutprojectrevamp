@@ -82,7 +82,7 @@ export const CircularProgress = React.memo(
             </span>
           )}
           {sublabel && (
-            <span className="text-[10px] text-muted-foreground">{sublabel}</span>
+            <span className="text-2xs text-muted-foreground">{sublabel}</span>
           )}
         </div>
       </div>

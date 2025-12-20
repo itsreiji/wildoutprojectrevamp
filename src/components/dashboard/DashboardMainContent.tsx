@@ -42,7 +42,7 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
           <div className="flex gap-3">
             <div className="bg-white p-2 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4 px-4">
               <div className="text-right">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <p className="text-2xs font-bold text-gray-400 uppercase tracking-widest">
                   Server Status
                 </p>
                 <p className="text-xs font-bold text-green-500">OPTIMAL</p>

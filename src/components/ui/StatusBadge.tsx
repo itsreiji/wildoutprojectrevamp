@@ -89,7 +89,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     <div
       id={id}
       className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold tracking-wider transition-all duration-300",
+        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-2xs font-bold tracking-wider transition-all duration-300",
         styles.container,
         className
       )}

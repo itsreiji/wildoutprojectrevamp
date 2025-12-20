@@ -211,7 +211,7 @@ export const RegisterPage: React.FC = () => {
             <p className="text-xs font-light text-white/40 tracking-wider">
               WildOut! Community
             </p>
-            <p className="text-[10px] text-white/30 mt-1 tracking-[0.2em] uppercase">
+            <p className="text-2xs text-white/30 mt-1 tracking-[0.2em] uppercase">
               Join the Creative Revolution
             </p>
           </div>
