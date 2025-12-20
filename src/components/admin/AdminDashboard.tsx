@@ -9,7 +9,7 @@ import { DashboardSettings } from "../dashboard/DashboardSettings";
 import { DashboardTeam } from "../dashboard/DashboardTeam";
 import { DashboardAuditLog } from "../dashboard/DashboardAuditLog";
 import { DashboardHome } from "../dashboard/DashboardHome";
-import { useRouter } from "../router";
+import { useRouter } from "../router/RouterContext";
 
 /**
  * AdminDashboard Component

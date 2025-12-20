@@ -29,7 +29,7 @@
 import type { LandingEvent } from "@/types/content";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ImagePlus, Upload } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -145,7 +145,7 @@ export function DashboardEventForm({
     }
   };
 
-  const getDefaultValues = (): EventFormValues => {
+  const getDefaultValues = useCallback((): EventFormValues => {
     if (!defaultValues) {
       return {
         title: "",
@@ -182,7 +182,7 @@ export function DashboardEventForm({
       featured_image_file: undefined,
       gallery_images_files: undefined,
     };
-  };
+  }, [defaultValues]);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -195,7 +195,7 @@ export function DashboardEventForm({
   // Reset form when editing target changes to ensure fresh values
   useEffect(() => {
     form.reset(getDefaultValues());
-  }, [defaultValues?.id, form]);
+  }, [defaultValues?.id, form, getDefaultValues]);
 
   // Transform form values to map empty strings to null for optional fields
   const handleFormSubmit = (values: EventFormValues) => {

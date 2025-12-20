@@ -6,7 +6,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Check if we should use dummy data
-const useDummyData = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
+export const useDummyData = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
 
 // Session ID storage key for cross-page consistency
 const SESSION_ID_KEY = 'wildout_session_id';
@@ -63,65 +63,29 @@ const createEnhancedStorage = () => ({
   },
 });
 
-// Create the Supabase client - either real or mock
+// Create the Supabase client
 let supabaseClient: any;
 
-// Create a mock client when using dummy data or when config is missing
-if (useDummyData || !supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('your-project')) {
-  console.warn('Using dummy Supabase client. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for real data.');
-  console.warn('Current config:', {
-    useDummyData,
-    hasSupabaseUrl: !!supabaseUrl,
-    hasSupabaseAnonKey: !!supabaseAnonKey,
-    supabaseUrl,
-    supabaseAnonKey: supabaseAnonKey?.substring(0, 20) + '...'
-  });
-
-  // Create a minimal mock client
-  const mockClient = {
-    from: () => mockClient,
-    select: () => mockClient,
-    insert: () => mockClient,
-    update: () => mockClient,
-    delete: () => mockClient,
-    eq: () => mockClient,
-    order: () => mockClient,
-    rpc: () => mockClient,
-    single: () => mockClient,
-    auth: {
-      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-      signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: null }),
-      signInWithOAuth: () => Promise.resolve({ data: { url: '' }, error: null }),
-      signOut: () => Promise.resolve({ error: null }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => { } } } }),
-      getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-      refreshSession: () => Promise.resolve({ data: { session: null }, error: null }),
-    },
-    storage: {
-      from: () => ({
-        upload: () => Promise.resolve({ data: { path: '' }, error: null }),
-        getPublicUrl: () => ({ data: { publicUrl: '' } }),
-        remove: () => Promise.resolve({ data: null, error: null }),
-      }),
-    },
-  };
-
-  supabaseClient = mockClient;
+// Error handling for missing environment variables
+if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('your-project')) {
+  console.error('Missing or invalid Supabase configuration. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for real data.');
+  // We still create a client but it will fail on requests, which is better than using a mock that hides errors
+  supabaseClient = createClient<Database>(
+    supabaseUrl || 'https://placeholder.supabase.co',
+    supabaseAnonKey || 'placeholder',
+    {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        storage: createEnhancedStorage(),
+        flowType: 'pkce',
+      }
+    }
+  );
 } else {
-  // Error handling for missing environment variables
-  if (!supabaseUrl) {
-    throw new Error('Missing VITE_SUPABASE_URL environment variable');
-  }
-
-  if (!supabaseAnonKey) {
-    throw new Error('Missing VITE_SUPABASE_ANON_KEY environment variable');
-  }
-
   // Supabase client configuration with optimized cookie and session management
-  console.log('Creating real Supabase client with:', {
-    supabaseUrl,
-    supabaseAnonKey: supabaseAnonKey?.substring(0, 20) + '...'
-  });
+  console.log('Creating real Supabase client');
   supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       // Automatic session persistence and refresh
@@ -140,7 +104,6 @@ if (useDummyData || !supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('yo
       },
     },
   });
-  console.log('Supabase client created successfully');
 }
 
 // Utility function to get stored session ID

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useRouter } from '../router';
+import { useRouter } from "../router/RouterContext";
 import { useAuth } from '../../contexts/AuthContext';
 import { Background3D } from '../Background3D';
 import { Button } from '../../components/ui/button';

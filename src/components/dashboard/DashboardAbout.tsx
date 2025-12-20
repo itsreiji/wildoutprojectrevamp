@@ -13,15 +13,22 @@ import type { Feature } from '@/types/content';
 export const DashboardAbout = React.memo(() => {
   const { about, saveAboutContent } = useContent();
   const [formData, setFormData] = useState({
-    ...about,
-    foundedYear: about.founded_year || ''
+    title: about?.title || '',
+    subtitle: about?.subtitle || '',
+    founded_year: about?.founded_year || '',
+    story: about?.story || [],
+    features: about?.features || [],
+    ...about
   });
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await saveAboutContent(formData);
+      await saveAboutContent({
+        ...formData,
+        title: formData.title || 'About' // title is required
+      });
       toast.success('About section updated successfully!');
     } catch (error) {
       toast.error('Failed to save about section');
@@ -132,8 +139,8 @@ export const DashboardAbout = React.memo(() => {
                 className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-about-founded-year-input"
                 placeholder="2020"
-                value={formData.foundedYear || ''}
-                onChange={(e) => setFormData({ ...formData, foundedYear: e.target.value })}
+                value={formData.founded_year || ''}
+                onChange={(e) => setFormData({ ...formData, founded_year: e.target.value })}
               />
             </div>
           </CardContent>

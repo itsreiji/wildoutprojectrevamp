@@ -7,6 +7,8 @@ import { useContent } from '../contexts/ContentContext';
 export const HeroSection = React.memo(() => {
   const { hero } = useContent();
 
+  if (!hero) return null;
+
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-20" id="hero-section">
       <div className="container mx-auto max-w-7xl">

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useRouter } from '../components/router';
+import { useRouter } from "../components/router/RouterContext";
 import { useAuth } from '../contexts/AuthContext';
 import { supabaseClient } from '../supabase/client';
 

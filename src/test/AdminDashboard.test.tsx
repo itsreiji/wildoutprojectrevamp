@@ -92,7 +92,7 @@ vi.mock('@/components/ui/separator', () => ({
 }));
 
 vi.mock('@/components/ui/button', () => ({
-  Button: ({ children, variant, size, className, onClick, ...props }: any) =>
+  Button: ({ children, variant: _variant, size: _size, className, onClick, ...props }: any) =>
     React.createElement('button', { className, onClick, ...props }, children)
 }));
 

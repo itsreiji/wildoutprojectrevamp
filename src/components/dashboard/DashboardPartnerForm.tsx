@@ -22,7 +22,7 @@
 
 import type { Partner } from "@/types/content";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -85,7 +85,7 @@ export function DashboardPartnerForm({
   defaultValues,
   onCancel,
 }: DashboardPartnerFormProps) {
-  const getDefaultValues = (): PartnerFormValues => {
+  const getDefaultValues = useCallback((): PartnerFormValues => {
     if (!defaultValues) {
       return {
         name: "",
@@ -111,7 +111,7 @@ export function DashboardPartnerForm({
       logo_url: defaultValues.logo_url || "",
       social_links: defaultValues.social_links || {},
     };
-  };
+  }, [defaultValues]);
 
   const form = useForm<PartnerFormValues>({
     resolver: zodResolver(partnerFormSchema) as Resolver<PartnerFormValues>,
@@ -121,7 +121,7 @@ export function DashboardPartnerForm({
   // Reset form when defaultValues changes (switching between create/edit modes)
   useEffect(() => {
     form.reset(getDefaultValues());
-  }, [defaultValues?.id]);
+  }, [defaultValues?.id, form, getDefaultValues]);
 
   return (
     <Form {...form}>
@@ -339,9 +339,9 @@ export function DashboardPartnerForm({
             />
 
             <FormField
-              control={form.control}
-              name="logo_file"
-              render={({ field: { onChange, value, ...field } }) => (
+                control={form.control}
+                name="logo_file"
+                render={({ field: { onChange, value: _value, ...field } }) => (
                 <FormItem
                   id="dashboard-partner-form-logo-field"
                   className="space-y-2 mt-6"

@@ -2,7 +2,7 @@ import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 import { LayoutDashboard, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { memo, useEffect, useState } from 'react';
-import { useRouter } from './router';
+import { useRouter } from './router/RouterContext';
 import { Link } from './router/Link';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ui/theme-toggle';
@@ -17,7 +17,7 @@ const NAV_ITEMS = [
 ];
 
 const NavigationComponent = () => {
-  const { getAdminPath, currentPath, navigate } = useRouter();
+  const { currentPath, navigate } = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -31,12 +31,12 @@ const NavigationComponent = () => {
   }, []);
 
   const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
-    console.log('🔵 Navigation - handleNavClick:', { 
-      item, 
+    console.log('🔵 Navigation - handleNavClick:', {
+      item,
       currentPath,
       isMobileMenuOpen
     });
-    
+
     setIsMobileMenuOpen(false);
 
     // If has hash and on landing, do hash scroll; otherwise navigate to href

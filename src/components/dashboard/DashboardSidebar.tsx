@@ -34,7 +34,7 @@ import {
 import React, { useMemo, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useStaticContent } from "../../contexts/StaticContentContext";
-import { useRouter } from "../router";
+import { useRouter } from "../router/RouterContext";
 import { cn } from "../ui/utils";
 
 interface DashboardSidebarProps {

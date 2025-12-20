@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import * as React from "react";
@@ -107,11 +106,13 @@ const ChartTooltip = RechartsPrimitive.Tooltip;
 
 function ChartTooltipContent({
   active,
+  // @ts-expect-error - Recharts types conflict with Div props
   payload,
   className,
   indicator = "dot",
   hideLabel = false,
   hideIndicator = false,
+  // @ts-expect-error - Recharts types conflict with Div props
   label,
   labelFormatter,
   labelClassName,
@@ -119,8 +120,8 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
+}: React.ComponentProps<"div"> &
+  RechartsPrimitive.TooltipProps<any, any> & {
     hideLabel?: boolean;
     hideIndicator?: boolean;
     indicator?: "line" | "dot" | "dashed";
@@ -258,7 +259,8 @@ function ChartLegendContent({
   verticalAlign = "bottom",
   nameKey,
 }: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+  Pick<RechartsPrimitive.LegendProps, "verticalAlign"> & {
+    payload?: any[];
     hideIcon?: boolean;
     nameKey?: string;
   }) {

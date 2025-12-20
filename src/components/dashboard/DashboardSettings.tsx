@@ -38,6 +38,8 @@ import {
 } from "../ui/select";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
+import type { SiteSettings } from "../../types/content";
+import type { Json } from "../../supabase/types";
 
 interface UserProfile {
   id: string;
@@ -51,18 +53,35 @@ interface UserProfile {
 export const DashboardSettings = React.memo(() => {
   const { settings, saveSiteSettings } = useStaticContent();
   const { role: currentUserRole } = useAuth();
-  const [formData, setFormData] = useState({
-    ...settings,
-    siteName: settings.site_name || "",
-    siteDescription: settings.site_description || "",
-    socialMedia: settings.social_media || {},
-  });
   const [isSaving, setIsSaving] = useState(false);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    site_name: settings?.site_name || "",
+    site_description: settings?.site_description || "",
+    tagline: settings?.tagline || "",
+    email: settings?.email || "",
+    phone: settings?.phone || "",
+    address: settings?.address || "",
+    social_media: settings?.social_media || {},
+  });
 
-  // Fetch users for role management
+  // Update formData when settings are loaded
+  useEffect(() => {
+    if (settings) {
+      setFormData({
+        site_name: settings.site_name || "",
+        site_description: settings.site_description || "",
+        tagline: settings.tagline || "",
+        email: settings.email || "",
+        phone: settings.phone || "",
+        address: settings.address || "",
+        social_media: settings.social_media || {},
+      });
+    }
+  }, [settings]);
+
   useEffect(() => {
     const fetchUsers = async () => {
       if (currentUserRole !== "admin") return;
@@ -71,9 +90,8 @@ export const DashboardSettings = React.memo(() => {
       try {
         // Fetch profiles using RPC function to ensure RLS is properly handled
         // The get_user_profile function respects the admin_full_access_profiles RLS policy
-        const { data: profilesData, error: profilesError } = await supabaseClient.rpc(
-          "get_user_profile"
-        );
+        const { data: profilesData, error: profilesError } =
+          await supabaseClient.rpc("get_user_profile");
 
         if (profilesError) {
           console.error("Error fetching profiles:", profilesError);
@@ -111,7 +129,21 @@ export const DashboardSettings = React.memo(() => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await saveSiteSettings(formData);
+      const updatedSettings: SiteSettings = {
+        ...settings,
+        id: settings?.id || "00000000-0000-0000-0000-000000000003",
+        site_name: formData.site_name,
+        site_description: formData.site_description,
+        tagline: formData.tagline,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        social_media: formData.social_media as Json,
+        updated_at: new Date().toISOString(),
+        created_at: settings?.created_at || new Date().toISOString(),
+        updated_by: null,
+      };
+      await saveSiteSettings(updatedSettings);
       toast.success("Settings saved successfully!");
     } catch (error) {
       toast.error("Failed to save settings");
@@ -205,11 +237,10 @@ export const DashboardSettings = React.memo(() => {
               <Input
                 className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-settings-site-name-input"
-                value={formData.siteName}
+                value={formData.site_name}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    siteName: e.target.value,
                     site_name: e.target.value,
                   })
                 }
@@ -223,11 +254,10 @@ export const DashboardSettings = React.memo(() => {
               <Input
                 className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
                 id="admin-settings-site-description-input"
-                value={formData.siteDescription}
+                value={formData.site_description}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    siteDescription: e.target.value,
                     site_description: e.target.value,
                   })
                 }
@@ -412,21 +442,15 @@ export const DashboardSettings = React.memo(() => {
                 id="admin-settings-instagram-input"
                 placeholder="https://instagram.com/username"
                 value={
-                  typeof formData.socialMedia === "object" &&
-                  formData.socialMedia !== null &&
-                  !Array.isArray(formData.socialMedia) &&
-                  "instagram" in formData.socialMedia
-                    ? String(formData.socialMedia.instagram)
+                  typeof formData.social_media === "object" &&
+                  formData.social_media !== null &&
+                  !Array.isArray(formData.social_media) &&
+                  "instagram" in formData.social_media
+                    ? String(formData.social_media.instagram)
                     : ""
                 }
                 onChange={(e) => {
                   const currentSocialMedia =
-                    typeof formData.socialMedia === "object" &&
-                    formData.socialMedia !== null &&
-                    !Array.isArray(formData.socialMedia)
-                      ? formData.socialMedia
-                      : {};
-                  const currentSocialMediaDb =
                     typeof formData.social_media === "object" &&
                     formData.social_media !== null &&
                     !Array.isArray(formData.social_media)
@@ -434,12 +458,8 @@ export const DashboardSettings = React.memo(() => {
                       : {};
                   setFormData({
                     ...formData,
-                    socialMedia: {
-                      ...currentSocialMedia,
-                      instagram: e.target.value,
-                    },
                     social_media: {
-                      ...currentSocialMediaDb,
+                      ...currentSocialMedia,
                       instagram: e.target.value,
                     },
                   });
@@ -463,21 +483,15 @@ export const DashboardSettings = React.memo(() => {
                 id="admin-settings-twitter-input"
                 placeholder="https://twitter.com/username"
                 value={
-                  typeof formData.socialMedia === "object" &&
-                  formData.socialMedia !== null &&
-                  !Array.isArray(formData.socialMedia) &&
-                  "twitter" in formData.socialMedia
-                    ? String(formData.socialMedia.twitter)
+                  typeof formData.social_media === "object" &&
+                  formData.social_media !== null &&
+                  !Array.isArray(formData.social_media) &&
+                  "twitter" in formData.social_media
+                    ? String(formData.social_media.twitter)
                     : ""
                 }
                 onChange={(e) => {
                   const currentSocialMedia =
-                    typeof formData.socialMedia === "object" &&
-                    formData.socialMedia !== null &&
-                    !Array.isArray(formData.socialMedia)
-                      ? formData.socialMedia
-                      : {};
-                  const currentSocialMediaDb =
                     typeof formData.social_media === "object" &&
                     formData.social_media !== null &&
                     !Array.isArray(formData.social_media)
@@ -485,12 +499,8 @@ export const DashboardSettings = React.memo(() => {
                       : {};
                   setFormData({
                     ...formData,
-                    socialMedia: {
-                      ...currentSocialMedia,
-                      twitter: e.target.value,
-                    },
                     social_media: {
-                      ...currentSocialMediaDb,
+                      ...currentSocialMedia,
                       twitter: e.target.value,
                     },
                   });
@@ -514,21 +524,15 @@ export const DashboardSettings = React.memo(() => {
                 id="admin-settings-facebook-input"
                 placeholder="https://facebook.com/page"
                 value={
-                  typeof formData.socialMedia === "object" &&
-                  formData.socialMedia !== null &&
-                  !Array.isArray(formData.socialMedia) &&
-                  "facebook" in formData.socialMedia
-                    ? String(formData.socialMedia.facebook)
+                  typeof formData.social_media === "object" &&
+                  formData.social_media !== null &&
+                  !Array.isArray(formData.social_media) &&
+                  "facebook" in formData.social_media
+                    ? String(formData.social_media.facebook)
                     : ""
                 }
                 onChange={(e) => {
                   const currentSocialMedia =
-                    typeof formData.socialMedia === "object" &&
-                    formData.socialMedia !== null &&
-                    !Array.isArray(formData.socialMedia)
-                      ? formData.socialMedia
-                      : {};
-                  const currentSocialMediaDb =
                     typeof formData.social_media === "object" &&
                     formData.social_media !== null &&
                     !Array.isArray(formData.social_media)
@@ -536,12 +540,8 @@ export const DashboardSettings = React.memo(() => {
                       : {};
                   setFormData({
                     ...formData,
-                    socialMedia: {
-                      ...currentSocialMedia,
-                      facebook: e.target.value,
-                    },
                     social_media: {
-                      ...currentSocialMediaDb,
+                      ...currentSocialMedia,
                       facebook: e.target.value,
                     },
                   });
@@ -565,21 +565,15 @@ export const DashboardSettings = React.memo(() => {
                 id="admin-settings-youtube-input"
                 placeholder="https://youtube.com/@channel"
                 value={
-                  typeof formData.socialMedia === "object" &&
-                  formData.socialMedia !== null &&
-                  !Array.isArray(formData.socialMedia) &&
-                  "youtube" in formData.socialMedia
-                    ? String(formData.socialMedia.youtube)
+                  typeof formData.social_media === "object" &&
+                  formData.social_media !== null &&
+                  !Array.isArray(formData.social_media) &&
+                  "youtube" in formData.social_media
+                    ? String(formData.social_media.youtube)
                     : ""
                 }
                 onChange={(e) => {
                   const currentSocialMedia =
-                    typeof formData.socialMedia === "object" &&
-                    formData.socialMedia !== null &&
-                    !Array.isArray(formData.socialMedia)
-                      ? formData.socialMedia
-                      : {};
-                  const currentSocialMediaDb =
                     typeof formData.social_media === "object" &&
                     formData.social_media !== null &&
                     !Array.isArray(formData.social_media)
@@ -587,12 +581,8 @@ export const DashboardSettings = React.memo(() => {
                       : {};
                   setFormData({
                     ...formData,
-                    socialMedia: {
-                      ...currentSocialMedia,
-                      youtube: e.target.value,
-                    },
                     social_media: {
-                      ...currentSocialMediaDb,
+                      ...currentSocialMedia,
                       youtube: e.target.value,
                     },
                   });

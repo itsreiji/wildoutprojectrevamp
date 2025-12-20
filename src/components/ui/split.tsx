@@ -45,7 +45,7 @@ interface SplitPanelProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const SplitPanel = React.forwardRef<HTMLDivElement, SplitPanelProps>(
-  ({ className, collapsible = false, minSize = 0, maxSize, defaultSize, onResize, ...props }, ref) => {
+  ({ className, collapsible: _collapsible = false, minSize = 0, maxSize, defaultSize, onResize: _onResize, ...props }, ref) => {
     const { direction, onLayout } = React.useContext(SplitContext)
     const [size] = React.useState<number | string>(defaultSize || 0)
 

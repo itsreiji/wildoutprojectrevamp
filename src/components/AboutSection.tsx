@@ -12,14 +12,11 @@ const ICON_MAP: Record<number, React.ComponentType> = {
 };
 
 export const AboutSection = React.memo(() => {
-  const { about } = useContent();
-  const aboutData: AboutData = about || {
-    title: '',
-    subtitle: '',
-    features: [],
-    story: [],
-    founded_year: '',
-  };
+  const { about, hero } = useContent();
+
+  if (!about) return null;
+
+  const aboutData: AboutData = about;
 
   return (
     <section className="relative py-20 px-4" id="about-section">
@@ -105,15 +102,15 @@ export const AboutSection = React.memo(() => {
                   <div className="text-sm text-white/60">Founded</div>
                 </div>
                 <div>
-                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">500+</div>
+                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero?.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'events' in hero.stats ? String(hero.stats.events) : '0'}</div>
                   <div className="text-sm text-white/60">Events Hosted</div>
                 </div>
                 <div>
-                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">50K+</div>
+                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero?.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'members' in hero.stats ? String(hero.stats.members) : '0'}</div>
                   <div className="text-sm text-white/60">Community Members</div>
                 </div>
                 <div>
-                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">100+</div>
+                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero?.stats && typeof hero.stats === 'object' && !Array.isArray(hero.stats) && 'partners' in hero.stats ? String(hero.stats.partners) : '0'}</div>
                   <div className="text-sm text-white/60">Brand Partners</div>
                 </div>
               </div>

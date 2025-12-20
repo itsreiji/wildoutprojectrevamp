@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-undef */
 /**
  * Development script to start Inngest alongside Vite
  * This script helps you run the Inngest dev server for local development

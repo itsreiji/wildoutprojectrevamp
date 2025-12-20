@@ -122,7 +122,7 @@ export const DashboardGallery = React.memo(() => {
       try {
         await deleteGalleryImage(id);
         deleted++;
-      } catch (error) {
+      } catch {
         errors.push(id);
       }
     }

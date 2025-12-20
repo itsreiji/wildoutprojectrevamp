@@ -1,7 +1,7 @@
 // AdminGuard component for protecting admin routes
 import { useAuth } from "@/contexts/AuthContext";
 import { type ReactNode } from "react";
-import { useRouter } from "@/components/router";
+import { useRouter } from "@/components/router/RouterContext";
 
 export const AdminGuard = ({ children }: { children?: ReactNode }) => {
   const { role, loading, user } = useAuth();

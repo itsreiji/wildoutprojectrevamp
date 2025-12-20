@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext, memo } from 'react';
+import React, { useState, useEffect, memo, useCallback } from 'react';
 import {
   DashboardAbout,
   DashboardEvents,
@@ -10,6 +10,7 @@ import {
   DashboardSettings,
   DashboardTeam,
 } from '../dashboard/index';
+import { RouterContext, useRouter } from './RouterContext';
 
 export {
   DashboardAbout,
@@ -21,28 +22,7 @@ export {
   DashboardPartners,
   DashboardSettings,
   DashboardTeam,
-};
-
-// Router context interface
-interface RouterContextValue {
-  currentPath: string;
-  navigate: (path: string) => void;
-  getSubPath: (basePath: string) => string;
-  getCurrentSubPath: () => string;
-  adminBasePath: string;
-  getAdminPath: (subPath?: string) => string;
-}
-
-// Create router context
-const RouterContext = createContext<RouterContextValue | undefined>(undefined);
-
-// Custom hook for using router
-export const useRouter = () => {
-  const context = useContext(RouterContext);
-  if (!context) {
-    throw new Error('useRouter must be used within RouterProvider');
-  }
-  return context;
+  useRouter,
 };
 
 // Router provider component
@@ -78,7 +58,7 @@ const RouterProviderComponent = ({ children }: { children: React.ReactNode }) =>
   }, []);
 
   // Navigation function
-  const navigate = (path: string) => {
+  const navigate = useCallback((path: string) => {
     setCurrentPath(path);
 
     // Update URL without reloading
@@ -86,12 +66,13 @@ const RouterProviderComponent = ({ children }: { children: React.ReactNode }) =>
 
     // Scroll to top on navigation
     window.scrollTo(0, 0);
-  };
+  }, []);
 
   // Redirect /admin to /admin/home
   useEffect(() => {
     const adminBasePath = import.meta.env.VITE_ADMIN_BASE_PATH || '/admin';
     if (currentPath === adminBasePath) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       navigate(`${adminBasePath}/home`);
     }
   }, [currentPath, navigate]);
@@ -138,43 +119,43 @@ interface RouterProps {
   routes: Record<string, React.ComponentType>;
 }
 
-const RouterComponent = memo(({ routes }: RouterProps) => {
-  const { currentPath } = useRouter();
+// Find matching route - support exact matches and nested routes
+const findMatchingRoute = (path: string, routes: Record<string, React.ComponentType>): React.ComponentType | undefined => {
+  // First try exact match
+  if (routes[path]) {
+    return routes[path];
+  }
 
-    // Find matching route - support exact matches and nested routes
-  const findMatchingRoute = (path: string): React.ComponentType | undefined => {
-    // First try exact match
-    if (routes[path]) {
-      return routes[path];
-    }
-
-    // Then try nested route matching
-    for (const routePath of Object.keys(routes)) {
-      // Handle routes like "/sadmin/*" (configurable admin base path)
-      if (routePath.endsWith('/*')) {
-        const basePath = routePath.slice(0, -2);
-        if (path.startsWith(basePath + '/') || path === basePath) {
-          return routes[routePath];
-        }
-      }
-
-      // Handle routes like "/sadmin" matching /sadmin/something
-      if (path.startsWith(routePath + '/') && routePath !== '/') {
+  // Then try nested route matching
+  for (const routePath of Object.keys(routes)) {
+    // Handle routes like "/sadmin/*" (configurable admin base path)
+    if (routePath.endsWith('/*')) {
+      const basePath = routePath.slice(0, -2);
+      if (path.startsWith(basePath + '/') || path === basePath) {
         return routes[routePath];
       }
     }
 
-    // Fallback to home route if registered and no other match
-    if (routes['/']) {
-      return routes['/'];
+    // Handle routes like "/sadmin" matching /sadmin/something
+    if (path.startsWith(routePath + '/') && routePath !== '/') {
+      return routes[routePath];
     }
+  }
 
-    return undefined;
-  };
+  // Fallback to home route if registered and no other match
+  if (routes['/']) {
+    return routes['/'];
+  }
 
-  const RouteComponent = findMatchingRoute(currentPath) || routes['/404'];
+  return undefined;
+};
 
-  return RouteComponent ? <RouteComponent /> : null;
+const RouterComponent = memo(function RouterComponent({ routes }: RouterProps) {
+  const { currentPath } = useRouter();
+
+  const RouteComponent = findMatchingRoute(currentPath, routes) || routes['/404'];
+
+  return RouteComponent ? React.createElement(RouteComponent) : null;
 });
 
 export const Router = RouterComponent;

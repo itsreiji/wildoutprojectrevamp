@@ -12,15 +12,23 @@ import { toast } from 'sonner';
 export const DashboardHero = React.memo(() => {
   const { hero, saveHeroContent } = useContent();
   const [formData, setFormData] = useState({
-    ...hero,
-    stats: hero.stats || { events: '500+', members: '50K+', partners: '100+' }
+    title: hero?.title || '',
+    subtitle: hero?.subtitle || '',
+    description: hero?.description || '',
+    stats: (hero?.stats as any) || { events: '500+', members: '50K+', partners: '100+' },
+    cta_text: hero?.cta_text || '',
+    cta_link: hero?.cta_link || '',
+    ...hero
   });
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await saveHeroContent(formData);
+      await saveHeroContent({
+        ...formData,
+        title: formData.title || 'WildOut!' // title is required
+      });
       toast.success('Hero section updated successfully!');
     } catch (error) {
       toast.error('Failed to save hero section');

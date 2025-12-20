@@ -8,7 +8,7 @@ import React, {
     useState,
 } from "react";
 import { auditService } from "../services/auditService";
-import supabaseClient from "../supabase/client";
+import supabaseClient, { useDummyData } from "../supabase/client";
 import {
     checkRateLimit,
     clearRateLimit as clearLoginAttempts,
@@ -19,9 +19,6 @@ import {
     validateSecureEmail,
     verifyCSRFToken,
 } from "../utils/security";
-
-// Check if we should use dummy data
-const useDummyData = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
 
 // AuthContext and hook
 export const AuthContext = createContext<any>(null);
@@ -156,12 +153,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Session validation function
   const validateSession = useCallback(async (): Promise<boolean> => {
-    // If using dummy data, simulate a successful session validation
-    if (useDummyData) {
-      console.log("Using dummy authentication");
-      return true;
-    }
-    
     try {
       const {
         data: { session },
@@ -199,20 +190,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Authentication functions
   const signInWithOAuth = async (provider: OAuthProvider) => {
-    // If using dummy data, simulate successful OAuth
-    if (useDummyData) {
-      console.log(`Simulating ${provider} OAuth login`);
-      const dummyUser: User = {
-        id: "dummy-user-id",
-        email: "dummy@example.com",
-        app_metadata: { role: "user" },
-        user_metadata: { role: "user" }
-      };
-      setUser(dummyUser);
-      setRole("user");
-      return null;
-    }
-    
     try {
       if (provider !== "google") {
         return {
@@ -246,15 +223,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   const signOut = async () => {
     setLoading(true); // Explicit action, safe to show loading
-    // If using dummy data, just clear the state
-    if (useDummyData) {
-      console.log("Simulating logout");
-      setUser(null);
-      setRole("anonymous");
-      setLoading(false);
-      return;
-    }
-    
     try {
       if (user?.id) {
         await auditService.logLogout(user.id);
@@ -320,10 +288,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           // Use refs to check against current state to avoid stale closure in listener
           const currentUser = userRef.current;
           const currentRole = roleRef.current;
-          
+
           const userIdChanged = currentUser?.id !== session.user.id;
-          const roleChanged = currentRole !== newRole; 
-          
+          const roleChanged = currentRole !== newRole;
+
           // Debug logging to understand the issue
           console.debug(
             "Session update check - userIdChanged:", userIdChanged,
@@ -333,7 +301,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             "currentRole:", currentRole,
             "newRole:", newRole
           );
-          
+
           if (userIdChanged || roleChanged) {
             // Log successful login if it's a new user session
             if (userIdChanged) {
@@ -395,7 +363,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setLoading(false);
         return;
       }
-      
+
       try {
         const {
           data: { session },
@@ -416,11 +384,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     initializeAuth();
 
-    // If using dummy data, skip the auth listener
-    if (useDummyData) {
-      return;
-    }
-
     // Listen to auth state changes
     const {
       data: { subscription },
@@ -437,20 +400,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signInWithEmailPassword = useCallback(
     async (email: string, password: string, rememberMe: boolean = false) => {
-      // If using dummy data, simulate successful login
-      if (useDummyData) {
-        console.log(`Simulating login for ${email}`);
-        const dummyUser: User = {
-          id: "dummy-user-id",
-          email: email,
-          app_metadata: { role: "user" },
-          user_metadata: { role: "user" }
-        };
-        setUser(dummyUser);
-        setRole("user");
-        return null;
-      }
-      
       // Input sanitization
       const sanitizedEmail = sanitizeInput(email);
       const sanitizedPassword = sanitizeInput(password);
@@ -547,7 +496,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false);
       return null;
     },
-    []
+    [updateSessionState]
   );
 
   return (

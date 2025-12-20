@@ -1,6 +1,6 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import React from "react";
-import { useRouter } from "../router";
+import { useRouter } from "../router/RouterContext";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardMainContent } from "./DashboardMainContent";
 import { DashboardSidebar } from "./DashboardSidebar";

@@ -105,6 +105,49 @@ export function UserProfile({ user, onEdit, onDelete }: UserProfileProps) {
 }
 ```
 
+## Supabase Data Integration
+
+### Content Context
+The `ContentContext` (`src/contexts/ContentContext.tsx`) is the primary way to access Supabase data in the frontend. It fetches and provides:
+- `hero`: Hero section content (via RPC `get_hero_content`)
+- `about`: About section content (via RPC `get_about_content`)
+- `settings`: Global site settings (via RPC `get_site_settings`)
+- `events`: List of public events (via view `public_events_view`)
+- `partners`: Active brand partners (via table `partners`)
+- `team`: Active team members (via table `team_members`)
+- `gallery`: Gallery items (via table `gallery_items`)
+
+### Usage Pattern
+Always use the `useContent()` hook to access this data. Avoid direct Supabase calls in UI components.
+
+```typescript
+import { useContent } from '../contexts/ContentContext';
+
+export const MyComponent = () => {
+  const { events, settings } = useContent();
+  // ...
+};
+```
+
+### Type Safety for Json Fields
+Supabase `Json` fields (like `social_media` or `stats`) require explicit type casting for property access.
+
+```typescript
+// Pattern for social media links
+const socialMedia = (settings?.social_media as Record<string, string>) || {};
+const instagramUrl = socialMedia.instagram;
+
+// Pattern for stats
+const eventsCount = hero?.stats && typeof hero.stats === 'object' && 'events' in hero.stats 
+  ? String(hero.stats.events) 
+  : '0';
+```
+
+### Dummy Data Removal Policy
+- **NO hardcoded Unsplash URLs**: Use empty strings or dedicated placeholder components.
+- **NO hardcoded emails/phones**: Use fallbacks from `settings?.email` or `settings?.phone`.
+- **NO hardcoded team/event data**: All content must originate from Supabase.
+
 ✅ **DO**: Use Lucide icons
 
 ```typescript

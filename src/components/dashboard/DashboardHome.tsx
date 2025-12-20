@@ -2,7 +2,7 @@ import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { StatusBadge } from '../ui/StatusBadge';
 import { useAuth } from '../../contexts/AuthContext';
-import { useRouter } from '../router';
+import { useRouter } from "../router/RouterContext";
 
 /**
  * DashboardHome Component

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { useRouter } from './index';
+import { useRouter } from './RouterContext';
 
 interface LinkProps {
   to: string;

@@ -176,8 +176,7 @@ describe('AuthContext', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       await act(async () => {
-        // @ts-ignore - Testing invalid provider
-        const response = await result.current.signInWithOAuth('github');
+        const response = await result.current.signInWithOAuth('github' as any);
         expect(response?.message).toContain('Only Google authentication is supported');
       });
 

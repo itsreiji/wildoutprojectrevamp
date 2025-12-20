@@ -179,9 +179,9 @@ export interface ContentContextType {
   partners: Partner[];
   gallery: GalleryImage[];
   team: TeamMember[];
-  hero: HeroContent;
-  about: AboutContent;
-  settings: SiteSettings;
+  hero: HeroContent | null;
+  about: AboutContent | null;
+  settings: SiteSettings | null;
   loading: boolean;
   publicContent: Record<string, Json>;
   // Methods

@@ -10,6 +10,7 @@ import type {
 import React, {
     createContext,
     type ReactNode,
+    useCallback,
     useContext,
     useEffect,
     useState,
@@ -26,60 +27,6 @@ import type { AuthRole } from "./AuthContext";
 import { useAuth } from "./AuthContext";
 
 // Initial data
-const INITIAL_HERO: HeroContent = {
-  id: "00000000-0000-0000-0000-000000000001",
-  title: "WildOut!",
-  subtitle: "Media Digital Nightlife & Event Multi-Platform",
-  description:
-    "Indonesia's premier creative community connecting artists, events, and experiences.",
-  stats: { events: "500+", members: "50K+", partners: "100+" },
-  cta_text: "Join Us",
-  cta_link: "/events",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  updated_by: null,
-};
-const INITIAL_ABOUT: AboutContent = {
-  id: "00000000-0000-0000-0000-000000000002",
-  title: "About WildOut!",
-  subtitle:
-    "Indonesia's leading creative community platform, connecting artists, events, and experiences since 2020.",
-  founded_year: "2020",
-  story: [
-    "Founded in 2020, WildOut! celebrates Indonesia’s creative culture.",
-    "We host community-driven events that bring artists, venues, and sponsors together.",
-  ],
-  features: [
-    { title: "Community First", description: "We build lasting connections." },
-    {
-      title: "Unforgettable Experiences",
-      description: "Every event is crafted to be memorable.",
-    },
-  ],
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  updated_by: null,
-};
-const INITIAL_SETTINGS: SiteSettings = {
-  id: "00000000-0000-0000-0000-000000000003",
-  site_name: "WildOut!",
-  site_description: "Indonesia's premier creative community platform",
-  tagline: "Indonesia's premier creative community platform",
-  email: "contact@wildoutproject.com",
-  phone: "+62 21 1234 567",
-  address: "Jakarta, Indonesia",
-  social_media: {
-    instagram: "https://instagram.com/wildoutproject.com",
-    twitter: "https://twitter.com/wildout_id",
-    facebook: "https://facebook.com/wildoutproject.com",
-    youtube: "https://youtube.com/@wildout",
-  },
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  updated_by: null,
-};
-const INITIAL_GALLERY: GalleryImage[] = [];
-
 const ensureStringArray = (value: Json | undefined): string[] | undefined => {
   if (!value) return undefined;
   if (Array.isArray(value)) {
@@ -108,18 +55,18 @@ const normalizeSocialLinks = (
 };
 
 interface StaticContentContextType {
-  hero: HeroContent;
-  about: AboutContent;
-  settings: SiteSettings;
+  hero: HeroContent | null;
+  about: AboutContent | null;
+  settings: SiteSettings | null;
   gallery: GalleryImage[];
   adminSections: AdminSection[];
   sectionContent: Record<string, SectionContent>;
   loading: boolean;
   adminSectionsLoading: boolean;
   error: string | null;
-  updateHero: React.Dispatch<React.SetStateAction<HeroContent>>;
-  updateAbout: React.Dispatch<React.SetStateAction<AboutContent>>;
-  updateSettings: React.Dispatch<React.SetStateAction<SiteSettings>>;
+  updateHero: React.Dispatch<React.SetStateAction<HeroContent | null>>;
+  updateAbout: React.Dispatch<React.SetStateAction<AboutContent | null>>;
+  updateSettings: React.Dispatch<React.SetStateAction<SiteSettings | null>>;
   updateGallery: React.Dispatch<React.SetStateAction<GalleryImage[]>>;
   saveHeroContent: (content: HeroContent) => Promise<void>;
   saveAboutContent: (content: AboutContent) => Promise<void>;
@@ -150,10 +97,10 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
   const user = authContext.user;
   const role: AuthRole = authContext.role;
 
-  const [hero, setHero] = useState<HeroContent>(INITIAL_HERO);
-  const [about, setAbout] = useState<AboutContent>(INITIAL_ABOUT);
-  const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
-  const [gallery, setGallery] = useState<GalleryImage[]>(INITIAL_GALLERY);
+  const [hero, setHero] = useState<HeroContent | null>(null);
+  const [about, setAbout] = useState<AboutContent | null>(null);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
   const [adminSections, setAdminSections] = useState<AdminSection[]>([]);
   const [sectionContent, setSectionContent] = useState<
     Record<string, SectionContent>
@@ -162,106 +109,105 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
   const [adminSectionsLoading, setAdminSectionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchHeroContent = async (): Promise<HeroContent> => {
+  const fetchHeroContent = async (): Promise<HeroContent | null> => {
     try {
       const { data, error } = await supabaseClient.rpc("get_hero_content");
       if (error) {
         console.error("Error fetching hero content:", error);
-        return INITIAL_HERO;
+        return null;
       }
       const result = (data as any)?.[0] as
         | Database["public"]["Tables"]["hero_content"]["Row"]
         | undefined;
       if (result) {
         return {
-          id: result.id ?? INITIAL_HERO.id,
-          title: result.title ?? INITIAL_HERO.title,
-          subtitle: result.subtitle ?? INITIAL_HERO.subtitle,
-          description: result.description ?? INITIAL_HERO.description,
+          id: result.id,
+          title: result.title ?? "",
+          subtitle: result.subtitle ?? "",
+          description: result.description ?? "",
           stats:
             typeof result.stats === "string"
-              ? JSON.parse(result.stats) ?? INITIAL_HERO.stats
-              : result.stats ?? INITIAL_HERO.stats,
-          cta_text: result.cta_text ?? INITIAL_HERO.cta_text,
-          cta_link: result.cta_link ?? INITIAL_HERO.cta_link,
-          created_at: result.created_at ?? INITIAL_HERO.created_at,
-          updated_at: result.updated_at ?? INITIAL_HERO.updated_at,
-          updated_by: result.updated_by ?? INITIAL_HERO.updated_by,
+              ? JSON.parse(result.stats)
+              : result.stats || {},
+          cta_text: result.cta_text ?? "",
+          cta_link: result.cta_link ?? "",
+          created_at: result.created_at,
+          updated_at: result.updated_at,
+          updated_by: result.updated_by,
         };
       }
-      return INITIAL_HERO;
+      return null;
     } catch (error) {
       console.error("Error in fetchHeroContent:", error);
-      return INITIAL_HERO;
+      return null;
     }
   };
 
-  const fetchAboutContent = async (): Promise<AboutContent> => {
+  const fetchAboutContent = async (): Promise<AboutContent | null> => {
     try {
       const { data, error } = await supabaseClient.rpc("get_about_content");
       if (error) {
         console.error("Error fetching about content:", error);
-        return INITIAL_ABOUT;
+        return null;
       }
       const result = (data as any)?.[0] as
         | Database["public"]["Tables"]["about_content"]["Row"]
         | undefined;
       if (result) {
         return {
-          id: result.id ?? INITIAL_ABOUT.id,
-          title: result.title ?? INITIAL_ABOUT.title,
-          subtitle: result.subtitle ?? INITIAL_ABOUT.subtitle,
-          founded_year: result.founded_year ?? INITIAL_ABOUT.founded_year,
-          story: ensureStringArray(result.story) ?? INITIAL_ABOUT.story,
+          id: result.id,
+          title: result.title ?? "",
+          subtitle: result.subtitle ?? "",
+          founded_year: result.founded_year ?? "",
+          story: ensureStringArray(result.story) || [],
           features:
             typeof result.features === "string"
-              ? JSON.parse(result.features) ?? INITIAL_ABOUT.features
-              : result.features ?? INITIAL_ABOUT.features,
-          created_at: result.created_at ?? INITIAL_ABOUT.created_at,
-          updated_at: result.updated_at ?? INITIAL_ABOUT.updated_at,
-          updated_by: result.updated_by ?? INITIAL_ABOUT.updated_by,
+              ? JSON.parse(result.features)
+              : result.features || [],
+          created_at: result.created_at,
+          updated_at: result.updated_at,
+          updated_by: result.updated_by,
         };
       }
-      return INITIAL_ABOUT;
+      return null;
     } catch (error) {
       console.error("Error in fetchAboutContent:", error);
-      return INITIAL_ABOUT;
+      return null;
     }
   };
 
-  const fetchSiteSettings = async (): Promise<SiteSettings> => {
+  const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
     try {
       const { data, error } = await supabaseClient.rpc("get_site_settings");
       if (error) {
         console.error("Error fetching site settings:", error);
-        return INITIAL_SETTINGS;
+        return null;
       }
       const result = (data as any)?.[0] as
         | Database["public"]["Tables"]["site_settings"]["Row"]
         | undefined;
       if (result) {
         return {
-          id: result.id ?? INITIAL_SETTINGS.id,
-          site_name: result.site_name ?? INITIAL_SETTINGS.site_name,
-          site_description:
-            result.site_description ?? INITIAL_SETTINGS.site_description,
-          tagline: result.tagline ?? INITIAL_SETTINGS.tagline,
-          email: result.email ?? INITIAL_SETTINGS.email,
-          phone: result.phone ?? INITIAL_SETTINGS.phone,
-          address: result.address ?? INITIAL_SETTINGS.address,
+          id: result.id,
+          site_name: result.site_name ?? "",
+          site_description: result.site_description ?? "",
+          tagline: result.tagline ?? "",
+          email: result.email ?? "",
+          phone: result.phone ?? "",
+          address: result.address ?? "",
           social_media: normalizeSocialLinks(result.social_media) as Record<
             string,
             string
           >,
-          created_at: result.created_at ?? INITIAL_SETTINGS.created_at,
-          updated_at: result.updated_at ?? INITIAL_SETTINGS.updated_at,
-          updated_by: result.updated_by ?? INITIAL_SETTINGS.updated_by,
+          created_at: result.created_at,
+          updated_at: result.updated_at,
+          updated_by: result.updated_by,
         };
       }
-      return INITIAL_SETTINGS;
+      return null;
     } catch (error) {
       console.error("Error in fetchSiteSettings:", error);
-      return INITIAL_SETTINGS;
+      return null;
     }
   };
 
@@ -274,7 +220,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
         .order("created_at", { ascending: false });
       if (error) {
         console.error("Error fetching gallery:", error);
-        return INITIAL_GALLERY;
+        return [];
       }
       return (data || []).map((row: any) => ({
         id: row.id || "",
@@ -292,11 +238,11 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
       }));
     } catch (error) {
       console.error("Error in fetchGallery:", error);
-      return INITIAL_GALLERY;
+      return [];
     }
   };
 
-  const loadStaticContent = async () => {
+  const loadStaticContent = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -318,11 +264,11 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadStaticContent();
-  }, []);
+  }, [loadStaticContent]);
 
   // Load admin sections
   useEffect(() => {
@@ -336,123 +282,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
 
         if (sectionsError) {
           console.error("Error fetching admin sections:", sectionsError);
-          // Fallback to hardcoded sections
-          setAdminSections([
-            {
-              id: "home-id",
-              slug: "home",
-              label: "Dashboard",
-              icon: "LayoutDashboard",
-              category: "main",
-              order_index: 1,
-              enabled: true,
-              description:
-                "Overview dashboard with statistics and recent activity",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null,
-            },
-            {
-              id: "hero-id",
-              slug: "hero",
-              label: "Hero Section",
-              icon: "Sparkles",
-              category: "content",
-              order_index: 2,
-              enabled: true,
-              description:
-                "Landing page hero section with title, subtitle, and call-to-action",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null,
-            },
-            {
-              id: "about-id",
-              slug: "about",
-              label: "About Us",
-              icon: "Info",
-              category: "content",
-              order_index: 3,
-              enabled: true,
-              description: "About page content including story and features",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null,
-            },
-            {
-              id: "events-id",
-              slug: "events",
-              label: "Events",
-              icon: "Calendar",
-              category: "content",
-              order_index: 4,
-              enabled: true,
-              description: "Manage events, categories, and event details",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null,
-            },
-            {
-              id: "team-id",
-              slug: "team",
-              label: "Team",
-              icon: "Users",
-              category: "content",
-              order_index: 5,
-              enabled: true,
-              description: "Team members and their information",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null,
-            },
-            {
-              id: "gallery-id",
-              slug: "gallery",
-              label: "Gallery",
-              icon: "Image",
-              category: "content",
-              order_index: 6,
-              enabled: true,
-              description: "Image gallery items and management",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null,
-            },
-            {
-              id: "partners-id",
-              slug: "partners",
-              label: "Partners",
-              icon: "Handshake",
-              category: "content",
-              order_index: 7,
-              enabled: true,
-              description: "Partner organizations and collaborations",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null,
-            },
-            {
-              id: "settings-id",
-              slug: "settings",
-              label: "Settings",
-              icon: "Settings",
-              category: "management",
-              order_index: 8,
-              enabled: true,
-              description: "Site-wide settings and configuration",
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              created_by: null,
-              updated_by: null,
-            },
-          ]);
+          setAdminSections([]);
         } else {
           // Add missing properties to match AdminSection type
           const sectionsWithFullType = Object.keys(sections || {})

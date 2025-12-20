@@ -19,7 +19,7 @@ import { StatusBadge } from "../ui/StatusBadge";
 import { Bell, Search } from "lucide-react";
 import React from "react";
 import { useStaticContent } from "../../contexts/StaticContentContext";
-import { useRouter } from "../router";
+import { useRouter } from "../router/RouterContext";
 import { cn } from "../ui/utils";
 
 interface DashboardHeaderProps {
@@ -64,9 +64,10 @@ export const DashboardHeader = React.memo(
       <header
         className={cn(
           "flex h-20 shrink-0 items-center justify-between gap-4",
-          "border-b border-white/5 bg-[#12141a] shadow-lg",
+          "border-b border-white/5 bg-[#12141a] !bg-opacity-100 !opacity-100 !backdrop-blur-none shadow-lg",
           "sticky top-0 z-20 w-full px-6 md:px-12 shrink-0"
         )}
+        style={{ backgroundColor: '#12141a', opacity: 1, backdropFilter: 'none' }}
         id="dashboard-header"
         data-testid="admin-header"
       >
@@ -133,9 +134,9 @@ export const DashboardHeader = React.memo(
               <PopoverContent
                 align="end"
                 className="w-80 p-0 border-white/10 shadow-2xl rounded-xl overflow-hidden !bg-[#1a1d24] !opacity-100 !backdrop-blur-none"
-                style={{ backgroundColor: '#1a1d24', opacity: 1 }}
+                style={{ backgroundColor: '#1a1d24', opacity: 1, backdropFilter: 'none' }}
               >
-                <div className="px-5 py-4 border-b border-white/5 !bg-[#12141a] !opacity-100" style={{ backgroundColor: '#12141a', opacity: 1 }}>
+                <div className="px-6 py-4 border-b border-white/5 !bg-[#12141a] !opacity-100" style={{ backgroundColor: '#12141a', opacity: 1, backdropFilter: 'none' }}>
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-sm text-white">
                       Notifications
@@ -149,7 +150,7 @@ export const DashboardHeader = React.memo(
                     </StatusBadge>
                   </div>
                 </div>
-                <div className="max-h-[400px] overflow-y-auto p-2 !bg-[#1a1d24] !opacity-100" style={{ backgroundColor: '#1a1d24', opacity: 1 }}>
+                <div className="max-h-[400px] overflow-y-auto px-3 py-2 !bg-[#1a1d24] !opacity-100" style={{ backgroundColor: '#1a1d24', opacity: 1, backdropFilter: 'none' }}>
                   {mockNotifications.map((notif, i) => (
                     <div
                       key={i}
@@ -175,7 +176,7 @@ export const DashboardHeader = React.memo(
                     </div>
                   ))}
                 </div>
-                <div className="p-2 border-t border-white/5 !bg-[#12141a] !opacity-100" style={{ backgroundColor: '#12141a', opacity: 1 }}>
+                <div className="px-6 py-2 border-t border-white/5 !bg-[#12141a] !opacity-100" style={{ backgroundColor: '#12141a', opacity: 1, backdropFilter: 'none' }}>
                   <Button
                     variant="ghost"
                     size="sm"

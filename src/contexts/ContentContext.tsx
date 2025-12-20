@@ -24,6 +24,7 @@ import type {
     SiteSettings,
     TeamMember
 } from "@/types/content";
+
 const normalizeSocialLinks = (
   value: Json | undefined
 ): Record<string, string | null> => {
@@ -51,165 +52,106 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
   return undefined;
 };
 
-// Initial data aligned with new types
-const INITIAL_EVENTS: PublicEventView[] = [];
-const INITIAL_PARTNERS: Partner[] = [];
-const INITIAL_GALLERY: GalleryImage[] = [];
-const INITIAL_TEAM: TeamMember[] = [];
-const INITIAL_HERO: HeroContent = {
-  id: "00000000-0000-0000-0000-000000000001",
-  title: "WildOut!",
-  subtitle: "Media Digital Nightlife & Event Multi-Platform",
-  description:
-    "Indonesia's premier creative community connecting artists, events, and experiences.",
-  stats: { events: "500+", members: "50K+", partners: "100+" },
-  cta_text: "Join Us",
-  cta_link: "/events",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  updated_by: null,
-};
-const INITIAL_ABOUT: AboutContent = {
-  id: "00000000-0000-0000-0000-000000000002",
-  title: "About WildOut!",
-  subtitle:
-    "Indonesia's leading creative community platform, connecting artists, events, and experiences since 2020.",
-  founded_year: "2020",
-  story: [
-    "Founded in 2020, WildOut! celebrates Indonesia’s creative culture.",
-    "We host community-driven events that bring artists, venues, and sponsors together.",
-  ],
-  features: [
-    { title: "Community First", description: "We build lasting connections." },
-    {
-      title: "Unforgettable Experiences",
-      description: "Every event is crafted to be memorable.",
-    },
-  ],
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  updated_by: null,
-};
-const INITIAL_SETTINGS: SiteSettings = {
-  id: "00000000-0000-0000-0000-000000000003",
-  site_name: "WildOut!",
-  site_description: "Indonesia's premier creative community platform",
-  tagline: "Indonesia's premier creative community platform",
-  email: "contact@wildoutproject.com",
-  phone: "+62 21 1234 567",
-  address: "Jakarta, Indonesia",
-  social_media: {
-    instagram: "https://instagram.com/wildoutproject.com",
-    twitter: "https://twitter.com/wildout_id",
-    facebook: "https://facebook.com/wildoutproject.com",
-    youtube: "https://youtube.com/@wildout",
-  },
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  updated_by: null,
-};
-
 // Fetch functions using content.ts types
-const fetchHeroContent = async (): Promise<HeroContent> => {
+const fetchHeroContent = async (): Promise<HeroContent | null> => {
   try {
     const { data, error } = await supabaseClient.rpc("get_hero_content");
     if (error) {
       console.error("Error fetching hero content:", error);
-      return INITIAL_HERO;
+      return null;
     }
     const result = (data as any)?.[0] as
       | Database["public"]["Tables"]["hero_content"]["Row"]
       | undefined;
     if (result) {
       return {
-        id: result.id ?? INITIAL_HERO.id,
-        title: result.title ?? INITIAL_HERO.title,
-        subtitle: result.subtitle ?? INITIAL_HERO.subtitle,
-        description: result.description ?? INITIAL_HERO.description,
+        id: result.id,
+        title: result.title ?? "",
+        subtitle: result.subtitle ?? "",
+        description: result.description ?? "",
         stats:
-          typeof result.stats === "string"
-            ? JSON.parse(result.stats) ?? INITIAL_HERO.stats
-            : result.stats ?? INITIAL_HERO.stats,
-        cta_text: result.cta_text ?? INITIAL_HERO.cta_text,
-        cta_link: result.cta_link ?? INITIAL_HERO.cta_link,
-        created_at: result.created_at ?? INITIAL_HERO.created_at,
-        updated_at: result.updated_at ?? INITIAL_HERO.updated_at,
-        updated_by: result.updated_by ?? INITIAL_HERO.updated_by,
+          result.stats && typeof result.stats === "object"
+            ? (result.stats as any)
+            : {},
+        cta_text: result.cta_text ?? "",
+        cta_link: result.cta_link ?? "",
+        created_at: result.created_at,
+        updated_at: result.updated_at,
+        updated_by: result.updated_by,
       };
     }
-    return INITIAL_HERO;
+    return null;
   } catch (error) {
     console.error("Error in fetchHeroContent:", error);
-    return INITIAL_HERO;
+    return null;
   }
 };
 
-const fetchAboutContent = async (): Promise<AboutContent> => {
+const fetchAboutContent = async (): Promise<AboutContent | null> => {
   try {
     const { data, error } = await supabaseClient.rpc("get_about_content");
     if (error) {
       console.error("Error fetching about content:", error);
-      return INITIAL_ABOUT;
+      return null;
     }
     const result = (data as any)?.[0] as
       | Database["public"]["Tables"]["about_content"]["Row"]
       | undefined;
     if (result) {
       return {
-        id: result.id ?? INITIAL_ABOUT.id,
-        title: result.title ?? INITIAL_ABOUT.title,
-        subtitle: result.subtitle ?? INITIAL_ABOUT.subtitle,
-        founded_year: result.founded_year ?? INITIAL_ABOUT.founded_year,
-        story: ensureStringArray(result.story) ?? INITIAL_ABOUT.story,
+        id: result.id,
+        title: result.title ?? "",
+        subtitle: result.subtitle ?? "",
+        founded_year: result.founded_year ?? "",
+        story: ensureStringArray(result.story) ?? [],
         features:
-          typeof result.features === "string"
-            ? JSON.parse(result.features) ?? INITIAL_ABOUT.features
-            : result.features ?? INITIAL_ABOUT.features,
-        created_at: result.created_at ?? INITIAL_ABOUT.created_at,
-        updated_at: result.updated_at ?? INITIAL_ABOUT.updated_at,
-        updated_by: result.updated_by ?? INITIAL_ABOUT.updated_by,
+          result.features && typeof result.features === "object"
+            ? (result.features as any)
+            : [],
+        created_at: result.created_at,
+        updated_at: result.updated_at,
+        updated_by: result.updated_by,
       };
     }
-    return INITIAL_ABOUT;
+    return null;
   } catch (error) {
     console.error("Error in fetchAboutContent:", error);
-    return INITIAL_ABOUT;
+    return null;
   }
 };
 
-const fetchSiteSettings = async (): Promise<SiteSettings> => {
+const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
   try {
     const { data, error } = await supabaseClient.rpc("get_site_settings");
     if (error) {
       console.error("Error fetching site settings:", error);
-      return INITIAL_SETTINGS;
+      return null;
     }
     const result = (data as any)?.[0] as
       | Database["public"]["Tables"]["site_settings"]["Row"]
       | undefined;
     if (result) {
       return {
-        id: result.id ?? INITIAL_SETTINGS.id,
-        site_name: result.site_name ?? INITIAL_SETTINGS.site_name,
-        site_description:
-          result.site_description ?? INITIAL_SETTINGS.site_description,
-        tagline: result.tagline ?? INITIAL_SETTINGS.tagline,
-        email: result.email ?? INITIAL_SETTINGS.email,
-        phone: result.phone ?? INITIAL_SETTINGS.phone,
-        address: result.address ?? INITIAL_SETTINGS.address,
+        id: result.id,
+        site_name: result.site_name ?? "",
+        site_description: result.site_description ?? "",
+        tagline: result.tagline ?? "",
+        email: result.email ?? "",
+        phone: result.phone ?? "",
+        address: result.address ?? "",
         social_media: normalizeSocialLinks(result.social_media) as Record<
           string,
           string
         >,
-        created_at: result.created_at ?? INITIAL_SETTINGS.created_at,
-        updated_at: result.updated_at ?? INITIAL_SETTINGS.updated_at,
-        updated_by: result.updated_by ?? INITIAL_SETTINGS.updated_by,
+        created_at: result.created_at,
+        updated_at: result.updated_at,
+        updated_by: result.updated_by,
       };
     }
-    return INITIAL_SETTINGS;
+    return null;
   } catch (error) {
     console.error("Error in fetchSiteSettings:", error);
-    return INITIAL_SETTINGS;
+    return null;
   }
 };
 
@@ -240,7 +182,7 @@ const fetchTeamMembers = async (): Promise<TeamMember[]> => {
       .order("name");
     if (error) {
       console.error("Error fetching team members:", error);
-      return INITIAL_TEAM;
+      return [];
     }
     return (data || []).map((row: any): TeamMember => ({
       id: row.id,
@@ -257,7 +199,7 @@ const fetchTeamMembers = async (): Promise<TeamMember[]> => {
     }));
   } catch (error) {
     console.error("Error in fetchTeamMembers:", error);
-    return INITIAL_TEAM;
+    return [];
   }
 };
 
@@ -270,12 +212,12 @@ const fetchPartners = async (): Promise<Partner[]> => {
       .order("name");
     if (error) {
       console.error("Error fetching partners:", error);
-      return INITIAL_PARTNERS;
+      return [];
     }
     return (data || []) as Partner[];
   } catch (error) {
     console.error("Error in fetchPartners:", error);
-    return INITIAL_PARTNERS;
+    return [];
   }
 };
 
@@ -288,12 +230,12 @@ const fetchGallery = async (): Promise<GalleryImage[]> => {
       .order("created_at", { ascending: false });
     if (error) {
       console.error("Error fetching gallery:", error);
-      return INITIAL_GALLERY;
+      return [];
     }
     return (data || []) as GalleryImage[];
   } catch (error) {
     console.error("Error in fetchGallery:", error);
-    return INITIAL_GALLERY;
+    return [];
   }
 };
 
@@ -303,35 +245,18 @@ export const ContentContext = createContext<ContentContextType | null>(null);
 export const ContentProvider = ({ children }: { children: ReactNode }) => {
   useAuth();
   const [events, setEvents] = useState<PublicEventView[]>([]);
-  const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
-  const [gallery, setGallery] = useState<GalleryImage[]>(INITIAL_GALLERY);
-  const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
-  const [hero, setHero] = useState<HeroContent>(INITIAL_HERO);
-  const [about, setAbout] = useState<AboutContent>(INITIAL_ABOUT);
-  const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [hero, setHero] = useState<HeroContent | null>(null);
+  const [about, setAbout] = useState<AboutContent | null>(null);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Check if we should use dummy data
-  const useDummyData = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
 
   // Fetch initial data
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
-
-      // If using dummy data, skip Supabase calls
-      if (useDummyData) {
-        console.log("Using dummy data instead of Supabase");
-        setEvents(INITIAL_EVENTS);
-        setPartners(INITIAL_PARTNERS);
-        setGallery(INITIAL_GALLERY);
-        setTeam(INITIAL_TEAM);
-        setHero(INITIAL_HERO);
-        setAbout(INITIAL_ABOUT);
-        setSettings(INITIAL_SETTINGS);
-        setLoading(false);
-        return;
-      }
 
       try {
         const [
@@ -367,14 +292,6 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
 
     initializeData();
   }, []);
-
-
-
-
-
-
-
-
 
   // Event Artists mutations - placeholder implementation
   const fetchEventArtists = async (eventId: string): Promise<EventArtist[]> => {
@@ -425,8 +342,6 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     await Promise.resolve();
   };
 
-
-
   const value: ContentContextType = {
     publicContent: {},
     events: events as PublicEventView[],
@@ -465,13 +380,6 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
     updateEventArtist,
     deleteEventArtist,
     refreshData: async () => {},
-    // Admin sections not in ContentContextType
-    // adminSections,
-    // sectionContent,
-    // adminSectionsLoading,
-    // getSectionContent,
-    // getSectionPermissions,
-    // updateSectionContent,
   };
 
   return (

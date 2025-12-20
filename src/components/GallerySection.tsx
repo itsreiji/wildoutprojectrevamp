@@ -20,8 +20,10 @@ const SPAN_PATTERNS = [
 ];
 
 export const GallerySection = React.memo(() => {
-  const { gallery, events } = useContent();
+  const { gallery, events, settings } = useContent();
   const [selectedEventId, setSelectedEventId] = useState<string>('all');
+
+  const socialMedia = (settings?.social_media as Record<string, string>) || {};
 
   const filteredGallery = useMemo(() => {
     if (selectedEventId === 'all') return gallery;
@@ -114,24 +116,36 @@ export const GallerySection = React.memo(() => {
             Want to see more? Follow us on social media for daily updates
           </p>
           <div className="flex justify-center gap-4">
-            <a
-              className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
-              href="#"
-            >
-              Instagram
-            </a>
-            <a
-              className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
-              href="#"
-            >
-              TikTok
-            </a>
-            <a
-              className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
-              href="#"
-            >
-              Twitter
-            </a>
+            {socialMedia.instagram && (
+              <a
+                className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
+                href={socialMedia.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Instagram
+              </a>
+            )}
+            {socialMedia.tiktok && (
+              <a
+                className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
+                href={socialMedia.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                TikTok
+              </a>
+            )}
+            {socialMedia.twitter && (
+              <a
+                className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
+                href={socialMedia.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Twitter
+              </a>
+            )}
           </div>
         </motion.div>
       </div>

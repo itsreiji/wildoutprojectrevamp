@@ -23,7 +23,7 @@
 
 import type { TeamMember } from "@/types/content";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -66,7 +66,7 @@ export function DashboardTeamForm({
   defaultValues,
   onCancel,
 }: DashboardTeamFormProps) {
-  const getDefaultValues = (): TeamFormValues => {
+  const getDefaultValues = useCallback((): TeamFormValues => {
     if (!defaultValues) {
       return {
         name: "",
@@ -90,7 +90,7 @@ export function DashboardTeamForm({
       social_links:
         (defaultValues.social_links as Record<string, string | null>) || {},
     };
-  };
+  }, [defaultValues]);
 
   const form = useForm<TeamFormValues>({
     resolver: zodResolver(teamFormSchema) as Resolver<TeamFormValues>,
@@ -100,7 +100,7 @@ export function DashboardTeamForm({
   // Reset form when defaultValues changes (switching between create/edit modes)
   useEffect(() => {
     form.reset(getDefaultValues());
-  }, [defaultValues?.id]);
+  }, [defaultValues?.id, form, getDefaultValues]);
 
   return (
     <Form {...form}>
@@ -313,7 +313,7 @@ export function DashboardTeamForm({
             <FormField
               control={form.control}
               name="avatar_file"
-              render={({ field: { onChange, value, ...field } }) => (
+              render={({ field: { onChange, value: _value, ...field } }) => (
                 <FormItem
                   id="dashboard-team-form-avatar-field"
                   className="space-y-2"

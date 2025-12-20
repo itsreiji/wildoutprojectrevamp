@@ -25,7 +25,7 @@ import { useContent } from "@/contexts/ContentContext";
 import type { GalleryImage } from "@/types/content";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -75,7 +75,7 @@ export function DashboardGalleryForm({
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const { events } = useContent();
 
-  const getDefaultValues = (): GalleryFormValues => {
+  const getDefaultValues = useCallback((): GalleryFormValues => {
     if (!defaultValues) {
       return {
         title: "",
@@ -94,7 +94,7 @@ export function DashboardGalleryForm({
       tags: Array.isArray(defaultValues.tags) ? defaultValues.tags : [],
       image_files: [],
     };
-  };
+  }, [defaultValues]);
 
   const form = useForm<GalleryFormValues>({
     resolver: zodResolver(galleryFormSchema) as Resolver<GalleryFormValues>,
@@ -104,9 +104,10 @@ export function DashboardGalleryForm({
   // Reset form when defaultValues changes (switching between create/edit modes)
   useEffect(() => {
     form.reset(getDefaultValues());
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedFiles([]);
     setPreviewUrls([]);
-  }, [defaultValues?.id]);
+  }, [defaultValues?.id, form, getDefaultValues]);
 
   // Handle file selection with preview generation
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -8,7 +8,7 @@ import type { TeamMember } from "../types/content";
 import TeamMemberModal from "./TeamMemberModal";
 
 export const TeamSection = React.memo(() => {
-  const { team } = useContent();
+  const { team, settings } = useContent();
   const activeTeam = team.filter((member) => member.status === "active");
   const [selectedMember, setSelectedMember] = React.useState<
     TeamMember | undefined
@@ -70,7 +70,7 @@ export const TeamSection = React.memo(() => {
                     id={`team-member-${member.id}-avatar`}
                     src={
                       member.avatar_url ||
-                      "https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400"
+                      ""
                     }
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
@@ -176,7 +176,7 @@ export const TeamSection = React.memo(() => {
           <p className="text-white/60 mb-4">Want to join our amazing team?</p>
           <a
             className="inline-flex items-center px-8 py-3 bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl transition-all duration-300 shadow-lg shadow-[#E93370]/20 hover:shadow-[#E93370]/40"
-            href="mailto:careers@wildoutproject.com"
+            href={`mailto:${settings?.email || 'careers@wildoutproject.com'}`}
           >
             <Mail className="mr-2 h-5 w-5" />
             Get in Touch

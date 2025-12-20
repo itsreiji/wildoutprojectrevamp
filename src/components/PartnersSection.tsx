@@ -10,9 +10,10 @@ import {
   SelectValue,
 } from './ui/select';
 import { useContent } from '../contexts/ContentContext';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export const PartnersSection = React.memo(() => {
-  const { partners } = useContent();
+  const { partners, settings } = useContent();
   const [filterTier, setFilterTier] = useState<string>('all');
 
   const tierOrder: Record<string, number> = {
@@ -87,12 +88,20 @@ export const PartnersSection = React.memo(() => {
               viewport={{ once: true }}
               whileInView={{ opacity: 1, y: 0 }}
             >
-              <div className="aspect-square p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500 flex flex-col items-center justify-center">
-                {/* Logo Placeholder */}
+              <div className="aspect-square p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500 flex flex-col items-center justify-center overflow-hidden">
+                {/* Logo */}
                 <div className="w-full h-full flex items-center justify-center mb-2">
-                  <div className="text-3xl md:text-4xl text-white/80 group-hover:text-[#E93370] transition-colors duration-300">
-                    {partner.name.charAt(0)}
-                  </div>
+                  {partner.logo_url ? (
+                    <ImageWithFallback
+                      alt={partner.name}
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                      src={partner.logo_url}
+                    />
+                  ) : (
+                    <div className="text-3xl md:text-4xl text-white/80 group-hover:text-[#E93370] transition-colors duration-300">
+                      {partner.name.charAt(0)}
+                    </div>
+                  )}
                 </div>
 
                 {/* Partner Info */}
@@ -137,9 +146,12 @@ export const PartnersSection = React.memo(() => {
               Join our network of innovative brands and create unforgettable experiences
               together. Let's collaborate and reach Indonesia's creative community.
             </p>
-            <button className="px-8 py-4 rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white transition-colors duration-300">
+            <a
+              className="inline-block px-8 py-4 rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white transition-colors duration-300"
+              href={`mailto:${settings?.email || 'partnerships@wildoutproject.com'}`}
+            >
               Get in Touch
-            </button>
+            </a>
           </div>
         </motion.div>
       </div>

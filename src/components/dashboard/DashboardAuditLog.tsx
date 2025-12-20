@@ -6,7 +6,7 @@
  * Uses AuditContext for data fetching with RLS enforced server-side
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calendar, User, Database, Zap, Edit3, Trash2 } from 'lucide-react';
 import {
   Table,
@@ -76,13 +76,13 @@ export const DashboardAuditLog = () => {
   const [filters, setFilters] = useState<{ table_name?: string; action?: string; user_id?: string }>({});
   const pageCount = Math.ceil(totalCount / pageSize);
 
-  const handleFetch = async () => {
+  const handleFetch = useCallback(async () => {
     await fetchAuditLogs(pageIndex, pageSize, filters);
-  };
+  }, [fetchAuditLogs, pageIndex, pageSize, filters]);
 
   useEffect(() => {
     handleFetch();
-  }, [pageIndex, filters]);
+  }, [handleFetch]);
 
   const handlePageChange = (newPage: number) => {
     setPageIndex(newPage);

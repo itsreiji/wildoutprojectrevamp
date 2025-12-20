@@ -18,7 +18,7 @@ async function checkStorage() {
   // First, list all buckets
   console.log('1. Listing all buckets:');
   const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
-  
+
   if (bucketsError) {
     console.error('Error listing buckets:', bucketsError);
     return;
@@ -103,7 +103,7 @@ async function checkStorage() {
     } else {
       console.log(`   Found ${allFiles.length} items at root`);
     }
-  } catch (e) {
+  } catch {
     console.log('   Recursive listing not supported');
   }
 }
