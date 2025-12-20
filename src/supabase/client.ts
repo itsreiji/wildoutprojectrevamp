@@ -5,8 +5,11 @@ import type { Database } from './types';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Check if we should use dummy data
-export const useDummyData = import.meta.env.VITE_USE_DUMMY_DATA === 'true';
+// Check if configuration is missing or invalid
+const isConfigMissing = !supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('your-project') || supabaseUrl.includes('placeholder');
+
+// Check if we should use dummy data (explicitly or because config is missing)
+export const useDummyData = import.meta.env.VITE_USE_DUMMY_DATA === 'true' || isConfigMissing;
 
 // Session ID storage key for cross-page consistency
 const SESSION_ID_KEY = 'wildout_session_id';
@@ -67,7 +70,7 @@ const createEnhancedStorage = () => ({
 let supabaseClient: any;
 
 // Error handling for missing environment variables
-if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('your-project')) {
+if (isConfigMissing) {
   console.error('Missing or invalid Supabase configuration. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for real data.');
   // We still create a client but it will fail on requests, which is better than using a mock that hides errors
   supabaseClient = createClient<Database>(

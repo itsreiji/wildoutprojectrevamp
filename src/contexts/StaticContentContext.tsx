@@ -15,7 +15,7 @@ import React, {
     useEffect,
     useState,
 } from "react";
-import { supabaseClient } from "../supabase/client";
+import { supabaseClient, useDummyData } from "../supabase/client";
 import type {
     Database,
     Json,
@@ -25,6 +25,12 @@ import type {
 import { cleanupGalleryAsset } from "../utils/storageHelpers";
 import type { AuthRole } from "./AuthContext";
 import { useAuth } from "./AuthContext";
+import {
+  MOCK_HERO,
+  MOCK_ABOUT,
+  MOCK_SETTINGS,
+  MOCK_GALLERY
+} from "../utils/mockData";
 
 // Initial data
 const ensureStringArray = (value: Json | undefined): string[] | undefined => {
@@ -247,6 +253,16 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
       setLoading(true);
       setError(null);
 
+      if (useDummyData) {
+        console.log("Using mock data for static content initialization");
+        setHero(MOCK_HERO);
+        setAbout(MOCK_ABOUT);
+        setSettings(MOCK_SETTINGS);
+        setGallery(MOCK_GALLERY);
+        setLoading(false);
+        return;
+      }
+
       const [heroData, aboutData, settingsData, galleryData] =
         await Promise.all([
           fetchHeroContent(),
@@ -275,6 +291,14 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
     const loadAdminSections = async () => {
       try {
         setAdminSectionsLoading(true);
+
+        if (useDummyData) {
+          setAdminSections([]);
+          setSectionContent({});
+          setAdminSectionsLoading(false);
+          return;
+        }
+
         const { data: sections, error: sectionsError } =
           await supabaseClient.rpc("get_admin_sections_for_user", {
             p_user_id: user?.id,

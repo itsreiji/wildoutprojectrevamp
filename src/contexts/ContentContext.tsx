@@ -6,12 +6,21 @@ import {
     useEffect,
     useState,
 } from "react";
-import supabaseClient from "../supabase/client";
+import supabaseClient, { useDummyData } from "../supabase/client";
 import type {
     Database,
     Json,
 } from "../supabase/types";
 import { useAuth } from "./AuthContext";
+import {
+  MOCK_HERO,
+  MOCK_ABOUT,
+  MOCK_SETTINGS,
+  MOCK_EVENTS,
+  MOCK_GALLERY,
+  MOCK_TEAM,
+  MOCK_PARTNERS
+} from "../utils/mockData";
 
 import type {
     AboutContent,
@@ -257,6 +266,19 @@ export const ContentProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initializeData = async () => {
       setLoading(true);
+
+      if (useDummyData) {
+        console.log("Using mock data for content initialization");
+        setEvents(MOCK_EVENTS);
+        setPartners(MOCK_PARTNERS);
+        setGallery(MOCK_GALLERY);
+        setTeam(MOCK_TEAM);
+        setHero(MOCK_HERO);
+        setAbout(MOCK_ABOUT);
+        setSettings(MOCK_SETTINGS);
+        setLoading(false);
+        return;
+      }
 
       try {
         const [
