@@ -1,7 +1,7 @@
 import { AuditProvider } from "../../contexts/AuditContext";
 import { DashboardAbout } from "../dashboard/DashboardAbout";
 import { DashboardEvents } from "../dashboard/DashboardEvents";
-import { DashboardGallery } from "../dashboard/DashboardGallery";
+import { DashboardGalleryEnhanced } from "../dashboard/DashboardGalleryEnhanced";
 import { DashboardHero } from "../dashboard/DashboardHero";
 import { DashboardLayout } from "../dashboard/DashboardLayout";
 import { DashboardPartners } from "../dashboard/DashboardPartners";
@@ -32,7 +32,7 @@ const AdminDashboard = () => {
       case "events":
         return <DashboardEvents />;
       case "gallery":
-        return <DashboardGallery />;
+        return <DashboardGalleryEnhanced />;
       case "team":
         return <DashboardTeam />;
       case "about":

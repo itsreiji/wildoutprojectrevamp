@@ -5,7 +5,7 @@
  * Supabase Storage-based gallery system while maintaining the existing UI/UX.
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Upload, Trash2, Image as ImageIcon, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 
@@ -37,8 +37,7 @@ import { Progress } from "../ui/progress";
 import { ScrollArea } from "../ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
-import type { GalleryImage } from "@/types/content";
-import type { TablesInsert, TablesUpdate } from "@/supabase/types";
+import type { TablesInsert } from "@/supabase/types";
 
 interface UploadProgress {
   fileName: string;
@@ -48,12 +47,11 @@ interface UploadProgress {
 }
 
 export function DashboardGalleryEnhanced() {
-  const { user, role } = useAuth();
+  const { user } = useAuth();
   const {
     gallery,
     loading,
     addGalleryImage,
-    updateGalleryImage,
     deleteGalleryImage,
     uploadGalleryFiles,
     getStorageStats,
@@ -357,7 +355,7 @@ export function DashboardGalleryEnhanced() {
         <CardHeader>
           <CardTitle>Upload Images</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-[var(--form-field-gap)]">
           <Input
             type="file"
             multiple
@@ -425,7 +423,7 @@ export function DashboardGalleryEnhanced() {
                     Add a gallery item with existing storage path
                   </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4">
+                <div className="space-y-[var(--form-field-gap)]">
                   <Input
                     placeholder="Title"
                     value={newItem.title || ""}
@@ -487,63 +485,96 @@ export function DashboardGalleryEnhanced() {
       </Card>
 
       {/* Gallery Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[var(--gap-lg)]">
         {gallery.map((item) => (
-          <div key={item.id} className="border rounded-lg overflow-hidden bg-white/5">
-            <div className="aspect-square bg-black/40 relative">
+          <div key={item.id} className="group flex flex-col border rounded-xl overflow-hidden bg-white/[0.03] hover:bg-white/[0.08] transition-all duration-300 border-white/10 hover:border-white/20 h-full shadow-lg">
+            <div className="aspect-[4/3] bg-black/40 relative overflow-hidden">
               {item.image_url ? (
                 <ImageWithFallback
                   src={item.image_url}
                   alt={item.title || "Gallery image"}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <ImageIcon className="h-12 w-12 text-white/20" />
+                  <ImageIcon className="h-12 w-12 text-white/10" />
                 </div>
               )}
-              <Badge
-                className="absolute top-2 left-2"
-                variant={item.status === "published" ? "default" : "secondary"}
-              >
-                {item.status}
-              </Badge>
-            </div>
-            <div className="p-3 space-y-2">
-              <h3 className="font-semibold truncate">{item.title}</h3>
-              {item.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {item.description}
+
+              {/* Status Badge - Positioned clearly on top of image */}
+              <div className="absolute top-3 left-3 z-10">
+                <Badge
+                  className={`${
+                    item.status === "published"
+                      ? "bg-[#E93370] hover:bg-[#E93370]/90 text-white border-none"
+                      : "bg-slate-700 text-slate-200 border-none"
+                  } shadow-md px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold`}
+                >
+                  {item.status}
+                </Badge>
+              </div>
+
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                <p className="text-white text-xs font-medium truncate w-full">
+                  {item.storage_path ? "Stored in Cloud" : "External Link"}
                 </p>
-              )}
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <Badge variant="outline">{item.category}</Badge>
-                 {item.metadata?.size && (
-                   <span>{formatFileSize(item.metadata.size as number)}</span>
-                 )}
+              </div>
+            </div>
+
+            <div className="p-4 flex flex-col flex-1 gap-[var(--form-field-gap)]">
+              <div className="space-y-1.5">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-bold text-base leading-tight text-white line-clamp-1 group-hover:text-[#E93370] transition-colors">
+                    {item.title}
+                  </h3>
                 </div>
-              <div className="flex gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => {
-                    // Edit functionality would go here
-                    toast.info("Edit functionality coming soon");
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => {
-                    setItemToDelete(item.id);
-                    setShowDeleteDialog(true);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {item.description ? (
+                  <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                    {item.description}
+                  </p>
+                ) : (
+                  <p className="text-sm text-slate-600 italic line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                    No description provided
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-auto space-y-[var(--form-field-gap)]">
+                <div className="flex items-center justify-between">
+                  <Badge variant="outline" className="bg-white/[0.02] border-white/10 text-slate-400 capitalize px-2 py-0">
+                    {item.category}
+                  </Badge>
+                  {item.metadata?.size && (
+                    <span className="text-[10px] font-mono text-slate-500 uppercase">
+                      {formatFileSize(item.metadata.size as number)}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-white/[0.02] border-white/10 hover:bg-white/[0.08] hover:border-white/20 text-white h-9"
+                    onClick={() => {
+                      toast.info("Edit functionality coming soon");
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="h-9 w-9 p-0 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all"
+                    onClick={() => {
+                      setItemToDelete(item.id);
+                      setShowDeleteDialog(true);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

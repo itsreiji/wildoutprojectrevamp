@@ -78,8 +78,8 @@ export const EventDetailModal = React.memo(
                       Date
                     </SmallText>
                     <SmallText className="text-white/80">
-                      {event.date
-                        ? new Date(event.date).toLocaleDateString()
+                      {event.start_date
+                        ? new Date(event.start_date).toLocaleDateString()
                         : "TBD"}
                     </SmallText>
                   </div>
@@ -91,7 +91,9 @@ export const EventDetailModal = React.memo(
                       Time
                     </SmallText>
                     <SmallText className="text-white/80">
-                      {event.time || "TBD"}
+                      {event.start_date
+                        ? new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : "TBD"}
                     </SmallText>
                   </div>
                 </div>
@@ -102,9 +104,7 @@ export const EventDetailModal = React.memo(
                       Price
                     </SmallText>
                     <SmallText className="text-white/80">
-                      {event.price
-                        ? formatCurrency(Number(event.price))
-                        : "Free"}
+                      {event.price_range || (event.price ? formatCurrency(Number(event.price)) : "Free")}
                     </SmallText>
                   </div>
                 </div>
@@ -130,10 +130,7 @@ export const EventDetailModal = React.memo(
                 <div className="flex items-start p-4 rounded-xl bg-white/5 border border-white/10">
                   <MapPin className="h-5 w-5 text-[#E93370] mr-3 mt-1" />
                   <div>
-                    <BodyText className="text-white font-medium">{event.venue}</BodyText>
-                    <SmallText className="text-white/60">
-                      {event.venueAddress}
-                    </SmallText>
+                    <BodyText className="text-white font-medium">{event.location || "Venue TBD"}</BodyText>
                   </div>
                 </div>
               </div>

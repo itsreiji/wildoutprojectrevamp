@@ -9,6 +9,7 @@ import { ContentProvider } from "./contexts/ContentContext";
 import { EventsProvider } from "./contexts/EventsContext";
 import { PartnersProvider } from "./contexts/PartnersContext";
 import { StaticContentProvider } from "./contexts/StaticContentContext";
+import { EnhancedStaticContentProvider } from "./contexts/EnhancedStaticContentContext";
 import { TeamProvider } from "./contexts/TeamContext";
 import "./index.css";
 
@@ -29,13 +30,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <AuthProvider>
           <ContentProvider>
             <StaticContentProvider>
-              <EventsProvider>
-                <PartnersProvider>
-                  <TeamProvider>
-                    <App />
-                  </TeamProvider>
-                </PartnersProvider>
-              </EventsProvider>
+              <EnhancedStaticContentProvider>
+                <EventsProvider>
+                  <PartnersProvider>
+                    <TeamProvider>
+                      <App />
+                    </TeamProvider>
+                  </PartnersProvider>
+                </EventsProvider>
+              </EnhancedStaticContentProvider>
             </StaticContentProvider>
           </ContentProvider>
         </AuthProvider>

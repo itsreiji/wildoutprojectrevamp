@@ -233,216 +233,210 @@ export const DashboardPartners = () => {
 
       {/* Partners Grid */}
       <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--gap-lg)]"
         id="dashboard-partners-grid"
       >
         {filteredPartners.map((partner, index) => (
           <motion.div
             key={partner.id}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 relative"
+            className="group flex flex-col h-full p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 relative shadow-lg"
             id={`dashboard-partner-card-${partner.id}`}
             initial={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            {/* Featured Badge */}
-            {partner.featured && (
-              <div
-                className="absolute top-4 right-4"
-                id={`dashboard-partner-featured-badge-container-${partner.id}`}
-              >
-                <StatusBadge
-                  status="upcoming"
-                  showDot={false}
-                  className="bg-amber-500/15 text-amber-400 border-amber-500/30 shadow-[0_0_8px_rgba(245,158,11,0.1)]"
-                  id={`dashboard-partner-featured-badge-${partner.id}`}
-                >
-                  FEATURED
-                </StatusBadge>
+            {/* Badges Row */}
+            <div className="flex items-start justify-between mb-[var(--form-field-gap)] gap-2">
+              <div id={`dashboard-partner-status-container-${partner.id}`}>
+                <StatusBadge status={partner.status || "active"} />
               </div>
-            )}
 
-            {/* Status Badge */}
-            <div
-              className="flex items-start justify-between mb-4"
-              id={`dashboard-partner-status-container-${partner.id}`}
-            >
-              <StatusBadge status={partner.status || "active"} />
+              {partner.featured && (
+                <div id={`dashboard-partner-featured-badge-container-${partner.id}`}>
+                  <StatusBadge
+                    status="upcoming"
+                    showDot={false}
+                    className="bg-amber-500/15 text-amber-400 border-amber-500/30 shadow-[0_0_8px_rgba(245,158,11,0.1)] text-[10px] px-2 py-0.5"
+                    id={`dashboard-partner-featured-badge-${partner.id}`}
+                  >
+                    FEATURED
+                  </StatusBadge>
+                </div>
+              )}
             </div>
 
             {/* Logo */}
             {partner.logo_url ? (
               <div
-                className="w-full h-24 rounded-lg overflow-hidden border border-white/10 mb-4 bg-white/5 flex items-center justify-center"
+                className="w-full h-32 rounded-xl overflow-hidden border border-white/10 mb-[var(--gap-lg)] bg-white/[0.03] group-hover:bg-white/[0.06] transition-colors flex items-center justify-center p-4"
                 id={`dashboard-partner-logo-container-${partner.id}`}
               >
                 <ImageWithFallback
                   alt={partner.name}
-                  className="w-full h-full object-contain p-2"
+                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                   id={`dashboard-partner-logo-${partner.id}`}
-                  src={partner.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200"}
+                  src={partner.logo_url}
                 />
               </div>
             ) : (
               <div
-                className="w-full h-24 rounded-lg overflow-hidden border border-white/10 mb-4 bg-white/5 flex items-center justify-center"
+                className="w-full h-32 rounded-xl overflow-hidden border border-white/10 mb-[var(--gap-lg)] bg-white/[0.03] flex items-center justify-center"
                 id={`dashboard-partner-logo-placeholder-${partner.id}`}
               >
                 <span
-                  className="text-sm text-white/40"
+                  className="text-sm text-white/20 font-medium"
                   id={`dashboard-partner-logo-placeholder-text-${partner.id}`}
                 >
-                  No logo
+                  No logo provided
                 </span>
               </div>
             )}
 
             {/* Info */}
-            <h3
-              className="text-xl text-white mb-2"
-              id={`dashboard-partner-name-${partner.id}`}
-            >
-              {partner.name}
-            </h3>
-            {partner.description && (
-              <p
-                className="text-sm text-white/60 mb-4 line-clamp-2"
-                id={`dashboard-partner-description-${partner.id}`}
+            <div className="mb-[var(--gap-lg)]">
+              <h3
+                className="text-lg font-bold text-white mb-2 group-hover:text-[#E93370] transition-colors"
+                id={`dashboard-partner-name-${partner.id}`}
               >
-                {partner.description}
-              </p>
-            )}
-
-            {/* Contact Info */}
-            <div
-              className="space-y-2 mb-4 text-sm text-white/70"
-              id={`dashboard-partner-contact-container-${partner.id}`}
-            >
-              {partner.contact_email && (
-                <div id={`dashboard-partner-email-container-${partner.id}`}>
-                  <span
-                    className="text-white/40"
-                    id={`dashboard-partner-email-label-${partner.id}`}
-                  >
-                    Email:
-                  </span>{" "}
-                  <a
-                    className="text-[#E93370] hover:text-[#E93370]/80"
-                    href={`mailto:${partner.contact_email}`}
-                    id={`dashboard-partner-email-link-${partner.id}`}
-                  >
-                    {partner.contact_email}
-                  </a>
-                </div>
-              )}
-              {partner.website_url && (
-                <div id={`dashboard-partner-website-container-${partner.id}`}>
-                  <span
-                    className="text-white/40"
-                    id={`dashboard-partner-website-label-${partner.id}`}
-                  >
-                    Website:
-                  </span>{" "}
-                  <a
-                    className="text-[#E93370] hover:text-[#E93370]/80 inline-flex items-center gap-1"
-                    href={partner.website_url}
-                    id={`dashboard-partner-website-link-${partner.id}`}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    Visit{" "}
-                    <ExternalLink
-                      className="h-3 w-3"
-                      id={`dashboard-partner-website-icon-${partner.id}`}
-                    />
-                  </a>
-                </div>
+                {partner.name}
+              </h3>
+              {partner.description ? (
+                <p
+                  className="text-sm text-white/60 line-clamp-2 leading-relaxed min-h-[2.5rem]"
+                  id={`dashboard-partner-description-${partner.id}`}
+                >
+                  {partner.description}
+                </p>
+              ) : (
+                <p className="text-sm text-white/30 italic line-clamp-2 leading-relaxed min-h-[2.5rem]">
+                  No description available
+                </p>
               )}
             </div>
 
-            {/* Actions */}
-            <div
-              className="flex space-x-2 mt-6"
-              id={`dashboard-partner-actions-${partner.id}`}
-            >
-              <Button
-                className="flex-1 border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
-                id={`dashboard-partner-edit-button-${partner.id}`}
-                size="sm"
-                variant="outline"
-                onClick={() => handleEdit(partner)}
+            {/* Contact & Actions Container - Pushed to bottom */}
+            <div className="mt-auto space-y-[var(--gap-lg)]">
+              {/* Contact Info */}
+              <div
+                className="space-y-[var(--form-field-gap)] pt-4 border-t border-white/5 text-sm"
+                id={`dashboard-partner-contact-container-${partner.id}`}
               >
-                <Edit
-                  className="mr-2 h-4 w-4"
-                  id={`dashboard-partner-edit-icon-${partner.id}`}
-                />
-                Edit
-              </Button>
-              <AlertDialog
-                open={isDeleteDialogOpen && deletingPartnerId === partner.id}
-                onOpenChange={(open) => {
-                  if (!open) setDeletingPartnerId(null);
-                  setIsDeleteDialogOpen(open);
-                }}
+                {partner.contact_email && (
+                  <div className="flex items-center gap-2 text-white/70" id={`dashboard-partner-email-container-${partner.id}`}>
+                    <span className="text-white/40 w-16" id={`dashboard-partner-email-label-${partner.id}`}>Email:</span>
+                    <a
+                      className="text-[#E93370] hover:text-[#E93370]/80 transition-colors truncate font-medium"
+                      href={`mailto:${partner.contact_email}`}
+                      id={`dashboard-partner-email-link-${partner.id}`}
+                    >
+                      {partner.contact_email}
+                    </a>
+                  </div>
+                )}
+                {partner.website_url && (
+                  <div className="flex items-center gap-2 text-white/70" id={`dashboard-partner-website-container-${partner.id}`}>
+                    <span className="text-white/40 w-16" id={`dashboard-partner-website-label-${partner.id}`}>Website:</span>
+                    <a
+                      className="text-[#E93370] hover:text-[#E93370]/80 inline-flex items-center gap-1 transition-colors font-medium"
+                      href={partner.website_url}
+                      id={`dashboard-partner-website-link-${partner.id}`}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Visit site
+                      <ExternalLink
+                        className="h-3 w-3"
+                        id={`dashboard-partner-website-icon-${partner.id}`}
+                      />
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div
+                className="flex space-x-2"
+                id={`dashboard-partner-actions-${partner.id}`}
               >
-                <AlertDialogTrigger asChild>
-                  <Button
-                    className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
-                    id={`dashboard-partner-delete-trigger-${partner.id}`}
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setDeletingPartnerId(partner.id)}
-                  >
-                    <Trash2
-                      className="h-4 w-4"
-                      id={`dashboard-partner-delete-icon-${partner.id}`}
-                    />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent
-                  className="bg-[#0a0a0a] border-white/10 text-white max-w-md"
-                  id={`dashboard-partner-delete-dialog-${partner.id}`}
+                <Button
+                  className="flex-1 border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-xl h-10 transition-all"
+                  id={`dashboard-partner-edit-button-${partner.id}`}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEdit(partner)}
                 >
-                  <AlertDialogHeader
-                    id={`dashboard-partner-delete-dialog-header-${partner.id}`}
+                  <Edit
+                    className="mr-2 h-4 w-4"
+                    id={`dashboard-partner-edit-icon-${partner.id}`}
+                  />
+                  Edit
+                </Button>
+                <AlertDialog
+                  open={isDeleteDialogOpen && deletingPartnerId === partner.id}
+                  onOpenChange={(open) => {
+                    if (!open) setDeletingPartnerId(null);
+                    setIsDeleteDialogOpen(open);
+                  }}
+                >
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      className="border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white rounded-xl h-10 w-10 p-0 transition-all"
+                      id={`dashboard-partner-delete-trigger-${partner.id}`}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setDeletingPartnerId(partner.id)}
+                    >
+                      <Trash2
+                        className="h-4 w-4"
+                        id={`dashboard-partner-delete-icon-${partner.id}`}
+                      />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent
+                    className="bg-[#0a0a0a] border-white/10 text-white max-w-md"
+                    id={`dashboard-partner-delete-dialog-${partner.id}`}
                   >
-                    <AlertDialogTitle
-                      className="text-xl font-bold"
-                      id={`dashboard-partner-delete-dialog-title-${partner.id}`}
+                    <AlertDialogHeader
+                      id={`dashboard-partner-delete-dialog-header-${partner.id}`}
                     >
-                      Remove Partner?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription
-                      className="text-white/60"
-                      id={`dashboard-partner-delete-dialog-description-${partner.id}`}
+                      <AlertDialogTitle
+                        className="text-xl font-bold"
+                        id={`dashboard-partner-delete-dialog-title-${partner.id}`}
+                      >
+                        Remove Partner?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription
+                        className="text-white/60"
+                        id={`dashboard-partner-delete-dialog-description-${partner.id}`}
+                      >
+                        This action cannot be undone. This will permanently remove{" "}
+                        <span className="text-white font-medium">
+                          {partner.name}
+                        </span>{" "}
+                        from the system.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter
+                      id={`dashboard-partner-delete-dialog-footer-${partner.id}`}
                     >
-                      This action cannot be undone. This will permanently remove{" "}
-                      <span className="text-white font-medium">
-                        {partner.name}
-                      </span>{" "}
-                      from the system.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter
-                    id={`dashboard-partner-delete-dialog-footer-${partner.id}`}
-                  >
-                    <AlertDialogCancel
-                      className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white transition-colors"
-                      id={`dashboard-partner-cancel-delete-button-${partner.id}`}
-                      onClick={() => setDeletingPartnerId(null)}
-                    >
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg shadow-red-600/20"
-                      id={`dashboard-partner-confirm-delete-button-${partner.id}`}
-                      onClick={() => handleDelete(partner.id)}
-                    >
-                      {isDeleting ? "Removing..." : "Remove Partner"}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                      <AlertDialogCancel
+                        className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white transition-colors rounded-xl"
+                        id={`dashboard-partner-cancel-delete-button-${partner.id}`}
+                        onClick={() => setDeletingPartnerId(null)}
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg shadow-red-600/20 rounded-xl"
+                        id={`dashboard-partner-confirm-delete-button-${partner.id}`}
+                        onClick={() => handleDelete(partner.id)}
+                      >
+                        {isDeleting ? "Removing..." : "Remove Partner"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           </motion.div>
         ))}

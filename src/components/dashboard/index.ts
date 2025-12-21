@@ -1,6 +1,7 @@
 export * from './DashboardAbout';
 export * from './DashboardEvents';
 export * from './DashboardGallery';
+export * from './DashboardGalleryEnhanced';
 export * from './DashboardHero';
 export * from './DashboardHome';
 export * from './DashboardLayout';

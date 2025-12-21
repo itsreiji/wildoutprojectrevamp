@@ -245,7 +245,7 @@ export const LoginPage: React.FC = () => {
 
           {/* Email/Password Form */}
           <Form {...form}>
-            <form className="space-y-6" id="admin-login-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="space-y-[var(--form-field-gap)]" id="admin-login-form" onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
                 control={form.control}
                 name="email"

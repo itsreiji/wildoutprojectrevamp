@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, Zap, Users, Sparkles } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
+import { Feature } from '@/types/content';
 
 const ICON_MAP: Record<number, any> = {
   0: Heart,
@@ -12,6 +13,11 @@ const ICON_MAP: Record<number, any> = {
 
 export const AboutSection = React.memo(() => {
   const { about } = useContent();
+
+  if (!about) return null;
+
+  const features = (about.features as unknown as Feature[]) || [];
+  const story = about.story || [];
 
   return (
     <section id="about" className="relative py-20 px-4">
@@ -36,7 +42,7 @@ export const AboutSection = React.memo(() => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {about.features.map((feature, index) => {
+          {features.map((feature, index) => {
             const Icon = ICON_MAP[index % 4] || Heart;
             return (
               <motion.div
@@ -87,7 +93,7 @@ export const AboutSection = React.memo(() => {
                 Our Story
               </h3>
               <div className="space-y-4 text-white/70 leading-relaxed">
-                {about.story.map((paragraph, index) => (
+                {story.map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
               </div>
@@ -95,7 +101,7 @@ export const AboutSection = React.memo(() => {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
                 <div>
-                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{about.foundedYear}</div>
+                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{about.founded_year}</div>
                   <div className="text-sm text-white/60">Founded</div>
                 </div>
                 <div>

@@ -220,9 +220,9 @@ export function DashboardEventForm({
         id="dashboard-event-form"
         onSubmit={form.handleSubmit(handleFormSubmit)}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-6 px-8 py-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-[var(--gap-lg)] px-8 py-6 custom-scrollbar">
           {/* Basic Info */}
-          <div className="space-y-4" id="dashboard-event-form-basic-info">
+          <div className="space-y-[var(--form-field-gap)]" id="dashboard-event-form-basic-info">
             <h3
               className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-3"
               id="dashboard-event-form-basic-info-title"
@@ -230,7 +230,7 @@ export function DashboardEventForm({
               <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Basic Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)] items-start relative">
               <FormField
                 control={form.control}
                 name="title"
@@ -394,7 +394,7 @@ export function DashboardEventForm({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)]">
               <FormField
                 control={form.control}
                 name="featured_image_file"
@@ -555,7 +555,7 @@ export function DashboardEventForm({
           </div>
 
           <div
-            className="space-y-4 pt-6 border-t border-white/5"
+            className="space-y-[var(--form-field-gap)] pt-6 border-t border-white/5"
             id="dashboard-event-form-date-time"
           >
             <h3
@@ -565,7 +565,7 @@ export function DashboardEventForm({
               <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Date & Time
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)]">
               <FormField
                 control={form.control}
                 name="start_date"
@@ -637,7 +637,7 @@ export function DashboardEventForm({
 
           {/* Venue & Capacity */}
           <div
-            className="space-y-4 pt-6 border-t border-white/5 pb-8"
+            className="space-y-[var(--form-field-gap)] pt-6 border-t border-white/5 pb-8"
             id="dashboard-event-form-venue-capacity"
           >
             <h3
@@ -647,7 +647,7 @@ export function DashboardEventForm({
               <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Venue & Capacity
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)]">
               <FormField
                 control={form.control}
                 name="location"

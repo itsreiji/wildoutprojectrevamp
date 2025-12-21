@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo, useCallback, Suspense } from 'react';
 import {
   DashboardAbout,
   DashboardEvents,
-  DashboardGallery,
+  DashboardGalleryEnhanced,
   DashboardHero,
   DashboardHome,
   DashboardLayout,
@@ -15,7 +15,7 @@ import { RouterContext, useRouter } from './RouterContext';
 export {
   DashboardAbout,
   DashboardEvents,
-  DashboardGallery,
+  DashboardGalleryEnhanced as DashboardGallery,
   DashboardHero,
   DashboardHome,
   DashboardLayout,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Mail, Phone, Linkedin, Twitter } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useContent } from '../contexts/ContentContext';
 
@@ -44,23 +44,23 @@ export const TeamSection = React.memo(() => {
                 {/* Photo */}
                 <div className="relative h-72 overflow-hidden">
                   <ImageWithFallback
-                    src={member.photoUrl || 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400'}
+                    src={member.avatar_url || member.photo_url_link || 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400'}
                     alt={member.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
-                  
+
                   {/* Info Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     <h3 className="text-xl text-white mb-1">{member.name}</h3>
-                    <p className="text-sm text-[#E93370] mb-3">{member.role}</p>
+                    <p className="text-sm text-[#E93370] mb-3">{member.title}</p>
                   </div>
                 </div>
 
                 {/* Bio & Contact */}
                 <div className="p-6 space-y-4">
                   <p className="text-sm text-white/70 line-clamp-2">{member.bio}</p>
-                  
+
                   <div className="space-y-2">
                     {member.email && (
                       <a
@@ -69,15 +69,6 @@ export const TeamSection = React.memo(() => {
                       >
                         <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
                         <span className="truncate">{member.email}</span>
-                      </a>
-                    )}
-                    {member.phone && (
-                      <a
-                        href={`tel:${member.phone}`}
-                        className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors"
-                      >
-                        <Phone className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span>{member.phone}</span>
                       </a>
                     )}
                   </div>

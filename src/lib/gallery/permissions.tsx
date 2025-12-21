@@ -70,7 +70,7 @@ export function hasPermission(
 export async function getUserRole(): Promise<string | null> {
   try {
     const { data: { user } } = await supabaseClient.auth.getUser();
-    
+
     if (!user) return null;
 
     // Get user role from profiles table
@@ -116,7 +116,7 @@ export async function validateItemAccess(
 
     // Get user permissions
     const permissions = await getCurrentUserPermissions();
-    
+
     if (!permissions[action]) {
       return { allowed: false, reason: 'Tidak memiliki izin' };
     }
@@ -175,7 +175,7 @@ export async function validateBatchOperation(
 
   for (const itemId of itemIds) {
     const validation = await validateItemAccess(itemId, userId, action);
-    
+
     if (validation.allowed) {
       validItems.push(itemId);
     } else {
@@ -261,8 +261,8 @@ export async function updateStorageUsage(
       .single();
 
     const currentUsage = profile?.storage_used || 0;
-    const newUsage = operation === 'add' 
-      ? currentUsage + fileSize 
+    const newUsage = operation === 'add'
+      ? currentUsage + fileSize
       : Math.max(0, currentUsage - fileSize);
 
     const { error } = await supabaseClient
@@ -288,7 +288,7 @@ export async function checkRateLimit(
   try {
     const now = Date.now();
     const key = `rate_limit_${userId}_${action}`;
-    
+
     // Get current rate limit data from localStorage (for demo)
     // In production, use Redis or similar
     const stored = localStorage.getItem(key);

@@ -332,16 +332,52 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+DECLARE
+    v_total_files BIGINT;
+    v_total_size BIGINT;
+    v_by_category JSONB;
+    v_by_status JSONB;
+    v_recent_uploads BIGINT;
 BEGIN
-    RETURN QUERY
-    SELECT
-        COUNT(*) as total_files,
-        SUM((file_metadata->>'size')::BIGINT) as total_size,
-        jsonb_object_agg(category, COUNT(*)) as by_category,
-        jsonb_object_agg(status, COUNT(*)) as by_status,
-        COUNT(CASE WHEN created_at > NOW() - INTERVAL '24 hours' THEN 1 END) as recent_uploads
+    -- 1. Total files count
+    SELECT COUNT(*) INTO v_total_files
     FROM public.gallery_items
     WHERE storage_path IS NOT NULL;
+
+    -- 2. Total size sum
+    SELECT COALESCE(SUM((file_metadata->>'size')::BIGINT), 0) INTO v_total_size
+    FROM public.gallery_items
+    WHERE storage_path IS NOT NULL;
+
+    -- 3. Category distribution (Avoiding nested aggregates)
+    SELECT COALESCE(jsonb_object_agg(category, cnt), '{}'::jsonb) INTO v_by_category
+    FROM (
+        SELECT category, COUNT(*) as cnt
+        FROM public.gallery_items
+        WHERE storage_path IS NOT NULL
+        GROUP BY category
+    ) c;
+
+    -- 4. Status distribution (Avoiding nested aggregates)
+    SELECT COALESCE(jsonb_object_agg(status, cnt), '{}'::jsonb) INTO v_by_status
+    FROM (
+        SELECT status, COUNT(*) as cnt
+        FROM public.gallery_items
+        WHERE storage_path IS NOT NULL
+        GROUP BY status
+    ) s;
+
+    -- 5. Recent uploads (last 24h)
+    SELECT COUNT(*) INTO v_recent_uploads
+    FROM public.gallery_items
+    WHERE storage_path IS NOT NULL AND created_at > NOW() - INTERVAL '24 hours';
+
+    RETURN QUERY SELECT
+        v_total_files,
+        v_total_size,
+        v_by_category,
+        v_by_status,
+        v_recent_uploads;
 END;
 $$;
 

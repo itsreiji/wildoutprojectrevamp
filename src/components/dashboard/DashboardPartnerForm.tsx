@@ -130,9 +130,9 @@ export function DashboardPartnerForm({
         id="dashboard-partner-form"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-8 px-8 py-10 wildout-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-[var(--gap-lg)] px-8 py-10 wildout-scrollbar">
           {/* Basic Info */}
-          <div className="space-y-6" id="dashboard-partner-form-basic-info">
+          <div className="space-y-[var(--form-field-gap)]" id="dashboard-partner-form-basic-info">
             <h3
               className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-4"
               id="dashboard-partner-form-basic-info-title"
@@ -140,7 +140,7 @@ export function DashboardPartnerForm({
               <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Partner Details
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)] items-start relative">
               <FormField
                 control={form.control}
                 name="name"

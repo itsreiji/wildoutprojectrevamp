@@ -6,8 +6,7 @@ export {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
-  CardAction
+  CardFooter
 } from './card';
 export {
   Form,

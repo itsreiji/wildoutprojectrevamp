@@ -270,7 +270,7 @@ export const DashboardGallery = React.memo(() => {
         if (uploadedFiles.length > 0) {
           try {
             await supabaseClient.storage
-              .from("event-media")
+              .from("wildout-images")
               .remove(uploadedFiles);
           } catch (cleanupError) {
             console.error("Error cleaning up uploaded files:", cleanupError);

@@ -6,13 +6,12 @@ import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useContent } from '../contexts/ContentContext';
-import type { LandingEvent as Event } from '@/types/content';
 import { useRouter } from './router';
 
 export const EventsSection = React.memo(() => {
   const { events } = useContent();
   const { navigate } = useRouter();
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   return (
     <>
@@ -58,12 +57,12 @@ export const EventsSection = React.memo(() => {
                   {/* Event Image */}
                   <div className="relative h-64 overflow-hidden">
                     <ImageWithFallback
-                      src={event.image}
-                      alt={event.title}
+                      src={event.image_url || event.image || ''}
+                      alt={event.title || ''}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                    
+
                     {/* Category Badge */}
                     <Badge className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0">
                       {event.category}
@@ -90,25 +89,30 @@ export const EventsSection = React.memo(() => {
                       <div className="flex items-center text-white/70">
                         <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
                         <span className="text-sm">
-                          {new Date(event.date).toLocaleDateString('en-US', {
+                          {event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
-                          })}
+                          }) : 'Date TBD'}
                         </span>
                       </div>
                       <div className="flex items-center text-white/70">
                         <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">{event.time}</span>
+                        <span className="text-sm">
+                          {event.start_date ? new Date(event.start_date).toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          }) : 'Time TBD'}
+                        </span>
                       </div>
                       <div className="flex items-center text-white/70">
                         <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">{event.venue}</span>
+                        <span className="text-sm">{event.location || 'Venue TBD'}</span>
                       </div>
                       <div className="flex items-center text-white/70">
                         <Ticket className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="text-sm">{event.price}</span>
+                        <span className="text-sm">{event.price_range || (event.price ? `$${event.price}` : 'Free')}</span>
                       </div>
                     </div>
 
@@ -116,7 +120,7 @@ export const EventsSection = React.memo(() => {
                     <div className="flex items-center space-x-2">
                       <Music className="h-4 w-4 text-[#E93370]" />
                       <div className="flex -space-x-2">
-                        {event.artists.slice(0, 3).map((artist, idx) => (
+                        {Array.isArray(event.artists) && event.artists.slice(0, 3).map((artist: any, idx) => (
                           <div
                             key={idx}
                             className="w-8 h-8 rounded-full border-2 border-black overflow-hidden"
@@ -130,7 +134,9 @@ export const EventsSection = React.memo(() => {
                         ))}
                       </div>
                       <span className="text-sm text-white/60">
-                        {event.artists.length} {event.artists.length === 1 ? 'Artist' : 'Artists'}
+                        {Array.isArray(event.artists) ? (
+                          `${event.artists.length} ${event.artists.length === 1 ? 'Artist' : 'Artists'}`
+                        ) : 'No Artists'}
                       </span>
                     </div>
 

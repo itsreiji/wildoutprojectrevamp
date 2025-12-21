@@ -1,16 +1,16 @@
 /**
  * Gallery System Usage Examples
- * 
+ *
  * This file provides practical examples of how to use the new Supabase Storage-based
  * gallery management system in your application.
  */
 
 import { galleryStorageService } from './storage-service';
-import { 
-  useGalleryItems, 
-  useUploadGallery, 
+import {
+  useGalleryItems,
+  useUploadGallery,
   useDeleteGallery,
-  useGalleryManager 
+  useGalleryManager
 } from './gallery-hooks';
 import { EnhancedGalleryManager } from '@/components/gallery/EnhancedGalleryManager';
 import { supabaseClient } from '@/supabase/client';
@@ -32,7 +32,7 @@ export async function exampleUploadSingleFile() {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = 'image/*';
-  
+
   fileInput.onchange = async (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
@@ -40,7 +40,7 @@ export async function exampleUploadSingleFile() {
     try {
       const result = await galleryStorageService.uploadFile(file, user.id);
       console.log('Upload successful:', result);
-      
+
       // Now create a gallery item record
       const { error } = await supabaseClient
         .from('gallery_items')
@@ -70,12 +70,12 @@ export async function exampleUploadSingleFile() {
  * Example 2: Get paginated gallery items
  */
 export function useGalleryExample() {
-  const { 
-    galleryItems, 
-    pagination, 
-    isLoading, 
+  const {
+    galleryItems,
+    pagination,
+    isLoading,
     error,
-    refetch 
+    refetch
   } = useGalleryItems({
     page: 1,
     limit: 20,
@@ -113,9 +113,9 @@ export function UploadComponent() {
 
   return (
     <div>
-      <input 
-        type="file" 
-        multiple 
+      <input
+        type="file"
+        multiple
         accept="image/*"
         onChange={(e) => e.target.files && handleUpload(e.target.files)}
         disabled={uploadMutation.isPending}
@@ -140,7 +140,7 @@ export function DeleteButton({ itemId }: { itemId: string }) {
   };
 
   return (
-    <button 
+    <button
       onClick={handleDelete}
       disabled={deleteMutation.isPending}
       className="bg-red-600 text-white px-4 py-2 rounded"
@@ -168,7 +168,7 @@ export function GalleryManagementPage() {
   return (
     <div>
       <h1>Gallery Management</h1>
-      
+
       {/* Stats */}
       {stats && (
         <div className="stats">
@@ -178,9 +178,9 @@ export function GalleryManagementPage() {
       )}
 
       {/* Upload */}
-      <input 
-        type="file" 
-        multiple 
+      <input
+        type="file"
+        multiple
         onChange={async (e) => {
           if (e.target.files) {
             const fileArray = Array.from(e.target.files);
@@ -211,7 +211,7 @@ export function CompleteGalleryPage() {
   return (
     <div className="container">
       <h1>My Gallery</h1>
-      
+
       {/* The complete gallery management system */}
       <EnhancedGalleryManager />
     </div>
@@ -228,7 +228,7 @@ export async function directServiceUsage() {
   // Upload
   const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
   Object.defineProperty(file, 'size', { value: 100000 });
-  
+
   const uploadResult = await galleryStorageService.uploadFile(file, user.id);
   console.log('Uploaded:', uploadResult.path);
 
@@ -353,7 +353,7 @@ export const integrationGuide = {
   step4: `
     // 4. Use in your components
     import { EnhancedGalleryManager } from '@/components/gallery/EnhancedGalleryManager';
-    
+
     function MyPage() {
       return <EnhancedGalleryManager />;
     }
@@ -362,7 +362,7 @@ export const integrationGuide = {
   step5: `
     // 5. Or use hooks for custom UI
     import { useGalleryItems, useUploadGallery } from '@/lib/gallery/gallery-hooks';
-    
+
     function CustomGallery() {
       const { galleryItems } = useGalleryItems({ page: 1, limit: 20 });
       const upload = useUploadGallery();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
