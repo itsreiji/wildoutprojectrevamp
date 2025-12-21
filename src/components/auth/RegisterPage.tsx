@@ -86,7 +86,7 @@ export const RegisterPage: React.FC = () => {
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       <Background3D />
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-sm space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
+        <div className="w-full max-w-sm space-y-8 rounded-xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">
           <div className="text-center">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent tracking-normal">
               {copy.title}
@@ -108,7 +108,7 @@ export const RegisterPage: React.FC = () => {
                       <Input
                         placeholder="you@wildoutproject.com"
                         {...field}
-                        className="rounded-2xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
+                        className="rounded-xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
                       />
                     </FormControl>
                     <FormMessage />
@@ -127,7 +127,7 @@ export const RegisterPage: React.FC = () => {
                         placeholder="••••••••"
                         type="password"
                         {...field}
-                        className="rounded-2xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
+                        className="rounded-xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
                       />
                     </FormControl>
                     <FormMessage />
@@ -146,7 +146,7 @@ export const RegisterPage: React.FC = () => {
                         placeholder="••••••••"
                         type="password"
                         {...field}
-                        className="rounded-2xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
+                        className="rounded-xl border border-white/10 bg-white/5 py-6 text-white placeholder:text-white/30 focus:border-[#E93370]/50 focus:ring-[#E93370]/20"
                       />
                     </FormControl>
                     <FormMessage />
@@ -173,7 +173,7 @@ export const RegisterPage: React.FC = () => {
               )}
 
               <Button
-                className="w-full rounded-2xl bg-[#E93370] hover:bg-[#E93370]/90 text-white h-auto py-4 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-xl"
+                className="w-full rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white h-auto py-4 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-xl"
                 disabled={loading}
                 type="submit"
               >

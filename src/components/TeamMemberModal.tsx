@@ -256,7 +256,7 @@ const TeamMemberModal = ({
 
           {/* Bio */}
           {member.bio && (
-            <div className="space-y-3 bg-white/5 rounded-2xl p-6 border border-white/10">
+            <div className="space-y-3 bg-white/5 rounded-xl p-6 border border-white/10">
               <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                 <span className="w-1 h-4 bg-[#E93370] rounded-full"></span>
                 About

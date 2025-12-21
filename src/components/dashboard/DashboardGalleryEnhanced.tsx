@@ -592,7 +592,7 @@ export function DashboardGalleryEnhanced() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl sm:rounded-[32px] bg-[#0a0a0a] border-white/10 text-white">
           <DialogHeader>
             <DialogTitle>Delete Gallery Item</DialogTitle>
             <DialogDescription>

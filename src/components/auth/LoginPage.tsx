@@ -225,7 +225,7 @@ export const LoginPage: React.FC = () => {
 
           {/* Enhanced error display with icons */}
           {formError && (
-            <div className="error-message rounded-lg border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2" id="admin-login-error-message">
+            <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2" id="admin-login-error-message">
               <AlertTriangle className="h-4 w-4 text-red-300 flex-shrink-0" id="admin-login-error-icon" />
               <p className="text-sm text-red-300" id="admin-login-error-text" role="alert">
                 {formError}
@@ -235,7 +235,7 @@ export const LoginPage: React.FC = () => {
 
           {/* Enhanced success display with icons */}
           {infoMessage && (
-            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3 flex items-center gap-2" id="admin-login-success-message">
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 flex items-center gap-2" id="admin-login-success-message">
               <CheckCircle2 className="h-4 w-4 text-emerald-300 flex-shrink-0" id="admin-login-success-icon" />
               <p className="text-sm text-emerald-300" id="admin-login-success-text" role="status">
                 {infoMessage}
@@ -341,7 +341,7 @@ export const LoginPage: React.FC = () => {
 
               {/* Rate Limit Warning */}
               {rateLimitInfo.isBlocked && (
-                <div className="p-3 bg-orange-900/50 text-orange-300 rounded-lg flex items-center gap-2" id="admin-login-rate-limit-warning">
+                <div className="p-3 bg-orange-900/50 text-orange-300 rounded-xl flex items-center gap-2" id="admin-login-rate-limit-warning">
                   <Clock className="h-4 w-4" id="admin-login-rate-limit-icon" />
                   <span id="admin-login-rate-limit-text">
                     Account temporarily locked. Try again in{' '}

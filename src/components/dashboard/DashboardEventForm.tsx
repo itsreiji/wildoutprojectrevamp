@@ -216,7 +216,7 @@ export function DashboardEventForm({
   return (
     <Form {...form}>
       <form
-        className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden"
+        className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden rounded-2xl sm:rounded-[32px]"
         id="dashboard-event-form"
         onSubmit={form.handleSubmit(handleFormSubmit)}
       >
@@ -772,7 +772,7 @@ export function DashboardEventForm({
         </div>
 
         <div
-          className="flex justify-end space-x-3 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
+          className="flex justify-end space-x-4 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-xl sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
           id="dashboard-event-form-actions"
         >
           <Button

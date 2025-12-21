@@ -261,7 +261,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
 
         {/* Dropdown Menu */}
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-black border border-white/10 rounded-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+          <div className="absolute z-50 w-full mt-1 bg-black border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
             {/* Search Input */}
             <div className="flex items-center gap-2 px-3 py-2 border-b border-white/10">
               <Search className="h-4 w-4 text-muted-foreground" />

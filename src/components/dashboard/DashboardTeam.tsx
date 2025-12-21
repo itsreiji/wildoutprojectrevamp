@@ -421,7 +421,10 @@ export const DashboardTeam = React.memo(() => {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent className="bg-[#0a0a0a] border-white/10 text-white max-w-md">
+                  <AlertDialogContent
+                    className="bg-[#0a0a0a] border-white/10 text-white max-w-md rounded-2xl"
+                    id={`dashboard-team-delete-dialog-content-${member.id}`}
+                  >
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-xl font-bold">
                         Remove Team Member?
@@ -465,7 +468,7 @@ export const DashboardTeam = React.memo(() => {
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent
-          className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+          className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0 rounded-2xl sm:rounded-[32px]"
           id="dashboard-team-create-edit-dialog"
           aria-label={editingMember ? `Edit Team Member: ${editingMember.name}` : "Add Team Member"}
           aria-labelledby="dashboard-team-create-edit-dialog-title"

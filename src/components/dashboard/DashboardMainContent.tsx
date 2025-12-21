@@ -53,7 +53,7 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="p-8 rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
+          <div className="p-8 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
             <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-500 group-hover:text-white transition-colors">
               <svg
                 className="w-6 h-6"
@@ -78,7 +78,7 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
+          <div className="p-8 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
             <div className="w-12 h-12 bg-purple-50 text-purple-500 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-500 group-hover:text-white transition-colors">
               <svg
                 className="w-6 h-6"
@@ -103,7 +103,7 @@ const DashboardMainContent = ({ children }: DashboardMainContentProps) => {
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
+          <div className="p-8 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow group">
             <div className="w-12 h-12 bg-[#E93370]/10 text-[#E93370] rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#E93370] group-hover:text-white transition-colors">
               <svg
                 className="w-6 h-6"

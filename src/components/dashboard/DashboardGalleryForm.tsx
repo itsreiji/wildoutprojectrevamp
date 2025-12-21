@@ -150,8 +150,8 @@ export function DashboardGalleryForm({
   return (
     <Form {...form}>
       <form
-        className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden"
-        id="admin-gallery-form"
+        className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden rounded-2xl sm:rounded-[32px]"
+        id="dashboard-gallery-form"
         onSubmit={form.handleSubmit(handleFormSubmit)}
       >
         <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-[var(--gap-lg)] px-8 py-10 wildout-scrollbar">
@@ -398,7 +398,7 @@ export function DashboardGalleryForm({
         </div>
 
         <div
-          className="flex justify-end space-x-3 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
+          className="flex justify-end space-x-3 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-xl sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
           id="admin-gallery-form-actions"
         >
           <Button

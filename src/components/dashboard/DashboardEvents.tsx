@@ -577,7 +577,7 @@ export const DashboardEvents = () => {
 
         {/* Events Table */}
         <div
-          className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden"
+          className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden"
           data-testid="events-events-table"
         >
           <Table data-testid="events-table">
@@ -1017,7 +1017,7 @@ export const DashboardEvents = () => {
         {/* Create/Edit Event Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent
-            className="sm:max-w-3xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+            className="sm:max-w-3xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0 rounded-2xl sm:rounded-[32px]"
             id="dashboard-events-create-edit-dialog"
             aria-label={editingEvent ? `Edit Event: ${editingEvent.title}` : "Add Event"}
             aria-labelledby="dashboard-events-create-edit-dialog-title"
@@ -1047,7 +1047,7 @@ export const DashboardEvents = () => {
           onOpenChange={setIsDeleteDialogOpen}
         >
           <AlertDialogContent
-            className="bg-[#0a0a0a] border-white/10 text-white max-w-md"
+            className="bg-[#0a0a0a] border-white/10 text-white max-w-md rounded-2xl"
             id="dashboard-events-delete-confirmation-dialog"
           >
             <AlertDialogHeader id="dashboard-events-delete-confirmation-dialog-header">

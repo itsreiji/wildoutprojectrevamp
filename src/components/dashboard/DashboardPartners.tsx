@@ -393,8 +393,8 @@ export const DashboardPartners = () => {
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent
-                    className="bg-[#0a0a0a] border-white/10 text-white max-w-md"
-                    id={`dashboard-partner-delete-dialog-${partner.id}`}
+                    className="bg-[#0a0a0a] border-white/10 text-white max-w-md rounded-2xl"
+                    id={`dashboard-partner-delete-dialog-content-${partner.id}`}
                   >
                     <AlertDialogHeader
                       id={`dashboard-partner-delete-dialog-header-${partner.id}`}
@@ -454,7 +454,7 @@ export const DashboardPartners = () => {
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent
-          className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+          className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0 rounded-2xl sm:rounded-[32px]"
           id="dashboard-partners-create-edit-dialog"
           aria-label={editingPartner ? `Edit Partner: ${editingPartner.name}` : "Add Partner"}
           aria-labelledby="dashboard-partners-create-edit-dialog-title"

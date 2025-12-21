@@ -580,7 +580,7 @@ export const DashboardGallery = React.memo(() => {
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent
-          className="sm:max-w-3xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
+          className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0 rounded-2xl sm:rounded-[32px]"
           id="dashboard-gallery-create-edit-dialog"
           aria-label={editingGallery ? `Edit Gallery Item: ${editingGallery.title}` : "Add Gallery Item"}
           aria-labelledby="dashboard-gallery-create-edit-dialog-title"

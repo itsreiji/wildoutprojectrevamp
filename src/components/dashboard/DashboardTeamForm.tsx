@@ -38,7 +38,6 @@ import {
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Trash2 } from "lucide-react";
-import { useState } from "react";
 
 const teamFormSchema = z.object({
   name: z.string().min(1, "Team member name is required"),
@@ -110,7 +109,7 @@ export function DashboardTeamForm({
   return (
     <Form {...form}>
       <form
-        className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden"
+        className="flex flex-col h-full bg-[#0a0a0a] overflow-hidden rounded-2xl sm:rounded-[32px]"
         id="dashboard-team-form"
         onSubmit={form.handleSubmit(onSubmit)}
       >
@@ -352,7 +351,7 @@ export function DashboardTeamForm({
                           />
                           <label
                             htmlFor="team-avatar-upload"
-                            className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:border-[#E93370]/50 hover:bg-white/5 transition-all text-center p-6 group"
+                            className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-[#E93370]/50 hover:bg-white/5 transition-all text-center p-6 group"
                           >
                             <div className="flex flex-col items-center justify-center">
                               <div className="w-12 h-12 mb-3 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#E93370]/10 transition-colors">
@@ -383,11 +382,11 @@ export function DashboardTeamForm({
 
                         {/* Right: Preview Area */}
                         {((defaultValues?.avatar_url && !form.watch("is_photo_removed")) || form.watch("avatar_file")) && (
-                          <div className="sm:col-span-4 flex flex-col items-center gap-3 bg-white/5 rounded-2xl p-4 border border-white/10">
+                          <div className="sm:col-span-4 flex flex-col items-center gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
                             <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
                               {form.watch("avatar_file") ? "Preview" : "Current"}
                             </label>
-                            <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-white/10 bg-[#0a0a0a] shadow-lg">
+                            <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-white/10 bg-[#0a0a0a] shadow-lg">
                               {form.watch("avatar_file") ? (
                                 <img
                                   src={URL.createObjectURL(form.watch("avatar_file"))}
@@ -435,7 +434,7 @@ export function DashboardTeamForm({
         </div>
 
         <div
-          className="flex justify-end space-x-4 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
+          className="flex justify-end space-x-4 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-xl sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
           id="dashboard-team-form-actions"
         >
           <Button
