@@ -23,11 +23,11 @@ export const HeroSection = React.memo(() => {
             className="relative"
           >
             <motion.div
-              className="absolute inset-0 blur-3xl opacity-50"
+              className="absolute -inset-4 blur-[100px] opacity-50 rounded-full"
               style={{ background: '#E93370' }}
               animate={{
                 scale: [1, 1.2, 1],
-                opacity: [0.5, 0.7, 0.5],
+                opacity: [0.4, 0.6, 0.4],
               }}
               transition={{
                 duration: 3,
