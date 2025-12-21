@@ -136,13 +136,21 @@ export interface GalleryImage {
   display_order: number | null;
   event_id: string | null;
   image_url: string;
-  metadata: Json;
+  metadata: {
+    size?: number;
+    width?: number;
+    height?: number;
+    mime_type?: string;
+    format?: string;
+    [key: string]: any;
+  };
   partner_id?: string | null;
   status?: string;
   tags?: string[];
   thumbnail_url?: string | null;
   title: string;
   updated_at: string | null;
+  storage_path?: string | null;
 }
 
 // EventArtist - app-specific, not direct Supabase table

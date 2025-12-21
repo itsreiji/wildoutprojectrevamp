@@ -24,6 +24,7 @@ export {
   enhancedAuditLogger,
   userRegistrationWorkflow,
   eventCreationWorkflow,
+  enhancedEmailProcessor,
   maintenanceWorkflow,
   inngestIntegrations,
 } from './integrations';

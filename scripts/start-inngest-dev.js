@@ -1,124 +1,119 @@
 #!/usr/bin/env node
-/**
- * Development script to start Inngest alongside Vite
- * This script helps you run the Inngest dev server for local development
- */
 
-const { spawn } = require('child_process');
+import { spawn } from 'child_process';
+import { createServer } from 'http';
+import { setTimeout } from 'timers';
+import { fetch } from 'undici';
 
-console.log('🚀 Starting Inngest Development Environment...\n');
+const PORT = 8288;
+const VITE_URL = 'http://localhost:5173/api/inngest';
 
-// Check if Inngest CLI is installed
-const checkInngest = () => {
+console.log('🚀 Starting Inngest Dev Server...');
+
+// Function to check if a port is available
+function isPortAvailable(port) {
   return new Promise((resolve) => {
-    const check = spawn('npx', ['inngest', '--version'], {
-      stdio: 'pipe',
-      shell: true
+    const server = createServer();
+    server.once('error', () => resolve(false));
+    server.once('listening', () => {
+      server.close();
+      resolve(true);
     });
-
-    let output = '';
-    check.stdout.on('data', (data) => output += data.toString());
-    check.stderr.on('data', (data) => output += data.toString());
-
-    check.on('close', (code) => {
-      resolve(code === 0);
-    });
+    server.listen(port);
   });
-};
+}
 
-// Start Inngest dev server
-const startInngest = () => {
-  console.log('📦 Starting Inngest dev server on http://127.0.0.1:8288');
+// Function to wait for a URL to be available
+function waitForUrl(url, maxAttempts = 30) {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
 
-  const inngestProcess = spawn('npx', ['inngest', 'dev', '-u', 'http://localhost:5173'], {
-    stdio: 'inherit',
+    const check = async () => {
+      attempts++;
+      try {
+        const response = await fetch(url);
+        if (response.ok) {
+          console.log(`✅ ${url} is ready`);
+          resolve(true);
+          return;
+        }
+      } catch {
+        // URL not ready yet
+      }
+
+      if (attempts >= maxAttempts) {
+        reject(new Error(`Timeout waiting for ${url}`));
+        return;
+      }
+
+      setTimeout(check, 1000);
+    };
+
+    check();
+  });
+}
+
+async function main() {
+  // Check if port is available
+  const portAvailable = await isPortAvailable(PORT);
+  if (!portAvailable) {
+    console.log(`⚠️  Port ${PORT} is already in use. Trying to stop existing process...`);
+    // You might want to add logic to kill the existing process here
+    console.log('Please stop any existing Inngest dev server and try again.');
+    process.exit(1);
+  }
+
+  // Start the Inngest dev server
+  // Use npx with the latest version
+  const inngestProcess = spawn('npx', [
+    'inngest-cli@latest',
+    'dev',
+    '-u',
+    VITE_URL,
+    '--port',
+    PORT.toString(),
+  ], {
+    stdio: 'pipe',
     shell: true,
-    env: { ...process.env, PORT: '8288' }
+  });
+
+  // Handle process output
+  inngestProcess.stdout.on('data', (data) => {
+    const output = data.toString();
+    if (output.includes('Inngest dev server running')) {
+      console.log('✅ Inngest dev server started successfully');
+    }
+    if (output.includes('error') || output.includes('Error')) {
+      console.error('❌ Error:', output);
+    }
+    process.stdout.write(output);
+  });
+
+  inngestProcess.stderr.on('data', (data) => {
+    console.error('STDERR:', data.toString());
+  });
+
+  inngestProcess.on('close', (code) => {
+    console.log(`Inngest dev server exited with code ${code}`);
+    process.exit(code);
   });
 
   inngestProcess.on('error', (error) => {
-    console.error('❌ Failed to start Inngest:', error.message);
+    console.error('Failed to start Inngest dev server:', error);
+    process.exit(1);
   });
 
-  return inngestProcess;
-};
-
-// Start Vite dev server
-const startVite = () => {
-  console.log('🌐 Starting Vite dev server on http://localhost:5173');
-
-  const viteProcess = spawn('npm', ['run', 'dev'], {
-    stdio: 'inherit',
-    shell: true
-  });
-
-  viteProcess.on('error', (error) => {
-    console.error('❌ Failed to start Vite:', error.message);
-  });
-
-  return viteProcess;
-};
-
-// Main execution
-async function main() {
-  const hasInngest = await checkInngest();
-
-  if (!hasInngest) {
-    console.log('⚠️  Inngest CLI not found. Installing...');
-    const install = spawn('npm', ['install', '-g', 'inngest@latest'], {
-      stdio: 'inherit',
-      shell: true
-    });
-
-    install.on('close', async (code) => {
-      if (code === 0) {
-        console.log('✅ Inngest CLI installed successfully\n');
-        startServers();
-      } else {
-        console.error('❌ Failed to install Inngest CLI');
-        process.exit(1);
-      }
-    });
-  } else {
-    startServers();
+  // Wait for the server to be ready
+  try {
+    await waitForUrl(`http://localhost:${PORT}`, 30);
+    console.log(`🎉 Inngest dev server is running at http://localhost:${PORT}`);
+    console.log(`🔗 Inngest API: ${VITE_URL}`);
+    console.log('📋 Check the dashboard at http://localhost:8288');
+  } catch (error) {
+    console.error('❌ Failed to start Inngest dev server:', error.message);
+    inngestProcess.kill();
+    process.exit(1);
   }
-}
-
-function startServers() {
-  console.log('\n📝 Configuration:');
-  console.log('   - Vite: http://localhost:5173');
-  console.log('   - Inngest Dev Server: http://127.0.0.1:8288');
-  console.log('   - Inngest API: http://localhost:5173/api/inngest (proxied to dev server)');
-  console.log('\n🔧 Make sure your .env file has:');
-  console.log('   VITE_INNGEST_DEV_SERVER_URL=http://localhost:5173');
-  console.log('   INNGEST_DEV_SERVER_URL=http://127.0.0.1:8288');
-  console.log('\nPress Ctrl+C to stop all servers\n');
-
-  const inngest = startInngest();
-  const vite = startVite();
-
-  // Handle cleanup
-  process.on('SIGINT', () => {
-    console.log('\n🛑 Shutting down servers...');
-    inngest.kill();
-    vite.kill();
-    process.exit(0);
-  });
-
-  // Restart servers if they crash
-  inngest.on('exit', (code) => {
-    if (code !== 0) {
-      console.log('⚠️  Inngest server crashed, restarting...');
-      setTimeout(() => startServers(), 2000);
-    }
-  });
-
-  vite.on('exit', (code) => {
-    if (code !== 0) {
-      console.log('⚠️  Vite server crashed, restarting...');
-      setTimeout(() => startServers(), 2000);
-    }
-  });
 }
 
 main().catch(console.error);

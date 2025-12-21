@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useCallback } from 'react';
+import React, { useState, useEffect, memo, useCallback, Suspense } from 'react';
 import {
   DashboardAbout,
   DashboardEvents,
@@ -155,7 +155,11 @@ const RouterComponent = memo(function RouterComponent({ routes }: RouterProps) {
 
   const RouteComponent = findMatchingRoute(currentPath, routes) || routes['/404'];
 
-  return RouteComponent ? React.createElement(RouteComponent) : null;
+  return RouteComponent ? (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>}>
+      {React.createElement(RouteComponent)}
+    </Suspense>
+  ) : null;
 });
 
 export const Router = RouterComponent;

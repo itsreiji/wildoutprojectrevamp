@@ -53,6 +53,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
@@ -72,6 +73,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { DashboardEventForm, type EventFormValues } from "./DashboardEventForm";
+import { H2, BodyText, SmallText } from "../ui/typography";
 
 /**
  * DashboardEvents component for managing event CRUD operations
@@ -481,20 +483,20 @@ export const DashboardEvents = () => {
     >
       <div className="flex flex-col space-y-4">
         <div id="admin-events-header">
-          <h2
-            className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent"
-            data-testid="events-page-title"
-            id="admin-events-title"
-          >
-            Event Management
-          </h2>
-          <p
+          <H2
+              gradient="from-white via-[#E93370] to-white"
+              data-testid="events-page-title"
+              id="admin-events-title"
+            >
+              Event Management
+            </H2>
+          <BodyText
             className="text-white/60"
             data-testid="events-page-subtitle"
             id="admin-events-subtitle"
           >
             Create and manage events - changes sync to landing page instantly
-          </p>
+          </BodyText>
         </div>
 
         {/* Header with Bulk Actions */}
@@ -747,12 +749,12 @@ export const DashboardEvents = () => {
                         {event.title || "Untitled Event"}
                       </span>
                       {event.description && (
-                        <span
-                          className="text-xs text-white/60 mt-1 line-clamp-2"
+                        <SmallText
+                          className="text-white/60 mt-1 line-clamp-2"
                           data-testid={`events-event-description-${event.id}`}
                         >
                           {event.description}
-                        </span>
+                        </SmallText>
                       )}
                     </div>
                   </TableCell>
@@ -766,8 +768,8 @@ export const DashboardEvents = () => {
                         data-testid="events-date-icon"
                       />
                       <div>
-                        <div
-                          className="text-sm text-white"
+                        <SmallText
+                          className="text-white"
                           data-testid={`events-event-date-${event.id}`}
                         >
                           {event.start_date
@@ -780,9 +782,9 @@ export const DashboardEvents = () => {
                                 }
                               )
                             : "No date"}
-                        </div>
-                        <div
-                          className="text-xs text-white/60"
+                        </SmallText>
+                        <SmallText
+                          className="text-white/60"
                           data-testid={`events-event-time-${event.id}`}
                         >
                           {(() => {
@@ -808,7 +810,7 @@ export const DashboardEvents = () => {
                               : "";
                             return startTime + (endTime ? ` - ${endTime}` : "");
                           })()}
-                        </div>
+                        </SmallText>
                       </div>
                     </div>
                   </TableCell>
@@ -821,25 +823,25 @@ export const DashboardEvents = () => {
                         className="h-4 w-4 text-white/60 flex-shrink-0"
                         data-testid="events-venue-icon"
                       />
-                      <span
-                        className="text-sm text-white"
+                      <SmallText
+                        className="text-white"
                         data-testid={`events-event-location-${event.id}`}
                       >
                         {event.location || "No location"}
-                      </span>
+                      </SmallText>
                     </div>
                   </TableCell>
                   <TableCell
                     className="w-32 px-4 py-3"
                     data-testid={`events-event-category-cell-${event.id}`}
                   >
-                    <StatusBadge
-                      status="update"
-                      showDot={false}
+                    <Badge
+                      variant="category"
+                      size="sm"
                       className={cn(getCategoryBadgeColor(event.category || ""), "border-0 shadow-none")}
                     >
                       {event.category || "UNCATEGORIZED"}
-                    </StatusBadge>
+                    </Badge>
                   </TableCell>
                   <TableCell
                     className="w-36 px-4 py-3"
@@ -850,12 +852,12 @@ export const DashboardEvents = () => {
                         className="h-4 w-4 text-white/60 flex-shrink-0"
                         data-testid="events-attendance-icon"
                       />
-                      <span
-                        className="text-sm text-white"
+                      <SmallText
+                        className="text-white"
                         data-testid={`events-event-attendance-${event.id}`}
                       >
                         {event.attendees || "0"} / {event.capacity || "∞"}
-                      </span>
+                      </SmallText>
                     </div>
                   </TableCell>
                   <TableCell
@@ -923,8 +925,8 @@ export const DashboardEvents = () => {
           className="flex items-center justify-between px-4 py-3 border-t border-white/10"
           id="dashboard-events-pagination"
         >
-          <div
-            className="text-sm text-white/60"
+          <SmallText
+            className="text-white/60"
             id="dashboard-events-pagination-info"
           >
             Showing{" "}
@@ -952,7 +954,7 @@ export const DashboardEvents = () => {
               {filteredEvents.length}
             </span>{" "}
             events
-          </div>
+          </SmallText>
           <div
             className="flex items-center space-x-2"
             id="dashboard-events-pagination-controls"

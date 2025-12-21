@@ -76,7 +76,7 @@ const TeamMemberModal = ({
             className="text-xl font-bold text-white flex items-center gap-2 p-4 pb-2 border-b border-white/10"
             id="team-member-edit-dialog-title"
           >
-            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
+            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse" aria-hidden="true"></div>
             {member ? "Edit Team Member" : "Add Team Member"}
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -219,13 +219,14 @@ const TeamMemberModal = ({
       <DialogContent
         className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0"
         id="team-member-view-dialog"
+        aria-labelledby="team-member-view-dialog-title"
       >
         <DialogTitle
           className="text-xl font-bold text-white flex items-center gap-2 p-4 pb-2 border-b border-white/10"
           id="team-member-view-dialog-title"
         >
-          <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
-          Team Member Profile
+          <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse" aria-hidden="true"></div>
+          Team Member Profile: {member.name}
         </DialogTitle>
         <DialogDescription className="sr-only">
           Detailed profile information for {member.name}
@@ -234,14 +235,11 @@ const TeamMemberModal = ({
         <div className="flex-1 overflow-y-auto wildout-scrollbar p-8 space-y-8">
           {/* Avatar & Header */}
           <div className="flex flex-col items-center text-center space-y-4">
-            <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#E93370]/30 shadow-2xl shadow-[#E93370]/10">
+            <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-[#E93370]/30 shadow-2xl shadow-[#E93370]/10" aria-hidden="true">
               <ImageWithFallback
-                alt={member.name}
+                alt=""
                 className="w-full h-full object-cover"
-                src={
-                  member.avatar_url ||
-                  "https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400"
-                }
+                src={member.avatar_url || photoUrlLink}
               />
             </div>
             <div>
@@ -249,7 +247,7 @@ const TeamMemberModal = ({
                 {member.name}
               </h2>
               {member.title && (
-                <p className="text-[#E93370] font-medium tracking-wide uppercase text-sm">
+                <p className="text-[#E93370] font-semibold tracking-wide uppercase text-sm">
                   {member.title}
                 </p>
               )}

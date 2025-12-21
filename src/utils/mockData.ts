@@ -10,15 +10,15 @@ import type {
 
 export const MOCK_HERO: HeroContent = {
   id: 'mock-hero',
-  title: 'Welcome to WildOut!',
-  subtitle: 'The Ultimate Event Experience',
-  description: 'Join us for the most exciting events in the city. Experience the wild side of entertainment.',
+  title: 'Elevate Your Nightlife Experience',
+  subtitle: 'The Premier Event Discovery Platform in Indonesia',
+  description: 'Uncover the most exclusive gatherings, high-energy festivals, and underground creative scenes. Join the community redefining how we celebrate.',
   stats: {
-    events: '50+',
-    members: '10k+',
-    partners: '20+'
+    events: '150+',
+    members: '25k+',
+    partners: '45+'
   },
-  cta_text: 'Explore Events',
+  cta_text: 'Discover Events',
   cta_link: '/events',
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
@@ -27,16 +27,18 @@ export const MOCK_HERO: HeroContent = {
 
 export const MOCK_ABOUT: AboutContent = {
   id: 'mock-about',
-  title: 'Our Story',
-  subtitle: 'Passion for Events',
+  title: 'The WildOut! Story',
+  subtitle: 'Pioneering Creative Connections',
   founded_year: '2020',
   story: [
-    'WildOut! started with a simple idea: to bring people together through unforgettable experiences.',
-    'Over the years, we have grown into a leading event management platform, connecting thousands of people with the best events in town.'
+    'WildOut! was born from a singular vision: to bridge the gap between Indonesia\'s vibrant creative talent and the audiences that crave authentic experiences.',
+    'What started as a niche community has evolved into a comprehensive ecosystem that empowers artists, event organizers, and attendees to connect in meaningful ways.'
   ],
   features: [
-    { title: 'Exclusive Access', description: 'Get access to members-only events and early bird tickets.' },
-    { title: 'Curated Experiences', description: 'We hand-pick the best events to ensure a high-quality experience.' }
+    { title: 'VIP Access', description: 'Unlock exclusive entry to members-only showcases and priority ticket reservations.' },
+    { title: 'Expertly Curated', description: 'Our team hand-picks every experience to ensure the highest standards of production and creativity.' },
+    { title: 'Secure Ticketing', description: 'Seamless, fraud-proof digital ticketing for a worry-free entry experience every time.' },
+    { title: 'Global Community', description: 'Connect with a diverse network of trendsetters and creative enthusiasts from across the region.' }
   ],
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
@@ -46,15 +48,15 @@ export const MOCK_ABOUT: AboutContent = {
 export const MOCK_SETTINGS: SiteSettings = {
   id: 'mock-settings',
   site_name: 'WildOut!',
-  site_description: 'The Ultimate Event Experience Platform',
-  tagline: 'Stay Wild, Stay Connected',
-  email: 'hello@wildoutproject.com',
-  phone: '+1 (555) 123-4567',
-  address: '123 Event Street, Cityville, ST 12345',
+  site_description: 'Indonesia\'s Leading Creative Event & Lifestyle Platform',
+  tagline: 'Stay Wild, Stay Inspired',
+  email: 'connect@wildoutproject.com',
+  phone: '+62 21 5088 0123',
+  address: 'Jakarta Creative Hub, Central Jakarta, Indonesia',
   social_media: {
-    instagram: 'https://instagram.com/wildout',
-    twitter: 'https://twitter.com/wildout',
-    facebook: 'https://facebook.com/wildout'
+    instagram: 'https://instagram.com/wildout.project',
+    twitter: 'https://twitter.com/wildoutproject',
+    facebook: 'https://facebook.com/wildoutproject'
   },
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),

@@ -16,41 +16,40 @@ export const LandingPage = React.memo(() => {
 
   if (loading) {
     return (
-      <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden" id="landing-page-container">
+      <div 
+        className="relative min-h-screen bg-background text-foreground overflow-x-hidden" 
+        id="landing-page-container"
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <span className="sr-only">Loading page content...</span>
+        {/* Background remains for continuity */}
         <Background3D />
         <Navigation />
-        <div className="relative z-10">
-          {/* Hero Section Skeleton */}
-          <div className="px-4 py-20">
-            <div className="container mx-auto max-w-7xl">
-              <Skeleton className="h-16 w-3/4 mb-6 rounded-xl" />
-              <Skeleton className="h-8 w-1/2 mb-8 rounded-xl" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-                <Skeleton className="h-20 rounded-xl" />
-                <Skeleton className="h-20 rounded-xl" />
-                <Skeleton className="h-20 rounded-xl" />
-                <Skeleton className="h-20 rounded-xl" />
+        
+        <div className="relative z-10 pt-20">
+          {/* Hero Skeleton */}
+          <div className="min-h-[80vh] flex items-center justify-center px-4" aria-hidden="true">
+            <div className="w-full max-w-4xl space-y-8 text-center">
+              <Skeleton className="h-24 md:h-32 w-3/4 mx-auto rounded-xl" />
+              <Skeleton className="h-6 md:h-8 w-1/2 mx-auto rounded-xl" />
+              <div className="flex justify-center gap-4">
+                <Skeleton className="h-12 w-32 rounded-xl" />
+                <Skeleton className="h-12 w-32 rounded-xl" />
               </div>
-              <Skeleton className="h-12 w-48 rounded-xl" />
             </div>
           </div>
 
           {/* Events Section Skeleton */}
-          <div className="px-4 py-20">
+          <div className="px-4 py-20" aria-hidden="true">
             <div className="container mx-auto max-w-7xl">
-              <Skeleton className="h-12 w-1/3 mb-6 rounded-xl mx-auto" />
-              <Skeleton className="h-6 w-1/2 mb-8 rounded-xl mx-auto" />
+              <Skeleton className="h-12 w-1/3 mb-12 rounded-xl mx-auto" />
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="space-y-4">
                     <Skeleton className="h-48 rounded-xl" />
                     <Skeleton className="h-6 w-3/4 rounded-xl" />
                     <Skeleton className="h-4 w-1/2 rounded-xl" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-1/3 rounded-xl" />
-                      <Skeleton className="h-4 w-1/4 rounded-xl" />
-                      <Skeleton className="h-4 w-1/5 rounded-xl" />
-                    </div>
                   </div>
                 ))}
               </div>

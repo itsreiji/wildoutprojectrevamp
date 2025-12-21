@@ -40,7 +40,7 @@ function DropdownMenuContent({
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         className={cn(
-          "bg-[#0a0a0a]/95 backdrop-blur-xl text-white data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[100] max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-white/20 p-1 shadow-[0_10px_40px_rgba(0,0,0,0.7)]",
+          "bg-[#0a0a0a] text-white data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[100] max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-[#1a1a1a] p-1 shadow-[0_10px_40px_rgba(0,0,0,0.7)]",
           className
         )}
         data-slot="dropdown-menu-content"

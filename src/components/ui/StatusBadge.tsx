@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+import { Badge } from "./badge";
 
 export type StatusType =
   | "active"
@@ -14,10 +14,15 @@ export type StatusType =
   | "operational"
   | "insert"
   | "update"
-  | "delete";
+  | "delete"
+  | "brand"
+  | "new"
+  | "completed_modern";
 
 interface StatusBadgeProps {
   status: string | StatusType;
+  variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "error" | "info" | "category" | "brand" | "completed";
+  size?: "xs" | "sm" | "md" | "lg";
   className?: string;
   icon?: React.ReactNode;
   showDot?: boolean;
@@ -25,84 +30,82 @@ interface StatusBadgeProps {
   id?: string;
 }
 
+/**
+ * Standardized StatusBadge Component
+ * Uses the standardized Badge component for consistent styling
+ */
 export const StatusBadge: React.FC<StatusBadgeProps> = ({
   status,
+  variant,
+  size = "md",
   className,
   icon,
   showDot = true,
   children,
   id
 }) => {
-  const getStatusStyles = (statusStr: string) => {
+  const getStatusConfig = (statusStr: string) => {
     const s = statusStr.toLowerCase();
     switch (s) {
+      case "brand":
+      case "new":
+        return {
+          variant: "brand" as const,
+          label: s.toUpperCase(),
+        };
       case "active":
       case "published":
       case "operational":
       case "ongoing":
       case "insert":
         return {
-          container: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 shadow-[0_0_8px_rgba(16,185,129,0.1)]",
-          dot: "bg-emerald-500",
-          label: s === "operational" ? "OPERATIONAL" : s.toUpperCase(),
+          variant: "success" as const,
+          label: s.toUpperCase(),
         };
       case "upcoming":
       case "update":
         return {
-          container: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-          dot: "bg-blue-500",
+          variant: "info" as const,
           label: s.toUpperCase(),
         };
       case "inactive":
       case "draft":
       case "archived":
         return {
-          container: "bg-white/5 text-white/40 border-white/10",
-          dot: "bg-white/20",
+          variant: "outline" as const,
           label: s.toUpperCase(),
         };
       case "cancelled":
       case "delete":
         return {
-          container: "bg-red-500/10 text-red-400 border-red-500/20",
-          dot: "bg-red-500",
+          variant: "error" as const,
           label: s.toUpperCase(),
         };
       case "completed":
         return {
-          container: "bg-gray-500/10 text-gray-400 border-gray-500/20",
-          dot: "bg-gray-500",
+          variant: "completed" as const,
           label: "COMPLETED",
         };
       default:
         return {
-          container: "bg-white/5 text-white/60 border-white/10",
-          dot: "bg-white/40",
+          variant: "category" as const,
           label: s.toUpperCase(),
         };
     }
   };
 
-  const styles = getStatusStyles(status);
+  const config = getStatusConfig(status);
 
   return (
-    <div
+    <Badge
+      variant={variant || config.variant}
+      size={size}
+      className={className}
+      dot={showDot}
+      icon={icon}
       id={id}
-      className={cn(
-        "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-2xs font-bold tracking-wider transition-all duration-300",
-        styles.container,
-        className
-      )}
     >
-      {icon ? (
-        icon
-      ) : showDot ? (
-        <span className="relative flex h-2 w-2 mr-0.5">
-          <span className={cn("animate-ping absolute inline-flex h-full w-full rounded-full opacity-75", styles.dot)} />
-          <span className={cn("relative inline-flex rounded-full h-2 w-2", styles.dot)} />
-        </span>
-      ) : null}
-      {children || styles.label}
-    </div>
+      {children || config.label}
+    </Badge>
   );
 };

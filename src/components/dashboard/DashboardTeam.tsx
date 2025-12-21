@@ -40,10 +40,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { StatusBadge } from "../ui/StatusBadge";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
+import { H2, H3, BodyText, SmallText } from "../ui/typography";
 import { DashboardTeamForm, type TeamFormValues } from "./DashboardTeamForm";
 // member.avatar_url → member.photoUrl || member.avatar_url
 
@@ -280,12 +280,12 @@ export const DashboardTeam = React.memo(() => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
+          <H2 gradient="from-white via-[#E93370] to-white">
             Team Management
-          </h2>
-          <p className="text-white/60">
+          </H2>
+          <BodyText className="text-white/60">
             Manage your team members - changes sync to landing page instantly
-          </p>
+          </BodyText>
         </div>
         <Button
           className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
@@ -337,18 +337,17 @@ export const DashboardTeam = React.memo(() => {
                   </div>
                 )}
               </div>
-              <StatusBadge status={member.status || "active"} />
             </div>
 
             {/* Info */}
             <div className="mb-4">
-              <h3 className="text-xl text-white mb-1">{member.name}</h3>
-              <p className="text-sm text-[#E93370]">{member.title}</p>
+              <H3 className="text-white mb-1">{member.name}</H3>
+              <SmallText className="text-[#E93370]">{member.title}</SmallText>
             </div>
 
-            <p className="text-sm text-white/60 mb-4 line-clamp-2">
+            <SmallText className="text-white/60 mb-4 line-clamp-2">
               {member.bio}
-            </p>
+            </SmallText>
 
             {/* Contact */}
             <div className="space-y-2 mb-4">

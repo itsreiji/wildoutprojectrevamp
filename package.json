@@ -78,6 +78,7 @@
     "@vitest/ui": "^4.0.15",
     "autoprefixer": "^10.4.23",
     "clsx": "*",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -105,9 +106,9 @@
     "lint": "eslint . --max-warnings=0",
     "verify:typography": "tsx scripts/verify-typography.ts",
     "inngest:dev": "node scripts/start-inngest-dev.js",
-    "inngest:server": "npx inngest dev -u http://localhost:5173",
-    "dev:full": "concurrently \"npm run inngest:server\" \"npm run dev\"",
-    "dev:inngest": "concurrently \"npx inngest dev -u http://localhost:5173\" \"vite\""
+    "inngest:server": "node scripts/start-inngest-dev.js",
+    "dev:full": "concurrently \"npm run inngest:dev\" \"npm run dev\"",
+    "dev:inngest": "concurrently \"node scripts/start-inngest-dev.js\" \"vite\""
   },
   "packageManager": "pnpm@10.26.0"
 }

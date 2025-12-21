@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
+import { Camera } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import {
   Select,
@@ -8,15 +9,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import { H2, BodyText, SmallText } from './ui/typography';
 import { useContent } from '../contexts/ContentContext';
 
 const SPAN_PATTERNS = [
-  'col-span-2 row-span-2',
-  'col-span-1 row-span-1',
-  'col-span-1 row-span-1',
-  'col-span-1 row-span-2',
-  'col-span-1 row-span-1',
-  'col-span-2 row-span-1',
+  'md:col-span-2 md:row-span-2',
+  'md:col-span-1 md:row-span-1',
+  'md:col-span-1 md:row-span-1',
+  'md:col-span-1 md:row-span-2',
+  'md:col-span-1 md:row-span-1',
+  'md:col-span-2 md:row-span-1',
 ];
 
 export const GallerySection = React.memo(() => {
@@ -32,30 +34,40 @@ export const GallerySection = React.memo(() => {
 
   const displayImages = filteredGallery.slice(0, 6);
   return (
-    <section className="relative py-20 px-4" id="gallery-section">
+    <section className="relative py-32 px-4 overflow-hidden" id="gallery-section">
       <div className="container mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-20"
           initial={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
           whileInView={{ opacity: 1, y: 0 }}
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 tracking-normal">
-            <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
-              Photo Moments
-            </span>
-          </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E93370]/10 border border-[#E93370]/20 text-[#E93370] text-xs font-medium mb-6 uppercase tracking-wider"
+          >
+            <Camera className="w-3 h-3" />
+            <span>Visual Journey</span>
+          </motion.div>
+          <H2 gradient="from-white via-[#E93370] to-white" className="mb-6">
+            Photo Moments
+          </H2>
+          <BodyText className="text-white/60 max-w-2xl mx-auto">
             Capturing unforgettable memories from our events and community gatherings
-          </p>
+          </BodyText>
         </motion.div>
 
         {/* Event Filter */}
         <div className="flex justify-center mb-8">
           <Select value={selectedEventId} onValueChange={setSelectedEventId}>
-            <SelectTrigger className="w-[280px] bg-white/5 border-white/20 text-white">
+            <SelectTrigger
+              className="w-full max-w-[280px] bg-white/5 border-white/20 text-white"
+              aria-label="Filter gallery by event"
+            >
               <SelectValue placeholder="Filter by event (optional)" />
             </SelectTrigger>
             <SelectContent position="popper" className="bg-black/95 border-white/10 text-white">
@@ -70,15 +82,18 @@ export const GallerySection = React.memo(() => {
         </div>
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[250px] md:auto-rows-[200px]">
           {displayImages.map((image, index) => (
             <motion.div
               key={index}
-              className={`${SPAN_PATTERNS[index % SPAN_PATTERNS.length]} group relative overflow-hidden rounded-2xl`}
+              className={`${SPAN_PATTERNS[index % SPAN_PATTERNS.length]} group relative overflow-hidden rounded-2xl h-[250px] md:h-auto focus:outline-none`}
               initial={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
               viewport={{ once: true }}
               whileInView={{ opacity: 1, scale: 1 }}
+              role="article"
+              tabIndex={0}
+              aria-label={`Gallery photo: ${image.title || image.description || 'Moment'}`}
             >
               <div className="relative w-full h-full">
                 <ImageWithFallback
@@ -90,9 +105,9 @@ export const GallerySection = React.memo(() => {
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-4 left-4 right-4">
-                    <p className="text-white text-sm">{image.title || image.description || ''}</p>
+                    <SmallText className="text-white">{image.title || image.description || ''}</SmallText>
                     {image.event_id && events.find(e => e.id === image.event_id) && (
-                      <p className="text-white/60 text-xs mt-1">{events.find(e => e.id === image.event_id)?.title}</p>
+                      <SmallText className="text-white/60 mt-1">{events.find(e => e.id === image.event_id)?.title}</SmallText>
                     )}
                   </div>
                 </div>
@@ -112,9 +127,9 @@ export const GallerySection = React.memo(() => {
           viewport={{ once: true }}
           whileInView={{ opacity: 1, y: 0 }}
         >
-          <p className="text-white/60 mb-4">
+          <BodyText className="text-white/60 mb-4">
             Want to see more? Follow us on social media for daily updates
-          </p>
+          </BodyText>
           <div className="flex justify-center gap-4">
             {socialMedia.instagram && (
               <a

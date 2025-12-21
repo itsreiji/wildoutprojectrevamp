@@ -1,29 +1,34 @@
 import React from "react";
 import { cn } from "./utils";
+import { Badge as StandardBadge } from "./badge";
 
 /**
- * Badge Component
- * Enhanced badge variants for notifications, status indicators, and labels
+ * Enhanced Badge Components (Legacy - Deprecated)
+ * These components are maintained for backward compatibility but should use the standardized Badge component
+ * @deprecated Use the standardized Badge component from ./badge instead
  */
 
-interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+interface LegacyBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: "count" | "status" | "new" | "pill";
   color?: "blue" | "green" | "red" | "purple" | "yellow" | "gray";
   children: React.ReactNode;
 }
 
+/**
+ * @deprecated Use Badge component with variant="category" and appropriate color classes
+ */
 export const Badge = React.memo(
-  ({ variant = "count", color = "blue", className, children, ...props }: BadgeProps) => {
-    const baseStyles = "inline-flex items-center justify-center font-medium transition-colors";
-    
-    const variantStyles = {
-      count: "text-xs px-2 py-0.5 rounded-full",
-      status: "text-xs px-2 py-1 rounded-full",
-      new: "text-xs font-bold px-2 py-0.5 rounded-full uppercase",
-      pill: "text-xs px-3 py-1 rounded-xl",
+  ({ variant = "count", color = "blue", className, children, ...props }: LegacyBadgeProps) => {
+    // Map legacy variants to standardized badge variants
+    const variantMap: Record<string, any> = {
+      count: { variant: "count", size: "sm" },
+      status: { variant: "secondary", size: "sm" },
+      new: { variant: "category", size: "sm" },
+      pill: { variant: "category", size: "md", rounded: "lg" },
     };
 
-    const colorStyles = {
+    // Map legacy colors to standardized color classes
+    const colorClassMap: Record<string, string> = {
       blue: "bg-blue-500 text-white",
       green: "bg-green-500 text-white",
       red: "bg-red-500 text-white",
@@ -32,18 +37,19 @@ export const Badge = React.memo(
       gray: "bg-gray-500 text-white",
     };
 
+    const mappedVariant = variantMap[variant];
+    const colorClass = colorClassMap[color];
+
     return (
-      <span
-        className={cn(
-          baseStyles,
-          variantStyles[variant],
-          colorStyles[color],
-          className
-        )}
+      <StandardBadge
+        variant={mappedVariant.variant}
+        size={mappedVariant.size}
+        rounded={mappedVariant.rounded || "full"}
+        className={cn(colorClass, className)}
         {...props}
       >
         {children}
-      </span>
+      </StandardBadge>
     );
   }
 );
@@ -63,26 +69,29 @@ interface NotificationBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 export const NotificationBadge = React.memo(
   ({ count, max = 99, color = "red", className, ...props }: NotificationBadgeProps) => {
     const displayCount = count > max ? `${max}+` : count;
-    
-    const colorStyles = {
-      red: "bg-red-500",
-      blue: "bg-blue-500",
-      green: "bg-green-500",
+
+    // Map colors to standardized variants
+    const variantMap: Record<string, any> = {
+      red: "error",
+      blue: "info",
+      green: "success",
     };
 
     if (count === 0) return null;
 
     return (
-      <span
+      <StandardBadge
+        variant={variantMap[color]}
+        size="sm"
+        rounded="full"
         className={cn(
-          "absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 flex items-center justify-center w-5 h-5 text-xs font-bold text-white rounded-full",
-          colorStyles[color],
+          "absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 min-w-[1.25rem] h-5 px-1.5 text-[10px] font-bold flex items-center justify-center",
           className
         )}
         {...props}
       >
         {displayCount}
-      </span>
+      </StandardBadge>
     );
   }
 );
@@ -90,39 +99,37 @@ export const NotificationBadge = React.memo(
 NotificationBadge.displayName = "NotificationBadge";
 
 /**
- * StatusBadge
+ * StatusBadge (Presence)
  * Badge for online/offline/status indicators
  */
-interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+interface PresenceBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   status: "online" | "offline" | "away" | "busy";
 }
 
-export const StatusBadge = React.memo(
-  ({ status, className, ...props }: StatusBadgeProps) => {
-    const statusConfig = {
-      online: { color: "bg-green-500", label: "Online" },
-      offline: { color: "bg-gray-500", label: "Offline" },
-      away: { color: "bg-yellow-500", label: "Away" },
-      busy: { color: "bg-red-500", label: "Busy" },
+export const PresenceBadge = React.memo(
+  ({ status, className, ...props }: PresenceBadgeProps) => {
+    const statusConfig: Record<string, { variant: any; label: string }> = {
+      online: { variant: "success", label: "Online" },
+      offline: { variant: "outline", label: "Offline" },
+      away: { variant: "warning", label: "Away" },
+      busy: { variant: "error", label: "Busy" },
     };
 
     const config = statusConfig[status];
 
     return (
-      <span
-        className={cn(
-          "inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full",
-          config.color,
-          "text-white",
-          className
-        )}
+      <StandardBadge
+        variant={config.variant}
+        size="sm"
+        rounded="full"
+        dot={true}
+        className={cn("font-medium", className)}
         {...props}
       >
-        <span className={cn("w-1.5 h-1.5 rounded-full", config.color)} />
         {config.label}
-      </span>
+      </StandardBadge>
     );
   }
 );
 
-StatusBadge.displayName = "StatusBadge";
+PresenceBadge.displayName = "PresenceBadge";

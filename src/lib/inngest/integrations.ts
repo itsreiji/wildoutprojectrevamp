@@ -221,12 +221,12 @@ export const eventCreationWorkflow = inngestClient.createFunction(
 );
 
 /**
- * Batch email processor with rate limiting
+ * Enhanced batch email processor with rate limiting and monitoring
  */
-export const batchEmailProcessor = inngestClient.createFunction(
+export const enhancedEmailProcessor = inngestClient.createFunction(
   {
-    id: 'batch-email-processor',
-    name: 'Batch Email Processor',
+    id: 'enhanced-email-processor',
+    name: 'Enhanced Email Processor',
     concurrency: 5, // Limit concurrent executions
     rateLimit: {
       limit: 100, // Max 100 events per period
@@ -355,6 +355,6 @@ export const inngestIntegrations = [
   enhancedAuditLogger,
   userRegistrationWorkflow,
   eventCreationWorkflow,
-  batchEmailProcessor,
+  enhancedEmailProcessor,
   maintenanceWorkflow,
 ];

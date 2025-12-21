@@ -73,18 +73,32 @@ function SidebarProvider({
     return defaultOpen;
   });
 
+  // Ref to track last toggle time to prevent rapid multiple clicks (throttling)
+  const lastToggleTime = React.useRef<number>(0);
+  const THROTTLE_DELAY = 300; // ms
+
   // Helper to toggle the sidebar
   const toggleSidebar = React.useCallback(() => {
+    const now = Date.now();
+    if (now - lastToggleTime.current < THROTTLE_DELAY) {
+      console.log("[SidebarDebug] toggleSidebar - Throttled click ignored");
+      return;
+    }
+    lastToggleTime.current = now;
+
     // Determine mobile state directly from window if possible for maximum reliability on click
     const isMobileNow =
       typeof window !== "undefined" ? window.innerWidth < 768 : isMobile;
 
     console.log("[SidebarDebug] toggleSidebar - isMobileNow:", isMobileNow);
 
-    return isMobileNow
-      ? setOpenMobile((open: boolean) => !open)
-      : setOpen((open: boolean) => !open);
-  }, [isMobile]);
+    if (isMobileNow) {
+      setOpenMobile((prev) => !prev);
+    } else {
+      setOpen((prev) => !prev);
+      setOpenProp?.(!open);
+    }
+  }, [isMobile, open, setOpenProp]);
 
   // Sync state if openProp changes
   React.useEffect(() => {
@@ -298,22 +312,39 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar, openMobile, isMobile } = useSidebar();
+  const { toggleSidebar, openMobile, isMobile, state } = useSidebar();
+
+  const handleClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event);
+      toggleSidebar();
+    },
+    [onClick, toggleSidebar]
+  );
+
+  const isOpen = isMobile ? openMobile : state === "expanded";
 
   return (
     <Button
-      className={cn("size-7", className)}
+      className={cn(
+        "size-7 transition-all duration-200 active:scale-95",
+        className
+      )}
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       size="icon"
       variant="ghost"
-      onClick={(event) => {
-        onClick?.(event);
-        toggleSidebar();
-      }}
+      aria-expanded={isOpen}
+      aria-label={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+      title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+      onClick={handleClick}
       {...props}
     >
-      {isMobile && openMobile ? <XIcon className="size-4" /> : <Menu />}
+      {isMobile && openMobile ? (
+        <XIcon className="size-4 animate-in fade-in zoom-in duration-200" />
+      ) : (
+        <Menu className="size-4 animate-in fade-in zoom-in duration-200" />
+      )}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

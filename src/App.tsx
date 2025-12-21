@@ -1,14 +1,16 @@
 /* @refresh reset */
-import { useEffect } from "react";
+import { useEffect, lazy } from "react";
 import { AdminGuard } from "./components/admin/AdminGuard";
-import { LandingPage } from "./components/LandingPage";
-import AllEventsPage from "./components/AllEventsPage";
-import AdminDashboard from "./components/admin/AdminDashboard";
-import { LoginPage } from "./components/auth/LoginPage";
 import { Router, RouterProvider } from "./components/router";
 import { useAuth } from "./contexts/AuthContext";
-import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 import supabaseClient from "./supabase/client";
+
+// Lazy load components
+const LandingPage = lazy(() => import("./components/LandingPage").then(m => ({ default: m.LandingPage })));
+const AllEventsPage = lazy(() => import("./components/AllEventsPage"));
+const AdminDashboard = lazy(() => import("./components/admin/AdminDashboard"));
+const LoginPage = lazy(() => import("./components/auth/LoginPage").then(m => ({ default: m.LoginPage })));
+const AuthCallbackPage = lazy(() => import("./pages/AuthCallbackPage").then(m => ({ default: m.AuthCallbackPage })));
 
 // Admin dashboard component wrapped with guard
 const AdminDashboardWrapper = () => (

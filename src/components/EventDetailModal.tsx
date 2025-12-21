@@ -3,9 +3,10 @@ import { formatCurrency } from "@/utils/formatting";
 import { Calendar, Clock, Heart, MapPin, Share2, Ticket } from "lucide-react";
 import React from "react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { StatusBadge } from "./ui/StatusBadge";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
+import { H3, BodyText, SmallText } from "./ui/typography";
 
 interface EventDetailModalProps {
   event: Event | null;
@@ -29,7 +30,7 @@ export const EventDetailModal = React.memo(
             className="text-xl font-bold text-white flex items-center gap-2 p-4 pb-2 border-b border-white/10"
             id="event-detail-dialog-title"
           >
-            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
+            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse" aria-hidden="true"></div>
             Event Details: {event.title}
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -54,16 +55,16 @@ export const EventDetailModal = React.memo(
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
               <div className="absolute bottom-4 left-6">
-                <StatusBadge
-                  status="active"
-                  showDot={false}
-                  className="bg-[#E93370] text-white border-0 px-3 py-1 text-2xs uppercase font-bold tracking-wider mb-2 shadow-[0_0_12px_rgba(233,51,112,0.3)]"
+                <Badge
+                  variant="brand"
+                  size="sm"
+                  className="mb-2"
                 >
                   {event.category || "EVENT"}
-                </StatusBadge>
-                <h2 className="text-3xl font-bold text-white shadow-sm">
+                </Badge>
+                <H3 className="text-white shadow-sm">
                   {event.title}
-                </h2>
+                </H3>
               </div>
             </div>
 
@@ -73,66 +74,66 @@ export const EventDetailModal = React.memo(
                 <div className="flex items-center p-3 rounded-xl bg-white/5 border border-white/10">
                   <Calendar className="h-5 w-5 text-[#E93370] mr-3" />
                   <div>
-                    <p className="text-2xs uppercase tracking-wider text-white/40 font-bold">
+                    <SmallText className="uppercase tracking-wider text-white/40 font-bold">
                       Date
-                    </p>
-                    <p className="text-white/80 text-sm">
+                    </SmallText>
+                    <SmallText className="text-white/80">
                       {event.date
                         ? new Date(event.date).toLocaleDateString()
                         : "TBD"}
-                    </p>
+                    </SmallText>
                   </div>
                 </div>
                 <div className="flex items-center p-3 rounded-xl bg-white/5 border border-white/10">
                   <Clock className="h-5 w-5 text-[#E93370] mr-3" />
                   <div>
-                    <p className="text-2xs uppercase tracking-wider text-white/40 font-bold">
+                    <SmallText className="uppercase tracking-wider text-white/40 font-bold">
                       Time
-                    </p>
-                    <p className="text-white/80 text-sm">
+                    </SmallText>
+                    <SmallText className="text-white/80">
                       {event.time || "TBD"}
-                    </p>
+                    </SmallText>
                   </div>
                 </div>
                 <div className="flex items-center p-3 rounded-xl bg-white/5 border border-white/10">
                   <Ticket className="h-5 w-5 text-[#E93370] mr-3" />
                   <div>
-                    <p className="text-2xs uppercase tracking-wider text-white/40 font-bold">
+                    <SmallText className="uppercase tracking-wider text-white/40 font-bold">
                       Price
-                    </p>
-                    <p className="text-white/80 text-sm">
+                    </SmallText>
+                    <SmallText className="text-white/80">
                       {event.price
                         ? formatCurrency(Number(event.price))
                         : "Free"}
-                    </p>
+                    </SmallText>
                   </div>
                 </div>
               </div>
 
               {/* Description Section */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <H3 className="text-white flex items-center gap-2">
                   <span className="w-1 h-4 bg-[#E93370] rounded-full"></span>
                   About This Event
-                </h3>
-                <p className="text-white/70 leading-relaxed bg-white/5 p-6 rounded-2xl border border-white/5">
+                </H3>
+                <BodyText className="text-white/70 bg-white/5 p-6 rounded-2xl border border-white/5">
                   {event.description}
-                </p>
+                </BodyText>
               </div>
 
               {/* Venue & Location */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <H3 className="text-white flex items-center gap-2">
                   <span className="w-1 h-4 bg-[#E93370] rounded-full"></span>
                   Venue & Location
-                </h3>
+                </H3>
                 <div className="flex items-start p-4 rounded-xl bg-white/5 border border-white/10">
                   <MapPin className="h-5 w-5 text-[#E93370] mr-3 mt-1" />
                   <div>
-                    <p className="text-white font-medium">{event.venue}</p>
-                    <p className="text-sm text-white/60">
+                    <BodyText className="text-white font-medium">{event.venue}</BodyText>
+                    <SmallText className="text-white/60">
                       {event.venueAddress}
-                    </p>
+                    </SmallText>
                   </div>
                 </div>
               </div>
@@ -142,10 +143,10 @@ export const EventDetailModal = React.memo(
                 Array.isArray(event.artists) &&
                 event.artists.length > 0 && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <H3 className="text-white flex items-center gap-2">
                       <span className="w-1 h-4 bg-[#E93370] rounded-full"></span>
                       Artist Lineup
-                    </h3>
+                    </H3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {event.artists.map((artist: any, index: number) => (
                         <div
@@ -160,12 +161,12 @@ export const EventDetailModal = React.memo(
                             />
                           </div>
                           <div>
-                            <div className="text-white text-sm font-medium">
+                            <BodyText className="text-white font-medium">
                               {artist.name}
-                            </div>
-                            <div className="text-xs text-[#E93370]">
+                            </BodyText>
+                            <SmallText className="text-[#E93370]">
                               {artist.role}
-                            </div>
+                            </SmallText>
                           </div>
                         </div>
                       ))}

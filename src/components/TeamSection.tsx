@@ -1,8 +1,9 @@
-import { Mail } from "lucide-react";
+import { Mail, Users } from "lucide-react";
 import { motion } from "motion/react";
 import React from "react";
 import { useContent } from "../contexts/ContentContext";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { H2, H3, BodyText, SmallText } from "./ui/typography";
 
 import type { TeamMember } from "../types/content";
 import TeamMemberModal from "./TeamMemberModal";
@@ -25,25 +26,32 @@ export const TeamSection = React.memo(() => {
   };
 
   return (
-    <section className="relative py-20 px-4" id="team-section">
+    <section className="relative py-32 px-4 overflow-hidden" id="team-section">
       <div className="container mx-auto max-w-7xl">
         {/* Section Header */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-20"
           initial={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
           whileInView={{ opacity: 1, y: 0 }}
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 tracking-normal">
-            <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
-              Meet Our Team
-            </span>
-          </h2>
-          <p className="text-lg text-white/60 max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E93370]/10 border border-[#E93370]/20 text-[#E93370] text-xs font-medium mb-6 uppercase tracking-wider"
+          >
+            <Users className="w-3 h-3" />
+            <span>The Visionaries</span>
+          </motion.div>
+          <H2 gradient="from-white via-[#E93370] to-white" className="mb-6">
+            Meet Our Team
+          </H2>
+          <BodyText className="text-white/60 max-w-2xl mx-auto">
             The creative minds behind Indonesia's most exciting events and
             experiences
-          </p>
+          </BodyText>
         </motion.div>
 
         {/* Team Grid */}
@@ -51,12 +59,21 @@ export const TeamSection = React.memo(() => {
           {activeTeam.map((member, index) => (
             <motion.div
               key={member.id}
-              className="group cursor-pointer"
+              className="group cursor-pointer focus:outline-none"
               initial={{ opacity: 0, y: 30 }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
               viewport={{ once: true }}
               whileInView={{ opacity: 1, y: 0 }}
               onClick={() => handleMemberClick(member)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleMemberClick(member);
+                }
+              }}
+              aria-label={`View details for ${member.name}`}
             >
               <div
                 className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 h-full"
@@ -77,29 +94,29 @@ export const TeamSection = React.memo(() => {
 
                   {/* Info Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3
-                      className="text-xl text-white mb-1"
+                    <H3
+                      className="text-white mb-1"
                       id={`team-member-${member.id}-name`}
                     >
                       {member.name}
-                    </h3>
-                    <p
-                      className="text-sm text-[#E93370] mb-3"
+                    </H3>
+                    <SmallText
+                      className="text-[#E93370] mb-3"
                       id={`team-member-${member.id}-title`}
                     >
                       {member.title || ""}
-                    </p>
+                    </SmallText>
                   </div>
                 </div>
 
                 {/* Bio & Contact */}
                 <div
-                  className="p-6 space-y-4"
+                  className="p-8 space-y-4"
                   id={`team-member-${member.id}-bio`}
                 >
-                  <p className="text-sm text-white/70 line-clamp-2">
+                  <SmallText className="text-white/70 line-clamp-3 leading-relaxed">
                     {member.bio}
-                  </p>
+                  </SmallText>
 
                   <div className="space-y-3">
                     {member.email && (

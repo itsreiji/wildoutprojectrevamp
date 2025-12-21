@@ -69,10 +69,20 @@ export { Textarea } from './textarea';
 export { Switch } from './switch';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { Badge } from './badge';
+export { badgeVariants } from './badge-variants';
+export { StatusBadge } from './StatusBadge';
 export { Avatar } from './avatar';
 export { Progress } from './progress';
 export { Table, TableHeader, TableBody, TableRow, TableCell, TableHead, TableFooter } from './table';
 export { SplitProvider, SplitPanel, SplitHandle } from './split';
+
+// Typography Components
+export {
+  H1, H2, H3, H4, H5, H6,
+  LeadText, BodyText, SmallText, TinyText,
+  GradientText, MutedText, HighlightText,
+  TextAlign, TextWeight, TextTransform
+} from './typography';
 
 // Utility
 export { cn } from './utils';

@@ -26,6 +26,7 @@ import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { StatusBadge } from "../ui/StatusBadge";
+import { H2, BodyText } from "../ui/typography";
 import {
   DashboardPartnerForm,
   type PartnerFormValues,
@@ -197,15 +198,12 @@ export const DashboardPartners = () => {
         id="dashboard-partners-header"
       >
         <div id="dashboard-partners-header-content">
-          <h2
-            className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent"
-            id="dashboard-partners-title"
-          >
+          <H2 gradient="from-white via-[#E93370] to-white" id="dashboard-partners-title">
             Partner Management
-          </h2>
-          <p className="text-white/60" id="dashboard-partners-subtitle">
+          </H2>
+          <BodyText className="text-white/60" id="dashboard-partners-subtitle">
             Manage brand partnerships - changes sync to landing page instantly
-          </p>
+          </BodyText>
         </div>
         <Button
           className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"

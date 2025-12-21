@@ -64,14 +64,30 @@ const ensureStringArray = (value: Json | undefined): string[] | undefined => {
 // Fetch functions using content.ts types
 const fetchHeroContent = async (): Promise<HeroContent | null> => {
   try {
-    const { data, error } = await supabaseClient.rpc("get_hero_content");
-    if (error) {
-      console.error("Error fetching hero content:", error);
-      return null;
-    }
-    const result = (data as any)?.[0] as
+    // 1. Try RPC
+    const { data: rpcData, error: rpcError } = await supabaseClient.rpc("get_hero_content");
+
+    let result = (rpcData as any)?.[0] as
       | Database["public"]["Tables"]["hero_content"]["Row"]
       | undefined;
+
+    // 2. Try direct table query if RPC failed or returned nothing
+    if (!result || rpcError) {
+      if (rpcError) console.warn("RPC get_hero_content failed, trying direct query:", rpcError);
+
+      const { data: tableData, error: tableError } = await supabaseClient
+        .from("hero_content")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+
+      if (tableError) {
+        console.error("Direct query to hero_content failed:", tableError);
+      } else if (tableData) {
+        result = tableData;
+      }
+    }
+
     if (result) {
       return {
         id: result.id,
@@ -89,23 +105,42 @@ const fetchHeroContent = async (): Promise<HeroContent | null> => {
         updated_by: result.updated_by,
       };
     }
-    return null;
+
+    // 3. Final fallback to mock data
+    console.log("No hero content found in database, using mock data");
+    return MOCK_HERO;
   } catch (error) {
     console.error("Error in fetchHeroContent:", error);
-    return null;
+    return MOCK_HERO;
   }
 };
 
 const fetchAboutContent = async (): Promise<AboutContent | null> => {
   try {
-    const { data, error } = await supabaseClient.rpc("get_about_content");
-    if (error) {
-      console.error("Error fetching about content:", error);
-      return null;
-    }
-    const result = (data as any)?.[0] as
+    // 1. Try RPC
+    const { data: rpcData, error: rpcError } = await supabaseClient.rpc("get_about_content");
+
+    let result = (rpcData as any)?.[0] as
       | Database["public"]["Tables"]["about_content"]["Row"]
       | undefined;
+
+    // 2. Try direct table query if RPC failed or returned nothing
+    if (!result || rpcError) {
+      if (rpcError) console.warn("RPC get_about_content failed, trying direct query:", rpcError);
+
+      const { data: tableData, error: tableError } = await supabaseClient
+        .from("about_content")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+
+      if (tableError) {
+        console.error("Direct query to about_content failed:", tableError);
+      } else if (tableData) {
+        result = tableData;
+      }
+    }
+
     if (result) {
       return {
         id: result.id,
@@ -122,23 +157,42 @@ const fetchAboutContent = async (): Promise<AboutContent | null> => {
         updated_by: result.updated_by,
       };
     }
-    return null;
+
+    // 3. Final fallback to mock data
+    console.log("No about content found in database, using mock data");
+    return MOCK_ABOUT;
   } catch (error) {
     console.error("Error in fetchAboutContent:", error);
-    return null;
+    return MOCK_ABOUT;
   }
 };
 
 const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
   try {
-    const { data, error } = await supabaseClient.rpc("get_site_settings");
-    if (error) {
-      console.error("Error fetching site settings:", error);
-      return null;
-    }
-    const result = (data as any)?.[0] as
+    // 1. Try RPC
+    const { data: rpcData, error: rpcError } = await supabaseClient.rpc("get_site_settings");
+
+    let result = (rpcData as any)?.[0] as
       | Database["public"]["Tables"]["site_settings"]["Row"]
       | undefined;
+
+    // 2. Try direct table query if RPC failed or returned nothing
+    if (!result || rpcError) {
+      if (rpcError) console.warn("RPC get_site_settings failed, trying direct query:", rpcError);
+
+      const { data: tableData, error: tableError } = await supabaseClient
+        .from("site_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+
+      if (tableError) {
+        console.error("Direct query to site_settings failed:", tableError);
+      } else if (tableData) {
+        result = tableData;
+      }
+    }
+
     if (result) {
       return {
         id: result.id,
@@ -157,10 +211,13 @@ const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
         updated_by: result.updated_by,
       };
     }
-    return null;
+
+    // 3. Final fallback to mock data
+    console.log("No site settings found in database, using mock data");
+    return MOCK_SETTINGS;
   } catch (error) {
     console.error("Error in fetchSiteSettings:", error);
-    return null;
+    return MOCK_SETTINGS;
   }
 };
 

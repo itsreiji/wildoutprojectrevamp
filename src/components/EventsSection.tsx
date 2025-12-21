@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, MapPin, Clock, Users, Music, Ticket, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
-import { StatusBadge } from './ui/StatusBadge';
+import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useEvents } from '../contexts/EventsContext';
 import type { LandingEvent as Event, LandingEvent } from '@/types/content';
 import { useRouter } from "./router/RouterContext";
+import { H2, H3, BodyText, SmallText } from './ui/typography';
 
 import { Skeleton } from './ui/skeleton';
 
@@ -20,24 +21,31 @@ export const EventsSection = React.memo(() => {
 
   return (
     <>
-      <section className="relative py-20 px-4" id="events-section">
+      <section className="relative py-32 px-4 overflow-hidden" id="events-section">
         <div className="container mx-auto max-w-7xl">
           {/* Section Header */}
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-20"
             initial={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
             whileInView={{ opacity: 1, y: 0 }}
           >
-            <h2 className="text-4xl md:text-5xl lg:text-6xl mb-4 tracking-normal">
-              <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
-                Upcoming Events
-              </span>
-            </h2>
-            <p className="text-lg text-white/60 max-w-2xl mx-auto mb-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E93370]/10 border border-[#E93370]/20 text-[#E93370] text-xs font-medium mb-6 uppercase tracking-wider"
+            >
+              <Calendar className="w-3 h-3" />
+              <span>Happening Now</span>
+            </motion.div>
+            <H2 gradient="from-white via-[#E93370] to-white" className="mb-6">
+              Upcoming Events
+            </H2>
+            <BodyText className="text-white/60 max-w-2xl mx-auto mb-8">
               Discover the hottest events in Indonesia's creative scene
-            </p>
+            </BodyText>
             <Button
               className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
               id="events-view-all-button"
@@ -49,11 +57,11 @@ export const EventsSection = React.memo(() => {
           </motion.div>
 
           {/* Events Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8" id="events-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="events-grid">
             {loading ? (
               // Loading state
-              [...Array(2)].map((_, i) => (
-                <div key={i} className="space-y-4">
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="space-y-4" aria-hidden="true">
                   <Skeleton className="h-64 rounded-3xl" />
                   <div className="p-6 space-y-4">
                     <Skeleton className="h-8 w-3/4 rounded-xl" />
@@ -70,12 +78,22 @@ export const EventsSection = React.memo(() => {
               upcomingEvents.slice(0, 4).map((event, index) => (
                 <motion.div
                   key={event.id}
-                  className="group relative"
+                  className="group relative cursor-pointer focus:outline-none"
                   id={`events-item-${event.id}`}
                   initial={{ opacity: 0, y: 30 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
                   whileInView={{ opacity: 1, y: 0 }}
+                  onClick={() => setSelectedEvent(event)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedEvent(event);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`View details for event: ${event.title}`}
                 >
                   <div className="relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500" id={`events-item-${event.id}-card`}>
                     {/* Event Image */}
@@ -89,36 +107,41 @@ export const EventsSection = React.memo(() => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
                       {/* Category Badge */}
-                      <StatusBadge
-                        status="active"
-                        showDot={false}
-                        className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0 shadow-[0_0_12px_rgba(233,51,112,0.3)]"
+                      <Badge
+                        variant="category"
+                        size="sm"
+                        className="absolute top-4 left-4"
                         id={`events-item-${event.id}-category-badge`}
                       >
                         {event.category?.toUpperCase() || "EVENT"}
-                      </StatusBadge>
+                      </Badge>
 
                       {/* Capacity Indicator */}
-                      <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-xl rounded-full px-3 py-1 text-sm text-white/90" id={`events-item-${event.id}-capacity-indicator`}>
-                        <Users className="inline h-4 w-4 mr-1" />
+                      <Badge
+                        variant="category"
+                        size="sm"
+                        className="absolute top-4 right-4"
+                        id={`events-item-${event.id}-capacity-indicator`}
+                      >
+                        <Users className="inline h-3 w-3 mr-1" />
                         {event.attendees}/{event.capacity}
-                      </div>
+                      </Badge>
                     </div>
 
                     {/* Event Info */}
                     <div className="p-6 space-y-4" id={`events-item-${event.id}-info`}>
-                      <h3 className="text-2xl text-white group-hover:text-[#E93370] transition-colors duration-300" id={`events-item-${event.id}-title`}>
+                      <H3 className="text-white group-hover:text-[#E93370] transition-colors duration-300" id={`events-item-${event.id}-title`}>
                         {event.title}
-                      </h3>
+                      </H3>
 
-                      <p className="text-white/60 line-clamp-2">
+                      <BodyText className="text-white/60 line-clamp-2">
                         {event.description}
-                      </p>
+                      </BodyText>
 
                       <div className="space-y-2">
                         <div className="flex items-center text-white/70">
                           <Calendar className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span className="text-sm">
+                          <SmallText>
                             {(event as any).date ? new Date((event as any).date).toLocaleDateString('en-US', {
                               weekday: 'long',
                               year: 'numeric',
@@ -130,19 +153,19 @@ export const EventsSection = React.memo(() => {
                               month: 'long',
                               day: 'numeric',
                             }) : 'TBD'}
-                          </span>
+                          </SmallText>
                         </div>
                         <div className="flex items-center text-white/70">
                           <Clock className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span className="text-sm">{(event as any).time || (event.start_date ? new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'TBD')}</span>
+                          <SmallText>{(event as any).time || (event.start_date ? new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'TBD')}</SmallText>
                         </div>
                         <div className="flex items-center text-white/70">
                           <MapPin className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span className="text-sm">{(event as any).venue || event.location || 'TBD'}</span>
+                          <SmallText>{(event as any).venue || event.location || 'TBD'}</SmallText>
                         </div>
                         <div className="flex items-center text-white/70">
                           <Ticket className="h-4 w-4 mr-2 text-[#E93370]" />
-                          <span className="text-sm">{event.price}</span>
+                          <SmallText>{event.price}</SmallText>
                         </div>
                       </div>
 

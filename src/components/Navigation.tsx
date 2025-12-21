@@ -31,17 +31,10 @@ const NavigationComponent = () => {
   }, []);
 
   const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
-    console.log('🔵 Navigation - handleNavClick:', {
-      item,
-      currentPath,
-      isMobileMenuOpen
-    });
-
     setIsMobileMenuOpen(false);
 
     // If has hash and on landing, do hash scroll; otherwise navigate to href
     if (item.hash && currentPath === '/') {
-      console.log('🔵 Handling hash navigation:', item.hash);
       if (item.hash === '#') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
@@ -51,7 +44,6 @@ const NavigationComponent = () => {
         }
       }
     } else {
-      console.log(`🔵 Navigating to: ${item.href}`);
       navigate(item.href);
       if (item.href === '/' && item.hash && item.hash !== '#') {
         setTimeout(() => {
@@ -90,16 +82,20 @@ const NavigationComponent = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-1">
-              {NAV_ITEMS.map((item) => (
-                <Button
-                  key={item.id}
-                  className="text-white/80 hover:text-white hover:bg-white/10"
-                  variant="ghost"
-                  onClick={() => handleNavClick(item)}
-                >
-                  {item.label}
-                </Button>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                const isActive = currentPath === item.href && (!item.hash || item.hash === '#');
+                return (
+                  <Button
+                    key={item.id}
+                    className={`text-white/80 hover:text-white hover:bg-white/10 ${isActive ? 'bg-white/10 text-white' : ''}`}
+                    variant="ghost"
+                    onClick={() => handleNavClick(item)}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {item.label}
+                  </Button>
+                );
+              })}
               <ThemeToggle />
               <button
                 aria-label="Admin Dashboard"
@@ -112,8 +108,8 @@ const NavigationComponent = () => {
                   // Close mobile menu if open
                   setIsMobileMenuOpen(false);
 
-                  // Redirect to admin login page with full page reload
-                  window.location.href = '/login';
+                  // Navigate to login page
+                  navigate('/login');
                 }}
                 type="button"
               >
@@ -132,6 +128,8 @@ const NavigationComponent = () => {
               size="icon"
               variant="outline"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -169,6 +167,7 @@ const NavigationComponent = () => {
                     size="icon"
                     variant="outline"
                     onClick={() => setIsMobileMenuOpen(false)}
+                    aria-label="Close menu"
                   >
                     <X className="h-5 w-5" />
                   </Button>
@@ -205,8 +204,8 @@ const NavigationComponent = () => {
                         e.preventDefault();
                         e.stopPropagation();
                         setIsMobileMenuOpen(false);
-                        // Redirect to admin login page with full page reload
-                        window.location.href = '/login';
+                        // Navigate to login page
+                        navigate('/login');
                       }}
                       type="button"
                     >
@@ -223,7 +222,7 @@ const NavigationComponent = () => {
                 {/* Footer */}
                 <div className="p-6 border-t border-white/10">
                   <p className="text-sm text-white/60 text-center">
-                    © 2025 WildOut! All rights reserved.
+                    © {new Date().getFullYear()} WildOut! All rights reserved.
                   </p>
                 </div>
               </div>

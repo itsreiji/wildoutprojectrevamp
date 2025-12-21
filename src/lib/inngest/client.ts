@@ -1,13 +1,5 @@
 import { Inngest } from 'inngest';
 
-// Create Inngest client
-export const inngest = new Inngest({
-  id: 'wildout-project',
-  eventKey: import.meta.env.VITE_INNGEST_EVENT_KEY || import.meta.env.INNGEST_EVENT_KEY,
-  // For local development with Inngest dev server
-  baseUrl: import.meta.env.VITE_INNGEST_DEV_SERVER_URL || import.meta.env.INNGEST_DEV_SERVER_URL,
-});
-
 // Define common event types for type safety
 export type WildoutEvents = {
   'user/registered': {
@@ -30,11 +22,23 @@ export type WildoutEvents = {
     subject: string;
     body: string;
   };
+  'security/alert': {
+    type: string;
+    userId: string;
+    attempts: number;
+    timestamp: number;
+  };
+  'system/maintenance': {
+    task: string;
+  };
 };
 
-// Export typed Inngest client
-export const inngestClient = new Inngest({
+// Create Inngest client with proper configuration
+export const inngest = new Inngest({
   id: 'wildout-project',
-  eventKey: import.meta.env.VITE_INNGEST_EVENT_KEY || import.meta.env.INNGEST_EVENT_KEY,
-  baseUrl: import.meta.env.VITE_INNGEST_DEV_SERVER_URL || import.meta.env.INNGEST_DEV_SERVER_URL,
+  eventKey: import.meta.env.VITE_INNGEST_EVENT_KEY || 'dev',
+  baseUrl: import.meta.env.VITE_INNGEST_DEV_SERVER_URL || 'http://localhost:5173',
 });
+
+// Export typed Inngest client
+export const inngestClient = inngest;

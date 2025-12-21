@@ -2,11 +2,13 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { defineConfig } from 'vite';
+import { inngestApiPlugin } from './vite-inngest-simple.js';
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    inngestApiPlugin(),
   ],
   define: {
     'import.meta.vitest': 'undefined',
@@ -60,9 +62,9 @@ export default defineConfig({
   build: {
     target: 'esnext',
     outDir: 'dist',
-    sourcemap: true, // Generate source maps for better debugging
+    sourcemap: true,
     minify: 'esbuild',
-    chunkSizeWarningLimit: 1000, // Increase limit to 1000 kB
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: (id: string) => {
@@ -90,7 +92,6 @@ export default defineConfig({
         sourcemapFileNames: '[name].[hash].js.map',
       },
       onwarn: (warning, warn) => {
-        // Suppress sourcemap warnings for specific UI components
         if (warning.code === 'SOURCEMAP_ERROR' &&
             warning.id &&
             warning.id.includes('src/components/ui/')) {
@@ -111,26 +112,5 @@ export default defineConfig({
       '0.0.0.0',
       'skypiea-pc.hyakutake-in.ts.net',
     ],
-    proxy: {
-      // Proxy Inngest API requests from Vite to the Inngest dev server
-      // This allows http://localhost:5173/api/inngest to work
-      '/api/inngest': {
-        target: 'http://127.0.0.1:8288',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/inngest/, ''),
-        configure: (proxy, options) => {
-          proxy.on('error', (err, _req, res) => {
-            console.log('Proxy error:', err.message);
-            if ('writeHead' in res && typeof res.writeHead === 'function') {
-              res.writeHead(500, { 'Content-Type': 'text/plain' });
-              res.end('Inngest dev server not running. Start it with: npx inngest dev -u http://localhost:5173');
-            }
-          });
-          proxy.on('proxyReq', (_proxyReq, req, _res) => {
-            console.log('Proxying:', req.method, req.url, '->', options.target);
-          });
-        },
-      },
-    },
   },
 });

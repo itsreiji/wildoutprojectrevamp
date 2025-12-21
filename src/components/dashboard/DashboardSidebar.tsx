@@ -18,7 +18,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import logo from "figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png";
-import { StatusBadge } from "../ui/StatusBadge";
 import {
   Calendar,
   ChevronLeft,
@@ -65,16 +64,6 @@ const menuGroups: MenuGroup[] = [
     sections: ["settings", "audit"],
   },
 ];
-
-// Badge configuration for menu items (can be dynamic from API)
-const menuBadges: Record<
-  string,
-  { count?: number; label?: string; color?: "blue" | "green" | "red" }
-> = {
-  events: { count: 5, color: "blue" },
-  team: { label: "New", color: "green" },
-  audit: { count: 12, color: "red" },
-};
 
 export const DashboardSidebar = React.memo(
   ({ currentPage }: DashboardSidebarProps) => {
@@ -157,31 +146,23 @@ export const DashboardSidebar = React.memo(
       >
         {/* Sidebar Header */}
         <SidebarHeader
-          className="h-20 border-b border-white/5 px-6 flex flex-row items-center gap-4 shrink-0 bg-[#1e2129]"
+          className="h-20 border-b border-white/5 px-6 flex flex-row items-center justify-center shrink-0 bg-[#1e2129]"
           id="dashboard-sidebar-header"
         >
           {/* Logo */}
           <div
-            className="flex items-center gap-3 font-bold text-xl overflow-hidden"
+            className="flex items-center justify-center overflow-hidden h-10 md:h-12 w-full cursor-pointer transition-transform hover:scale-105 active:scale-95"
             data-testid="dashboard-logo"
             id="dashboard-logo"
+            onClick={() => navigate('/')}
           >
-            <div className="bg-[#E93370] p-1.5 rounded-lg shadow-lg shadow-[#E93370]/20">
-              <img
-                alt="WildOut Logo"
-                className="h-6 w-6 object-contain brightness-0 invert"
-                data-testid="logo-image"
-                id="logo-image"
-                src={logo}
-              />
-            </div>
-            <span
-              className="whitespace-nowrap tracking-tight text-white font-black italic"
-              data-testid="logo-text"
-              id="logo-text"
-            >
-              WILDOUT!
-            </span>
+            <img
+              alt="WildOut Logo"
+              className="h-full w-auto object-contain"
+              data-testid="logo-image"
+              id="logo-image"
+              src={logo}
+            />
           </div>
         </SidebarHeader>
 
@@ -202,7 +183,6 @@ export const DashboardSidebar = React.memo(
                 {group.sections.map((section) => {
                   const Icon = iconMap[section.icon] || LayoutDashboard;
                   const isActive = currentPage === section.slug;
-                  const badge = menuBadges[section.slug];
 
                   return (
                     <SidebarMenuItem
@@ -244,17 +224,6 @@ export const DashboardSidebar = React.memo(
                         >
                           {section.label}
                         </span>
-
-                        {/* Badge - count or label */}
-                        {badge && !isActive && (
-                          <StatusBadge
-                            status={badge.count ? "active" : "update"}
-                            showDot={false}
-                            className="ml-2 scale-[0.85] origin-right px-1.5 py-0 min-w-[1.25rem] justify-center"
-                          >
-                            {badge.count || badge.label}
-                          </StatusBadge>
-                        )}
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );

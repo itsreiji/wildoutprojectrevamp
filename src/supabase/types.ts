@@ -281,6 +281,10 @@ export type Database = {
           thumbnail_url: string | null
           title: string | null
           updated_at: string | null
+          storage_path: string | null
+          file_metadata: Json | null
+          upload_session_id: string | null
+          processing_status: string | null
         }
         Insert: {
           category?: string
@@ -297,6 +301,10 @@ export type Database = {
           thumbnail_url?: string | null
           title?: string | null
           updated_at?: string | null
+          storage_path?: string | null
+          file_metadata?: Json | null
+          upload_session_id?: string | null
+          processing_status?: string | null
         }
         Update: {
           category?: string
@@ -313,6 +321,10 @@ export type Database = {
           thumbnail_url?: string | null
           title?: string | null
           updated_at?: string | null
+          storage_path?: string | null
+          file_metadata?: Json | null
+          upload_session_id?: string | null
+          processing_status?: string | null
         }
         Relationships: [
           {
