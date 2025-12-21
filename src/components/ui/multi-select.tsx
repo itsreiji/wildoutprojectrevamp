@@ -164,8 +164,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
 
       if (onSearch) {
         // Debounce search calls
-        const timeout = setTimeout(() => onSearch(query), 300);
-        return () => clearTimeout(timeout);
+        setTimeout(() => onSearch(query), 300);
       }
     }, [onSearch]);
 

@@ -3,7 +3,6 @@
 import { spawn } from 'child_process';
 import { createServer } from 'http';
 import { setTimeout } from 'timers';
-import { fetch } from 'undici';
 
 const PORT = 8288;
 const VITE_URL = 'http://localhost:5173/api/inngest';

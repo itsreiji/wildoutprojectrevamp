@@ -34,10 +34,10 @@ export interface GalleryMetadata {
 }
 
 // Tipe item galeri yang diperluas
-export interface GalleryItem extends GalleryItemDB {
+export interface GalleryItem extends Omit<GalleryItemDB, 'image_url' | 'thumbnail_url'> {
   metadata_obj?: GalleryMetadata;
-  thumbnail_url?: string;
-  image_url?: string;
+  thumbnail_url?: string | null;
+  image_url?: string; // Make optional for frontend use
   file_name?: string;
   file_extension?: string;
   created_by_name?: string;

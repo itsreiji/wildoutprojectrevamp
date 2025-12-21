@@ -92,6 +92,7 @@ export const FILE_SIZE_LIMITS = {
   SINGLE: 20 * 1024 * 1024, // 20MB
   BATCH: 100 * 1024 * 1024, // 100MB
   TOTAL_QUOTA: 500 * 1024 * 1024, // 500MB
+  MAX_FILES: 10, // Max files per batch
 } as const;
 
 // Supported formats
@@ -121,13 +122,14 @@ export const GALLERY_AUDIT_ACTIONS = {
   UPDATE: 'update',
   RESTORE: 'restore',
   DOWNLOAD: 'download',
+  BULK_DELETE: 'bulk_delete',
 } as const;
 
 // Backup intervals
 export const BACKUP_INTERVALS = {
-  DAILY: 'daily',
-  WEEKLY: 'weekly',
-  MONTHLY: 'monthly',
+  DAILY: 24, // hours
+  WEEKLY: 168, // hours (7 days)
+  MONTHLY: 720, // hours (30 days)
 } as const;
 
 // Sort options
@@ -146,6 +148,8 @@ export const SORT_DIRECTIONS = {
 
 // Pagination constants
 export const PAGINATION = {
+  DEFAULT_PAGE: 1,
+  DEFAULT_LIMIT: 20,
   DEFAULT_PAGE_SIZE: 20,
   PAGE_SIZE_OPTIONS: [12, 24, 48, 96],
 } as const;

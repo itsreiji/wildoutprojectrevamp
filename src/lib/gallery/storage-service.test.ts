@@ -423,8 +423,8 @@ describe('GalleryStorageService', () => {
         expect(true).toBe(false); // Should not reach here
       } catch (error) {
         expect(error).toBeInstanceOf(ValidationError);
-        expect(error.details).toContain('File size exceeds');
-        expect(error.details).toContain('not supported');
+        expect((error as ValidationError).details).toContain('File size exceeds');
+        expect((error as ValidationError).details).toContain('not supported');
       }
     });
   });

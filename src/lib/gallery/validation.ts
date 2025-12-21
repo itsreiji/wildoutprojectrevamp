@@ -3,11 +3,10 @@
  * Validasi format, ukuran, dan kualitas file gambar
  */
 
-import { 
-  SUPPORTED_FORMATS, 
-  FILE_SIZE_LIMITS, 
-  GALLERY_CATEGORIES,
-  METADATA_FIELDS 
+import {
+  SUPPORTED_FORMATS,
+  FILE_SIZE_LIMITS,
+  GALLERY_CATEGORIES
 } from './constants';
 import type { FileValidationResult, GalleryMetadata } from './types';
 
@@ -38,7 +37,7 @@ export function validateFileFormat(file: File): FileValidationResult {
 
   // Validasi ekstensi
   const extension = result.info.extension;
-  if (!SUPPORTED_FORMATS.EXTENSIONS.includes(extension)) {
+  if (!SUPPORTED_FORMATS.EXTENSIONS.includes(extension as any)) {
     result.valid = false;
     result.errors.push(
       `Ekstensi file tidak valid: ${extension}. ` +
@@ -128,7 +127,7 @@ export function validateMetadata(metadata: Partial<GalleryMetadata>): { valid: b
     if (metadata.tags.length > 10) {
       errors.push('Maksimal 10 tags per item');
     }
-    
+
     metadata.tags.forEach((tag, index) => {
       if (typeof tag !== 'string' || tag.length < 2) {
         errors.push(`Tag ke-${index + 1} minimal 2 karakter`);
@@ -228,18 +227,18 @@ export function validateBatchUpload(files: File[], metadata: Partial<GalleryMeta
 export function sanitizeFilename(filename: string): string {
   // Hapus karakter berbahaya
   let sanitized = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
-  
+
   // Hapus path traversal
   sanitized = sanitized.replace(/\.\.\//g, '');
   sanitized = sanitized.replace(/^\//g, '');
-  
+
   // Batasi panjang
   if (sanitized.length > 100) {
     const ext = sanitized.split('.').pop();
     const name = sanitized.substring(0, sanitized.length - (ext?.length || 0) - 1);
     sanitized = name.substring(0, 80) + '.' + ext;
   }
-  
+
   return sanitized;
 }
 
@@ -254,9 +253,9 @@ export function generateStandardFilename(
   const sanitized = sanitizeFilename(originalName);
   const ext = sanitized.split('.').pop();
   const nameWithoutExt = sanitized.substring(0, sanitized.lastIndexOf('.'));
-  
+
   const ts = timestamp || new Date().toISOString().replace(/[-:T.]/g, '').substring(0, 14);
-  
+
   return `${category}_${ts}_${nameWithoutExt}.${ext}`;
 }
 
@@ -269,37 +268,37 @@ export async function validateImageDimensions(
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
-    
+
     img.onload = () => {
       const width = img.naturalWidth;
       const height = img.naturalHeight;
       const errors: string[] = [];
-      
+
       // Validasi minimum dimensions
       if (width < 100 || height < 100) {
         errors.push('Resolusi terlalu rendah (minimal 100x100px)');
       }
-      
+
       // Validasi maximum dimensions (prevent memory issues)
       if (width > 10000 || height > 10000) {
         errors.push('Resolusi terlalu tinggi (maksimal 10000x10000px)');
       }
-      
+
       // Validasi aspect ratio (opsional)
       const ratio = width / height;
       if (ratio > 5 || ratio < 0.2) {
         errors.push('Aspect ratio tidak wajar');
       }
-      
+
       URL.revokeObjectURL(url);
       resolve({ width, height, valid: errors.length === 0, errors });
     };
-    
+
     img.onerror = () => {
       URL.revokeObjectURL(url);
       resolve({ width: 0, height: 0, valid: false, errors: ['Gagal membaca gambar'] });
     };
-    
+
     img.src = url;
   });
 }
@@ -313,21 +312,21 @@ export async function validateImageQuality(file: File): Promise<{ valid: boolean
     const url = URL.createObjectURL(file);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    
+
     if (!ctx) {
       resolve({ valid: true, warnings: [] });
       return;
     }
-    
+
     img.onload = () => {
       // Buat versi kecil untuk analisis
       canvas.width = 100;
       canvas.height = 100;
       ctx.drawImage(img, 0, 0, 100, 100);
-      
+
       const imageData = ctx.getImageData(0, 0, 100, 100);
       const data = imageData.data;
-      
+
       // Hitung kontras
       let totalContrast = 0;
       for (let i = 0; i < data.length; i += 4) {
@@ -335,28 +334,28 @@ export async function validateImageQuality(file: File): Promise<{ valid: boolean
         totalContrast += Math.abs(brightness - 128);
       }
       const avgContrast = totalContrast / (data.length / 4);
-      
+
       const warnings: string[] = [];
-      
+
       // Deteksi gambar gelap
       if (avgContrast < 20) {
         warnings.push('Gambar terlihat gelap, mungkin perlu pencahayaan');
       }
-      
+
       // Deteksi gambar terang berlebihan
       if (avgContrast > 100) {
         warnings.push('Kontras tinggi, mungkin ada overexposure');
       }
-      
+
       URL.revokeObjectURL(url);
       resolve({ valid: true, warnings });
     };
-    
+
     img.onerror = () => {
       URL.revokeObjectURL(url);
       resolve({ valid: true, warnings: [] });
     };
-    
+
     img.src = url;
   });
 }
@@ -407,7 +406,7 @@ export async function comprehensiveValidation(
         // Validasi kualitas
         const qualityValidation = await validateImageQuality(file);
         warnings.push(...qualityValidation.warnings);
-        
+
         return {
           valid: errors.length === 0,
           errors,
@@ -439,12 +438,12 @@ export async function validateStorageQuota(
   quotaLimit: number
 ): Promise<{ valid: boolean; error?: string }> {
   const projectedUsage = currentUsage + newFileSize;
-  
+
   if (projectedUsage > quotaLimit) {
     const usedMB = (currentUsage / (1024 * 1024)).toFixed(2);
     const newMB = (newFileSize / (1024 * 1024)).toFixed(2);
     const limitMB = (quotaLimit / (1024 * 1024)).toFixed(0);
-    
+
     return {
       valid: false,
       error: `Quota storage akan terlampaui. ` +
@@ -452,7 +451,7 @@ export async function validateStorageQuota(
              `Maksimal: ${limitMB}MB`
     };
   }
-  
+
   return { valid: true };
 }
 
@@ -461,24 +460,24 @@ export async function validateStorageQuota(
  */
 export function validateExtensionSecurity(filename: string): { valid: boolean; error?: string } {
   const ext = filename.split('.').pop()?.toLowerCase();
-  
+
   if (!ext) {
     return { valid: false, error: 'File tidak memiliki ekstensi' };
   }
-  
+
   // Daftar ekstensi berbahaya
   const dangerousExtensions = [
-    'exe', 'bat', 'cmd', 'sh', 'php', 'js', 'html', 'css', 
+    'exe', 'bat', 'cmd', 'sh', 'php', 'js', 'html', 'css',
     'sql', 'db', 'config', 'env', 'ini'
   ];
-  
+
   if (dangerousExtensions.includes(ext)) {
-    return { 
-      valid: false, 
-      error: `Ekstensi ${ext} tidak diizinkan karena alasan keamanan` 
+    return {
+      valid: false,
+      error: `Ekstensi ${ext} tidak diizinkan karena alasan keamanan`
     };
   }
-  
+
   return { valid: true };
 }
 
@@ -488,14 +487,14 @@ export function validateExtensionSecurity(filename: string): { valid: boolean; e
 export function validateSpecialCharacters(text: string, field: string): { valid: boolean; error?: string } {
   // Karakter yang diizinkan: huruf, angka, spasi, tanda baca umum
   const allowedPattern = /^[a-zA-Z0-9\s.,!?'"()-_]+$/;
-  
+
   if (!allowedPattern.test(text)) {
     return {
       valid: false,
       error: `Field ${field} mengandung karakter khusus yang tidak diizinkan`
     };
   }
-  
+
   return { valid: true };
 }
 
@@ -516,12 +515,18 @@ export async function validateBatchWithProgress(
     dimensions?: { width: number; height: number };
   }>;
 }> {
-  const results = [];
-  
+  const results: Array<{
+    file: File;
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+    dimensions?: { width: number; height: number };
+  }> = [];
+
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const result = await comprehensiveValidation(file, metadata);
-    
+
     results.push({
       file,
       valid: result.valid,
@@ -529,14 +534,14 @@ export async function validateBatchWithProgress(
       warnings: result.warnings,
       dimensions: result.dimensions,
     });
-    
+
     if (onProgress) {
       onProgress(i + 1, files.length);
     }
   }
-  
+
   const allValid = results.every(r => r.valid);
-  
+
   return {
     valid: allValid,
     results,

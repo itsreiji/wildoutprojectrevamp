@@ -626,7 +626,7 @@ const schedule = await checkBackupSchedule();
 import { runCleanupTask, createMaintenanceTask } from '@/lib/gallery/audit';
 
 // Buat task
-const task = await createMaintenanceTask('cleanup', userId);
+const task = await createMaintenanceTask('cleanup');
 
 // Jalankan cleanup
 const result = await runCleanupTask(task.taskId, userId);

@@ -155,7 +155,6 @@ export class GalleryStorageService {
   generateStoragePath(file: File, userId: string): string {
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = file.name.split('.').pop();
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_').replace(/_{2,}/g, '_');
 
     return `${this.basePath}/${userId}/${timestamp}-${randomString}-${sanitizedFileName}`;
@@ -511,7 +510,7 @@ export class GalleryStorageService {
         updateData.image_url = ''; // Clear old URL, use storage path
       }
 
-      const { data, error } = await supabaseClient
+      const { error } = await supabaseClient
         .from('gallery_items')
         .update(updateData)
         .eq('id', itemId)
@@ -819,7 +818,7 @@ export class GalleryStorageService {
   /**
    * Generate thumbnail (placeholder - would need image processing)
    */
-  private async generateThumbnail(originalPath: string, file: File): Promise<string> {
+  private async generateThumbnail(originalPath: string): Promise<string> {
     // In a real implementation, this would:
     // 1. Read the uploaded file
     // 2. Resize it to thumbnail dimensions
@@ -991,7 +990,7 @@ export const galleryGetEndpoint = async (request: Request): Promise<Response> =>
  * DELETE /api/gallery/items/:id
  * Delete gallery item
  */
-export const galleryDeleteEndpoint = async (request: Request, itemId: string): Promise<Response> => {
+export const galleryDeleteEndpoint = async (itemId: string): Promise<Response> => {
   try {
     await galleryStorageService.deleteGalleryItem(itemId);
 

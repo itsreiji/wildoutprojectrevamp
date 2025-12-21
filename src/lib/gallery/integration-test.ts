@@ -1,6 +1,6 @@
 /**
  * Gallery Storage Integration Test
- * 
+ *
  * This file provides a simple integration test to verify the gallery system works correctly
  * Run this in the browser console or as a script to test the complete flow
  */
@@ -52,7 +52,7 @@ export async function runGalleryIntegrationTest() {
   console.log('\n3. Testing file validation...');
   const validFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
   Object.defineProperty(validFile, 'size', { value: 100000 });
-  
+
   const invalidFile = new File(['test'], 'test.pdf', { type: 'application/pdf' });
   Object.defineProperty(invalidFile, 'size', { value: 100000 });
 
@@ -90,7 +90,7 @@ export async function runGalleryIntegrationTest() {
   // Test 6: Check gallery items table
   console.log('\n6. Testing gallery items table...');
   try {
-    const { data: items, error } = await supabaseClient
+    const { error } = await supabaseClient
       .from('gallery_items')
       .select('*')
       .limit(1);
@@ -127,7 +127,7 @@ export async function runGalleryIntegrationTest() {
     console.log('✅ File deletion successful');
 
   } catch (error) {
-    console.log('⚠️  Upload test skipped (expected in some environments):', error.message);
+    console.log('⚠️  Upload test skipped (expected in some environments):', (error as Error).message);
   }
 
   // Test 10: Test pagination
@@ -140,7 +140,7 @@ export async function runGalleryIntegrationTest() {
       items: result.data.length
     });
   } catch (error) {
-    console.log('⚠️  Pagination test skipped:', error.message);
+    console.log('⚠️  Pagination test skipped:', (error as Error).message);
   }
 
   console.log('\n🎉 Integration test completed!');
@@ -159,11 +159,11 @@ export async function runGalleryIntegrationTest() {
  */
 export async function testUploadFlow() {
   console.log('Testing upload flow...');
-  
+
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (!user) {
     console.error('Please sign in first');
-    return;
+    return null;
   }
 
   // Create a test file
@@ -173,7 +173,7 @@ export async function testUploadFlow() {
   try {
     const result = await galleryStorageService.uploadFile(testFile, user.id);
     console.log('Upload result:', result);
-    
+
     // Verify it's in the database
     const { data: galleryItem, error } = await supabaseClient
       .from('gallery_items')
@@ -190,6 +190,7 @@ export async function testUploadFlow() {
     return result;
   } catch (error) {
     console.error('Upload failed:', error);
+    return null;
   }
 }
 
@@ -198,7 +199,7 @@ export async function testUploadFlow() {
  */
 export async function checkSystemHealth() {
   console.log('🔍 Checking system health...');
-  
+
   const health = {
     supabase: false,
     auth: false,
@@ -209,7 +210,7 @@ export async function checkSystemHealth() {
 
   // Check Supabase connection
   try {
-    const { data, error } = await supabaseClient.from('gallery_items').select('id').limit(1);
+    const { error } = await supabaseClient.from('gallery_items').select('id').limit(1);
     health.supabase = true;
     health.database = !error;
   } catch (e) {

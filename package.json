@@ -98,6 +98,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:prod": "NODE_ENV=production vite build",
+    "build:vercel": "./vercel-build.sh",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:ui": "vitest",
@@ -108,7 +110,10 @@
     "inngest:dev": "node scripts/start-inngest-dev.js",
     "inngest:server": "node scripts/start-inngest-dev.js",
     "dev:full": "concurrently \"npm run inngest:dev\" \"npm run dev\"",
-    "dev:inngest": "concurrently \"node scripts/start-inngest-dev.js\" \"vite\""
+    "dev:inngest": "concurrently \"node scripts/start-inngest-dev.js\" \"vite\"",
+    "preview": "vite preview",
+    "vercel:deploy": "vercel --prod",
+    "vercel:deploy:dry": "vercel --dry-run"
   },
   "packageManager": "pnpm@10.26.0"
 }

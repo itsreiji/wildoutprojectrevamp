@@ -136,6 +136,11 @@ export const DashboardTeam = React.memo(() => {
     try {
       let avatarUrl: string | undefined =
         values.photo_url_link || editingMember?.avatar_url || undefined;
+
+      if (values.is_photo_removed) {
+        avatarUrl = undefined;
+      }
+
       const newUploadedFiles: string[] = [];
 
       // Handle avatar upload - File upload takes precedence over photo_url_link
@@ -466,7 +471,7 @@ export const DashboardTeam = React.memo(() => {
           aria-labelledby="dashboard-team-create-edit-dialog-title"
         >
           <DialogTitle
-            className="text-xl font-bold text-white flex items-center gap-2 px-8 py-6 border-b border-white/10"
+            className="text-xl font-bold text-white flex items-center gap-2 px-8 py-5 border-b border-white/10"
             id="dashboard-team-create-edit-dialog-title"
           >
             <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>

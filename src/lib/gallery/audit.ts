@@ -136,7 +136,7 @@ export async function getUserActivitySummary(
 
   logs?.forEach(log => {
     actionsByType[log.action] = (actionsByType[log.action] || 0) + 1;
-    
+
     if (
       log.action === GALLERY_AUDIT_ACTIONS.UPLOAD ||
       log.action === GALLERY_AUDIT_ACTIONS.DELETE ||
@@ -151,7 +151,7 @@ export async function getUserActivitySummary(
     total_actions: logs?.length || 0,
     actions_by_type: actionsByType,
     recent_actions: logs?.slice(0, 10) || [],
-    storage_changes,
+    storage_changes: storageChanges,
   };
 }
 
@@ -545,7 +545,7 @@ export async function exportAuditLogs(
       const headers = Object.keys(data[0]);
       const csv = [
         headers.join(','),
-        ...data.map(row => 
+        ...data.map(row =>
           headers.map(header => {
             const value = row[header as keyof typeof row];
             if (typeof value === 'object') {
@@ -679,7 +679,7 @@ export async function monitorStorageUsage(): Promise<{
 }> {
   try {
     const { data: { user } } = await supabaseClient.auth.getUser();
-    
+
     if (!user) {
       return { used: 0, limit: 0, percentage: 0, warning: false };
     }
@@ -738,8 +738,7 @@ export async function getMaintenanceTasks(): Promise<Array<{
  * Create maintenance task
  */
 export async function createMaintenanceTask(
-  type: 'cleanup' | 'optimize' | 'backup' | 'restore',
-  userId: string
+  type: 'cleanup' | 'optimize' | 'backup' | 'restore'
 ): Promise<{ success: boolean; taskId?: string; error?: string }> {
   try {
     const { data, error } = await supabaseClient

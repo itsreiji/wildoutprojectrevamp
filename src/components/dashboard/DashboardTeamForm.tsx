@@ -37,6 +37,8 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
 
 const teamFormSchema = z.object({
   name: z.string().min(1, "Team member name is required"),
@@ -45,6 +47,7 @@ const teamFormSchema = z.object({
   bio: z.string().optional().nullable(),
   avatar_file: z.any().optional(),
   photo_url_link: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  is_photo_removed: z.boolean().optional(),
   social_links: z
     .record(z.string(), z.string().nullable())
     .optional()
@@ -74,6 +77,7 @@ export function DashboardTeamForm({
         email: "",
         bio: "",
         photo_url_link: "",
+        is_photo_removed: false,
         social_links: {},
       };
     }
@@ -87,6 +91,7 @@ export function DashboardTeamForm({
         defaultValues.photo_url_link ||
         (defaultValues.metadata as any)?.photo_url_link ||
         "",
+      is_photo_removed: false,
       social_links:
         (defaultValues.social_links as Record<string, string | null>) || {},
     };
@@ -109,27 +114,27 @@ export function DashboardTeamForm({
         id="dashboard-team-form"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-[var(--gap-lg)] px-8 py-10 wildout-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-8 px-8 py-8 wildout-scrollbar">
           {/* Basic Info */}
-          <div className="space-y-[var(--form-field-gap)]" id="dashboard-team-form-basic-info">
+          <div className="space-y-6" id="dashboard-team-form-basic-info">
             <h3
-              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-4"
+              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-6"
               id="dashboard-team-form-basic-info-title"
             >
               <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Personal Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)] items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start relative">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-team-form-name-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/80 text-sm font-semibold mb-1.5 block"
                       htmlFor="dashboard-team-form-name-input"
                     >
                       Full Name <span className="text-[#E93370]">*</span>
@@ -139,7 +144,7 @@ export function DashboardTeamForm({
                         id="dashboard-team-form-name-input"
                         placeholder="e.g. John Doe"
                         {...field}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors px-4 text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -155,10 +160,10 @@ export function DashboardTeamForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-team-form-title-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/80 text-sm font-semibold mb-1.5 block"
                       htmlFor="dashboard-team-form-title-input"
                     >
                       Title / Role <span className="text-[#E93370]">*</span>
@@ -168,7 +173,7 @@ export function DashboardTeamForm({
                         id="dashboard-team-form-title-input"
                         placeholder="e.g. CEO & Founder"
                         {...field}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors px-4 text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -184,10 +189,10 @@ export function DashboardTeamForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-team-form-email-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/80 text-sm font-semibold mb-1.5 block"
                       htmlFor="dashboard-team-form-email-input"
                     >
                       Email Address <span className="text-[#E93370]">*</span>
@@ -198,7 +203,7 @@ export function DashboardTeamForm({
                         placeholder="e.g. john@example.com"
                         type="email"
                         {...field}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors px-4 text-sm"
                       />
                     </FormControl>
                     <FormMessage
@@ -214,17 +219,17 @@ export function DashboardTeamForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-team-form-instagram-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/80 text-sm font-semibold mb-1.5 block"
                       htmlFor="dashboard-team-form-instagram-input"
                     >
                       Instagram Handle
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-sm">
                           @
                         </span>
                         <Input
@@ -236,7 +241,7 @@ export function DashboardTeamForm({
                             const value = e.target.value.replace(/^@/, "");
                             field.onChange(value || null);
                           }}
-                          className="pl-8 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                          className="h-11 pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
                         />
                       </div>
                     </FormControl>
@@ -255,10 +260,10 @@ export function DashboardTeamForm({
               render={({ field }) => (
                 <FormItem
                   id="dashboard-team-form-bio-field"
-                  className="space-y-2"
+                  className="space-y-2.5"
                 >
                   <FormLabel
-                    className="text-white/80 text-sm font-semibold"
+                    className="text-white/80 text-sm font-semibold mb-1.5 block"
                     htmlFor="dashboard-team-form-bio-textarea"
                   >
                     Biography
@@ -269,7 +274,7 @@ export function DashboardTeamForm({
                       placeholder="Enter a brief biography..."
                       {...field}
                       value={field.value || ""}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus-visible:ring-[#E93370] transition-colors resize-none"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus-visible:ring-[#E93370] transition-colors resize-none px-4 py-3 leading-relaxed text-sm"
                     />
                   </FormControl>
                   <FormMessage
@@ -286,10 +291,10 @@ export function DashboardTeamForm({
               render={({ field }) => (
                 <FormItem
                   id="dashboard-team-form-photo-link-field"
-                  className="space-y-2"
+                  className="space-y-2.5"
                 >
                   <FormLabel
-                    className="text-white/80 text-sm font-semibold"
+                    className="text-white/80 text-sm font-semibold mb-1.5 block"
                     htmlFor="dashboard-team-form-photo-link-input"
                   >
                     Photo Link (URL)
@@ -299,7 +304,7 @@ export function DashboardTeamForm({
                       id="dashboard-team-form-photo-link-input"
                       placeholder="https://example.com/photo.jpg"
                       {...field}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                      className="h-11 bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors px-4 text-sm"
                     />
                   </FormControl>
                   <FormMessage
@@ -316,70 +321,108 @@ export function DashboardTeamForm({
               render={({ field: { onChange, value: _value, ...field } }) => (
                 <FormItem
                   id="dashboard-team-form-avatar-field"
-                  className="space-y-2"
+                  className="space-y-4"
                 >
                   <FormLabel
-                    className="text-white/80 text-sm font-semibold"
+                    className="text-white/80 text-sm font-semibold mb-1 block"
                     htmlFor="dashboard-team-form-avatar-input"
                   >
                     Profile Photo
                   </FormLabel>
                   <FormControl>
-                    <div className="flex items-center gap-6">
-                      <div className="flex-1">
-                        <Input
-                          accept="image/*"
-                          className="hidden"
-                          id="team-avatar-upload"
-                          type="file"
-                          onChange={(e) => {
-                            const file = e.target.files
-                              ? e.target.files[0]
-                              : null;
-                            onChange(file);
-                          }}
-                          {...field}
-                        />
-                        <label
-                          htmlFor="team-avatar-upload"
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-[#E93370]/50 hover:bg-white/5 transition-all text-center p-4"
-                        >
-                          <div className="flex flex-col items-center justify-center">
-                            <svg
-                              className="w-8 h-8 mb-2 text-white/40"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12 4v16m8-8H4"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                              ></path>
-                            </svg>
-                            <p className="text-sm text-white/60">
-                              Click to upload photo
-                            </p>
-                            <p className="text-xs text-white/40 mt-1">
-                              PNG, JPG or WebP (max 10MB)
-                            </p>
-                          </div>
-                        </label>
-                      </div>
-                      {defaultValues?.avatar_url && (
-                        <div className="flex flex-col items-center gap-3">
-                          <label className="text-2xs uppercase tracking-wider text-white/40 font-bold">
-                            Current
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-start">
+                        {/* Left: Upload area */}
+                        <div className="sm:col-span-8">
+                          <Input
+                            accept="image/*"
+                            className="hidden"
+                            id="team-avatar-upload"
+                            type="file"
+                            onChange={(e) => {
+                              const file = e.target.files
+                                ? e.target.files[0]
+                                : null;
+                              onChange(file);
+                              if (file) {
+                                form.setValue("is_photo_removed", false);
+                              }
+                            }}
+                            {...field}
+                          />
+                          <label
+                            htmlFor="team-avatar-upload"
+                            className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:border-[#E93370]/50 hover:bg-white/5 transition-all text-center p-6 group"
+                          >
+                            <div className="flex flex-col items-center justify-center">
+                              <div className="w-12 h-12 mb-3 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#E93370]/10 transition-colors">
+                                <svg
+                                  className="w-6 h-6 text-white/40 group-hover:text-[#E93370] transition-colors"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M12 4v16m8-8H4"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                  ></path>
+                                </svg>
+                              </div>
+                              <p className="text-sm font-medium text-white/80">
+                                Click to upload photo
+                              </p>
+                              <p className="text-xs text-white/40 mt-1.5">
+                                PNG, JPG or WebP (max 10MB)
+                              </p>
+                            </div>
                           </label>
-                          <div className="w-20 h-20 rounded-xl overflow-hidden border border-white/10">
-                            <img
-                              src={defaultValues.avatar_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200"}
-                              alt="Current avatar"
-                              className="w-full h-full object-cover"
-                            />
+                        </div>
+
+                        {/* Right: Preview Area */}
+                        {((defaultValues?.avatar_url && !form.watch("is_photo_removed")) || form.watch("avatar_file")) && (
+                          <div className="sm:col-span-4 flex flex-col items-center gap-3 bg-white/5 rounded-2xl p-4 border border-white/10">
+                            <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">
+                              {form.watch("avatar_file") ? "Preview" : "Current"}
+                            </label>
+                            <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-white/10 bg-[#0a0a0a] shadow-lg">
+                              {form.watch("avatar_file") ? (
+                                <img
+                                  src={URL.createObjectURL(form.watch("avatar_file"))}
+                                  alt="Preview"
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <img
+                                  src={defaultValues?.avatar_url || ""}
+                                  alt="Current"
+                                  className="w-full h-full object-cover"
+                                />
+                              )}
+                            </div>
                           </div>
+                        )}
+                      </div>
+
+                      {/* Bottom Right: Delete Button */}
+                      {((defaultValues?.avatar_url && !form.watch("is_photo_removed")) || form.watch("avatar_file")) && (
+                        <div className="flex justify-end">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="h-10 px-6 bg-red-500/5 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 rounded-xl border"
+                            onClick={() => {
+                              form.setValue("is_photo_removed", true);
+                              form.setValue("avatar_file", null);
+                              form.setValue("photo_url_link", "");
+                              form.trigger();
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="font-semibold text-sm">Hapus Foto</span>
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -392,11 +435,11 @@ export function DashboardTeamForm({
         </div>
 
         <div
-          className="flex justify-end space-x-3 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
+          className="flex justify-end space-x-4 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-lg sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
           id="dashboard-team-form-actions"
         >
           <Button
-            className="h-10 px-6 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
+            className="h-11 px-8 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-colors rounded-xl"
             disabled={isSubmitting}
             id="dashboard-team-form-cancel-button"
             size="lg"
@@ -407,7 +450,7 @@ export function DashboardTeamForm({
             Cancel
           </Button>
           <Button
-            className="h-10 px-6 bg-[#E93370] hover:bg-[#E93370]/90 text-white font-medium transition-colors"
+            className="h-11 px-8 bg-[#E93370] hover:bg-[#E93370]/90 text-white font-bold transition-all shadow-[0_0_20px_rgba(233,51,112,0.2)] hover:shadow-[0_0_25px_rgba(233,51,112,0.4)] rounded-xl"
             disabled={isSubmitting}
             id="dashboard-team-form-submit-button"
             size="lg"

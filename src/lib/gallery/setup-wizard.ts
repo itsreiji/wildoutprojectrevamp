@@ -169,7 +169,7 @@ export class GallerySetupWizard {
       { name: 'Storage Policies', fn: () => this.verifyStoragePolicies() }
     ];
 
-    const results = [];
+    const results: Array<{ name: string; success: boolean; message: string }> = [];
     let overallSuccess = true;
 
     for (const check of checks) {

@@ -525,7 +525,8 @@ export async function searchWithSizeAggregation(
   const grouped: Record<string, GalleryItem[]> = {};
 
   data.forEach(item => {
-    const size = item.metadata?.file_size || 0;
+    const metadata = typeof item.metadata === 'object' && item.metadata !== null ? item.metadata : {};
+    const size = (metadata as any)?.file_size || 0;
     const range = ranges.find(r => size >= r.min && size < r.max);
 
     if (range) {
@@ -538,7 +539,10 @@ export async function searchWithSizeAggregation(
     label,
     items,
     count: items.length,
-    totalSize: items.reduce((sum, item) => sum + (item.metadata?.file_size || 0), 0),
+    totalSize: items.reduce((sum, item) => {
+      const metadata = typeof item.metadata === 'object' && item.metadata !== null ? item.metadata : {};
+      return sum + ((metadata as any)?.file_size || 0);
+    }, 0),
   }));
 }
 
