@@ -130,27 +130,27 @@ export function DashboardPartnerForm({
         id="dashboard-partner-form"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-[var(--gap-lg)] px-8 py-10 wildout-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-10 px-8 py-10 wildout-scrollbar">
           {/* Basic Info */}
-          <div className="space-y-[var(--form-field-gap)]" id="dashboard-partner-form-basic-info">
+          <div className="space-y-8" id="dashboard-partner-form-basic-info">
             <h3
-              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-4"
+              className="text-sm font-bold text-[#E93370] flex items-center gap-2 mb-6 tracking-wider uppercase"
               id="dashboard-partner-form-basic-info-title"
             >
               <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
               Partner Details
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)] items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start relative">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-partner-form-name-field"
-                    className="space-y-2"
+                    className="space-y-3"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-partner-form-name-input"
                     >
                       Partner Name <span className="text-[#E93370]">*</span>
@@ -160,11 +160,11 @@ export function DashboardPartnerForm({
                         id="dashboard-partner-form-name-input"
                         placeholder="e.g. Red Bull, Spotify"
                         {...field}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
                       />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-partner-form-name-error"
                     />
                   </FormItem>
@@ -176,10 +176,10 @@ export function DashboardPartnerForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-partner-form-level-field"
-                    className="space-y-2"
+                    className="space-y-3"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-partner-form-level-select"
                     >
                       Sponsorship Level{" "}
@@ -191,13 +191,13 @@ export function DashboardPartnerForm({
                     >
                       <FormControl>
                         <SelectTrigger
-                          className="w-full bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                          className="w-full bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
                           id="dashboard-partner-form-level-select"
                         >
                           <SelectValue placeholder="Select tier" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent position="popper">
+                      <SelectContent position="popper" className="bg-[#1a1a1a] border-white/10 text-white rounded-xl">
                         <SelectItem value="bronze">Bronze</SelectItem>
                         <SelectItem value="silver">Silver</SelectItem>
                         <SelectItem value="gold">Gold</SelectItem>
@@ -205,7 +205,7 @@ export function DashboardPartnerForm({
                       </SelectContent>
                     </Select>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-partner-form-level-error"
                     />
                   </FormItem>
@@ -217,10 +217,10 @@ export function DashboardPartnerForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-partner-form-website-field"
-                    className="space-y-2"
+                    className="space-y-3"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-partner-form-website-input"
                     >
                       Website URL
@@ -232,11 +232,11 @@ export function DashboardPartnerForm({
                         type="url"
                         {...field}
                         value={field.value || ""}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
                       />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-partner-form-website-error"
                     />
                   </FormItem>
@@ -248,10 +248,10 @@ export function DashboardPartnerForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-partner-form-email-field"
-                    className="space-y-2"
+                    className="space-y-3"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-partner-form-email-input"
                     >
                       Contact Email
@@ -263,11 +263,11 @@ export function DashboardPartnerForm({
                         type="email"
                         {...field}
                         value={field.value || ""}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus:border-[#E93370] focus:ring-1 focus:ring-[#E93370]/50 transition-colors text-sm"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
                       />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-partner-form-email-error"
                     />
                   </FormItem>
@@ -281,10 +281,10 @@ export function DashboardPartnerForm({
               render={({ field }) => (
                 <FormItem
                   id="dashboard-partner-form-description-field"
-                  className="space-y-2 mt-6"
+                  className="space-y-3 mt-8"
                 >
                   <FormLabel
-                    className="text-white/80 text-sm font-semibold"
+                    className="text-white/90 text-sm font-bold tracking-tight"
                     htmlFor="dashboard-partner-form-description-textarea"
                   >
                     Partner Description
@@ -295,11 +295,11 @@ export function DashboardPartnerForm({
                       placeholder="Brief description of the partnership..."
                       {...field}
                       value={field.value || ""}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[100px] hover:border-white/20 focus-visible:ring-[#E93370] transition-colors resize-none"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 min-h-[120px] hover:border-white/20 focus-visible:ring-[#E93370] transition-all resize-none rounded-xl text-base p-4 leading-relaxed"
                     />
                   </FormControl>
                   <FormMessage
-                    className="text-[#E93370] text-xs mt-1"
+                    className="text-[#E93370] text-xs mt-1 font-medium"
                     id="dashboard-partner-form-description-error"
                   />
                 </FormItem>
@@ -312,10 +312,10 @@ export function DashboardPartnerForm({
               render={({ field }) => (
                 <FormItem
                   id="dashboard-partner-form-logo-url-field"
-                  className="space-y-2 mt-6"
+                  className="space-y-3 mt-8"
                 >
                   <FormLabel
-                    className="text-white/80 text-sm font-semibold"
+                    className="text-white/90 text-sm font-bold tracking-tight"
                     htmlFor="dashboard-partner-form-logo-url-input"
                   >
                     Partner Logo URL
@@ -327,11 +327,11 @@ export function DashboardPartnerForm({
                       type="url"
                       {...field}
                       value={field.value || ""}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
                     />
                   </FormControl>
                   <FormMessage
-                    className="text-[#E93370] text-xs mt-1"
+                    className="text-[#E93370] text-xs mt-1 font-medium"
                     id="dashboard-partner-form-logo-url-error"
                   />
                 </FormItem>
@@ -344,17 +344,17 @@ export function DashboardPartnerForm({
                 render={({ field: { onChange, value: _value, ...field } }) => (
                 <FormItem
                   id="dashboard-partner-form-logo-field"
-                  className="space-y-2 mt-6"
+                  className="space-y-4 mt-8"
                 >
                   <FormLabel
-                    className="text-white/80 text-sm font-semibold"
+                    className="text-white/90 text-sm font-bold tracking-tight"
                     htmlFor="dashboard-partner-form-logo-input"
                   >
-                    Partner Logo
+                    Upload Logo
                   </FormLabel>
                   <FormControl>
-                    <div className="flex items-center gap-6">
-                      <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 rounded-2xl bg-white/5 border border-white/10">
+                      <div className="flex-1 w-full">
                         <Input
                           accept="image/*"
                           className="hidden"
@@ -370,24 +370,26 @@ export function DashboardPartnerForm({
                         />
                         <label
                           htmlFor="partner-logo-upload"
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-[#E93370]/50 hover:bg-white/5 transition-all text-center p-4"
+                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:border-[#E93370]/50 hover:bg-[#E93370]/5 transition-all text-center p-4 group"
                         >
                           <div className="flex flex-col items-center justify-center">
-                            <svg
-                              className="w-8 h-8 mb-2 text-white/40"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12 4v16m8-8H4"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                              ></path>
-                            </svg>
-                            <p className="text-sm text-white/60">
+                            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-2 group-hover:bg-[#E93370]/10 transition-colors">
+                              <svg
+                                className="w-5 h-5 text-white/40 group-hover:text-[#E93370] transition-colors"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M12 4v16m8-8H4"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                ></path>
+                              </svg>
+                            </div>
+                            <p className="text-sm font-bold text-white/80">
                               Click to upload logo
                             </p>
                             <p className="text-xs text-white/40 mt-1">
@@ -397,13 +399,13 @@ export function DashboardPartnerForm({
                         </label>
                       </div>
                       {defaultValues?.logo_url && (
-                        <div className="flex flex-col items-center gap-3">
-                          <label className="text-2xs uppercase tracking-wider text-white/40 font-bold">
+                        <div className="flex flex-col items-center gap-3 shrink-0">
+                          <label className="text-[10px] uppercase tracking-widest text-white/40 font-black">
                             Current
                           </label>
-                          <div className="w-20 h-20 rounded-xl overflow-hidden border border-white/10 p-2 bg-white/5">
+                          <div className="w-24 h-24 rounded-2xl overflow-hidden border border-white/10 p-3 bg-white/5 flex items-center justify-center">
                             <img
-                              src={defaultValues.logo_url || "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200"}
+                              src={defaultValues.logo_url}
                               alt="Current logo"
                               className="w-full h-full object-contain"
                             />
@@ -412,7 +414,7 @@ export function DashboardPartnerForm({
                       )}
                     </div>
                   </FormControl>
-                  <FormMessage className="text-[#E93370] text-xs mt-1" />
+                  <FormMessage className="text-[#E93370] text-xs mt-1 font-medium" />
                 </FormItem>
               )}
             />
@@ -420,11 +422,11 @@ export function DashboardPartnerForm({
         </div>
 
         <div
-          className="flex justify-end space-x-3 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-xl sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
+          className="flex justify-end space-x-4 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-xl sticky bottom-0 z-20"
           id="dashboard-partner-form-actions"
         >
           <Button
-            className="h-10 px-6 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
+            className="h-12 px-8 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-all rounded-xl font-bold"
             disabled={isSubmitting}
             id="dashboard-partner-form-cancel-button"
             size="lg"
@@ -435,7 +437,7 @@ export function DashboardPartnerForm({
             Cancel
           </Button>
           <Button
-            className="h-10 px-6 bg-[#E93370] hover:bg-[#E93370]/90 text-white font-medium transition-colors"
+            className="h-12 px-8 bg-[#E93370] hover:bg-[#E93370]/90 text-white font-black transition-all rounded-xl shadow-lg shadow-[#E93370]/20"
             disabled={isSubmitting}
             id="dashboard-partner-form-submit-button"
             size="lg"

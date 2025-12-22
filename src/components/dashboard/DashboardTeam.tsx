@@ -281,31 +281,33 @@ export const DashboardTeam = React.memo(() => {
   };
 
   return (
-    <div className="space-y-6" id="dashboard-team-container">
+    <div className="space-y-10" id="dashboard-team-container">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <H2 gradient="from-white via-[#E93370] to-white">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6" id="dashboard-team-header">
+        <div id="dashboard-team-header-content">
+          <H2 gradient="from-white via-[#E93370] to-white" id="dashboard-team-title">
             Team Management
           </H2>
-          <BodyText className="text-white/60">
+          <BodyText className="text-white/60" id="dashboard-team-subtitle">
             Manage your team members - changes sync to landing page instantly
           </BodyText>
         </div>
         <Button
-          className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
+          className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20 h-12 px-6 font-bold transition-all"
+          id="dashboard-team-create-button"
           onClick={handleCreate}
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="mr-2 h-5 w-5" id="dashboard-team-create-icon" />
           Add Team Member
         </Button>
       </div>
 
       {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+      <div className="relative" id="dashboard-team-search-container">
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" id="dashboard-team-search-icon" />
         <Input
-          className="pl-12 pr-4 h-10 bg-white/5 border-white/10 focus-visible:ring-[#E93370] rounded-xl"
+          className="pl-12 pr-4 h-12 bg-white/5 border-white/10 focus-visible:ring-[#E93370] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl text-base placeholder:text-white/30"
+          id="dashboard-team-search-input"
           placeholder="Search team members..."
           type="text"
           value={searchQuery}
@@ -314,51 +316,53 @@ export const DashboardTeam = React.memo(() => {
       </div>
 
       {/* Team Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[var(--gap-lg)]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredTeam.map((member, index) => (
           <motion.div
             key={member.id}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col h-full p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300"
+            className="flex flex-col h-full p-8 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 group"
             initial={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            {/* Header */}
-            <div className="flex items-start justify-between mb-[var(--form-field-gap)]">
-              <div className="flex items-center space-x-3">
+            {/* Header with Avatar */}
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="relative group-hover:scale-105 transition-transform duration-300">
                 {member.avatar_url ? (
-                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#E93370]/30 shadow-lg shadow-[#E93370]/10">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#E93370]/30 shadow-xl shadow-[#E93370]/10">
                     <ImageWithFallback
                       alt={member.name}
                       className="w-full h-full object-cover"
-                      src={member.avatar_url || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200"}
+                      src={member.avatar_url}
                     />
                   </div>
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-[#E93370]/20 flex items-center justify-center border-2 border-[#E93370]/30 shadow-lg shadow-[#E93370]/10">
-                    <span className="text-2xl text-[#E93370] font-bold">
+                  <div className="w-24 h-24 rounded-full bg-[#E93370]/20 flex items-center justify-center border-2 border-[#E93370]/30 shadow-xl shadow-[#E93370]/10">
+                    <span className="text-3xl text-[#E93370] font-bold">
                       {member.name.charAt(0)}
                     </span>
                   </div>
                 )}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#E93370]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+
+              <div className="mt-4">
+                <H3 className="text-white font-bold text-xl leading-tight">{member.name}</H3>
+                <SmallText className="text-[#E93370] font-semibold tracking-wider uppercase text-xs mt-1 block">
+                  {member.title}
+                </SmallText>
               </div>
             </div>
 
-            {/* Info */}
-            <div className="mb-[var(--form-field-gap)]">
-              <H3 className="text-white mb-1 font-bold">{member.name}</H3>
-              <SmallText className="text-[#E93370] font-medium tracking-wide uppercase text-[10px]">{member.title}</SmallText>
-            </div>
-
-            <SmallText className="text-white/60 mb-[var(--gap-lg)] line-clamp-3 leading-relaxed min-h-[3rem]">
+            <SmallText className="text-white/60 mb-8 line-clamp-3 leading-relaxed min-h-[3rem] text-center">
               {member.bio || "No bio provided."}
             </SmallText>
 
             {/* Contact & Actions Container - Pushed to bottom */}
             <div className="mt-auto space-y-6">
               {/* Contact */}
-              <div className="space-y-2.5 pt-4 border-t border-white/5">
-                <div className="flex items-center space-x-2 text-sm text-white/70">
+              <div className="space-y-3 pt-6 border-t border-white/5">
+                <div className="flex items-center justify-center space-x-2.5 text-sm text-white/70">
                   <Mail className="h-4 w-4 text-[#E93370] flex-shrink-0" />
                   <a
                     className="hover:text-[#E93370] transition-colors truncate font-medium"
@@ -368,7 +372,7 @@ export const DashboardTeam = React.memo(() => {
                   </a>
                 </div>
                 {member.social_links?.instagram && (
-                  <div className="flex items-center space-x-2 text-sm text-white/70">
+                  <div className="flex items-center justify-center space-x-2.5 text-sm text-white/70">
                     <svg
                       aria-hidden="true"
                       className="h-4 w-4 text-[#E93370] flex-shrink-0"
@@ -394,15 +398,15 @@ export const DashboardTeam = React.memo(() => {
               </div>
 
               {/* Actions */}
-              <div className="flex space-x-2">
+              <div className="flex gap-3">
                 <Button
-                  className="flex-1 border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-xl transition-all h-10"
+                  className="flex-1 bg-white/5 border-white/10 text-white hover:bg-[#E93370] hover:border-[#E93370] rounded-xl transition-all duration-300 h-11 font-semibold"
                   size="sm"
                   variant="outline"
                   onClick={() => handleEdit(member)}
                 >
                   <Edit className="mr-2 h-4 w-4" />
-                  Edit
+                  Edit Profile
                 </Button>
                 <AlertDialog
                   open={isDeleteDialogOpen && deletingMemberId === member.id}
@@ -413,7 +417,7 @@ export const DashboardTeam = React.memo(() => {
                 >
                   <AlertDialogTrigger asChild>
                     <Button
-                      className="border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all h-10 w-10 p-0"
+                      className="border-white/10 bg-white/5 text-white/40 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-500 rounded-xl transition-all duration-300 h-11 w-11 p-0"
                       size="sm"
                       variant="outline"
                       onClick={() => setDeletingMemberId(member.id)}

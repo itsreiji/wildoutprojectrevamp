@@ -45,6 +45,7 @@ import {
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
+import { H2, BodyText } from "../ui/typography";
 import {
   DashboardGalleryForm,
   type GalleryFormValues,
@@ -298,45 +299,41 @@ export const DashboardGallery = React.memo(() => {
   };
 
   return (
-    <div className="space-y-6" id="dashboard-gallery-container">
+    <div className="space-y-10" id="dashboard-gallery-container">
       {/* Header */}
       <div
-        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
         id="dashboard-gallery-header"
       >
         <div id="dashboard-gallery-header-content">
-          <h2
-            className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent"
-            id="dashboard-gallery-title"
-          >
+          <H2 gradient="from-white via-[#E93370] to-white" id="dashboard-gallery-title">
             Gallery Management
-          </h2>
-          <p className="text-white/60" id="dashboard-gallery-subtitle">
+          </H2>
+          <BodyText className="text-white/60" id="dashboard-gallery-subtitle">
             Manage event photos - changes sync to landing page instantly
-          </p>
+          </BodyText>
         </div>
-        <div className="flex space-x-2" id="dashboard-gallery-header-actions">
+        <div className="flex items-center gap-4 w-full md:w-auto" id="dashboard-gallery-header-actions">
           {selectedImages.size > 0 && (
             <Button
-              className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-xl"
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-600/20 h-12 px-6 font-bold transition-all"
               disabled={isDeleting}
               id="dashboard-gallery-bulk-delete-button"
-              variant="outline"
               onClick={handleBulkDelete}
             >
               <Trash2
-                className="mr-2 h-4 w-4"
+                className="mr-2 h-5 w-5"
                 id="dashboard-gallery-bulk-delete-icon"
               />
               Delete ({selectedImages.size})
             </Button>
           )}
           <Button
-            className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
+            className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20 h-12 px-6 font-bold transition-all flex-1 md:flex-none"
             id="dashboard-gallery-create-button"
             onClick={handleCreate}
           >
-            <Plus className="mr-2 h-4 w-4" id="dashboard-gallery-create-icon" />
+            <Plus className="mr-2 h-5 w-5" id="dashboard-gallery-create-icon" />
             New Gallery
           </Button>
         </div>
@@ -349,7 +346,7 @@ export const DashboardGallery = React.memo(() => {
           id="dashboard-gallery-search-icon"
         />
         <Input
-          className="pl-12 pr-4 h-10 bg-white/5 border-white/10 focus-visible:ring-[#E93370] rounded-xl"
+          className="pl-12 pr-4 h-12 bg-white/5 border-white/10 focus-visible:ring-[#E93370] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl text-base placeholder:text-white/30"
           id="dashboard-gallery-search-input"
           placeholder="Search by title, description or category..."
           type="text"
@@ -567,13 +564,16 @@ export const DashboardGallery = React.memo(() => {
           className="text-center py-12 text-white/60"
           id="dashboard-gallery-empty-state"
         >
-          <ImageIcon
-            className="h-16 w-16 mx-auto mb-4 text-white/40"
-            id="dashboard-gallery-empty-icon"
-          />
-          <p id="dashboard-gallery-empty-text">
-            No gallery items found. Create your first gallery!
-          </p>
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+              <ImageIcon
+                className="h-8 w-8 text-white/40"
+                id="dashboard-gallery-empty-icon"
+              />
+            </div>
+            <p className="text-lg font-semibold text-white/80">No gallery items found</p>
+            <p className="text-sm text-white/50">Create your first gallery to get started</p>
+          </div>
         </div>
       )}
 

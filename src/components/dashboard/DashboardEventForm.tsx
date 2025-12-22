@@ -220,41 +220,41 @@ export function DashboardEventForm({
         id="dashboard-event-form"
         onSubmit={form.handleSubmit(handleFormSubmit)}
       >
-        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-[var(--gap-lg)] px-8 py-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-10 px-8 py-10 custom-scrollbar">
           {/* Basic Info */}
-          <div className="space-y-[var(--form-field-gap)]" id="dashboard-event-form-basic-info">
+          <div className="space-y-8" id="dashboard-event-form-basic-info">
             <h3
-              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-3"
+              className="text-sm font-bold text-[#E93370] uppercase tracking-[0.2em] flex items-center gap-3 mb-6"
               id="dashboard-event-form-basic-info-title"
             >
-              <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
+              <span className="w-2 h-2 rounded-full bg-[#E93370] shadow-[0_0_10px_#E93370]"></span>
               Basic Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)] items-start relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start relative">
               <FormField
                 control={form.control}
                 name="title"
                 render={({ field }) => (
                   <FormItem
-                    className="md:col-span-2 space-y-2"
+                    className="md:col-span-2 space-y-2.5"
                     id="dashboard-event-form-title-field"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-event-form-title-input"
                     >
                       Event Name <span className="text-[#E93370]">*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
-                          id="dashboard-event-form-title-input"
-                          placeholder="e.g. Summer Music Festival"
-                          {...field}
-                          className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
-                        />
+                        id="dashboard-event-form-title-input"
+                        placeholder="e.g. Summer Music Festival"
+                        {...field}
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
+                      />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-title-error"
                     />
                   </FormItem>
@@ -266,10 +266,10 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-category-field"
-                    className="flex-1 space-y-2"
+                    className="flex-1 space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-event-form-category-select"
                     >
                       Category <span className="text-[#E93370]">*</span>
@@ -280,7 +280,7 @@ export function DashboardEventForm({
                     >
                       <FormControl>
                         <SelectTrigger
-                          className="w-full relative z-10 bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                          className="w-full h-12 rounded-xl relative z-10 bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-all text-base"
                           id="dashboard-event-form-category-select"
                         >
                           <SelectValue
@@ -289,9 +289,7 @@ export function DashboardEventForm({
                           />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent
-                        position="popper"
-                      >
+                      <SelectContent position="popper" className="bg-[#1a1a1a] border-white/10 text-white rounded-xl">
                         <SelectItem value="music">Music</SelectItem>
                         <SelectItem value="sports">Sports</SelectItem>
                         <SelectItem value="arts">Arts</SelectItem>
@@ -306,7 +304,7 @@ export function DashboardEventForm({
                       </SelectContent>
                     </Select>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-category-error"
                     />
                   </FormItem>
@@ -318,10 +316,10 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-status-field"
-                    className="flex-1 space-y-2"
+                    className="flex-1 space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-event-form-status-select"
                     >
                       Status <span className="text-[#E93370]">*</span>
@@ -332,7 +330,7 @@ export function DashboardEventForm({
                     >
                       <FormControl>
                         <SelectTrigger
-                          className="w-full relative z-10 bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                          className="w-full h-12 rounded-xl relative z-10 bg-white/5 border-white/10 hover:border-white/20 focus-visible:ring-[#E93370] transition-all text-base"
                           id="dashboard-event-form-status-select"
                         >
                           <SelectValue
@@ -341,13 +339,11 @@ export function DashboardEventForm({
                           />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent
-                        position="popper"
-                      >
+                      <SelectContent position="popper" className="bg-[#1a1a1a] border-white/10 text-white rounded-xl">
                         {["draft", "published", "cancelled", "archived"].map(
                           (status) => (
                             <SelectItem key={status} value={status}>
-                              <span className="w-full capitalize">
+                              <span className="w-full capitalize font-medium">
                                 {status}
                               </span>
                             </SelectItem>
@@ -356,7 +352,7 @@ export function DashboardEventForm({
                       </SelectContent>
                     </Select>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-status-error"
                     />
                   </FormItem>
@@ -369,11 +365,11 @@ export function DashboardEventForm({
               name="description"
               render={({ field }) => (
                 <FormItem
-                  className="md:col-span-2 space-y-2"
+                  className="md:col-span-2 space-y-2.5"
                   id="dashboard-event-form-description-field"
                 >
                   <FormLabel
-                    className="text-white/80 text-sm font-semibold"
+                    className="text-white/90 text-sm font-bold tracking-tight"
                     htmlFor="dashboard-event-form-description-input"
                   >
                     Description
@@ -383,27 +379,27 @@ export function DashboardEventForm({
                       id="dashboard-event-form-description-input"
                       placeholder="Enter event description"
                       {...field}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[120px] hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30 min-h-[160px] hover:border-white/20 focus-visible:ring-[#E93370] transition-all rounded-xl text-base py-4"
                       value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage
-                    className="text-[#E93370] text-xs mt-1"
+                    className="text-[#E93370] text-xs mt-1 font-medium"
                     id="dashboard-event-form-description-error"
                   />
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="featured_image_file"
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-featured-image-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
-                    <FormLabel className="text-white/80 text-sm font-semibold">
+                    <FormLabel className="text-white/90 text-sm font-bold tracking-tight">
                       Featured Image
                     </FormLabel>
                     <FormControl>
@@ -432,30 +428,34 @@ export function DashboardEventForm({
                         />
                         <label
                           htmlFor="featured-image-upload"
-                          className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${
+                          className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
                             featuredImagePreview
                               ? "border-transparent"
                               : "border-white/10 hover:border-[#E93370]/50 hover:bg-white/5"
                           }`}
                         >
                           {featuredImagePreview ? (
-                            <div className="relative w-full h-full rounded-xl overflow-hidden">
+                            <div className="relative w-full h-full rounded-2xl overflow-hidden">
                               <img
                                 src={featuredImagePreview}
                                 alt="Featured Preview"
                                 className="w-full h-full object-cover"
                               />
                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <Upload className="h-8 w-8 text-white" />
+                                <div className="p-3 rounded-full bg-white/10 backdrop-blur-sm">
+                                  <Upload className="h-6 w-6 text-white" />
+                                </div>
                               </div>
                             </div>
                           ) : (
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <ImagePlus className="w-8 h-8 mb-3 text-white/40" />
-                              <p className="mb-2 text-sm text-white/60">
-                                Click to upload featured image
+                              <div className="p-3 rounded-xl bg-white/5 mb-4">
+                                <ImagePlus className="w-6 h-6 text-[#E93370]" />
+                              </div>
+                              <p className="text-sm text-white/60 font-bold">
+                                Upload featured image
                               </p>
-                              <p className="text-xs text-white/40">
+                              <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">
                                 PNG, JPG or WebP (max 10MB)
                               </p>
                             </div>
@@ -463,7 +463,7 @@ export function DashboardEventForm({
                         </label>
                       </div>
                     </FormControl>
-                    <FormMessage className="text-[#E93370] text-xs mt-1" />
+                    <FormMessage className="text-[#E93370] text-xs mt-1 font-medium" />
                   </FormItem>
                 )}
               />
@@ -473,9 +473,9 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-gallery-images-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
-                    <FormLabel className="text-white/80 text-sm font-semibold">
+                    <FormLabel className="text-white/90 text-sm font-bold tracking-tight">
                       Gallery Images
                     </FormLabel>
                     <FormControl>
@@ -508,16 +508,16 @@ export function DashboardEventForm({
                         />
                         <label
                           htmlFor="gallery-images-upload"
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-[#E93370]/50 hover:bg-white/5 transition-all overflow-hidden"
+                          className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:border-[#E93370]/50 hover:bg-white/5 transition-all overflow-hidden"
                         >
                           {galleryImagesPreviews.length > 0 ? (
-                            <div className="grid grid-cols-2 gap-1 w-full h-full p-2">
+                            <div className="grid grid-cols-2 gap-2 w-full h-full p-3">
                               {galleryImagesPreviews
                                 .slice(0, 4)
                                 .map((preview, i) => (
                                   <div
                                     key={i}
-                                    className="relative rounded overflow-hidden h-full"
+                                    className="relative rounded-lg overflow-hidden h-full shadow-lg"
                                   >
                                     <img
                                       src={preview}
@@ -526,7 +526,7 @@ export function DashboardEventForm({
                                     />
                                     {i === 3 &&
                                       galleryImagesPreviews.length > 4 && (
-                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs font-bold">
+                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-sm font-bold">
                                           +{galleryImagesPreviews.length - 4}
                                         </div>
                                       )}
@@ -535,11 +535,13 @@ export function DashboardEventForm({
                             </div>
                           ) : (
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <Upload className="w-8 h-8 mb-3 text-white/40" />
-                              <p className="mb-2 text-sm text-white/60">
+                              <div className="p-3 rounded-xl bg-white/5 mb-4">
+                                <Upload className="w-6 h-6 text-[#E93370]" />
+                              </div>
+                              <p className="text-sm text-white/60 font-bold">
                                 Upload gallery images
                               </p>
-                              <p className="text-xs text-white/40">
+                              <p className="text-[10px] text-white/30 uppercase tracking-widest mt-1">
                                 Multiple selection allowed
                               </p>
                             </div>
@@ -547,7 +549,7 @@ export function DashboardEventForm({
                         </label>
                       </div>
                     </FormControl>
-                    <FormMessage className="text-[#E93370] text-xs mt-1" />
+                    <FormMessage className="text-[#E93370] text-xs mt-1 font-medium" />
                   </FormItem>
                 )}
               />
@@ -555,45 +557,43 @@ export function DashboardEventForm({
           </div>
 
           <div
-            className="space-y-[var(--form-field-gap)] pt-6 border-t border-white/5"
+            className="space-y-8 pt-10 border-t border-white/5"
             id="dashboard-event-form-date-time"
           >
             <h3
-              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-3"
+              className="text-sm font-bold text-[#E93370] uppercase tracking-[0.2em] flex items-center gap-3 mb-6"
               id="dashboard-event-form-date-time-title"
             >
-              <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
+              <span className="w-2 h-2 rounded-full bg-[#E93370] shadow-[0_0_10px_#E93370]"></span>
               Date & Time
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="start_date"
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-start-date-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-event-form-start-date-input"
                     >
                       Start Date <span className="text-[#E93370]">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Input
-                          id="dashboard-event-form-start-date-input"
-                          type="date"
-                          {...field}
-                          className="w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors [&::-webkit-calendar-picker-indicator]:invert"
-                          min={new Date().toISOString().split("T")[0]} // Prevent selecting past dates
-                          value={field.value || ""}
-                        />
-                      </div>
+                      <Input
+                        id="dashboard-event-form-start-date-input"
+                        type="date"
+                        {...field}
+                        className="w-full h-12 rounded-xl bg-white/5 border-white/10 text-white hover:border-white/20 focus-visible:ring-[#E93370] transition-all text-base [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-50"
+                        min={new Date().toISOString().split("T")[0]}
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-start-date-error"
                     />
                   </FormItem>
@@ -605,28 +605,26 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-end-date-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-event-form-end-date-input"
                     >
                       End Date <span className="text-[#E93370]">*</span>
                     </FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <Input
-                          id="dashboard-event-form-end-date-input"
-                          type="date"
-                          {...field}
-                          className="w-full bg-white/5 border-white/10 text-white/90 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors [&::-webkit-calendar-picker-indicator]:invert"
-                          min={new Date().toISOString().split("T")[0]} // Prevent selecting past dates
-                          value={field.value || ""}
-                        />
-                      </div>
+                      <Input
+                        id="dashboard-event-form-end-date-input"
+                        type="date"
+                        {...field}
+                        className="w-full h-12 rounded-xl bg-white/5 border-white/10 text-white hover:border-white/20 focus-visible:ring-[#E93370] transition-all text-base [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-50"
+                        min={new Date().toISOString().split("T")[0]}
+                        value={field.value || ""}
+                      />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-end-date-error"
                     />
                   </FormItem>
@@ -637,27 +635,27 @@ export function DashboardEventForm({
 
           {/* Venue & Capacity */}
           <div
-            className="space-y-[var(--form-field-gap)] pt-6 border-t border-white/5 pb-8"
+            className="space-y-8 pt-10 border-t border-white/5 pb-10"
             id="dashboard-event-form-venue-capacity"
           >
             <h3
-              className="text-sm font-semibold text-[#E93370] flex items-center gap-2 mb-3"
+              className="text-sm font-bold text-[#E93370] uppercase tracking-[0.2em] flex items-center gap-3 mb-6"
               id="dashboard-event-form-venue-capacity-title"
             >
-              <span className="w-1.5 h-5 bg-[#E93370] rounded-full"></span>
+              <span className="w-2 h-2 rounded-full bg-[#E93370] shadow-[0_0_10px_#E93370]"></span>
               Venue & Capacity
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-[var(--form-field-gap)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="location"
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-location-field"
-                    className="self-start space-y-2"
+                    className="self-start space-y-2.5"
                   >
                     <FormLabel
-                      className="text-white/80 text-sm font-semibold"
+                      className="text-white/90 text-sm font-bold tracking-tight"
                       htmlFor="dashboard-event-form-location-input"
                     >
                       Venue Name
@@ -667,12 +665,12 @@ export function DashboardEventForm({
                         id="dashboard-event-form-location-input"
                         placeholder="Enter venue name"
                         {...field}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
                         value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-location-error"
                     />
                   </FormItem>
@@ -684,14 +682,14 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-capacity-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
-                    <FormLabel className="text-white/80 text-sm font-semibold">
+                    <FormLabel className="text-white/90 text-sm font-bold tracking-tight">
                       Capacity
                     </FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         id="dashboard-event-form-capacity-input"
                         min="0"
                         placeholder="e.g., 500"
@@ -707,7 +705,7 @@ export function DashboardEventForm({
                       />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-capacity-error"
                     />
                   </FormItem>
@@ -719,9 +717,9 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-price-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
-                    <FormLabel className="text-white/80 text-sm font-semibold">
+                    <FormLabel className="text-white/90 text-sm font-bold tracking-tight">
                       Price Range
                     </FormLabel>
                     <FormControl>
@@ -729,12 +727,12 @@ export function DashboardEventForm({
                         id="dashboard-event-form-price-input"
                         placeholder="e.g., IDR 250K - 500K"
                         {...field}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
                         value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-price-error"
                     />
                   </FormItem>
@@ -746,9 +744,9 @@ export function DashboardEventForm({
                 render={({ field }) => (
                   <FormItem
                     id="dashboard-event-form-ticket-field"
-                    className="space-y-2"
+                    className="space-y-2.5"
                   >
-                    <FormLabel className="text-white/80 text-sm font-semibold">
+                    <FormLabel className="text-white/90 text-sm font-bold tracking-tight">
                       Ticket URL
                     </FormLabel>
                     <FormControl>
@@ -756,12 +754,12 @@ export function DashboardEventForm({
                         id="dashboard-event-form-ticket-input"
                         placeholder="https://example.com/tickets"
                         {...field}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-white/40 hover:border-white/20 focus-visible:ring-[#E93370] transition-colors"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 hover:border-white/20 focus-visible:ring-[#E93370] transition-all h-12 rounded-xl text-base"
                         value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage
-                      className="text-[#E93370] text-xs mt-1"
+                      className="text-[#E93370] text-xs mt-1 font-medium"
                       id="dashboard-event-form-ticket-error"
                     />
                   </FormItem>
@@ -772,14 +770,13 @@ export function DashboardEventForm({
         </div>
 
         <div
-          className="flex justify-end space-x-4 px-8 py-6 bg-[#0a0a0a] border-t border-white/10 rounded-b-xl sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]"
+          className="flex justify-end space-x-4 px-10 py-8 bg-[#0a0a0a] border-t border-white/5 sticky bottom-0 z-20 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]"
           id="dashboard-event-form-actions"
         >
           <Button
-            className="px-6 text-white/80 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-colors"
+            className="px-8 h-12 rounded-xl text-white/60 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-all font-bold tracking-tight"
             disabled={isSubmitting}
             id="dashboard-event-form-cancel-button"
-            size="lg"
             type="button"
             variant="outline"
             onClick={() => {
@@ -790,16 +787,15 @@ export function DashboardEventForm({
             Cancel
           </Button>
           <Button
-            className="px-6 bg-[#E93370] hover:bg-[#E93370]/90 text-white font-medium transition-colors"
+            className="px-8 h-12 rounded-xl bg-[#E93370] hover:bg-[#E93370]/90 text-white font-bold tracking-tight transition-all shadow-lg shadow-[#E93370]/20"
             disabled={isSubmitting}
             id="dashboard-event-form-submit-button"
-            size="lg"
             type="submit"
           >
             {isSubmitting ? (
-              <>
+              <div className="flex items-center gap-2">
                 <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  className="animate-spin h-4 w-4 text-white"
                   fill="none"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
@@ -818,8 +814,8 @@ export function DashboardEventForm({
                     fill="currentColor"
                   ></path>
                 </svg>
-                {isEditMode ? "Saving Changes..." : "Creating Event..."}
-              </>
+                <span>Processing...</span>
+              </div>
             ) : isEditMode ? (
               "Save Changes"
             ) : (

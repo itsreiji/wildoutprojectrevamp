@@ -73,7 +73,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { DashboardEventForm, type EventFormValues } from "./DashboardEventForm";
-import { H2, BodyText, SmallText } from "../ui/typography";
+import { H2, BodyText } from "../ui/typography";
 
 /**
  * DashboardEvents component for managing event CRUD operations
@@ -481,17 +481,18 @@ export const DashboardEvents = () => {
       data-testid="dashboard-events"
       id="admin-events-container"
     >
-      <div className="flex flex-col space-y-4">
-        <div id="admin-events-header">
+      <div className="flex flex-col space-y-8" id="admin-events-header-container">
+        <div id="admin-events-header" className="space-y-2">
           <H2
-              gradient="from-white via-[#E93370] to-white"
-              data-testid="events-page-title"
-              id="admin-events-title"
-            >
-              Event Management
-            </H2>
+            gradient="from-white via-[#E93370] to-white"
+            data-testid="events-page-title"
+            id="admin-events-title"
+            className="text-3xl md:text-4xl font-bold tracking-tight"
+          >
+            Event Management
+          </H2>
           <BodyText
-            className="text-white/60"
+            className="text-white/60 text-lg"
             data-testid="events-page-subtitle"
             id="admin-events-subtitle"
           >
@@ -499,25 +500,48 @@ export const DashboardEvents = () => {
           </BodyText>
         </div>
 
-        {/* Header with Bulk Actions */}
+        {/* Header with Search and Actions */}
         <div
-          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-xl"
           id="admin-events-actions-header"
         >
           <div
-            className="flex items-center gap-3"
+            className="relative flex-1 w-full"
+            data-testid="events-search-container"
+            id="admin-events-search-container"
+          >
+            <Search
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40"
+              data-testid="events-search-icon"
+              id="admin-events-search-icon"
+            />
+            <Input
+              className="pl-12 pr-4 h-12 bg-white/5 border-white/10 focus-visible:ring-[#E93370] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl text-base placeholder:text-white/30"
+              data-testid="events-event-search-input"
+              id="admin-events-search-input"
+              placeholder="Search events by name or category..."
+              type="text"
+              value={searchQuery}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchQuery(e.target.value)
+              }
+            />
+          </div>
+
+          <div
+            className="flex items-center gap-4 w-full md:w-auto"
             id="admin-events-actions-container"
           >
             {selectedEvents.size > 0 && (
               <Button
-                className="bg-[#E9370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
+                className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-600/20 h-12 px-6 font-bold transition-all"
                 data-testid="events-bulk-delete-button"
                 disabled={isDeleting}
                 id="admin-events-bulk-delete-button"
                 onClick={handleBulkDelete}
               >
                 <Trash2
-                  className="mr-2 h-4 w-4"
+                  className="mr-2 h-5 w-5"
                   data-testid="events-bulk-delete-icon"
                   id="admin-events-bulk-delete-icon"
                 />
@@ -525,19 +549,18 @@ export const DashboardEvents = () => {
                   data-testid="events-bulk-delete-text"
                   id="admin-events-bulk-delete-text"
                 >
-                  Delete {selectedEvents.size}{" "}
-                  {selectedEvents.size === 1 ? "Event" : "Events"}
+                  Delete {selectedEvents.size}
                 </span>
               </Button>
             )}
             <Button
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20 h-12 px-6 font-bold transition-all flex-1 md:flex-none"
               data-testid="events-create-event-button"
               id="admin-events-create-event-button"
               onClick={handleCreate}
             >
               <Plus
-                className="mr-2 h-4 w-4"
+                className="mr-2 h-5 w-5"
                 data-testid="events-create-event-icon"
                 id="admin-events-create-event-icon"
               />
@@ -551,166 +574,123 @@ export const DashboardEvents = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Events Table Container */}
         <div
-          className="relative"
-          data-testid="events-search-container"
-          id="admin-events-search-container"
-        >
-          <Search
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40"
-            data-testid="events-search-icon"
-            id="admin-events-search-icon"
-          />
-          <Input
-            className="pl-12 pr-4 h-10 bg-white/5 border-white/10 focus-visible:ring-[#E93370] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl"
-            data-testid="events-event-search-input"
-            id="admin-events-search-input"
-            placeholder="Search events by name or category..."
-            type="text"
-            value={searchQuery}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setSearchQuery(e.target.value)
-            }
-          />
-        </div>
-
-        {/* Events Table */}
-        <div
-          className="rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden"
+          className="rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden shadow-2xl"
           data-testid="events-events-table"
         >
           <Table data-testid="events-table">
-            <TableHeader data-testid="events-table-header">
+            <TableHeader data-testid="events-table-header" className="bg-white/5">
               <TableRow
-                className="border-white/10 hover:bg-white/5"
+                className="border-white/10 hover:bg-transparent"
                 data-testid="events-header-row"
               >
                 <TableHead
-                  className="w-16 py-3 pl-5 pr-0"
+                  className="w-16 py-5 pl-6 pr-0"
                   data-testid="events-select-all-header"
                 >
-                  <div className="flex items-center justify-start w-4">
+                  <div className="flex items-center justify-start">
                     <Checkbox
                       checked={
                         paginatedEvents.length > 0 &&
                         selectedEvents.size === paginatedEvents.length
                       }
-                      className="border-white/30 h-4 w-4 flex-shrink-0"
+                      className="border-white/30 h-5 w-5 rounded-md data-[state=checked]:bg-[#E93370] data-[state=checked]:border-[#E93370]"
                       data-testid="events-select-all-checkbox"
                       onCheckedChange={handleSelectAll}
                     />
                   </div>
                 </TableHead>
                 <TableHead
-                  className="min-w-[200px] px-4 py-3 text-white/90 text-sm font-semibold"
+                  className="min-w-[250px] px-4 py-5"
                   data-testid="events-event-name-header"
                 >
                   <Button
-                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-3 h-10 font-bold text-sm tracking-tight"
                     data-testid="events-sort-by-title-button"
                     size="sm"
                     variant="ghost"
                     onClick={() => handleSort("title")}
                   >
-                    <span data-testid="events-title-header-text">
-                      Event Name
-                    </span>
-                    <ArrowUpDown
-                      className="ml-2 h-3.5 w-3.5"
-                      data-testid="events-title-sort-icon"
-                    />
+                    <span>EVENT NAME</span>
+                    <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
                   </Button>
                 </TableHead>
                 <TableHead
-                  className="w-48 px-4 py-3 text-white/90 text-sm font-semibold"
+                  className="w-48 px-4 py-5 text-white/90 text-sm font-bold tracking-tight"
                   data-testid="events-date-time-header"
                 >
                   <Button
-                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-3 h-10 font-bold text-sm tracking-tight"
                     data-testid="events-sort-by-date-button"
                     size="sm"
                     variant="ghost"
                     onClick={() => handleSort("start_date")}
                   >
-                    <span data-testid="events-date-header-text">
-                      Date & Time
-                    </span>
-                    <ArrowUpDown
-                      className="ml-2 h-3.5 w-3.5"
-                      data-testid="events-date-sort-icon"
-                    />
+                    <span data-testid="events-date-header-text">DATE & TIME</span>
+                    <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
                   </Button>
                 </TableHead>
                 <TableHead
-                  className="w-48 px-4 py-3 text-white/90 text-sm font-semibold"
+                  className="w-48 px-4 py-5 text-white/90 text-sm font-bold tracking-tight"
                   data-testid="events-venue-header"
                 >
                   <Button
-                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-3 h-10 font-bold text-sm tracking-tight"
                     data-testid="events-sort-by-location-button"
                     size="sm"
                     variant="ghost"
                     onClick={() => handleSort("location")}
                   >
-                    <span data-testid="events-venue-header-text">Venue</span>
-                    <ArrowUpDown
-                      className="ml-2 h-3.5 w-3.5"
-                      data-testid="events-venue-sort-icon"
-                    />
+                    <span data-testid="events-venue-header-text">VENUE</span>
+                    <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
                   </Button>
                 </TableHead>
                 <TableHead
-                  className="w-32 px-4 py-3 text-white/90 text-sm font-semibold"
+                  className="w-32 px-4 py-5 text-white/90 text-sm font-bold tracking-tight"
                   data-testid="events-category-header"
                 >
                   <Button
-                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-3 h-10 font-bold text-sm tracking-tight"
                     data-testid="events-sort-by-category-button"
                     size="sm"
                     variant="ghost"
                     onClick={() => handleSort("category")}
                   >
-                    <span data-testid="events-category-header-text">
-                      Category
-                    </span>
-                    <ArrowUpDown
-                      className="ml-2 h-3.5 w-3.5"
-                      data-testid="events-category-sort-icon"
-                    />
+                    <span data-testid="events-category-header-text">CATEGORY</span>
+                    <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
                   </Button>
                 </TableHead>
                 <TableHead
-                  className="w-36 px-4 py-3 text-white/90 text-sm font-semibold"
+                  className="w-36 px-4 py-5 text-white/90 text-sm font-bold tracking-tight"
                   data-testid="events-attendance-header"
                 >
-                  <span data-testid="events-attendance-header-text">
-                    Attendance
-                  </span>
+                  <div className="px-3 h-10 flex items-center">
+                    <span data-testid="events-attendance-header-text">ATTENDANCE</span>
+                  </div>
                 </TableHead>
                 <TableHead
-                  className="w-28 px-4 py-3 text-white/90 text-sm font-semibold"
+                  className="w-28 px-4 py-5 text-white/90 text-sm font-bold tracking-tight"
                   data-testid="events-status-header"
                 >
                   <Button
-                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-2"
+                    className="w-full justify-start text-white/90 hover:text-white hover:bg-white/10 px-3 h-10 font-bold text-sm tracking-tight"
                     data-testid="events-sort-by-status-button"
                     size="sm"
                     variant="ghost"
                     onClick={() => handleSort("status")}
                   >
-                    <span data-testid="events-status-header-text">Status</span>
-                    <ArrowUpDown
-                      className="ml-2 h-3.5 w-3.5"
-                      data-testid="events-status-sort-icon"
-                    />
+                    <span data-testid="events-status-header-text">STATUS</span>
+                    <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
                   </Button>
                 </TableHead>
                 <TableHead
-                  className="w-24 px-4 py-3 text-white/90 text-right text-sm font-semibold"
+                  className="w-24 px-4 py-5 text-right text-white/90 text-sm font-bold tracking-tight"
                   data-testid="events-actions-header"
                 >
-                  <span data-testid="events-actions-header-text">Actions</span>
+                  <div className="px-3 h-10 flex items-center justify-end">
+                    <span data-testid="events-actions-header-text">ACTIONS</span>
+                  </div>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -718,198 +698,156 @@ export const DashboardEvents = () => {
               {paginatedEvents.map((event) => (
                 <TableRow
                   key={event.id}
-                  className="border-white/10 hover:bg-white/5"
+                  className="border-white/5 hover:bg-white/5 transition-colors group"
                   data-event-id={event.id}
                   data-testid={`events-event-row-${event.id}`}
                 >
                   <TableCell
-                    className="py-2.5 pl-5 pr-0"
+                    className="py-6 pl-8 pr-0"
                     data-testid={`events-select-event-${event.id}`}
                   >
-                    <div className="flex items-center justify-start w-4">
-                      <Checkbox
-                        checked={selectedEvents.has(event.id)}
-                        className="border-white/30 h-4 w-4 flex-shrink-0"
-                        data-testid={`events-select-event-checkbox-${event.id}`}
-                        onCheckedChange={(checked) =>
-                          handleSelectEvent(event.id, checked as boolean)
-                        }
-                      />
-                    </div>
+                    <Checkbox
+                      checked={selectedEvents.has(event.id)}
+                      className="border-white/20 data-[state=checked]:bg-[#E93370] data-[state=checked]:border-[#E93370] transition-all"
+                      data-testid={`events-select-event-checkbox-${event.id}`}
+                      onCheckedChange={(checked) =>
+                        handleSelectEvent(event.id, checked as boolean)
+                      }
+                    />
                   </TableCell>
                   <TableCell
-                    className="min-w-[200px] px-4 py-3"
+                    className="min-w-[200px] px-4 py-6"
                     data-testid={`events-event-name-cell-${event.id}`}
                   >
-                    <div className="flex flex-col">
+                    <div className="flex flex-col gap-1">
                       <span
-                        className="font-medium text-white"
+                        className="font-bold text-white text-base tracking-tight group-hover:text-[#E93370] transition-colors"
                         data-testid={`events-event-title-${event.id}`}
                       >
                         {event.title || "Untitled Event"}
                       </span>
                       {event.description && (
-                        <SmallText
-                          className="text-white/60 mt-1 line-clamp-2"
+                        <p
+                          className="text-white/40 text-xs line-clamp-1 max-w-[300px]"
                           data-testid={`events-event-description-${event.id}`}
                         >
                           {event.description}
-                        </SmallText>
+                        </p>
                       )}
                     </div>
                   </TableCell>
                   <TableCell
-                    className="w-48 px-4 py-3"
+                    className="w-48 px-4 py-6"
                     data-testid={`events-event-date-cell-${event.id}`}
                   >
-                    <div className="flex items-center gap-2">
-                      <Calendar
-                        className="h-4 w-4 text-white/60 flex-shrink-0"
-                        data-testid="events-date-icon"
-                      />
-                      <div>
-                        <SmallText
-                          className="text-white"
-                          data-testid={`events-event-date-${event.id}`}
-                        >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-white/5 text-white/60">
+                        <Calendar className="h-4 w-4" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-white font-bold text-sm tracking-tight">
                           {event.start_date
-                            ? new Date(event.start_date).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                }
-                              )
+                            ? new Date(event.start_date).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })
                             : "No date"}
-                        </SmallText>
-                        <SmallText
-                          className="text-white/60"
-                          data-testid={`events-event-time-${event.id}`}
-                        >
+                        </span>
+                        <span className="text-white/40 text-[11px] font-bold uppercase tracking-widest">
                           {(() => {
                             const startTime = event.start_date
-                              ? new Date(event.start_date).toLocaleTimeString(
-                                  "en-US",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                  }
-                                )
+                              ? new Date(event.start_date).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                })
                               : "";
-                            const endTime = event.end_date
-                              ? new Date(event.end_date).toLocaleTimeString(
-                                  "en-US",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                    hour12: true,
-                                  }
-                                )
-                              : "";
-                            return startTime + (endTime ? ` - ${endTime}` : "");
+                            return startTime;
                           })()}
-                        </SmallText>
+                        </span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell
-                    className="w-48 px-4 py-3"
+                    className="w-48 px-4 py-6"
                     data-testid={`events-event-venue-cell-${event.id}`}
                   >
-                    <div className="flex items-center gap-2">
-                      <MapPin
-                        className="h-4 w-4 text-white/60 flex-shrink-0"
-                        data-testid="events-venue-icon"
-                      />
-                      <SmallText
-                        className="text-white"
-                        data-testid={`events-event-location-${event.id}`}
-                      >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-white/5 text-white/60">
+                        <MapPin className="h-4 w-4" />
+                      </div>
+                      <span className="text-white/80 text-sm font-bold tracking-tight">
                         {event.location || "No location"}
-                      </SmallText>
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell
-                    className="w-32 px-4 py-3"
+                    className="w-32 px-4 py-6"
                     data-testid={`events-event-category-cell-${event.id}`}
                   >
                     <Badge
                       variant="category"
                       size="sm"
-                      className={cn(getCategoryBadgeColor(event.category || ""), "border-0 shadow-none")}
+                      className={cn(
+                        getCategoryBadgeColor(event.category || ""),
+                        "border-0 shadow-none px-3 py-1 text-[10px] font-bold tracking-wider uppercase"
+                      )}
                     >
                       {event.category || "UNCATEGORIZED"}
                     </Badge>
                   </TableCell>
                   <TableCell
-                    className="w-36 px-4 py-3"
+                    className="w-36 px-4 py-6"
                     data-testid={`events-event-attendance-cell-${event.id}`}
                   >
-                    <div className="flex items-center gap-2">
-                      <Users
-                        className="h-4 w-4 text-white/60 flex-shrink-0"
-                        data-testid="events-attendance-icon"
-                      />
-                      <SmallText
-                        className="text-white"
-                        data-testid={`events-event-attendance-${event.id}`}
-                      >
-                        {event.attendees || "0"} / {event.capacity || "∞"}
-                      </SmallText>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-white/5 text-white/60">
+                        <Users className="h-4 w-4" />
+                      </div>
+                      <span className="text-white/80 text-sm font-bold tracking-tight">
+                        {event.attendees || "0"} <span className="text-white/30 mx-1">/</span> {event.capacity || "∞"}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell
-                    className="w-28 px-4 py-3"
+                    className="w-28 px-4 py-6"
                     data-testid={`events-event-status-cell-${event.id}`}
                   >
                     <StatusBadge status={event.status || "draft"} />
                   </TableCell>
                   <TableCell
-                    className="w-24 px-4 py-3 text-right"
+                    className="w-24 px-4 py-6 text-right"
                     data-testid={`events-event-actions-cell-${event.id}`}
                   >
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          className="h-8 w-8 p-0 hover:bg-white/10"
+                          className="h-10 w-10 p-0 hover:bg-[#E93370]/10 hover:text-[#E93370] transition-all rounded-xl border border-white/5"
                           data-testid={`events-event-actions-button-${event.id}`}
                           size="icon"
                           variant="ghost"
                         >
-                          <MoreHorizontal
-                            className="h-4 w-4 text-white/60"
-                            data-testid="events-more-actions-icon"
-                          />
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="bg-gray-900 border-gray-700 text-white"
-                        data-testid={`events-event-actions-menu-${event.id}`}
+                        className="bg-[#1a1a1a] border-white/10 text-white p-2 rounded-xl min-w-[160px] shadow-2xl"
                       >
                         <DropdownMenuItem
-                          className="cursor-pointer hover:bg-gray-80"
-                          data-testid="events-edit-event-action"
+                          className="cursor-pointer hover:bg-white/5 rounded-lg px-3 py-2 text-sm transition-colors flex items-center gap-2 font-bold tracking-tight"
                           onClick={() => handleEdit(event)}
                         >
-                          <Edit
-                            className="mr-2 h-4 w-4"
-                            data-testid="events-edit-icon"
-                          />
-                          <span data-testid="events-edit-text">Edit</span>
+                          <Edit className="h-4 w-4 text-white/60" />
+                          <span>Edit Event</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          className="cursor-pointer text-red-400 hover:bg-red-500/10"
-                          data-testid="events-delete-event-action"
+                          className="cursor-pointer text-red-400 hover:bg-red-500/10 hover:text-red-400 rounded-lg px-3 py-2 text-sm transition-colors flex items-center gap-2 font-bold tracking-tight"
                           onClick={() => handleDelete(event.id)}
                         >
-                          <Trash2
-                            className="mr-2 h-4 w-4"
-                            data-testid="events-delete-icon"
-                          />
-                          <span data-testid="events-delete-text">Delete</span>
+                          <Trash2 className="h-4 w-4" />
+                          <span>Delete Event</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -922,72 +860,38 @@ export const DashboardEvents = () => {
 
         {/* Pagination */}
         <div
-          className="flex items-center justify-between px-4 py-3 border-t border-white/10"
+          className="flex items-center justify-between px-8 py-6 border-t border-white/5 bg-white/[0.02]"
           id="dashboard-events-pagination"
         >
-          <SmallText
-            className="text-white/60"
-            id="dashboard-events-pagination-info"
-          >
-            Showing{" "}
-            <span
-              className="font-medium text-white"
-              id="dashboard-events-showing-from"
-            >
-              {Math.min(
-                (currentPage - 1) * itemsPerPage + 1,
-                filteredEvents.length
-              )}
-            </span>{" "}
-            to{" "}
-            <span
-              className="font-medium text-white"
-              id="dashboard-events-showing-to"
-            >
-              {Math.min(currentPage * itemsPerPage, filteredEvents.length)}
-            </span>{" "}
-            of{" "}
-            <span
-              className="font-medium text-white"
-              id="dashboard-events-total-items"
-            >
-              {filteredEvents.length}
-            </span>{" "}
-            events
-          </SmallText>
-          <div
-            className="flex items-center space-x-2"
-            id="dashboard-events-pagination-controls"
-          >
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-white/40 font-bold tracking-tight">
+              Showing <span className="text-white">{Math.min((currentPage - 1) * itemsPerPage + 1, filteredEvents.length)}</span> to <span className="text-white">{Math.min(currentPage * itemsPerPage, filteredEvents.length)}</span> of <span className="text-white">{filteredEvents.length}</span> events
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
             <Button
-              className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
-              id="dashboard-events-previous-page-button"
+              className="h-10 px-4 rounded-xl border-white/5 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white transition-all text-xs font-bold tracking-tight disabled:opacity-30"
               disabled={currentPage === 1}
-              size="sm"
               variant="outline"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             >
               Previous
             </Button>
-            <div
-              className="flex items-center space-x-1"
-              id="dashboard-events-page-numbers"
-            >
+            <div className="flex items-center gap-1 mx-2">
               {Array.from(
                 { length: Math.ceil(filteredEvents.length / itemsPerPage) },
                 (_, i) => i + 1
               ).map((page) => (
                 <Button
                   key={page}
-                  className={`h-8 w-8 p-0 ${
+                  className={cn(
+                    "h-10 w-10 rounded-xl transition-all text-xs font-bold tracking-tight",
                     currentPage === page
-                      ? "bg-white/10 border-white/20 text-white"
-                      : "text-white/60 hover:bg-white/5"
-                  }`}
-                  data-active={currentPage === page}
-                  id={`dashboard-events-page-button-${page}`}
-                  size="sm"
-                  variant={currentPage === page ? "outline" : "ghost"}
+                      ? "bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20"
+                      : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                  )}
+                  size="icon"
+                  variant="ghost"
                   onClick={() => setCurrentPage(page)}
                 >
                   {page}
@@ -995,19 +899,10 @@ export const DashboardEvents = () => {
               ))}
             </div>
             <Button
-              className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
-              id="dashboard-events-next-page-button"
+              className="h-10 px-4 rounded-xl border-white/5 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white transition-all text-xs font-bold tracking-tight disabled:opacity-30"
               disabled={currentPage * itemsPerPage >= filteredEvents.length}
-              size="sm"
               variant="outline"
-              onClick={() =>
-                setCurrentPage((p) =>
-                  Math.min(
-                    Math.ceil(filteredEvents.length / itemsPerPage),
-                    p + 1
-                  )
-                )
-              }
+              onClick={() => setCurrentPage((p) => Math.min(Math.ceil(filteredEvents.length / itemsPerPage), p + 1))}
             >
               Next
             </Button>
