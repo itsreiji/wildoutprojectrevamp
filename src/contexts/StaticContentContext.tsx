@@ -149,17 +149,107 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const fetchAboutContent = async (): Promise<AboutContent | null> => {
+  const importAboutContentFallback = async (): Promise<{ success: boolean; data: AboutContent | null; error?: string }> => {
+    console.log('StaticContentContext: Starting fallback import for about content');
+
     try {
+      if (!user) {
+        console.warn('StaticContentContext: User not authenticated yet, skipping database import and using mock data');
+        return { success: false, data: MOCK_ABOUT, error: "User not authenticated yet" };
+      }
+
+      if (role !== "admin") {
+        console.warn('StaticContentContext: Insufficient permissions for fallback import, using mock data only');
+        return { success: false, data: MOCK_ABOUT, error: "Insufficient permissions" };
+      }
+
+      // Use mock data as the source for fallback import
+      const fallbackData = MOCK_ABOUT;
+
+      console.log('StaticContentContext: Preparing to import mock data to database', {
+        title: fallbackData.title,
+        featuresCount: Array.isArray(fallbackData.features) ? fallbackData.features.length : 0,
+        storyCount: Array.isArray(fallbackData.story) ? fallbackData.story.length : 0
+      });
+
+      const saveData = {
+        id: "00000000-0000-0000-0000-000000000002",
+        title: fallbackData.title,
+        subtitle: fallbackData.subtitle,
+        founded_year: fallbackData.founded_year,
+        story: fallbackData.story,
+        features: fallbackData.features,
+        updated_at: new Date().toISOString(),
+        updated_by: user.id,
+        created_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabaseClient
+        .from("about_content")
+        .upsert(saveData);
+
+      if (error) {
+        console.error("StaticContentContext: Database error during fallback import:", error);
+        return { success: false, data: null, error: error.message };
+      }
+
+      console.log('StaticContentContext: Successfully imported fallback data to database');
+
+      // Return the imported data
+      return {
+        success: true,
+        data: {
+          ...fallbackData,
+          updated_at: saveData.updated_at,
+          updated_by: saveData.updated_by,
+          created_at: saveData.created_at
+        }
+      };
+
+    } catch (error) {
+      console.error("StaticContentContext: Error during fallback import:", error);
+      return {
+        success: false,
+        data: MOCK_ABOUT,
+        error: error instanceof Error ? error.message : "Unknown error during import"
+      };
+    }
+  };
+
+  const fetchAboutContent = async (): Promise<AboutContent | null> => {
+    console.log('StaticContentContext: Starting fetchAboutContent', {
+      timestamp: new Date().toISOString(),
+      useDummyData
+    });
+
+    try {
+      if (useDummyData) {
+        console.log('StaticContentContext: Using mock data for about content');
+        return MOCK_ABOUT;
+      }
+
       const { data, error } = await supabaseClient.rpc("get_about_content");
+
+      console.log('StaticContentContext: Database response', {
+        hasData: !!data,
+        error: error?.message || null,
+        dataLength: data?.length || 0
+      });
+
       if (error) {
         console.error("Error fetching about content:", error);
-        return null;
+
+        // Fallback to mock data if database is empty or unreachable
+        console.warn('StaticContentContext: Database error, falling back to mock data');
+        return MOCK_ABOUT;
       }
+
       const result = (data as any)?.[0] as
         | Database["public"]["Tables"]["about_content"]["Row"]
         | undefined;
+
       if (result) {
+        console.log('StaticContentContext: Successfully fetched about content from database');
         return {
           id: result.id,
           title: result.title ?? "",
@@ -175,10 +265,24 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
           updated_by: result.updated_by,
         };
       }
-      return null;
+
+      // No data in database - fallback to mock data and import it
+      console.warn('StaticContentContext: No data in database, implementing fallback import');
+
+      // Import mock data to database
+      const importResult = await importAboutContentFallback();
+      if (importResult.success) {
+        console.log('StaticContentContext: Successfully imported fallback data to database');
+        return importResult.data;
+      } else {
+        console.warn('StaticContentContext: Import fallback skipped/failed:', importResult.error, '- Using mock data');
+        return MOCK_ABOUT; // Final fallback to mock data
+      }
+
     } catch (error) {
       console.error("Error in fetchAboutContent:", error);
-      return null;
+      console.warn('StaticContentContext: Exception caught, falling back to mock data');
+      return MOCK_ABOUT;
     }
   };
 
@@ -413,11 +517,28 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const saveAboutContent = async (content: AboutContent): Promise<void> => {
+    console.log('StaticContentContext: Starting saveAboutContent', {
+      timestamp: new Date().toISOString(),
+      user: user?.id,
+      role,
+      content: {
+        title: content.title,
+        featuresCount: Array.isArray(content.features) ? content.features.length : 0,
+        storyCount: Array.isArray(content.story) ? content.story.length : 0
+      }
+    });
+
     try {
       setError(null);
-      if (!user) throw new Error("User not authenticated");
-      if (role !== "admin")
+      if (!user) {
+        console.error('StaticContentContext: User not authenticated');
+        throw new Error("User not authenticated");
+      }
+
+      if (role !== "admin") {
+        console.error('StaticContentContext: Insufficient permissions', { user: user.id, role });
         throw new Error(`Insufficient permissions. User role: ${role}`);
+      }
 
       const saveData = {
         id: "00000000-0000-0000-0000-000000000002",
@@ -427,21 +548,36 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
         story: content.story,
         features: content.features,
         updated_at: new Date().toISOString(),
+        updated_by: user.id,
       };
+
+      console.log('StaticContentContext: Attempting to upsert about content to database');
 
       const { error } = await supabaseClient
         .from("about_content")
         .upsert(saveData);
 
       if (error) {
-        console.error("Database error:", error);
+        console.error("StaticContentContext: Database error during save:", error);
         setError(`Failed to save about content: ${error.message}`);
         throw error;
       }
 
+      console.log('StaticContentContext: Successfully saved about content to database');
+
+      // Update local state
       setAbout(content);
+
+      // Log the change
+      console.log('StaticContentContext: About content state updated', {
+        previousTitle: about?.title,
+        newTitle: content.title,
+        updatedAt: saveData.updated_at,
+        updatedBy: saveData.updated_by
+      });
+
     } catch (err) {
-      console.error("Error in saveAboutContent:", err);
+      console.error("StaticContentContext: Error in saveAboutContent:", err);
       setError(
         `Failed to save about content: ${
           err instanceof Error ? err.message : "Unknown error"
