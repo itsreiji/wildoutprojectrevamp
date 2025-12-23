@@ -6,14 +6,14 @@
 - [x] Task: Refactor layout classes for the narrower profile
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Core Dimensions & Padding' (Protocol in workflow.md)
 
-## Phase 2: Proportional Typography & Icons
-- [ ] Task: Create failing tests for scaled-down text and icons
-- [ ] Task: Apply smaller font sizes (titles, labels) and scale down icons
-- [ ] Task: Refactor styles to ensure consistent scaling across the form
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Proportional Typography & Icons' (Protocol in workflow.md)
+## Phase 2: Proportional Typography & Icons [checkpoint: ec75f32]
+- [x] Task: Create failing tests for scaled-down text and icons
+- [x] Task: Apply smaller font sizes (titles, labels) and scale down icons
+- [x] Task: Refactor styles to ensure consistent scaling across the form
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Proportional Typography & Icons' (Protocol in workflow.md)
 
 ## Phase 3: Spatial Density & Alignment
-- [ ] Task: Create failing tests for vertical gaps and element alignment
+- [~] Task: Create failing tests for vertical gaps and element alignment
 - [ ] Task: Tighten vertical spacing (space-y-X) and ensure perfect vertical alignment
 - [ ] Task: Refactor spacing logic for better maintainability
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Spatial Density & Alignment' (Protocol in workflow.md)
