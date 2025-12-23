@@ -194,7 +194,6 @@ export class EnhancedGalleryStorageService {
   generateStoragePath(file: File, userId: string): string {
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = file.name.split('.').pop();
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_').replace(/_{2,}/g, '_');
 
     return `${this.basePath}/${userId}/${timestamp}-${randomString}-${sanitizedFileName}`;
@@ -216,14 +215,20 @@ export class EnhancedGalleryStorageService {
    */
   private async optimizeImage(file: File, quality: number = COMPRESSION_QUALITY): Promise<Blob> {
     // Skip optimization in non-browser environments
-    if (typeof window === 'undefined' || !window.Image || typeof document === 'undefined') {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
       return file;
     }
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
       reader.onload = (e) => {
-        const img = new Image();
+        // Check for Image constructor in non-browser environments
+        if (typeof (globalThis as any).Image === 'undefined') {
+          resolve(file);
+          return;
+        }
+
+        const img = new (globalThis as any).Image();
 
         img.onload = () => {
           // Calculate new dimensions
@@ -276,14 +281,20 @@ export class EnhancedGalleryStorageService {
    */
   private async generateThumbnailFromImage(file: File): Promise<Blob> {
     // Skip thumbnail generation in non-browser environments
-    if (typeof window === 'undefined' || !window.Image || typeof document === 'undefined') {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
       return file;
     }
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
       reader.onload = (e) => {
-        const img = new Image();
+        // Check for Image constructor in non-browser environments
+        if (typeof (globalThis as any).Image === 'undefined') {
+          resolve(file);
+          return;
+        }
+
+        const img = new (globalThis as any).Image();
 
         img.onload = () => {
           // Calculate square crop
@@ -335,14 +346,20 @@ export class EnhancedGalleryStorageService {
    */
   private async getImageDimensions(file: File): Promise<{ width: number; height: number }> {
     // Skip dimension check in non-browser environments
-    if (typeof window === 'undefined' || !window.Image) {
+    if (typeof window === 'undefined') {
       return { width: 0, height: 0 };
     }
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
       reader.onload = (e) => {
-        const img = new Image();
+        // Check for Image constructor in non-browser environments
+        if (typeof (globalThis as any).Image === 'undefined') {
+          resolve({ width: 0, height: 0 });
+          return;
+        }
+
+        const img = new (globalThis as any).Image();
 
         img.onload = () => {
           resolve({ width: img.width, height: img.height });

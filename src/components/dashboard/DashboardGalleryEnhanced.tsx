@@ -270,7 +270,7 @@ export function DashboardGalleryEnhanced() {
       } else {
         toast.warning(`Found ${issues.length} consistency issues`);
       }
-    } catch (err) {
+    } catch {
       toast.error("Consistency check failed");
     }
   };
@@ -290,7 +290,7 @@ export function DashboardGalleryEnhanced() {
       if (result.errors.length > 0) {
         toast.error(`${result.errors.length} cleanup errors occurred`);
       }
-    } catch (err) {
+    } catch {
       toast.error("Cleanup failed");
     }
   };

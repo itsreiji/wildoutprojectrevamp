@@ -79,14 +79,14 @@ export const TeamSection = React.memo(() => {
                     )}
                     {(member.social_links?.instagram || (member.metadata as any)?.social_links?.instagram) && (
                       <a
-                        href={`https://instagram.com/${(member.social_links?.instagram || (member.metadata as any)?.social_links?.instagram).replace('@', '')}`}
+                        href={`https://instagram.com/${(member.social_links?.instagram || (member.metadata as any)?.social_links?.instagram || '').replace('@', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors group"
                       >
                         <Instagram className="h-4 w-4 mr-2 text-[#E93370]" />
                         <span className="truncate">
-                          @{(member.social_links?.instagram || (member.metadata as any)?.social_links?.instagram).replace('@', '')}
+                          @{(member.social_links?.instagram || (member.metadata as any)?.social_links?.instagram || '').replace('@', '')}
                         </span>
                       </a>
                     )}

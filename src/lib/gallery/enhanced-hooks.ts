@@ -738,12 +738,12 @@ export function useRealtimeGalleryManager() {
     // Skip interval in non-browser environments
     if (typeof window === 'undefined') return;
 
-    const interval = setInterval(() => {
+    const interval = (globalThis as any).setInterval(() => {
       manager.refresh();
       setLastUpdate(new Date());
     }, 30000); // Refresh every 30 seconds
 
-    return () => clearInterval(interval);
+    return () => (globalThis as any).clearInterval(interval);
   }, [manager]);
 
   return {

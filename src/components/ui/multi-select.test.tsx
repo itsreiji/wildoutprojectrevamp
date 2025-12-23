@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -399,7 +398,6 @@ describe("MultiSelect Component", () => {
 
   describe("Touch Interactions", () => {
     it("should open dropdown on touch", async () => {
-      const user = userEvent.setup();
       render(<MultiSelect {...defaultProps} />);
 
       const trigger = screen.getByRole("button");
@@ -413,7 +411,6 @@ describe("MultiSelect Component", () => {
     });
 
     it("should select option on touch", async () => {
-      const user = userEvent.setup();
       const onChange = vi.fn();
       render(<MultiSelect {...defaultProps} onChange={onChange} />);
 

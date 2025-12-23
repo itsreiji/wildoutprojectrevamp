@@ -395,8 +395,8 @@ export const calculateProgress = (
 
 // Memory usage helper
 export const getMemoryUsage = () => {
-  if (typeof window !== 'undefined' && typeof performance !== 'undefined' && 'memory' in performance) {
-    const memory = (performance as any).memory;
+  if (typeof window !== 'undefined' && typeof (globalThis as any).performance !== 'undefined' && 'memory' in (globalThis as any).performance) {
+    const memory = ((globalThis as any).performance as any).memory;
     return {
       usedJSHeapSize: formatFileSize(memory.usedJSHeapSize),
       totalJSHeapSize: formatFileSize(memory.totalJSHeapSize),

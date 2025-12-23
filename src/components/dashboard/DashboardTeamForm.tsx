@@ -24,7 +24,7 @@
 import type { TeamMember } from "@/types/content";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useCallback } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import {
@@ -104,6 +104,16 @@ export function DashboardTeamForm({
   useEffect(() => {
     form.reset(getDefaultValues());
   }, [defaultValues?.id, form, getDefaultValues]);
+
+  // Extract watched values using useWatch to avoid memoization issues
+  const isPhotoRemoved = useWatch({
+    control: form.control,
+    name: "is_photo_removed",
+  });
+  const avatarFile = useWatch({
+    control: form.control,
+    name: "avatar_file",
+  });
 
   return (
     <Form {...form}>
@@ -382,12 +392,12 @@ export function DashboardTeamForm({
                               </label>
                             </div>
 
-                            {((defaultValues?.avatar_url && !form.watch("is_photo_removed")) || form.watch("avatar_file")) && (
+                            {((defaultValues?.avatar_url && !isPhotoRemoved) || avatarFile) && (
                               <div className="flex flex-col items-center gap-2 bg-white/5 rounded-xl p-3 border border-white/10 shrink-0">
                                 <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-[#E93370]/30 bg-[#0a0a0a] shadow-lg">
-                                  {form.watch("avatar_file") ? (
+                                  {avatarFile ? (
                                     <img
-                                      src={URL.createObjectURL(form.watch("avatar_file"))}
+                                      src={URL.createObjectURL(avatarFile)}
                                       alt="Preview"
                                       className="w-full h-full object-cover"
                                     />

@@ -114,7 +114,7 @@ export async function runGalleryIntegrationTest() {
       console.log('⚠️  Skipping upload test in non-browser environment');
       return;
     }
-    const testImageBuffer = Uint8Array.from(atob(testImageBase64), c => c.charCodeAt(0));
+    const testImageBuffer = Uint8Array.from((globalThis as any).atob(testImageBase64), (c: string) => c.charCodeAt(0));
     const testFile = new File([testImageBuffer], 'test-integration.png', { type: 'image/png' });
     Object.defineProperty(testFile, 'size', { value: testImageBuffer.length });
 

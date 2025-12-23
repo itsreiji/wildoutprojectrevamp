@@ -27,45 +27,6 @@ describe('Gallery Permissions - validateItemAccess', () => {
     vi.clearAllMocks();
   });
 
-  const mockUserRole = (role: string) => {
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: userId } } });
-    mockSupabase.from.mockImplementation((table) => {
-      if (table === 'profiles') {
-        mockSupabase.select.mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { role } }),
-          }),
-        });
-      } else if (table === 'gallery_items') {
-        mockSupabase.select.mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: {} }),
-          }),
-        });
-      }
-      return mockSupabase;
-    });
-  };
-
-  const mockItem = (itemData: any) => {
-    mockSupabase.from.mockImplementation((table) => {
-      if (table === 'gallery_items') {
-        mockSupabase.select.mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: itemData, error: null }),
-          }),
-        });
-      } else if (table === 'profiles') {
-        mockSupabase.select.mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { role: 'viewer' } }),
-          }),
-        });
-      }
-      return mockSupabase;
-    });
-  };
-
   const mockItemError = () => {
       mockSupabase.from.mockImplementation((table) => {
         if (table === 'gallery_items') {

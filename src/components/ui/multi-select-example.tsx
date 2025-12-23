@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { MultiSelect, type MultiSelectOption } from "./multi-select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 import { Badge } from "./badge";
-import { H3, BodyText, SmallText } from "./typography";
+import { H3, SmallText } from "./typography";
 
 /**
  * Example usage of MultiSelect component

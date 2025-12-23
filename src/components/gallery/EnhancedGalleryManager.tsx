@@ -150,11 +150,6 @@ export function EnhancedGalleryManager() {
   const [generateThumbnails, setGenerateThumbnails] = useState(true);
   const [compressionQuality, setCompressionQuality] = useState(0.85);
 
-  // Load data on mount and when filters change
-  useEffect(() => {
-    loadGalleryData();
-  }, [currentPage, filterCategory, filterStatus, searchQuery]);
-
   const loadGalleryData = useCallback(async () => {
     try {
       await getGalleryItemsPaginated(currentPage, 20, {
@@ -166,6 +161,11 @@ export function EnhancedGalleryManager() {
       console.error("Failed to load gallery data:", err);
     }
   }, [currentPage, filterCategory, filterStatus, searchQuery, getGalleryItemsPaginated]);
+
+  // Load data on mount and when filters change
+  useEffect(() => {
+    loadGalleryData();
+  }, [currentPage, filterCategory, filterStatus, searchQuery, loadGalleryData]);
 
   // Handle file selection
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -355,7 +355,7 @@ export function EnhancedGalleryManager() {
       setSelectedFiles([]);
       setUploadProgress([]);
 
-    } catch (err) {
+    } catch {
       toast.error("Bulk upload failed");
     }
   };
@@ -365,7 +365,7 @@ export function EnhancedGalleryManager() {
     try {
       await checkStorageConsistency();
       setShowConsistencyCheck(true);
-    } catch (err) {
+    } catch {
       toast.error("Consistency check failed");
     }
   };
@@ -374,7 +374,7 @@ export function EnhancedGalleryManager() {
   const handleCleanup = async () => {
     try {
       await cleanupOrphanedFiles();
-    } catch (err) {
+    } catch {
       toast.error("Cleanup failed");
     }
   };
@@ -391,7 +391,7 @@ export function EnhancedGalleryManager() {
       a.download = `gallery-backup-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) {
+    } catch {
       toast.error("Backup creation failed");
     }
   };
@@ -406,7 +406,7 @@ export function EnhancedGalleryManager() {
       try {
         const backupData = JSON.parse(e.target?.result as string);
         setBackupFile(backupData);
-      } catch (err) {
+      } catch {
         toast.error("Invalid backup file format");
       }
     };
@@ -421,7 +421,7 @@ export function EnhancedGalleryManager() {
       await restoreFromBackup(backupFile);
       setShowRestoreDialog(false);
       setBackupFile(null);
-    } catch (err) {
+    } catch {
       toast.error("Restore failed");
     }
   };

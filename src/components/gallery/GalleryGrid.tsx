@@ -864,9 +864,9 @@ export const GalleryGrid: React.FC<GalleryGridProps> = ({
 
   // Metadata editor dialog
   const MetadataEditorDialog = () => {
-    if (!editingItem) return null;
+    const [formData, setFormData] = useState<GalleryItem>(editingItem || {} as GalleryItem);
 
-    const [formData, setFormData] = useState<GalleryItem>(editingItem);
+    if (!editingItem) return null;
 
     return (
       <DialogContent className="max-w-2xl">

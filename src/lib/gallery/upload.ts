@@ -63,12 +63,18 @@ export async function optimizeImage(
   config: ImageOptimizationConfig
 ): Promise<File> {
   // Skip optimization in non-browser environments
-  if (typeof window === 'undefined' || !window.Image) {
+  if (typeof window === 'undefined') {
     return file;
   }
 
   return new Promise((resolve, reject) => {
-    const img = new Image();
+    // Check for Image constructor in non-browser environments
+    if (typeof (globalThis as any).Image === 'undefined') {
+      resolve(file);
+      return;
+    }
+
+    const img = new (globalThis as any).Image();
     const url = URL.createObjectURL(file);
 
     img.onload = () => {
@@ -143,8 +149,19 @@ export async function addWatermark(
   file: File,
   watermarkConfig: WatermarkConfig
 ): Promise<File> {
+  // Skip watermark in non-browser environments
+  if (typeof window === 'undefined') {
+    return file;
+  }
+
   return new Promise((resolve, reject) => {
-    const img = new Image();
+    // Check for Image constructor in non-browser environments
+    if (typeof (globalThis as any).Image === 'undefined') {
+      resolve(file);
+      return;
+    }
+
+    const img = new (globalThis as any).Image();
     const url = URL.createObjectURL(file);
 
     img.onload = () => {

@@ -1,7 +1,6 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MultiSelect, type MultiSelectOption } from "./multi-select";
 
 // Mock IntersectionObserver
@@ -31,26 +30,26 @@ describe("MultiSelect Performance Tests", () => {
       const onChange = vi.fn();
 
       const startTime = performance.now();
-      
+
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={onChange}
           placeholder="Select items..."
         />
       );
-      
+
       const renderTime = performance.now() - startTime;
       console.log(`Initial render time for 1000 options: ${renderTime.toFixed(2)}ms`);
-      
+
       expect(renderTime).toBeLessThan(100); // Should render in under 100ms
 
       const trigger = screen.getByRole("button");
       const openStartTime = performance.now();
       await user.click(trigger);
       const openTime = performance.now() - openStartTime;
-      
+
       console.log(`Dropdown open time for 1000 options: ${openTime.toFixed(2)}ms`);
       expect(openTime).toBeLessThan(150); // Should open in under 150ms
     });
@@ -60,18 +59,18 @@ describe("MultiSelect Performance Tests", () => {
       const largeOptions = generateLargeDataset(5000);
 
       const startTime = performance.now();
-      
+
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={vi.fn()}
         />
       );
-      
+
       const renderTime = performance.now() - startTime;
       console.log(`Render time for 5000 options: ${renderTime.toFixed(2)}ms`);
-      
+
       // Allow more time for 5000 options but still reasonable
       expect(renderTime).toBeLessThan(500);
 
@@ -87,20 +86,20 @@ describe("MultiSelect Performance Tests", () => {
       const largeOptions = generateLargeDataset(2000);
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={vi.fn()}
         />
       );
-      
+
       const trigger = screen.getByRole("button");
       await user.click(trigger);
 
       // Should only render visible options
       const options = screen.getAllByRole("option");
       console.log(`Visible options in viewport: ${options.length}`);
-      
+
       // Should not render all 2000 options at once
       expect(options.length).toBeLessThan(100);
     });
@@ -112,24 +111,24 @@ describe("MultiSelect Performance Tests", () => {
       const largeOptions = generateLargeDataset(1000);
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={vi.fn()}
         />
       );
-      
+
       const trigger = screen.getByRole("button");
       await user.click(trigger);
 
       const searchInput = screen.getByPlaceholderText("Search...");
       const searchStartTime = performance.now();
-      
+
       await user.type(searchInput, "500");
-      
+
       const searchTime = performance.now() - searchStartTime;
       console.log(`Search time for 1000 options: ${searchTime.toFixed(2)}ms`);
-      
+
       expect(searchTime).toBeLessThan(50);
 
       // Should show results
@@ -143,18 +142,18 @@ describe("MultiSelect Performance Tests", () => {
       const largeOptions = generateLargeDataset(1000);
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={vi.fn()}
         />
       );
-      
+
       const trigger = screen.getByRole("button");
       await user.click(trigger);
 
       const searchInput = screen.getByPlaceholderText("Search...");
-      
+
       const queries = ["1", "12", "123", "1234", "12345"];
       const startTime = performance.now();
 
@@ -165,7 +164,7 @@ describe("MultiSelect Performance Tests", () => {
 
       const totalTime = performance.now() - startTime;
       console.log(`Rapid search queries time: ${totalTime.toFixed(2)}ms`);
-      
+
       expect(totalTime).toBeLessThan(200); // All queries should complete quickly
     });
 
@@ -175,22 +174,22 @@ describe("MultiSelect Performance Tests", () => {
       const largeOptions = generateLargeDataset(1000);
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={vi.fn()}
           onSearch={onSearch}
         />
       );
-      
+
       const trigger = screen.getByRole("button");
       await user.click(trigger);
 
       const searchInput = screen.getByPlaceholderText("Search...");
-      
+
       // Type rapidly
       await user.type(searchInput, "test");
-      
+
       // Should debounce and only call once after typing stops
       await waitFor(() => {
         expect(onSearch).toHaveBeenCalledWith("test");
@@ -207,13 +206,13 @@ describe("MultiSelect Performance Tests", () => {
       const onChange = vi.fn();
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={onChange}
         />
       );
-      
+
       const trigger = screen.getByRole("button");
       await user.click(trigger);
 
@@ -227,7 +226,7 @@ describe("MultiSelect Performance Tests", () => {
 
       const selectionTime = performance.now() - startTime;
       console.log(`Selection time for 100 items: ${selectionTime.toFixed(2)}ms`);
-      
+
       expect(selectionTime).toBeLessThan(1000); // Should complete in under 1 second
       expect(onChange).toHaveBeenCalledTimes(100);
     });
@@ -239,13 +238,13 @@ describe("MultiSelect Performance Tests", () => {
       const onChange = vi.fn();
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={selectedValues} 
+        <MultiSelect
+          options={largeOptions}
+          value={selectedValues}
           onChange={onChange}
         />
       );
-      
+
       const trigger = screen.getByRole("button");
       await user.click(trigger);
 
@@ -257,7 +256,7 @@ describe("MultiSelect Performance Tests", () => {
 
       const clearTime = performance.now() - startTime;
       console.log(`Bulk clear time for 50 items: ${clearTime.toFixed(2)}ms`);
-      
+
       expect(clearTime).toBeLessThan(100);
       expect(onChange).toHaveBeenCalledWith([]);
     });
@@ -267,13 +266,13 @@ describe("MultiSelect Performance Tests", () => {
       const largeOptions = generateLargeDataset(1000);
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={vi.fn()}
         />
       );
-      
+
       const trigger = screen.getByRole("button");
       await user.click(trigger);
 
@@ -286,7 +285,7 @@ describe("MultiSelect Performance Tests", () => {
 
       const navigationTime = performance.now() - startTime;
       console.log(`Keyboard navigation time for 50 items: ${navigationTime.toFixed(2)}ms`);
-      
+
       expect(navigationTime).toBeLessThan(500);
     });
   });
@@ -297,13 +296,13 @@ describe("MultiSelect Performance Tests", () => {
       const largeOptions = generateLargeDataset(1000);
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={vi.fn()}
         />
       );
-      
+
       const trigger = screen.getByRole("button");
 
       const startTime = performance.now();
@@ -316,16 +315,15 @@ describe("MultiSelect Performance Tests", () => {
 
       const totalTime = performance.now() - startTime;
       console.log(`20 open/close cycles: ${totalTime.toFixed(2)}ms`);
-      
+
       expect(totalTime).toBeLessThan(2000); // Should be fast
     });
 
     it("should handle rapid prop updates", async () => {
-      const user = userEvent.setup();
       const { rerender } = render(
-        <MultiSelect 
-          options={generateLargeDataset(1000)} 
-          value={[]} 
+        <MultiSelect
+          options={generateLargeDataset(1000)}
+          value={[]}
           onChange={vi.fn()}
         />
       );
@@ -335,9 +333,9 @@ describe("MultiSelect Performance Tests", () => {
       // Rapidly update props
       for (let i = 0; i < 20; i++) {
         rerender(
-          <MultiSelect 
-            options={generateLargeDataset(1000)} 
-            value={[`option-${i}`]} 
+          <MultiSelect
+            options={generateLargeDataset(1000)}
+            value={[`option-${i}`]}
             onChange={vi.fn()}
           />
         );
@@ -345,7 +343,7 @@ describe("MultiSelect Performance Tests", () => {
 
       const rerenderTime = performance.now() - startTime;
       console.log(`20 rerenders with 1000 options: ${rerenderTime.toFixed(2)}ms`);
-      
+
       expect(rerenderTime).toBeLessThan(1000);
     });
   });
@@ -357,9 +355,9 @@ describe("MultiSelect Performance Tests", () => {
       const onChange = vi.fn();
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={onChange}
           placeholder="Select categories..."
         />
@@ -403,9 +401,9 @@ describe("MultiSelect Performance Tests", () => {
       const onChange = vi.fn();
 
       render(
-        <MultiSelect 
-          options={largeOptions} 
-          value={[]} 
+        <MultiSelect
+          options={largeOptions}
+          value={[]}
           onChange={onChange}
         />
       );
@@ -441,9 +439,9 @@ describe("MultiSelect Performance Tests", () => {
       const startTime = performance.now();
 
       render(
-        <MultiSelect 
-          options={massiveOptions} 
-          value={[]} 
+        <MultiSelect
+          options={massiveOptions}
+          value={[]}
           onChange={vi.fn()}
         />
       );
@@ -468,9 +466,9 @@ describe("MultiSelect Performance Tests", () => {
       const onChange = vi.fn();
 
       render(
-        <MultiSelect 
-          options={options} 
-          value={[]} 
+        <MultiSelect
+          options={options}
+          value={[]}
           onChange={onChange}
         />
       );

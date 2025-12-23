@@ -11,6 +11,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { toast } from "sonner";
@@ -145,7 +146,7 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
   const user = authContext.user;
 
   // Service instance
-  const storageService = new EnhancedGalleryStorageService();
+  const storageService = useMemo(() => new EnhancedGalleryStorageService(), []);
 
   // Use enhanced manager hooks
   const galleryManager = useEnhancedGalleryManager();
@@ -169,12 +170,6 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
   const [error, setError] = useState<string | null>(null);
 
   // Load initial data
-  useEffect(() => {
-    if (user) {
-      loadGalleryData();
-    }
-  }, [user]);
-
   const loadGalleryData = useCallback(async () => {
     if (!user) return;
 
@@ -203,7 +198,14 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
       setError("Failed to load gallery data");
       toast.error("Failed to load gallery data");
     }
-  }, [user]);
+  }, [user, storageService]);
+
+  // Load initial data
+  useEffect(() => {
+    if (user) {
+      loadGalleryData();
+    }
+  }, [user, loadGalleryData]);
 
   const refreshGallery = useCallback(async () => {
     await loadGalleryData();
@@ -242,7 +244,7 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
       });
       throw err;
     }
-  }, [user, storageService]);
+  }, [user, storageService, refreshGallery]);
 
   const addGalleryImage = useCallback(async (item: TablesInsert<"gallery_items">): Promise<GalleryImage> => {
     if (!user) {

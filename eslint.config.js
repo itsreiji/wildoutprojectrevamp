@@ -19,6 +19,7 @@ export default [
       "vite.config.ts",
       "vitest.config.ts",
       "tailwind.config.ts",
+      "api/", // Exclude API directory - not part of main TypeScript project
     ],
   },
   {
@@ -57,6 +58,8 @@ export default [
         // Timer API
         setTimeout: "readonly",
         clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
         // Web Crypto API
         crypto: "readonly",
         // TypeScript/Node.js globals
@@ -80,6 +83,11 @@ export default [
         vi: "readonly",
         // Browser confirmation API
         confirm: "readonly",
+        alert: "readonly",
+        // Performance API
+        performance: "readonly",
+        // Global object
+        global: "readonly",
       },
     },
     plugins: {
@@ -146,6 +154,11 @@ export default [
         clearTimeout: "readonly",
         setInterval: "readonly",
         clearInterval: "readonly",
+        fetch: "readonly",
+        alert: "readonly",
+        confirm: "readonly",
+        performance: "readonly",
+        global: "readonly",
       },
     },
     rules: {

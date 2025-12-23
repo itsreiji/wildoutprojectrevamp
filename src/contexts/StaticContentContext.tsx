@@ -115,7 +115,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
   const [adminSectionsLoading, setAdminSectionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchHeroContent = async (): Promise<HeroContent | null> => {
+  const fetchHeroContent = useCallback(async (): Promise<HeroContent | null> => {
     try {
       const { data, error } = await supabaseClient.rpc("get_hero_content");
       if (error) {
@@ -147,9 +147,9 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Error in fetchHeroContent:", error);
       return null;
     }
-  };
+  }, []);
 
-  const importAboutContentFallback = async (): Promise<{ success: boolean; data: AboutContent | null; error?: string }> => {
+  const importAboutContentFallback = useCallback(async (): Promise<{ success: boolean; data: AboutContent | null; error?: string }> => {
     console.log('StaticContentContext: Starting fallback import for about content');
 
     try {
@@ -214,9 +214,9 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
         error: error instanceof Error ? error.message : "Unknown error during import"
       };
     }
-  };
+  }, [user, role]);
 
-  const fetchAboutContent = async (): Promise<AboutContent | null> => {
+  const fetchAboutContent = useCallback(async (): Promise<AboutContent | null> => {
     console.log('StaticContentContext: Starting fetchAboutContent', {
       timestamp: new Date().toISOString(),
       useDummyData
@@ -284,9 +284,9 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
       console.warn('StaticContentContext: Exception caught, falling back to mock data');
       return MOCK_ABOUT;
     }
-  };
+  }, [importAboutContentFallback]);
 
-  const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
+  const fetchSiteSettings = useCallback(async (): Promise<SiteSettings | null> => {
     try {
       const { data, error } = await supabaseClient.rpc("get_site_settings");
       if (error) {
@@ -319,9 +319,9 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Error in fetchSiteSettings:", error);
       return null;
     }
-  };
+  }, []);
 
-  const fetchGallery = async (): Promise<GalleryImage[]> => {
+  const fetchGallery = useCallback(async (): Promise<GalleryImage[]> => {
     try {
       const { data, error } = await supabaseClient
         .from("gallery_items")
@@ -350,7 +350,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Error in fetchGallery:", error);
       return [];
     }
-  };
+  }, []);
 
   const loadStaticContent = useCallback(async () => {
     try {
@@ -384,7 +384,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchHeroContent, fetchAboutContent, fetchSiteSettings, fetchGallery]);
 
   useEffect(() => {
     loadStaticContent();

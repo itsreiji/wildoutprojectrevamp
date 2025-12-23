@@ -266,12 +266,18 @@ export async function validateImageDimensions(
   file: File
 ): Promise<{ width: number; height: number; valid: boolean; errors: string[] }> {
   // Skip validation in non-browser environments
-  if (typeof window === 'undefined' || !window.Image) {
+  if (typeof window === 'undefined') {
     return { width: 0, height: 0, valid: true, errors: [] };
   }
 
   return new Promise((resolve) => {
-    const img = new Image();
+    // Check for Image constructor in non-browser environments
+    if (typeof (globalThis as any).Image === 'undefined') {
+      resolve({ width: 0, height: 0, valid: true, errors: [] });
+      return;
+    }
+
+    const img = new (globalThis as any).Image();
     const url = URL.createObjectURL(file);
 
     img.onload = () => {
@@ -313,12 +319,18 @@ export async function validateImageDimensions(
  */
 export async function validateImageQuality(file: File): Promise<{ valid: boolean; warnings: string[] }> {
   // Skip validation in non-browser environments
-  if (typeof window === 'undefined' || !window.Image || typeof document === 'undefined') {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
     return { valid: true, warnings: [] };
   }
 
   return new Promise((resolve) => {
-    const img = new Image();
+    // Check for Image constructor in non-browser environments
+    if (typeof (globalThis as any).Image === 'undefined') {
+      resolve({ valid: true, warnings: [] });
+      return;
+    }
+
+    const img = new (globalThis as any).Image();
     const url = URL.createObjectURL(file);
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
