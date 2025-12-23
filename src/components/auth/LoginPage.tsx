@@ -217,10 +217,10 @@ export const LoginPage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="login-container relative z-10 w-full max-w-[380px]"
+        className="login-container relative z-10 w-full max-w-[340px]"
         data-animated="true"
       >
-        <div className="login-card space-y-8 rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-8 md:p-10 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
+        <div className="login-card space-y-6 rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-6 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
           <div className="text-center mb-10" id="admin-login-header">
             <h1 className="text-3xl font-black tracking-tight text-white" id="admin-login-title">
               Admin <span className="text-brand-pink">access</span>
