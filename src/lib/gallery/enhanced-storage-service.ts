@@ -215,6 +215,10 @@ export class EnhancedGalleryStorageService {
    * Optimize image using browser Canvas API
    */
   private async optimizeImage(file: File, quality: number = COMPRESSION_QUALITY): Promise<Blob> {
+    // Skip optimization in non-browser environments
+    if (typeof window === 'undefined' || !window.Image || typeof document === 'undefined') {
+      return file;
+    }
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
@@ -271,6 +275,10 @@ export class EnhancedGalleryStorageService {
    * Generate thumbnail from file
    */
   private async generateThumbnailFromImage(file: File): Promise<Blob> {
+    // Skip thumbnail generation in non-browser environments
+    if (typeof window === 'undefined' || !window.Image || typeof document === 'undefined') {
+      return file;
+    }
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
@@ -326,6 +334,10 @@ export class EnhancedGalleryStorageService {
    * Get image dimensions
    */
   private async getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+    // Skip dimension check in non-browser environments
+    if (typeof window === 'undefined' || !window.Image) {
+      return { width: 0, height: 0 };
+    }
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
@@ -778,7 +790,7 @@ export class EnhancedGalleryStorageService {
         updateData.image_url = ''; // Clear old URL, use storage path
       }
 
-      const { data, error } = await supabaseClient
+      const { error } = await supabaseClient
         .from('gallery_items')
         .update(updateData)
         .eq('id', itemId)
@@ -1292,7 +1304,7 @@ export class EnhancedGalleryStorageService {
 
       return { status, issues, recommendations };
 
-    } catch (error) {
+    } catch {
       return {
         status: 'error',
         issues: ['Failed to check storage health'],
@@ -1307,15 +1319,6 @@ export class EnhancedGalleryStorageService {
    * Get file metadata
    */
   private async getFileMetadata(path: string, file: File): Promise<StorageMetadata> {
-    // Get file info from storage
-    const { data: fileInfo, error } = await supabaseClient.storage
-      .from(this.bucket)
-      .list(path.split('/').slice(0, -1).join('/'), {
-        limit: 1,
-        offset: 0,
-        search: path.split('/').pop()
-      });
-
     // Create metadata object
     const metadata: StorageMetadata = {
       size: file.size,

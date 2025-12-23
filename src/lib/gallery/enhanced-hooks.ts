@@ -735,6 +735,9 @@ export function useRealtimeGalleryManager() {
 
   // Simulate real-time updates (in production, use Supabase Realtime)
   useEffect(() => {
+    // Skip interval in non-browser environments
+    if (typeof window === 'undefined') return;
+
     const interval = setInterval(() => {
       manager.refresh();
       setLastUpdate(new Date());

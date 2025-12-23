@@ -60,7 +60,7 @@ export function buildGalleryQuery(
   // Pencarian full-text
   if (filters.search_query) {
     const searchQuery = filters.search_query.toLowerCase();
-    
+
     // Gunakan or untuk mencari di multiple fields
     query = query.or(
       `title.ilike.%${searchQuery}%,` +
@@ -140,7 +140,7 @@ export async function advancedSearch(
   const baseQuery = buildGalleryQuery(filters, sort, pagination);
 
   // Apply advanced filters after initial query
-  let { data, count, error } = await baseQuery;
+  let { data, error } = await baseQuery;
 
   if (error) {
     return { data: [], count: null, error: error.message };
@@ -337,7 +337,7 @@ export function fuzzySearch(items: GalleryItem[], query: string): GalleryItem[] 
   if (!query) return items;
 
   const lowerQuery = query.toLowerCase();
-  
+
   return items.filter(item => {
     const title = (item.title || '').toLowerCase();
     const description = (item.description || '').toLowerCase();
@@ -480,11 +480,12 @@ export async function searchWithDateAggregation(
       case 'day':
         key = date.toISOString().split('T')[0];
         break;
-      case 'week':
+      case 'week': {
         const weekStart = new Date(date);
         weekStart.setDate(date.getDate() - date.getDay());
         key = weekStart.toISOString().split('T')[0];
         break;
+      }
       case 'month':
         key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         break;

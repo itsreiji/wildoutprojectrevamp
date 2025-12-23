@@ -1,6 +1,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { SupabaseGalleryProvider, useSupabaseGallery } from '../contexts/SupabaseGalleryContext';
 import * as Permissions from '../lib/gallery/permissions';
 

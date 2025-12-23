@@ -1,42 +1,21 @@
 /**
  * Gallery Storage Service Tests
- * 
+ *
  * Comprehensive test suite for the Supabase Storage-based gallery system
  * Tests all major functionality including upload, retrieval, management, and error handling
  */
 
-import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
-import { 
-  GalleryStorageService, 
-  ValidationError, 
+import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import {
+  GalleryStorageService,
+  ValidationError,
   UploadError,
   DownloadError,
   STORAGE_BUCKET,
   MOMENTS_PATH,
-  MAX_FILE_SIZE,
-  ALLOWED_MIME_TYPES
+  MAX_FILE_SIZE
 } from './storage-service';
 import type { GalleryImage } from '@/types/content';
-
-// Mock Supabase client
-const mockSupabaseClient = {
-  storage: {
-    from: vi.fn().mockReturnValue({
-      upload: vi.fn(),
-      getPublicUrl: vi.fn(),
-      list: vi.fn(),
-      remove: vi.fn(),
-    }),
-  },
-  rpc: vi.fn(),
-  from: vi.fn().mockReturnValue({
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    delete: vi.fn().mockReturnThis(),
-    single: vi.fn(),
-  }),
-};
 
 // Mock auth context
 const mockUser = { id: 'test-user-123' };
@@ -461,7 +440,7 @@ describe('GalleryStorageService Integration', () => {
       // This would test the actual workflow in a real environment
       // For now, we'll mock the entire process
       const mockFile = createMockFile('event-photo.jpg', 500000, 'image/jpeg');
-      
+
       // 1. Validate
       const validation = service.validateFile(mockFile);
       expect(validation.valid).toBe(true);
@@ -536,7 +515,7 @@ describe('GalleryStorageService Performance', () => {
   });
 
   it('should handle large batch operations efficiently', async () => {
-    const files = Array.from({ length: 10 }, (_, i) => 
+    const files = Array.from({ length: 10 }, (_, i) =>
       createMockFile(`test${i}.jpg`, 100000, 'image/jpeg')
     );
 
@@ -605,9 +584,9 @@ describe('GalleryStorageService Security', () => {
 
   it('should prevent path traversal attacks', () => {
     const maliciousFile = createMockFile('../../../etc/passwd', 1000, 'image/jpeg');
-    
+
     const path = service.generateStoragePath(maliciousFile, 'user-123');
-    
+
     // Should sanitize the path
     expect(path).not.toContain('..');
     expect(path).toMatch(/^moments\/user-123\/\d+-[a-z0-9]+-____etc_passwd$/);
@@ -615,9 +594,9 @@ describe('GalleryStorageService Security', () => {
 
   it('should sanitize file names with special characters', () => {
     const specialFile = createMockFile('test file (1) [final].jpg', 1000, 'image/jpeg');
-    
+
     const path = service.generateStoragePath(specialFile, 'user-123');
-    
+
     expect(path).not.toContain(' ');
     expect(path).not.toContain('(');
     expect(path).not.toContain(')');

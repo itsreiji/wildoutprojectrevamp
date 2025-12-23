@@ -50,7 +50,7 @@ export async function uploadToStorage(
       .getPublicUrl(data.path);
 
     return { success: true, url: urlData.publicUrl };
-  } catch (error) {
+  } catch {
     return { success: false, error: 'Gagal mengupload ke storage' };
   }
 }
@@ -62,6 +62,11 @@ export async function optimizeImage(
   file: File,
   config: ImageOptimizationConfig
 ): Promise<File> {
+  // Skip optimization in non-browser environments
+  if (typeof window === 'undefined' || !window.Image) {
+    return file;
+  }
+
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);

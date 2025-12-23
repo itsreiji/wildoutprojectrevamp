@@ -1,19 +1,16 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { validateItemAccess, ROLE_PERMISSIONS } from '../lib/gallery/permissions';
+import { validateItemAccess } from '../lib/gallery/permissions';
 
 // Use vi.hoisted to create the mock object before the mock factory is evaluated
 const mockSupabase = vi.hoisted(() => ({
   auth: {
     getUser: vi.fn(),
   },
-  from: vi.fn(() => ({
-    select: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        single: vi.fn(),
-      })),
-    })),
-  })),
+  from: vi.fn().mockReturnThis(),
+  select: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  single: vi.fn(),
 }));
 
 vi.mock('@/supabase/client', () => ({
@@ -34,58 +31,51 @@ describe('Gallery Permissions - validateItemAccess', () => {
     mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: userId } } });
     mockSupabase.from.mockImplementation((table) => {
       if (table === 'profiles') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: { role } }),
-            }),
-          }),
-        };
-      }
-      return {
-        select: vi.fn().mockReturnValue({
+        mockSupabase.select.mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: {} }), // Default item mock
+            single: vi.fn().mockResolvedValue({ data: { role } }),
           }),
-        }),
-      };
+        });
+      } else if (table === 'gallery_items') {
+        mockSupabase.select.mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: {} }),
+          }),
+        });
+      }
+      return mockSupabase;
     });
   };
 
   const mockItem = (itemData: any) => {
     mockSupabase.from.mockImplementation((table) => {
       if (table === 'gallery_items') {
-        return {
-          select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: itemData, error: null }),
-            }),
+        mockSupabase.select.mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: itemData, error: null }),
           }),
-        };
-      }
-      // Fallback for profiles if needed
-      return {
-        select: vi.fn().mockReturnValue({
+        });
+      } else if (table === 'profiles') {
+        mockSupabase.select.mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({ data: { role: 'viewer' } }),
           }),
-        }),
-      };
+        });
+      }
+      return mockSupabase;
     });
   };
-  
+
   const mockItemError = () => {
       mockSupabase.from.mockImplementation((table) => {
         if (table === 'gallery_items') {
-          return {
-            select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } }),
-              }),
+          mockSupabase.select.mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: null, error: { message: 'Not found' } }),
             }),
-          };
+          });
         }
-        return { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn() };
+        return mockSupabase;
       });
   };
 
@@ -102,30 +92,28 @@ describe('Gallery Permissions - validateItemAccess', () => {
      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: userId } } });
      mockSupabase.from.mockImplementation((table) => {
       if (table === 'profiles') {
-          return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { role: 'guest' } }) }) }) };
+          mockSupabase.select.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { role: 'guest' } }) }) });
+      } else if (table === 'gallery_items') {
+          mockSupabase.select.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { created_by: otherUserId, status: 'published' } }) }) });
       }
-      if (table === 'gallery_items') {
-           return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { created_by: otherUserId, status: 'published' } }) }) }) };
-      }
-      return {};
+      return mockSupabase;
      });
 
     const result = await validateItemAccess(itemId, userId, 'can_view');
     expect(result.allowed).toBe(false);
     expect(result.reason).toBe('Tidak memiliki izin');
   });
-  
+
   it('should allow owner to edit their item', async () => {
     // Role: editor (can_edit=true)
      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: userId } } });
      mockSupabase.from.mockImplementation((table) => {
       if (table === 'profiles') {
-          return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { role: 'editor' } }) }) }) };
+          mockSupabase.select.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { role: 'editor' } }) }) });
+      } else if (table === 'gallery_items') {
+          mockSupabase.select.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { created_by: userId, status: 'published' } }) }) });
       }
-      if (table === 'gallery_items') {
-           return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { created_by: userId, status: 'published' } }) }) }) };
-      }
-      return {};
+      return mockSupabase;
      });
 
     const result = await validateItemAccess(itemId, userId, 'can_edit');
@@ -137,12 +125,11 @@ describe('Gallery Permissions - validateItemAccess', () => {
      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: userId } } });
      mockSupabase.from.mockImplementation((table) => {
       if (table === 'profiles') {
-          return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { role: 'editor' } }) }) }) };
+          mockSupabase.select.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { role: 'editor' } }) }) });
+      } else if (table === 'gallery_items') {
+          mockSupabase.select.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { created_by: otherUserId, status: 'published' } }) }) });
       }
-      if (table === 'gallery_items') {
-           return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { created_by: otherUserId, status: 'published' } }) }) }) };
-      }
-      return {};
+      return mockSupabase;
      });
 
     const result = await validateItemAccess(itemId, userId, 'can_edit');
@@ -155,12 +142,11 @@ describe('Gallery Permissions - validateItemAccess', () => {
      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: userId } } });
      mockSupabase.from.mockImplementation((table) => {
       if (table === 'profiles') {
-          return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { role: 'admin' } }) }) }) };
+          mockSupabase.select.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { role: 'admin' } }) }) });
+      } else if (table === 'gallery_items') {
+          mockSupabase.select.mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { created_by: otherUserId, status: 'published' } }) }) });
       }
-      if (table === 'gallery_items') {
-           return { select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: { created_by: otherUserId, status: 'published' } }) }) }) };
-      }
-      return {};
+      return mockSupabase;
      });
 
     const result = await validateItemAccess(itemId, userId, 'can_edit');

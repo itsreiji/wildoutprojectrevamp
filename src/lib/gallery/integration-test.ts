@@ -83,7 +83,7 @@ export async function runGalleryIntegrationTest() {
     } else {
       console.log('✅ Storage stats function available:', stats);
     }
-  } catch (error) {
+  } catch {
     console.log('⚠️  Database functions check skipped');
   }
 
@@ -100,7 +100,7 @@ export async function runGalleryIntegrationTest() {
     } else {
       console.log('✅ Gallery items table accessible');
     }
-  } catch (error) {
+  } catch {
     console.log('⚠️  Gallery items table check skipped');
   }
 
@@ -109,6 +109,11 @@ export async function runGalleryIntegrationTest() {
   try {
     // Create a tiny test image (1x1 pixel PNG)
     const testImageBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+    // Use atob only in browser environment, otherwise skip this test
+    if (typeof atob === 'undefined') {
+      console.log('⚠️  Skipping upload test in non-browser environment');
+      return;
+    }
     const testImageBuffer = Uint8Array.from(atob(testImageBase64), c => c.charCodeAt(0));
     const testFile = new File([testImageBuffer], 'test-integration.png', { type: 'image/png' });
     Object.defineProperty(testFile, 'size', { value: testImageBuffer.length });

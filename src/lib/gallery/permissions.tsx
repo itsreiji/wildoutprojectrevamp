@@ -410,7 +410,7 @@ export function withPermissionGuard(
         setLoading(false);
       }
       checkAccess();
-    }, [requiredPermission]);
+    }, []);
 
     if (loading) {
       return <div>Loading...</div>;

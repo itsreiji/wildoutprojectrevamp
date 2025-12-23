@@ -1,19 +1,17 @@
 /**
  * Gallery React Hooks
- * 
- * Provides React hooks for gallery operations with caching, 
+ *
+ * Provides React hooks for gallery operations with caching,
  * optimistic updates, and error handling.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { 
-  GalleryStorageService, 
-  type PaginationOptions,
-  type StorageStats,
-  type StorageConsistencyIssue 
+import {
+  GalleryStorageService,
+  type PaginationOptions
 } from './storage-service';
 import type { GalleryImage } from '@/types/content';
 import { useAuth } from '@/contexts/AuthContext';
@@ -122,7 +120,7 @@ export function useUploadGallery() {
   return useMutation({
     mutationFn: async (files: File[]) => {
       if (!user) throw new Error('Authentication required');
-      
+
       const results = await storageService.uploadMultipleFiles(files, user.id, {
         optimize: true,
         generateThumbnail: true,
@@ -189,7 +187,7 @@ export function useBulkGalleryOperations() {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['gallery'] });
       queryClient.invalidateQueries({ queryKey: ['gallery-stats'] });
-      
+
       if (result.success > 0) {
         toast.success(`Uploaded ${result.success} files`);
       }
@@ -206,7 +204,7 @@ export function useBulkGalleryOperations() {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['gallery'] });
       queryClient.invalidateQueries({ queryKey: ['gallery-stats'] });
-      
+
       if (result.success > 0) {
         toast.success(`Deleted ${result.success} items`);
       }
@@ -231,7 +229,7 @@ export function useStorageManagement() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['gallery-stats'] });
-      
+
       if (result.deleted > 0) {
         toast.success(`Cleaned up ${result.deleted} orphaned files`);
       } else {
@@ -278,12 +276,12 @@ export function useUploadProgress() {
   const trackUpload = useCallback(async (files: File[], userId: string) => {
     setIsUploading(true);
     setResults([]);
-    
+
     try {
       const uploadResults = await storageService.uploadMultipleFiles(files, userId, {
         onProgress: (p) => setProgress(p),
       });
-      
+
       setResults(uploadResults);
       return uploadResults;
     } finally {
@@ -393,7 +391,7 @@ export function useGalleryManager() {
   const galleryQuery = useGalleryItems(pagination.params);
   const statsQuery = useStorageStats();
   const consistencyQuery = useConsistencyCheck();
-  
+
   const uploadMutation = useUploadGallery();
   const deleteMutation = useDeleteGallery();
   const bulkOps = useBulkGalleryOperations();
@@ -411,13 +409,13 @@ export function useGalleryManager() {
     pagination: galleryQuery.pagination,
     stats: statsQuery.data,
     consistencyIssues: consistencyQuery.data || [],
-    
+
     // State
     isLoading: galleryQuery.isLoading || statsQuery.isLoading,
     isUploading: uploadMutation.isPending,
     isDeleting: deleteMutation.isPending,
     isChecking: consistencyQuery.isFetching,
-    
+
     // Actions
     upload: uploadMutation.mutate,
     delete: deleteMutation.mutate,
@@ -427,12 +425,12 @@ export function useGalleryManager() {
     checkConsistency: consistencyQuery.refetch,
     optimisticUpload: optimistic.optimisticUpload,
     refresh,
-    
+
     // Pagination
     setPage: pagination.setPage,
     setLimit: pagination.setLimit,
     setFilters: pagination.setFilters,
-    
+
     // Errors
     error: galleryQuery.error || statsQuery.error,
   };

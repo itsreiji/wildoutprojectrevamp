@@ -265,6 +265,11 @@ export function generateStandardFilename(
 export async function validateImageDimensions(
   file: File
 ): Promise<{ width: number; height: number; valid: boolean; errors: string[] }> {
+  // Skip validation in non-browser environments
+  if (typeof window === 'undefined' || !window.Image) {
+    return { width: 0, height: 0, valid: true, errors: [] };
+  }
+
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -307,6 +312,11 @@ export async function validateImageDimensions(
  * Validasi kualitas gambar (deteksi gambar buram/blur)
  */
 export async function validateImageQuality(file: File): Promise<{ valid: boolean; warnings: string[] }> {
+  // Skip validation in non-browser environments
+  if (typeof window === 'undefined' || !window.Image || typeof document === 'undefined') {
+    return { valid: true, warnings: [] };
+  }
+
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -417,7 +427,7 @@ export async function comprehensiveValidation(
           },
         };
       }
-    } catch (error) {
+    } catch {
       warnings.push('Gagal melakukan validasi kualitas gambar');
     }
   }
