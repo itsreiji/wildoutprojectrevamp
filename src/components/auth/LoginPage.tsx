@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from "../router/RouterContext";
 import { useAuth } from '../../contexts/AuthContext';
 import { Background3D } from '../Background3D';
+import { motion } from 'motion/react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Checkbox } from '../../components/ui/checkbox';
@@ -201,24 +202,28 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // Mobile responsiveness - adjust layout for smaller screens
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  // Debug: Log accessibility info if needed
-  // useEffect(() => {
-  //   console.log('LoginPage rendered');
-  // }, []);
+  const inputClasses = "h-11 bg-white/[0.05] border-white/10 text-white placeholder:text-white/20 focus:ring-1 focus:ring-[#E93370]/50 focus:border-[#E93370]/50 transition-all rounded-xl px-4";
+  const labelClasses = "flex items-center gap-2 text-sm font-semibold text-white/60 mb-2";
+  const brandPink = "#E93370";
 
   return (
-    <div className="login-page relative min-h-screen bg-background text-foreground overflow-x-hidden" id="admin-login-page">
+    <div className="login-page relative min-h-screen bg-black text-foreground overflow-x-hidden flex items-center justify-center p-4" id="admin-login-page">
       <Background3D />
-      <div className="login-container relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
-        <div className={`login-card w-full space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl ${isMobile ? 'max-w-xs' : 'max-w-sm'}`} id="admin-login-card">
-          <div className="text-center" id="admin-login-header">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent tracking-normal" id="admin-login-title">
-              {copy.title}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="login-container relative z-10 w-full max-w-[380px]"
+        data-animated="true"
+      >
+        <div className="login-card space-y-8 rounded-4xl border border-white/10 bg-[#0a0a0a]/80 p-8 md:p-10 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
+          <div className="text-center mb-10" id="admin-login-header">
+            <h1 className="text-3xl font-black tracking-tight text-white" id="admin-login-title">
+              Admin <span className="text-[#E93370]">access</span>
             </h1>
-            <p className="mt-3 text-sm text-white/60 leading-relaxed max-w-xs mx-auto" id="admin-login-subtitle">
+            <p className="mt-3 text-sm text-white/40 leading-relaxed max-w-[240px] mx-auto" id="admin-login-subtitle">
               {copy.subtitle}
             </p>
           </div>
@@ -245,14 +250,15 @@ export const LoginPage: React.FC = () => {
 
           {/* Email/Password Form */}
           <Form {...form}>
-            <form className="space-y-[var(--form-field-gap)]" id="admin-login-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="space-y-5" id="admin-login-form" onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem id="admin-login-email-field">
-                    <FormLabel className="flex items-center gap-2 text-white/80" id="admin-login-email-label">
-                      <Mail className="h-4 w-4" id="admin-login-email-icon" /> Email
+                    <FormLabel className={labelClasses} id="admin-login-email-label">
+                      <Mail className="h-4 w-4 text-[#E93370]" id="admin-login-email-icon" />
+                      <span>Email</span>
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
@@ -260,11 +266,11 @@ export const LoginPage: React.FC = () => {
                           id="admin-login-email-input"
                           placeholder="Enter your email"
                           {...field}
-                          className="bg-gray-800 border-white/20 text-white focus:ring-2 focus:ring-[#E93370]/50"
+                          className={inputClasses}
                         />
                         {field.value && !form.formState.errors.email && (
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2" id="admin-login-email-valid-indicator">
-                            <CheckCircle2 className="h-5 w-5 text-green-400" id="admin-login-email-valid-icon" />
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center" id="admin-login-email-valid-indicator">
+                            <CheckCircle2 className="h-4 w-4 text-green-400" id="admin-login-email-valid-icon" />
                           </div>
                         )}
                       </div>
@@ -279,8 +285,9 @@ export const LoginPage: React.FC = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem id="admin-login-password-field">
-                    <FormLabel className="flex items-center gap-2 text-white/80" id="admin-login-password-label">
-                      <Lock className="h-4 w-4" id="admin-login-password-icon" /> Password
+                    <FormLabel className={labelClasses} id="admin-login-password-label">
+                      <Lock className="h-4 w-4 text-[#E93370]" id="admin-login-password-icon" />
+                      <span>Password</span>
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
@@ -289,16 +296,16 @@ export const LoginPage: React.FC = () => {
                           placeholder="Enter your password"
                           type={showPassword ? 'text' : 'password'}
                           {...field}
-                          className="bg-gray-800 border-white/20 text-white focus:ring-2 focus:ring-[#E93370]/50"
+                          className={inputClasses}
                         />
                         <button
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors p-1 flex items-center justify-center"
                           id="admin-login-password-toggle"
                           data-testid="admin-login-password-toggle"
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                         >
-                          {showPassword ? <EyeOff className="h-5 w-5" id="admin-login-password-hide-icon" /> : <Eye className="h-5 w-5" id="admin-login-password-show-icon" />}
+                          {showPassword ? <EyeOff className="h-4 w-4" id="admin-login-password-hide-icon" /> : <Eye className="h-4 w-4" id="admin-login-password-show-icon" />}
                         </button>
                       </div>
                     </FormControl>
@@ -306,28 +313,28 @@ export const LoginPage: React.FC = () => {
 
                     {/* Password Strength Indicator */}
                     {field.value && (
-                      <div className="mt-3" data-testid="password-strength" id="admin-login-password-strength-indicator">
-                        <div className="flex items-center justify-between text-xs text-gray-400 mb-2" id="admin-login-password-strength-header">
-                          <span id="admin-login-password-strength-label">Password Strength</span>
-                          <span className={`font-medium ${passwordStrength.score >= 3 ? 'text-green-400' :
+                      <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/5" data-testid="password-strength" id="admin-login-password-strength-indicator">
+                        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider text-white/40 mb-2" id="admin-login-password-strength-header">
+                          <span id="admin-login-password-strength-label">Strength</span>
+                          <span className={`font-bold ${passwordStrength.score >= 3 ? 'text-green-400' :
                             passwordStrength.score >= 2 ? 'text-yellow-400' :
                               passwordStrength.score >= 1 ? 'text-orange-400' : 'text-red-400'
                             }`} id="admin-login-password-strength-value">
                             {getStrengthText(passwordStrength.score)}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-700 rounded-full h-2" id="admin-login-password-strength-bar-wrapper">
+                        <div className="w-full bg-white/10 rounded-full h-1" id="admin-login-password-strength-bar-wrapper">
                           <div
-                            className={`h-2 rounded-full transition-all duration-300 ${getStrengthColor(passwordStrength.score)}`}
+                            className={`h-1 rounded-full transition-all duration-500 ${getStrengthColor(passwordStrength.score)}`}
                             id="admin-login-password-strength-bar"
                             style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
                           />
                         </div>
                         {passwordStrength.feedback.length > 0 && (
-                          <ul className="mt-2 text-xs text-gray-400 space-y-1" id="admin-login-password-strength-feedback">
+                          <ul className="mt-2 text-[10px] text-white/30 space-y-1" id="admin-login-password-strength-feedback">
                             {passwordStrength.feedback.map((item, index) => (
                               <li key={`password-feedback-${index}`} className="flex items-center">
-                                <AlertTriangle className="h-3 w-3 mr-2 text-yellow-400" id={`admin-login-password-feedback-icon-${index}`} />
+                                <div className={`h-1 w-1 rounded-full mr-2 bg-[${brandPink}]`} />
                                 <span id={`admin-login-password-feedback-text-${index}`}>{item}</span>
                               </li>
                             ))}
@@ -354,25 +361,23 @@ export const LoginPage: React.FC = () => {
                 control={form.control}
                 name="rememberMe"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0" id="admin-login-remember-me-field">
+                  <FormItem className="flex items-center space-x-2.5 space-y-0 py-1" id="admin-login-remember-me-field">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        className="border-pink-500 data-[state=checked]:bg-pink-500"
+                        className={`h-4 w-4 border-white/20 data-[state=checked]:bg-[${brandPink}] data-[state=checked]:border-[${brandPink}]`}
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel className="text-gray-300" id="admin-login-remember-me-label">
-                        Remember me
-                      </FormLabel>
-                    </div>
+                    <FormLabel className="text-sm font-medium text-white/40 cursor-pointer" id="admin-login-remember-me-label">
+                      Remember me
+                    </FormLabel>
                   </FormItem>
                 )}
               />
 
               <Button
-                className="w-full bg-[#E93370] hover:bg-[#E93370]/80 text-white"
+                className={`w-full h-11 bg-[${brandPink}] hover:bg-[${brandPink}]/90 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98]`}
                 disabled={oauthLoading || rateLimitInfo.isBlocked}
                 id="admin-login-submit-button"
                 type="submit"
@@ -389,9 +394,15 @@ export const LoginPage: React.FC = () => {
             </form>
           </Form>
 
-          <div className="mt-6" id="admin-login-oauth-section">
+          <div className="mt-10" id="admin-login-oauth-section">
+            <div className="flex items-center gap-4 mb-8" id="admin-login-separator">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/10 whitespace-nowrap">or</span>
+              <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/20 to-transparent" />
+            </div>
+
             <Button
-              className="google-button w-full flex items-center justify-center gap-2 border-white/10 bg-white/5 hover:bg-white/10 h-12 text-base transition-all-smooth text-white"
+              className="google-button w-full flex items-center justify-center gap-3 border-white/10 bg-white/[0.05] hover:bg-white/[0.1] h-11 text-sm font-semibold transition-all rounded-xl text-white group"
               disabled={oauthLoading || loading}
               id="admin-login-google-button"
               variant="outline"
@@ -403,22 +414,22 @@ export const LoginPage: React.FC = () => {
                   <span id="admin-login-google-text">Authenticating...</span>
                 </>
               ) : (
-                <>
-                  <SiGoogle className="h-5 w-5 text-[#EA4335]" id="admin-login-google-icon" />
-                  <span className="font-medium" id="admin-login-google-label">{copy.oauthProviders.google}</span>
-                </>
+                <div className="flex items-center justify-center gap-3">
+                  <SiGoogle className={`h-4 w-4 text-[#EA4335] group-hover:scale-110 transition-transform duration-300`} id="admin-login-google-icon" />
+                  <span id="admin-login-google-label">{copy.oauthProviders.google}</span>
+                </div>
               )}
             </Button>
           </div>
 
-          <div className="mt-8 text-center" id="admin-login-terms-section">
+          <div className="mt-10 text-center" id="admin-login-terms-section">
             <button
-              className="terms-toggle mobile-terms text-xs text-white/40 hover:text-white/60 transition-colors duration-200 flex items-center justify-center gap-1 mx-auto"
+              className="terms-toggle text-[10px] uppercase tracking-[0.2em] font-bold text-white/20 hover:text-white/40 transition-all flex items-center justify-center gap-2 mx-auto"
               id="admin-login-terms-toggle"
               onClick={() => setShowTerms(!showTerms)}
             >
               <span id="admin-login-terms-toggle-text">{showTerms ? 'Hide' : 'Show'} Terms & Conditions</span>
-              <span className={`transform transition-transform ${showTerms ? 'rotate-180' : 'rotate-0'}`} id="admin-login-terms-toggle-icon">
+              <span className={`text-[8px] transition-transform duration-300 ${showTerms ? 'rotate-180' : 'rotate-0'} flex items-center justify-center`} id="admin-login-terms-toggle-icon">
                 ▼
               </span>
             </button>
@@ -432,7 +443,7 @@ export const LoginPage: React.FC = () => {
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

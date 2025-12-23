@@ -18,7 +18,7 @@ vi.mock('../contexts/AuthContext', () => ({
   }))
 }));
 
-vi.mock('../components/router', () => ({
+vi.mock('../components/router/RouterContext', () => ({
   useRouter: () => ({
     navigate: vi.fn()
   })
@@ -75,7 +75,7 @@ describe('LoginPage', () => {
   it('should render login form with all elements', () => {
     renderLoginPage();
 
-    expect(screen.getByText('Admin access')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Admin access/i })).toBeInTheDocument();
     expect(screen.getByText('Sign in with your WildOut! administrator account to manage landing page content.')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter your password')).toBeInTheDocument();
