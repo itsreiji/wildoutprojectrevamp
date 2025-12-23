@@ -47,3 +47,26 @@ describe('LoginPage Refinement - Dimensions & Padding', () => {
     expect(card).not.toHaveClass('md:p-10');
   });
 });
+
+describe('LoginPage Refinement - Typography & Icons', () => {
+  it('should have scaled down font sizes', () => {
+    const { container } = render(<LoginPage />);
+    const title = container.querySelector('#admin-login-title');
+    const subtitle = container.querySelector('#admin-login-subtitle');
+    
+    expect(title).toHaveClass('text-2xl'); // Down from 3xl
+    expect(subtitle).toHaveClass('text-xs'); // Down from text-sm
+  });
+
+  it('should have scaled down icons (size-3.5 or h-3.5 w-3.5)', () => {
+    const { container } = render(<LoginPage />);
+    const emailIcon = container.querySelector('#admin-login-email-icon');
+    const passwordIcon = container.querySelector('#admin-login-password-icon');
+    
+    // Expecting h-3.5 w-3.5 or similar scale down
+    expect(emailIcon).toHaveClass('h-3.5');
+    expect(emailIcon).toHaveClass('w-3.5');
+    expect(passwordIcon).toHaveClass('h-3.5');
+    expect(passwordIcon).toHaveClass('w-3.5');
+  });
+});

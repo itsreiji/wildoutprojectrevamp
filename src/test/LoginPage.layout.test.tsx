@@ -65,7 +65,7 @@ describe('LoginPage Layout', () => {
     const title = container.querySelector('#admin-login-title');
     
     expect(header).toHaveClass('text-center');
-    expect(title).toHaveClass('text-3xl');
+    expect(title).toHaveClass('text-2xl');
     expect(title).toHaveClass('font-black');
     expect(title).toHaveClass('tracking-tight');
   });

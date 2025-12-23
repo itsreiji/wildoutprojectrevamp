@@ -32,23 +32,23 @@ vi.mock('../../utils/authValidation', () => ({
 }));
 
 describe('LoginPage Accessibility & Mobile', () => {
-  it('should have adequate touch targets for buttons (min 44px)', () => {
+  it('should have adequate touch targets for buttons (min 40px)', () => {
     render(<LoginPage />);
     const submitButton = screen.getByRole('button', { name: /Sign in with Email/i });
     const googleButton = screen.getByRole('button', { name: /Sign in with Google/i });
     
-    // h-11 is 44px
-    expect(submitButton).toHaveClass('h-11');
-    expect(googleButton).toHaveClass('h-11');
+    // h-10 is 40px
+    expect(submitButton).toHaveClass('h-10');
+    expect(googleButton).toHaveClass('h-10');
   });
 
-  it('should have adequate touch targets for inputs (min 44px)', () => {
+  it('should have adequate touch targets for inputs (min 40px)', () => {
     render(<LoginPage />);
     const emailInput = screen.getByPlaceholderText(/Enter your email/i);
     const passwordInput = screen.getByPlaceholderText(/Enter your password/i);
     
-    expect(emailInput).toHaveClass('h-11');
-    expect(passwordInput).toHaveClass('h-11');
+    expect(emailInput).toHaveClass('h-10');
+    expect(passwordInput).toHaveClass('h-10');
   });
 
   it('should have proper ARIA labels and roles', () => {

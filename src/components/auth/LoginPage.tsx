@@ -206,8 +206,8 @@ export const LoginPage: React.FC = () => {
 
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  const inputClasses = "h-11 bg-white/[0.05] border-white/10 text-white placeholder:text-white/20 focus:ring-1 focus:ring-brand-pink/50 focus:border-brand-pink/50 transition-all rounded-xl px-4";
-  const labelClasses = "flex items-center gap-2 text-sm font-semibold text-white/60 mb-2";
+  const inputClasses = "h-10 bg-white/[0.05] border-white/10 text-white placeholder:text-white/20 focus:ring-1 focus:ring-brand-pink/50 focus:border-brand-pink/50 transition-all rounded-xl px-4 text-sm";
+  const labelClasses = "flex items-center gap-2 text-xs font-semibold text-white/60 mb-1.5";
   const brandPink = "brand-pink";
 
   return (
@@ -222,10 +222,10 @@ export const LoginPage: React.FC = () => {
       >
         <div className="login-card space-y-6 rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-6 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
           <div className="text-center mb-10" id="admin-login-header">
-            <h1 className="text-3xl font-black tracking-tight text-white" id="admin-login-title">
+            <h1 className="text-2xl font-black tracking-tight text-white" id="admin-login-title">
               Admin <span className="text-brand-pink">access</span>
             </h1>
-            <p className="mt-3 text-sm text-white/40 leading-relaxed max-w-[240px] mx-auto" id="admin-login-subtitle">
+            <p className="mt-3 text-xs text-white/40 leading-relaxed max-w-[240px] mx-auto" id="admin-login-subtitle">
               {copy.subtitle}
             </p>
           </div>
@@ -294,7 +294,7 @@ export const LoginPage: React.FC = () => {
                 render={({ field }) => (
                   <FormItem id="admin-login-email-field">
                     <FormLabel className={labelClasses} id="admin-login-email-label">
-                      <Mail className="h-4 w-4 text-brand-pink" aria-hidden="true" />
+                      <Mail className="h-3.5 w-3.5 text-brand-pink" id="admin-login-email-icon" aria-hidden="true" />
                       <span>Email</span>
                     </FormLabel>
                     <div className="relative">
@@ -330,7 +330,7 @@ export const LoginPage: React.FC = () => {
                 render={({ field }) => (
                   <FormItem id="admin-login-password-field">
                     <FormLabel className={labelClasses} id="admin-login-password-label">
-                      <Lock className="h-4 w-4 text-brand-pink" aria-hidden="true" />
+                      <Lock className="h-3.5 w-3.5 text-brand-pink" id="admin-login-password-icon" aria-hidden="true" />
                       <span>Password</span>
                     </FormLabel>
                     <div className="relative">
@@ -429,7 +429,7 @@ export const LoginPage: React.FC = () => {
               />
 
               <Button
-                className="w-full h-11 bg-brand-pink hover:bg-brand-pink/90 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98]"
+                className="w-full h-10 bg-brand-pink hover:bg-brand-pink/90 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] text-sm"
                 disabled={isLoading || rateLimitInfo.isBlocked}
                 id="admin-login-submit-button"
                 type="submit"
@@ -446,15 +446,15 @@ export const LoginPage: React.FC = () => {
             </form>
           </Form>
 
-          <div className="mt-10" id="admin-login-oauth-section">
-            <div className="flex items-center gap-4 mb-8" id="admin-login-separator">
+          <div className="mt-8" id="admin-login-oauth-section">
+            <div className="flex items-center gap-4 mb-6" id="admin-login-separator">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/10 whitespace-nowrap">or</span>
               <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/20 to-transparent" />
             </div>
 
             <Button
-              className="google-button w-full flex items-center justify-center gap-3 border-white/10 bg-white/[0.05] hover:bg-white/[0.1] h-11 text-sm font-semibold transition-all rounded-xl text-white group"
+              className="google-button w-full flex items-center justify-center gap-3 border-white/10 bg-white/[0.05] hover:bg-white/[0.1] h-10 text-xs font-semibold transition-all rounded-xl text-white group"
               disabled={isLoading}
               id="admin-login-google-button"
               variant="outline"
