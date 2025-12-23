@@ -24,8 +24,8 @@
 - [x] Task: Refactor animation logic for performance and reuse
 - [x] Task: Conductor - User Manual Verification 'Phase 4: Animations & Interactions' (Protocol in workflow.md)
 
-## Phase 5: Mobile Optimization & Accessibility
-- [ ] Task: Create failing tests for mobile touch targets and accessibility (ARIA)
-- [ ] Task: Final polish for mobile responsiveness (input sizes, spacing, keyboard handling)
-- [ ] Task: Refactor for accessibility compliance
-- [ ] Task: Conductor - User Manual Verification 'Phase 5: Mobile Optimization & Accessibility' (Protocol in workflow.md)
+## Phase 5: Mobile Optimization & Accessibility [checkpoint: 9acac83]
+- [x] Task: Create failing tests for mobile touch targets and accessibility (ARIA)
+- [x] Task: Final polish for mobile responsiveness (input sizes, spacing, keyboard handling)
+- [x] Task: Refactor for accessibility compliance
+- [x] Task: Conductor - User Manual Verification 'Phase 5: Mobile Optimization & Accessibility' (Protocol in workflow.md)
