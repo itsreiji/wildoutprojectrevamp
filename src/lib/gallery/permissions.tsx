@@ -23,6 +23,22 @@ export const ROLE_PERMISSIONS: Record<string, GalleryPermission> = {
     can_delete: true,
     can_manage: false,
   },
+  // Mapping AuthContext 'user' to viewer permissions
+  user: {
+    can_view: true,
+    can_upload: false,
+    can_edit: false,
+    can_delete: false,
+    can_manage: false,
+  },
+  // Mapping AuthContext 'anonymous' to guest permissions
+  anonymous: {
+    can_view: false,
+    can_upload: false,
+    can_edit: false,
+    can_delete: false,
+    can_manage: false,
+  },
   contributor: {
     can_view: true,
     can_upload: true,
