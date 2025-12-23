@@ -47,21 +47,25 @@ const copy = {
 };
 
 export const LoginPage: React.FC = () => {
-  const { signInWithOAuth, signInWithEmailPassword, role, loading, isAuthenticated, error: authError, getRememberedEmail } = useAuth();
+  const { signInWithOAuth, signInWithEmailPassword, role, loading: authLoading, isAuthenticated, error: authError, getRememberedEmail } = useAuth();
   const { navigate } = useRouter();
-  const [formError, setFormError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [oauthLoading, setOAuthLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<{ strength: string; score: number; feedback: string[]; suggestions: string[] }>({ strength: 'weak', score: 0, feedback: [], suggestions: [] });
   const [rateLimitInfo, setRateLimitInfo] = useState<{ isBlocked: boolean; timeRemaining?: number }>({ isBlocked: false });
 
+  // Effective error message
+  const displayError = localError || authError;
+  const isLoading = isSubmitting || authLoading;
+
   // Initial values
   const rememberedEmail = getRememberedEmail();
 
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema) as any, // Cast to any to resolve strict type mismatch with RHF Resolver
+    resolver: zodResolver(loginSchema) as any,
     defaultValues: {
       email: rememberedEmail || '',
       password: '',
@@ -73,10 +77,10 @@ export const LoginPage: React.FC = () => {
   const email = watch('email');
   const password = watch('password');
 
-  // Enhanced error handling for OAuth
+  // Clear local error when auth error changes
   useEffect(() => {
     if (authError) {
-      setFormError(authError);
+      setLocalError(null);
     }
   }, [authError]);
 
@@ -95,68 +99,60 @@ export const LoginPage: React.FC = () => {
   }, [isAuthenticated, role, navigate]);
 
   const handleOAuthSignIn = async () => {
-    setFormError(null);
+    setLocalError(null);
     setInfoMessage(null);
-    setOAuthLoading(true);
+    setIsSubmitting(true);
 
     try {
       // Check if popups are blocked
       const popupCheck = window.open('', '_blank');
       if (!popupCheck) {
-        setFormError(copy.errorMessages.popupBlocked);
-        setOAuthLoading(false);
+        setLocalError(copy.errorMessages.popupBlocked);
+        setIsSubmitting(false);
         return;
       }
       popupCheck.close();
 
       const error = await signInWithOAuth('google');
       if (error) {
-        // Enhanced error handling
+        // We let AuthContext handle most errors, but we can set local ones if needed
         if (error.message.includes('network')) {
-          setFormError(copy.errorMessages.network);
-        } else {
-          setFormError(error.message || copy.errorMessages.authFailed);
+          setLocalError(copy.errorMessages.network);
         }
       } else {
         setInfoMessage(copy.successMessages.redirecting);
       }
     } catch (error) {
       console.error('Google OAuth error:', error);
-      if (error instanceof Error && error.message.includes('network')) {
-        setFormError(copy.errorMessages.network);
-      } else {
-        setFormError(copy.errorMessages.unexpected);
-      }
+      setLocalError(copy.errorMessages.unexpected);
     } finally {
-      setOAuthLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const onSubmit = async (values: LoginFormValues) => {
-    setFormError(null);
+    setLocalError(null);
     setInfoMessage(null);
-    setOAuthLoading(true);
+    setIsSubmitting(true);
 
     try {
       const error = await signInWithEmailPassword(values.email, values.password);
       if (error) {
         if (error.message.includes('invalid_credentials')) {
-          setFormError('Invalid email or password. Please try again.')
+          setLocalError('Invalid email or password. Please try again.')
         } else if (error.message.includes('user_not_found')) {
-          setFormError('No account found with this email.')
+          setLocalError('No account found with this email.')
         } else if (error.message.includes('too_many_requests')) {
-          setFormError('Too many login attempts. Please try again later.')
-        } else {
-          setFormError(error.message || 'Authentication failed. Please try again.')
+          setLocalError('Too many login attempts. Please try again later.')
         }
       } else {
         setInfoMessage(copy.successMessages.redirecting);
       }
     } catch (error) {
       console.error('Email/password sign-in error:', error);
-      setFormError(copy.errorMessages.unexpected);
+      setLocalError(copy.errorMessages.unexpected);
     } finally {
-      setOAuthLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -229,11 +225,11 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {/* Enhanced error display with icons */}
-          {formError && (
-            <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2" id="admin-login-error-message">
+          {displayError && (
+            <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2 animate-shake" id="admin-login-error-message">
               <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0" id="admin-login-error-icon" />
               <p className="text-sm text-red-400" id="admin-login-error-text" role="alert">
-                {formError}
+                {displayError}
               </p>
             </div>
           )}
@@ -245,6 +241,19 @@ export const LoginPage: React.FC = () => {
               <p className="text-sm text-green-400" id="admin-login-success-text" role="status">
                 {infoMessage}
               </p>
+            </div>
+          )}
+
+          {/* Loading Overlay */}
+          {isLoading && (
+            <div 
+              data-testid="loading-overlay"
+              className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] rounded-3xl transition-all"
+            >
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-brand-pink" />
+                <span className="text-sm font-bold text-white/80 tracking-widest uppercase">Processing</span>
+              </div>
             </div>
           )}
 
@@ -378,11 +387,11 @@ export const LoginPage: React.FC = () => {
 
               <Button
                 className="w-full h-11 bg-brand-pink hover:bg-brand-pink/90 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98]"
-                disabled={oauthLoading || rateLimitInfo.isBlocked}
+                disabled={isLoading || rateLimitInfo.isBlocked}
                 id="admin-login-submit-button"
                 type="submit"
               >
-                {oauthLoading ? (
+                {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" id="admin-login-submit-spinner" />
                     <span id="admin-login-submit-text">Signing in...</span>
@@ -403,12 +412,12 @@ export const LoginPage: React.FC = () => {
 
             <Button
               className="google-button w-full flex items-center justify-center gap-3 border-white/10 bg-white/[0.05] hover:bg-white/[0.1] h-11 text-sm font-semibold transition-all rounded-xl text-white group"
-              disabled={oauthLoading || loading}
+              disabled={isLoading}
               id="admin-login-google-button"
               variant="outline"
               onClick={handleOAuthSignIn}
             >
-              {oauthLoading ? (
+              {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" id="admin-login-google-spinner" />
                   <span id="admin-login-google-text">Authenticating...</span>

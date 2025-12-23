@@ -4367,7 +4367,7 @@ button:focus-visible {
 }
 
 /* Error message animations */
-.error-message {
+.error-message, .animate-shake {
   animation: shake 0.3s ease-in-out;
 }
 
