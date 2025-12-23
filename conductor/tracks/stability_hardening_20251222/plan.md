@@ -1,7 +1,7 @@
 # Track Plan: Operational Stability and Media Management Hardening
 
 ## Phase 1: RBAC & Security Hardening
-- [ ] Task: Audit existing RBAC implementation against Supabase profiles.
+- [x] Task: Audit existing RBAC implementation against Supabase profiles. [commit: 4535e42]
 - [ ] Task: Write tests for section-level permission validation.
 - [ ] Task: Implement missing permission checks for sensitive delete/publish operations.
 - [ ] Task: Conductor - User Manual Verification 'RBAC & Security Hardening' (Protocol in workflow.md)
