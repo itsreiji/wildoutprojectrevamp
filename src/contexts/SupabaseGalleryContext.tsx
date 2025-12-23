@@ -19,6 +19,11 @@ import type { GalleryImage } from "@/types/content";
 import type { TablesInsert, TablesUpdate } from "@/supabase/types";
 import { useAuth } from "./AuthContext";
 import { supabaseClient } from "@/supabase/client";
+import {
+  validateItemAccess,
+  getCurrentUserPermissions,
+  validateBatchOperation,
+} from "@/lib/gallery/permissions";
 
 // Import enhanced storage service
 import {
@@ -245,6 +250,12 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
     }
 
     try {
+      // Permission check
+      const permissions = await getCurrentUserPermissions();
+      if (!permissions.can_upload) {
+        throw new Error("Permission denied: Cannot upload images");
+      }
+
       // If item has a storage_path, ensure the file exists
       if (item.storage_path) {
         const exists = await storageService.fileExists(item.storage_path);
@@ -309,6 +320,12 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
     }
 
     try {
+      // Permission check
+      const validation = await validateItemAccess(id, user.id, 'can_edit');
+      if (!validation.allowed) {
+        throw new Error(`Permission denied: ${validation.reason || 'Cannot edit this item'}`);
+      }
+
       // Handle storage path updates
       if (updates.storage_path) {
         const exists = await storageService.fileExists(updates.storage_path);
@@ -374,6 +391,12 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
     }
 
     try {
+      // Permission check
+      const validation = await validateItemAccess(id, user.id, 'can_delete');
+      if (!validation.allowed) {
+        throw new Error(`Permission denied: ${validation.reason || 'Cannot delete this item'}`);
+      }
+
       const itemToDelete = gallery.find((item) => item.id === id);
 
       // Get storage path from storage_path property
@@ -573,6 +596,11 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
     }
 
     try {
+      const permissions = await getCurrentUserPermissions();
+      if (!permissions.can_upload) {
+        throw new Error("Permission denied: Cannot upload images");
+      }
+
       const result = await storageService.bulkUpload(files, user.id, {
         optimize: true,
         generateThumbnail: true,
@@ -595,8 +623,26 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
   }, [user, storageService, refreshGallery]);
 
   const bulkDelete = useCallback(async (itemIds: string[]) => {
+    if (!user) throw new Error("User not authenticated");
+
     try {
-      const result = await storageService.bulkDelete(itemIds);
+      // Validate permissions for all items
+      const validation = await validateBatchOperation(itemIds, user.id, 'can_delete');
+
+      if (validation.invalidItems.length > 0) {
+        toast.warning(`Skipping ${validation.invalidItems.length} items: Permission denied`);
+      }
+
+      if (validation.validItems.length === 0) {
+        return {
+          success: 0,
+          failed: itemIds.length,
+          errors: validation.invalidItems.map(i => ({ id: i.id, error: i.reason }))
+        };
+      }
+
+      // Only delete valid items
+      const result = await storageService.bulkDelete(validation.validItems);
 
       if (result.success > 0) {
         toast.success(`Deleted ${result.success} items`);
@@ -612,7 +658,7 @@ export const SupabaseGalleryProvider: React.FC<{ children: ReactNode }> = ({ chi
       toast.error("Bulk delete failed");
       throw err;
     }
-  }, [storageService, refreshGallery]);
+  }, [user, storageService, refreshGallery]);
 
   // Utility
   const getFileUrl = useCallback((path: string): string => {
