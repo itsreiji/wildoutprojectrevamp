@@ -150,6 +150,9 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
   // Original fetch functions remain the same
   const fetchHeroContent = async (): Promise<HeroContent | null> => {
     try {
+      if (useDummyData) {
+        return MOCK_HERO;
+      }
       const { data, error } = await supabaseClient.rpc("get_hero_content");
       if (error) {
         console.error("Error fetching hero content:", error);
@@ -159,6 +162,7 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
         | Database["public"]["Tables"]["hero_content"]["Row"]
         | undefined;
       if (result) {
+        console.log('EnhancedStaticContentContext: Fetched hero content', { id: result.id });
         return {
           id: result.id,
           title: result.title ?? "",
@@ -184,6 +188,9 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
 
   const fetchAboutContent = async (): Promise<AboutContent | null> => {
     try {
+      if (useDummyData) {
+        return MOCK_ABOUT;
+      }
       const { data, error } = await supabaseClient.rpc("get_about_content");
       if (error) {
         console.error("Error fetching about content:", error);
@@ -193,6 +200,7 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
         | Database["public"]["Tables"]["about_content"]["Row"]
         | undefined;
       if (result) {
+        console.log('EnhancedStaticContentContext: Fetched about content', { id: result.id });
         return {
           id: result.id,
           title: result.title ?? "",
@@ -217,6 +225,9 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
 
   const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
     try {
+      if (useDummyData) {
+        return MOCK_SETTINGS;
+      }
       const { data, error } = await supabaseClient.rpc("get_site_settings");
       if (error) {
         console.error("Error fetching site settings:", error);
@@ -226,6 +237,7 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
         | Database["public"]["Tables"]["site_settings"]["Row"]
         | undefined;
       if (result) {
+        console.log('EnhancedStaticContentContext: Fetched site settings', { id: result.id });
         return {
           id: result.id,
           site_name: result.site_name ?? "",
@@ -432,34 +444,48 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
   }, [user?.id]);
 
   const saveHeroContent = async (content: HeroContent): Promise<void> => {
+    console.log('EnhancedStaticContentContext: Starting saveHeroContent', {
+      timestamp: new Date().toISOString(),
+      user: user?.id,
+      role
+    });
     try {
       setError(null);
-      if (!user) throw new Error("User not authenticated");
-      if (role !== "admin")
+      if (!user) {
+        console.error('EnhancedStaticContentContext: User not authenticated');
+        throw new Error("User not authenticated");
+      }
+      if (role !== "admin") {
+        console.error('EnhancedStaticContentContext: Insufficient permissions', { user: user.id, role });
         throw new Error(`Insufficient permissions. User role: ${role}`);
+      }
 
       const saveData = {
-        ...content,
-        description:
-          typeof content.description === "string" ? content.description : "",
-        stats: typeof content.stats === "string" ? content.stats : "",
         id: "00000000-0000-0000-0000-000000000001",
+        title: content.title,
+        subtitle: content.subtitle,
+        description: typeof content.description === "string" ? content.description : "",
+        stats: typeof content.stats === "string" ? content.stats : (content.stats || {}),
+        cta_text: content.cta_text,
+        cta_link: content.cta_link,
         updated_at: new Date().toISOString(),
+        updated_by: user.id,
       };
 
+      console.log('EnhancedStaticContentContext: Attempting to upsert hero content');
       const { error } = await supabaseClient
         .from("hero_content")
         .upsert(saveData);
 
       if (error) {
-        console.error("Database error:", error);
+        console.error("EnhancedStaticContentContext: Database error during saveHeroContent:", error);
         setError(`Failed to save hero content: ${error.message}`);
         throw error;
       }
 
       setHero(content);
     } catch (err) {
-      console.error("Error in saveHeroContent:", err);
+      console.error("EnhancedStaticContentContext: Error in saveHeroContent:", err);
       setError(
         `Failed to save hero content: ${
           err instanceof Error ? err.message : "Unknown error"
@@ -470,11 +496,28 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
   };
 
   const saveAboutContent = async (content: AboutContent): Promise<void> => {
+    console.log('EnhancedStaticContentContext: Starting saveAboutContent', {
+      timestamp: new Date().toISOString(),
+      user: user?.id,
+      role,
+      content: {
+        title: content.title,
+        featuresCount: Array.isArray(content.features) ? content.features.length : 0,
+        storyCount: Array.isArray(content.story) ? content.story.length : 0
+      }
+    });
+
     try {
       setError(null);
-      if (!user) throw new Error("User not authenticated");
-      if (role !== "admin")
+      if (!user) {
+        console.error('EnhancedStaticContentContext: User not authenticated');
+        throw new Error("User not authenticated");
+      }
+
+      if (role !== "admin") {
+        console.error('EnhancedStaticContentContext: Insufficient permissions', { user: user.id, role });
         throw new Error(`Insufficient permissions. User role: ${role}`);
+      }
 
       const saveData = {
         id: "00000000-0000-0000-0000-000000000002",
@@ -484,21 +527,26 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
         story: content.story,
         features: content.features,
         updated_at: new Date().toISOString(),
+        updated_by: user.id,
       };
+
+      console.log('EnhancedStaticContentContext: Attempting to upsert about content to database');
 
       const { error } = await supabaseClient
         .from("about_content")
         .upsert(saveData);
 
       if (error) {
-        console.error("Database error:", error);
+        console.error("EnhancedStaticContentContext: Database error during save:", error);
         setError(`Failed to save about content: ${error.message}`);
         throw error;
       }
 
+      console.log('EnhancedStaticContentContext: Successfully saved about content to database');
+
       setAbout(content);
     } catch (err) {
-      console.error("Error in saveAboutContent:", err);
+      console.error("EnhancedStaticContentContext: Error in saveAboutContent:", err);
       setError(
         `Failed to save about content: ${
           err instanceof Error ? err.message : "Unknown error"

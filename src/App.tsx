@@ -4,6 +4,7 @@ import { AdminGuard } from "./components/admin/AdminGuard";
 import { Router, RouterProvider } from "./components/router";
 import { useAuth } from "./contexts/AuthContext";
 import supabaseClient from "./supabase/client";
+import { Toaster } from "sonner";
 
 // Lazy load components
 const LandingPage = lazy(() => import("./components/LandingPage").then(m => ({ default: m.LandingPage })));
@@ -50,6 +51,7 @@ const App = () => {
 
   return (
     <RouterProvider>
+      <Toaster position="top-right" richColors />
       <Router routes={routes} />
     </RouterProvider>
   );

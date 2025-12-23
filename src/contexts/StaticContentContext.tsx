@@ -89,7 +89,7 @@ interface StaticContentContextType {
   getSectionContent: (sectionSlug: string) => SectionContent | null;
   getSectionPermissions: (sectionSlug: string) => SectionPermissions;
   updateSectionContent: (sectionSlug: string, content: Json) => Promise<void>;
-  refreshStaticContent: () => Promise<void>;
+  refreshStaticContent: (forceRefresh?: boolean) => Promise<void>;
 }
 
 const StaticContentContext = createContext<
@@ -114,6 +114,12 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [adminSectionsLoading, setAdminSectionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Track if fallback import has been attempted to prevent duplicates
+  const fallbackImportAttempted = React.useRef<Set<string>>(new Set());
+
+  // Track if content loading is in progress to prevent race conditions
+  const isLoadingContent = React.useRef(false);
 
   const fetchHeroContent = useCallback(async (): Promise<HeroContent | null> => {
     try {
@@ -267,7 +273,17 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       // No data in database - fallback to mock data and import it
+      // Check if we've already attempted fallback import for this content type
+      const fallbackKey = "about_content";
+      if (fallbackImportAttempted.current.has(fallbackKey)) {
+        console.log('StaticContentContext: Fallback import already attempted, using mock data');
+        return MOCK_ABOUT;
+      }
+
       console.warn('StaticContentContext: No data in database, implementing fallback import');
+
+      // Mark as attempted to prevent duplicates
+      fallbackImportAttempted.current.add(fallbackKey);
 
       // Import mock data to database
       const importResult = await importAboutContentFallback();
@@ -352,8 +368,28 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  const loadStaticContent = useCallback(async () => {
+  const loadStaticContent = useCallback(async (forceRefresh = false) => {
+    // Prevent loading if authentication is still being determined
+    // This avoids race conditions where we try to fetch before knowing user state
+    if (!useDummyData && authContext.loading) {
+      console.log("StaticContentContext: Waiting for authentication to complete");
+      return;
+    }
+
+    // Prevent multiple simultaneous fetches
+    if (isLoadingContent.current) {
+      console.log("StaticContentContext: Content loading already in progress, skipping");
+      return;
+    }
+
+    // Reset fallback flags if forcing refresh
+    if (forceRefresh) {
+      console.log("StaticContentContext: Force refresh requested, resetting fallback flags");
+      fallbackImportAttempted.current.clear();
+    }
+
     try {
+      isLoadingContent.current = true;
       setLoading(true);
       setError(null);
 
@@ -382,9 +418,10 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
       console.error("Error loading static content:", err);
       setError("Failed to load static content");
     } finally {
+      isLoadingContent.current = false;
       setLoading(false);
     }
-  }, [fetchHeroContent, fetchAboutContent, fetchSiteSettings, fetchGallery]);
+  }, [fetchHeroContent, fetchAboutContent, fetchSiteSettings, fetchGallery, useDummyData, authContext.loading]);
 
   useEffect(() => {
     loadStaticContent();

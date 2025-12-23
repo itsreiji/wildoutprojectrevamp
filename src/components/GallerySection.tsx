@@ -1,13 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
 import { useContent } from '../contexts/ContentContext';
 
 const SPAN_PATTERNS = [
@@ -21,14 +14,8 @@ const SPAN_PATTERNS = [
 
 export const GallerySection = React.memo(() => {
   const { gallery, events } = useContent();
-  const [selectedEventId, setSelectedEventId] = useState<string>('');
 
-  const filteredGallery = useMemo(() => {
-    if (selectedEventId === 'all') return gallery;
-    return gallery.filter((item) => item.event_id === selectedEventId);
-  }, [gallery, selectedEventId]);
-
-  const displayImages = filteredGallery.slice(0, 6);
+  const displayImages = gallery.slice(0, 6);
   return (
     <section id="gallery" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -50,22 +37,7 @@ export const GallerySection = React.memo(() => {
           </p>
         </motion.div>
 
-        {/* Event Filter */}
-        <div className="flex justify-center mb-8">
-          <Select value={selectedEventId} onValueChange={setSelectedEventId}>
-            <SelectTrigger className="w-[280px] bg-white/5 border-white/20 text-white">
-              <SelectValue placeholder="Filter by event (optional)" />
-            </SelectTrigger>
-            <SelectContent className="bg-black/95 border-white/10 text-white">
-              <SelectItem value="all">All Events</SelectItem>
-              {events.map((event) => (
-                <SelectItem key={event.id} value={event.id || ''}>
-                  {event.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+
 
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
