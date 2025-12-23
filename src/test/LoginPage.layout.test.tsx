@@ -46,7 +46,7 @@ describe('LoginPage Layout', () => {
     const cardContainer = container.querySelector('.login-container');
     
     expect(cardContainer).toHaveClass('w-full');
-    expect(cardContainer).toHaveClass('max-w-[340px]');
+    expect(cardContainer).toHaveStyle({ maxWidth: '320px' });
   });
 
   it('should use WildOut! specific brand colors and styling', () => {

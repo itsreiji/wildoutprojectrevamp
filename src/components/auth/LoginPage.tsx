@@ -206,8 +206,8 @@ export const LoginPage: React.FC = () => {
 
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  const inputClasses = "h-10 bg-white/[0.05] border-white/10 text-white placeholder:text-white/20 focus:ring-1 focus:ring-brand-pink/50 focus:border-brand-pink/50 transition-all rounded-xl px-4 text-sm";
-  const labelClasses = "flex items-center gap-2 text-xs font-semibold text-white/60 mb-1.5";
+  const inputClasses = "h-10 bg-white/[0.03] border-white/10 text-white placeholder:text-white/20 focus:ring-1 focus:ring-brand-pink/50 focus:border-brand-pink/50 transition-all rounded-xl px-4 text-sm";
+  const labelClasses = "flex items-center gap-2 text-xs font-semibold text-white/70 mb-1.5";
   const brandPink = "brand-pink";
 
   return (
@@ -217,10 +217,11 @@ export const LoginPage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="login-container relative z-10 w-full max-w-[340px]"
+        className="login-container relative z-10 w-full px-4"
+        style={{ maxWidth: '320px' }}
         data-animated="true"
       >
-        <div className="login-card space-y-4 rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-6 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
+        <div className="login-card w-full space-y-4 rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-8 shadow-xl backdrop-blur-3xl" id="admin-login-card">
           <div className="text-center mb-6" id="admin-login-header">
             <h1 className="text-2xl font-black tracking-tight text-white" id="admin-login-title">
               Admin <span className="text-brand-pink">access</span>
@@ -408,7 +409,7 @@ export const LoginPage: React.FC = () => {
                 control={form.control}
                 name="rememberMe"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2.5 space-y-0 py-1" id="admin-login-remember-me-field">
+                  <FormItem className="flex items-center gap-2 space-y-0 py-1" id="admin-login-remember-me-field">
                     <FormControl>
                       <Checkbox
                         id="admin-login-remember-me-checkbox"
@@ -418,7 +419,7 @@ export const LoginPage: React.FC = () => {
                       />
                     </FormControl>
                     <FormLabel 
-                      className="text-xs font-medium text-white/40 cursor-pointer select-none py-1" 
+                      className="text-xs font-medium text-white/60 cursor-pointer select-none" 
                       id="admin-login-remember-me-label"
                       htmlFor="admin-login-remember-me-checkbox"
                     >
@@ -477,7 +478,7 @@ export const LoginPage: React.FC = () => {
 
           <div className="mt-6 text-center" id="admin-login-terms-section">
             <button
-              className="terms-toggle text-[10px] uppercase tracking-[0.2em] font-bold text-white/20 hover:text-white/40 transition-all flex items-center justify-center gap-2 mx-auto"
+              className="terms-toggle text-[9px] uppercase tracking-[0.2em] font-bold text-white/20 hover:text-white/40 transition-all flex items-center justify-center gap-2 mx-auto"
               id="admin-login-terms-toggle"
               onClick={() => setShowTerms(!showTerms)}
             >

@@ -35,15 +35,15 @@ describe('LoginPage Refinement - Dimensions & Padding', () => {
     const { container } = render(<LoginPage />);
     const cardContainer = container.querySelector('.login-container');
     
-    expect(cardContainer).toHaveClass('max-w-[340px]');
+    expect(cardContainer).toHaveStyle({ maxWidth: '320px' });
   });
 
-  it('should have reduced internal padding (p-6)', () => {
+  it('should have reduced internal padding (p-8)', () => {
     const { container } = render(<LoginPage />);
     const card = container.querySelector('.login-card');
     
-    expect(card).toHaveClass('p-6');
-    expect(card).not.toHaveClass('p-8');
+    expect(card).toHaveClass('p-8');
+    expect(card).not.toHaveClass('p-6');
     expect(card).not.toHaveClass('md:p-10');
   });
 });
@@ -54,8 +54,8 @@ describe('LoginPage Refinement - Typography & Icons', () => {
     const title = container.querySelector('#admin-login-title');
     const subtitle = container.querySelector('#admin-login-subtitle');
     
-    expect(title).toHaveClass('text-2xl'); // Down from 3xl
-    expect(subtitle).toHaveClass('text-xs'); // Down from text-sm
+    expect(title).toHaveClass('text-2xl'); 
+    expect(subtitle).toHaveClass('text-xs'); 
   });
 
   it('should have scaled down icons (size-3.5 or h-3.5 w-3.5)', () => {
@@ -63,7 +63,6 @@ describe('LoginPage Refinement - Typography & Icons', () => {
     const emailIcon = container.querySelector('#admin-login-email-icon');
     const passwordIcon = container.querySelector('#admin-login-password-icon');
     
-    // Expecting h-3.5 w-3.5 or similar scale down
     expect(emailIcon).toHaveClass('h-3.5');
     expect(emailIcon).toHaveClass('w-3.5');
     expect(passwordIcon).toHaveClass('h-3.5');
@@ -77,8 +76,8 @@ describe('LoginPage Refinement - Density & Alignment', () => {
     const card = container.querySelector('.login-card');
     const form = container.querySelector('#admin-login-form');
     
-    expect(card).toHaveClass('space-y-4'); // Expecting even tighter than 6
-    expect(form).toHaveClass('space-y-4'); // Expecting even tighter than 5
+    expect(card).toHaveClass('space-y-4'); 
+    expect(form).toHaveClass('space-y-4'); 
   });
 
   it('should have consistent left alignment for labels and indicators', () => {
@@ -89,6 +88,35 @@ describe('LoginPage Refinement - Density & Alignment', () => {
       expect(label).toHaveClass('flex');
       expect(label).toHaveClass('items-center');
       expect(label).toHaveClass('gap-2');
+    });
+  });
+});
+
+describe('LoginPage Refinement - Component Finalization', () => {
+  it('should have a compact Remember Me layout', () => {
+    const { container } = render(<LoginPage />);
+    const rememberMeField = container.querySelector('#admin-login-remember-me-field');
+    const rememberMeLabel = container.querySelector('#admin-login-remember-me-label');
+    
+    expect(rememberMeField).toHaveClass('py-1'); 
+    expect(rememberMeLabel).toHaveClass('text-xs'); 
+  });
+
+  it('should have consistent rounded corners (xl for components, 3xl for card)', () => {
+    const { container } = render(<LoginPage />);
+    const inputs = container.querySelectorAll('input:not([type="checkbox"])');
+    const buttons = container.querySelectorAll('button:not(.terms-toggle)');
+    
+    inputs.forEach(input => {
+      if (input.id && input.id.includes('input')) {
+        expect(input).toHaveClass('rounded-xl');
+      }
+    });
+    
+    buttons.forEach(button => {
+      if (button.id === 'admin-login-submit-button') {
+        expect(button).toHaveClass('rounded-xl');
+      }
     });
   });
 });
