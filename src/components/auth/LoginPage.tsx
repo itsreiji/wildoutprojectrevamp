@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from "../router/RouterContext";
 import { useAuth } from '../../contexts/AuthContext';
 import { Background3D } from '../Background3D';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Checkbox } from '../../components/ui/checkbox';
@@ -28,6 +28,12 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
+
+const messageVariants = {
+  hidden: { opacity: 0, height: 0, y: -10 },
+  visible: { opacity: 1, height: 'auto', y: 0 },
+  exit: { opacity: 0, height: 0, y: -10 }
+};
 
 const copy = {
   title: 'Admin access',
@@ -224,25 +230,42 @@ export const LoginPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Enhanced error display with icons */}
-          {displayError && (
-            <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2 animate-shake" id="admin-login-error-message">
-              <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0" id="admin-login-error-icon" />
-              <p className="text-sm text-red-400" id="admin-login-error-text" role="alert">
-                {displayError}
-              </p>
-            </div>
-          )}
+          {/* Enhanced error and success displays with AnimatePresence */}
+          <AnimatePresence mode="wait">
+            {displayError && (
+              <motion.div
+                key="error"
+                variants={messageVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2 animate-shake overflow-hidden"
+                id="admin-login-error-message"
+              >
+                <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0" id="admin-login-error-icon" />
+                <p className="text-sm text-red-400" id="admin-login-error-text" role="alert">
+                  {displayError}
+                </p>
+              </motion.div>
+            )}
 
-          {/* Enhanced success display with icons */}
-          {infoMessage && (
-            <div className="rounded-xl border border-green-500/20 bg-green-500/10 p-3 flex items-center gap-2" id="admin-login-success-message">
-              <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" id="admin-login-success-icon" />
-              <p className="text-sm text-green-400" id="admin-login-success-text" role="status">
-                {infoMessage}
-              </p>
-            </div>
-          )}
+            {infoMessage && (
+              <motion.div
+                key="success"
+                variants={messageVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                className="rounded-xl border border-green-500/20 bg-green-500/10 p-3 flex items-center gap-2 overflow-hidden"
+                id="admin-login-success-message"
+              >
+                <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" id="admin-login-success-icon" />
+                <p className="text-sm text-green-400" id="admin-login-success-text" role="status">
+                  {infoMessage}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Loading Overlay */}
           {isLoading && (
