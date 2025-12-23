@@ -282,31 +282,43 @@ export const LoginPage: React.FC = () => {
 
           {/* Email/Password Form */}
           <Form {...form}>
-            <form className="space-y-5" id="admin-login-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <form 
+              className="space-y-5" 
+              id="admin-login-form" 
+              onSubmit={form.handleSubmit(onSubmit)}
+              aria-busy={isLoading ? "true" : "false"}
+            >
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem id="admin-login-email-field">
                     <FormLabel className={labelClasses} id="admin-login-email-label">
-                      <Mail className="h-4 w-4 text-brand-pink" id="admin-login-email-icon" />
+                      <Mail className="h-4 w-4 text-brand-pink" aria-hidden="true" />
                       <span>Email</span>
                     </FormLabel>
-                    <FormControl>
-                      <div className="relative">
+                    <div className="relative">
+                      <FormControl>
                         <Input
                           id="admin-login-email-input"
                           placeholder="Enter your email"
                           {...field}
                           className={inputClasses}
+                          aria-labelledby="admin-login-email-label"
+                          autoComplete="email"
                         />
-                        {field.value && !form.formState.errors.email && (
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center" id="admin-login-email-valid-indicator">
-                            <CheckCircle2 className="h-4 w-4 text-green-400" id="admin-login-email-valid-icon" />
-                          </div>
-                        )}
-                      </div>
-                    </FormControl>
+                      </FormControl>
+                      {field.value && !form.formState.errors.email && (
+                        <div 
+                          className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center" 
+                          id="admin-login-email-valid-indicator"
+                          role="status"
+                          aria-label="Email is valid"
+                        >
+                          <CheckCircle2 className="h-4 w-4 text-green-400" />
+                        </div>
+                      )}
+                    </div>
                     <FormMessage id="admin-login-email-error-message" />
                   </FormItem>
                 )}
@@ -318,29 +330,32 @@ export const LoginPage: React.FC = () => {
                 render={({ field }) => (
                   <FormItem id="admin-login-password-field">
                     <FormLabel className={labelClasses} id="admin-login-password-label">
-                      <Lock className="h-4 w-4 text-brand-pink" id="admin-login-password-icon" />
+                      <Lock className="h-4 w-4 text-brand-pink" aria-hidden="true" />
                       <span>Password</span>
                     </FormLabel>
-                    <FormControl>
-                      <div className="relative">
+                    <div className="relative">
+                      <FormControl>
                         <Input
                           id="admin-login-password-input"
                           placeholder="Enter your password"
                           type={showPassword ? 'text' : 'password'}
                           {...field}
                           className={inputClasses}
+                          aria-labelledby="admin-login-password-label"
+                          autoComplete="current-password"
                         />
-                        <button
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors p-1 flex items-center justify-center"
-                          id="admin-login-password-toggle"
-                          data-testid="admin-login-password-toggle"
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff className="h-4 w-4" id="admin-login-password-hide-icon" /> : <Eye className="h-4 w-4" id="admin-login-password-show-icon" />}
-                        </button>
-                      </div>
-                    </FormControl>
+                      </FormControl>
+                      <button
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white transition-colors p-1 flex items-center justify-center focus-visible:ring-1 focus-visible:ring-brand-pink rounded-md"
+                        id="admin-login-password-toggle"
+                        data-testid="admin-login-password-toggle"
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                      </button>
+                    </div>
                     <FormMessage id="admin-login-password-error-message" />
 
                     {/* Password Strength Indicator */}
@@ -393,15 +408,20 @@ export const LoginPage: React.FC = () => {
                 control={form.control}
                 name="rememberMe"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2.5 space-y-0 py-1" id="admin-login-remember-me-field">
+                  <FormItem className="flex items-center space-x-2.5 space-y-0 py-2 min-h-[44px]" id="admin-login-remember-me-field">
                     <FormControl>
                       <Checkbox
+                        id="admin-login-remember-me-checkbox"
                         checked={field.value}
-                        className="h-4 w-4 border-white/20 data-[state=checked]:bg-brand-pink data-[state=checked]:border-brand-pink"
+                        className="h-5 w-5 border-white/20 data-[state=checked]:bg-brand-pink data-[state=checked]:border-brand-pink transition-all"
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
-                    <FormLabel className="text-sm font-medium text-white/40 cursor-pointer" id="admin-login-remember-me-label">
+                    <FormLabel 
+                      className="text-sm font-medium text-white/40 cursor-pointer select-none py-2" 
+                      id="admin-login-remember-me-label"
+                      htmlFor="admin-login-remember-me-checkbox"
+                    >
                       Remember me
                     </FormLabel>
                   </FormItem>
@@ -439,15 +459,16 @@ export const LoginPage: React.FC = () => {
               id="admin-login-google-button"
               variant="outline"
               onClick={handleOAuthSignIn}
+              aria-label="Sign in with Google"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" id="admin-login-google-spinner" />
-                  <span id="admin-login-google-text">Authenticating...</span>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  <span>Authenticating...</span>
                 </>
               ) : (
                 <div className="flex items-center justify-center gap-3">
-                  <SiGoogle className={`h-4 w-4 text-[#EA4335] group-hover:scale-110 transition-transform duration-300`} id="admin-login-google-icon" />
+                  <SiGoogle className={`h-4 w-4 text-[#EA4335] group-hover:scale-110 transition-transform duration-300`} aria-hidden="true" />
                   <span id="admin-login-google-label">{copy.oauthProviders.google}</span>
                 </div>
               )}

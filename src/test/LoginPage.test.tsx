@@ -79,7 +79,7 @@ describe('LoginPage', () => {
     expect(screen.getByText('Sign in with your WildOut! administrator account to manage landing page content.')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Enter your password')).toBeInTheDocument();
-    expect(screen.getByText('Continue with Google')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sign in with Google/i })).toBeInTheDocument();
     expect(screen.getByText('Sign in with Email')).toBeInTheDocument();
   });
 
@@ -89,7 +89,7 @@ describe('LoginPage', () => {
     fireEvent.change(emailInput, { target: { value: 'invalid' } });
     fireEvent.blur(emailInput);
 
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
+    const submitButton = screen.getByRole('button', { name: /^sign in with email$/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {

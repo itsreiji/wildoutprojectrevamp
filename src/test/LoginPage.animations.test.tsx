@@ -61,11 +61,11 @@ describe('LoginPage Animations & Interactions', () => {
   it('should have scale interactions on interactive buttons', () => {
     render(<LoginPage />);
     const submitButton = screen.getByRole('button', { name: /Sign in with Email/i });
-    const googleButton = screen.getByRole('button', { name: /Continue with Google/i });
+    const googleButton = screen.getByRole('button', { name: /Sign in with Google/i });
     
     expect(submitButton).toHaveClass('active:scale-[0.98]');
     // Let's expect hover:scale-105 on the google button icon which might not be there yet
-    const googleIcon = screen.getByRole('button', { name: /Continue with Google/i }).querySelector('svg');
+    const googleIcon = screen.getByRole('button', { name: /Sign in with Google/i }).querySelector('svg');
     expect(googleIcon).toHaveClass('group-hover:scale-110');
   });
 
