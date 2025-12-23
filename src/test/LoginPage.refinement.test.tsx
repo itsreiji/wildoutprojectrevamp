@@ -70,3 +70,25 @@ describe('LoginPage Refinement - Typography & Icons', () => {
     expect(passwordIcon).toHaveClass('w-3.5');
   });
 });
+
+describe('LoginPage Refinement - Density & Alignment', () => {
+  it('should have tightened vertical gaps (space-y-4 or lower)', () => {
+    const { container } = render(<LoginPage />);
+    const card = container.querySelector('.login-card');
+    const form = container.querySelector('#admin-login-form');
+    
+    expect(card).toHaveClass('space-y-4'); // Expecting even tighter than 6
+    expect(form).toHaveClass('space-y-4'); // Expecting even tighter than 5
+  });
+
+  it('should have consistent left alignment for labels and indicators', () => {
+    const { container } = render(<LoginPage />);
+    const labels = container.querySelectorAll('label');
+    
+    labels.forEach(label => {
+      expect(label).toHaveClass('flex');
+      expect(label).toHaveClass('items-center');
+      expect(label).toHaveClass('gap-2');
+    });
+  });
+});

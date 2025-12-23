@@ -220,12 +220,12 @@ export const LoginPage: React.FC = () => {
         className="login-container relative z-10 w-full max-w-[340px]"
         data-animated="true"
       >
-        <div className="login-card space-y-6 rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-6 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
-          <div className="text-center mb-10" id="admin-login-header">
+        <div className="login-card space-y-4 rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-6 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
+          <div className="text-center mb-6" id="admin-login-header">
             <h1 className="text-2xl font-black tracking-tight text-white" id="admin-login-title">
               Admin <span className="text-brand-pink">access</span>
             </h1>
-            <p className="mt-3 text-xs text-white/40 leading-relaxed max-w-[240px] mx-auto" id="admin-login-subtitle">
+            <p className="mt-2 text-xs text-white/40 leading-relaxed max-w-[240px] mx-auto" id="admin-login-subtitle">
               {copy.subtitle}
             </p>
           </div>
@@ -283,7 +283,7 @@ export const LoginPage: React.FC = () => {
           {/* Email/Password Form */}
           <Form {...form}>
             <form 
-              className="space-y-5" 
+              className="space-y-4" 
               id="admin-login-form" 
               onSubmit={form.handleSubmit(onSubmit)}
               aria-busy={isLoading ? "true" : "false"}
@@ -408,17 +408,17 @@ export const LoginPage: React.FC = () => {
                 control={form.control}
                 name="rememberMe"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2.5 space-y-0 py-2 min-h-[44px]" id="admin-login-remember-me-field">
+                  <FormItem className="flex items-center space-x-2.5 space-y-0 py-1" id="admin-login-remember-me-field">
                     <FormControl>
                       <Checkbox
                         id="admin-login-remember-me-checkbox"
                         checked={field.value}
-                        className="h-5 w-5 border-white/20 data-[state=checked]:bg-brand-pink data-[state=checked]:border-brand-pink transition-all"
+                        className="h-4 w-4 border-white/20 data-[state=checked]:bg-brand-pink data-[state=checked]:border-brand-pink transition-all"
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
                     <FormLabel 
-                      className="text-sm font-medium text-white/40 cursor-pointer select-none py-2" 
+                      className="text-xs font-medium text-white/40 cursor-pointer select-none py-1" 
                       id="admin-login-remember-me-label"
                       htmlFor="admin-login-remember-me-checkbox"
                     >
@@ -446,8 +446,8 @@ export const LoginPage: React.FC = () => {
             </form>
           </Form>
 
-          <div className="mt-8" id="admin-login-oauth-section">
-            <div className="flex items-center gap-4 mb-6" id="admin-login-separator">
+          <div className="mt-6" id="admin-login-oauth-section">
+            <div className="flex items-center gap-4 mb-4" id="admin-login-separator">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/10 whitespace-nowrap">or</span>
               <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/20 to-transparent" />
@@ -475,7 +475,7 @@ export const LoginPage: React.FC = () => {
             </Button>
           </div>
 
-          <div className="mt-10 text-center" id="admin-login-terms-section">
+          <div className="mt-6 text-center" id="admin-login-terms-section">
             <button
               className="terms-toggle text-[10px] uppercase tracking-[0.2em] font-bold text-white/20 hover:text-white/40 transition-all flex items-center justify-center gap-2 mx-auto"
               id="admin-login-terms-toggle"
