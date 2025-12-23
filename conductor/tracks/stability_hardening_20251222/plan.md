@@ -2,7 +2,7 @@
 
 ## Phase 1: RBAC & Security Hardening
 - [x] Task: Audit existing RBAC implementation against Supabase profiles. [commit: 4535e42]
-- [ ] Task: Write tests for section-level permission validation.
+- [x] Task: Write tests for section-level permission validation. [commit: bc0bde8]
 - [ ] Task: Implement missing permission checks for sensitive delete/publish operations.
 - [ ] Task: Conductor - User Manual Verification 'RBAC & Security Hardening' (Protocol in workflow.md)
 
