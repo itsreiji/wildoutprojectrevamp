@@ -204,9 +204,9 @@ export const LoginPage: React.FC = () => {
 
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
-  const inputClasses = "h-11 bg-white/[0.05] border-white/10 text-white placeholder:text-white/20 focus:ring-1 focus:ring-[#E93370]/50 focus:border-[#E93370]/50 transition-all rounded-xl px-4";
+  const inputClasses = "h-11 bg-white/[0.05] border-white/10 text-white placeholder:text-white/20 focus:ring-1 focus:ring-brand-pink/50 focus:border-brand-pink/50 transition-all rounded-xl px-4";
   const labelClasses = "flex items-center gap-2 text-sm font-semibold text-white/60 mb-2";
-  const brandPink = "#E93370";
+  const brandPink = "brand-pink";
 
   return (
     <div className="login-page relative min-h-screen bg-black text-foreground overflow-x-hidden flex items-center justify-center p-4" id="admin-login-page">
@@ -218,10 +218,10 @@ export const LoginPage: React.FC = () => {
         className="login-container relative z-10 w-full max-w-[380px]"
         data-animated="true"
       >
-        <div className="login-card space-y-8 rounded-4xl border border-white/10 bg-[#0a0a0a]/80 p-8 md:p-10 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
+        <div className="login-card space-y-8 rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-8 md:p-10 shadow-2xl backdrop-blur-3xl" id="admin-login-card">
           <div className="text-center mb-10" id="admin-login-header">
             <h1 className="text-3xl font-black tracking-tight text-white" id="admin-login-title">
-              Admin <span className="text-[#E93370]">access</span>
+              Admin <span className="text-brand-pink">access</span>
             </h1>
             <p className="mt-3 text-sm text-white/40 leading-relaxed max-w-[240px] mx-auto" id="admin-login-subtitle">
               {copy.subtitle}
@@ -231,8 +231,8 @@ export const LoginPage: React.FC = () => {
           {/* Enhanced error display with icons */}
           {formError && (
             <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 flex items-center gap-2" id="admin-login-error-message">
-              <AlertTriangle className="h-4 w-4 text-red-300 flex-shrink-0" id="admin-login-error-icon" />
-              <p className="text-sm text-red-300" id="admin-login-error-text" role="alert">
+              <AlertTriangle className="h-4 w-4 text-red-400 flex-shrink-0" id="admin-login-error-icon" />
+              <p className="text-sm text-red-400" id="admin-login-error-text" role="alert">
                 {formError}
               </p>
             </div>
@@ -240,9 +240,9 @@ export const LoginPage: React.FC = () => {
 
           {/* Enhanced success display with icons */}
           {infoMessage && (
-            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 flex items-center gap-2" id="admin-login-success-message">
-              <CheckCircle2 className="h-4 w-4 text-emerald-300 flex-shrink-0" id="admin-login-success-icon" />
-              <p className="text-sm text-emerald-300" id="admin-login-success-text" role="status">
+            <div className="rounded-xl border border-green-500/20 bg-green-500/10 p-3 flex items-center gap-2" id="admin-login-success-message">
+              <CheckCircle2 className="h-4 w-4 text-green-400 flex-shrink-0" id="admin-login-success-icon" />
+              <p className="text-sm text-green-400" id="admin-login-success-text" role="status">
                 {infoMessage}
               </p>
             </div>
@@ -257,7 +257,7 @@ export const LoginPage: React.FC = () => {
                 render={({ field }) => (
                   <FormItem id="admin-login-email-field">
                     <FormLabel className={labelClasses} id="admin-login-email-label">
-                      <Mail className="h-4 w-4 text-[#E93370]" id="admin-login-email-icon" />
+                      <Mail className="h-4 w-4 text-brand-pink" id="admin-login-email-icon" />
                       <span>Email</span>
                     </FormLabel>
                     <FormControl>
@@ -286,7 +286,7 @@ export const LoginPage: React.FC = () => {
                 render={({ field }) => (
                   <FormItem id="admin-login-password-field">
                     <FormLabel className={labelClasses} id="admin-login-password-label">
-                      <Lock className="h-4 w-4 text-[#E93370]" id="admin-login-password-icon" />
+                      <Lock className="h-4 w-4 text-brand-pink" id="admin-login-password-icon" />
                       <span>Password</span>
                     </FormLabel>
                     <FormControl>
@@ -334,7 +334,7 @@ export const LoginPage: React.FC = () => {
                           <ul className="mt-2 text-[10px] text-white/30 space-y-1" id="admin-login-password-strength-feedback">
                             {passwordStrength.feedback.map((item, index) => (
                               <li key={`password-feedback-${index}`} className="flex items-center">
-                                <div className={`h-1 w-1 rounded-full mr-2 bg-[${brandPink}]`} />
+                                <div className="h-1 w-1 rounded-full mr-2 bg-brand-pink" />
                                 <span id={`admin-login-password-feedback-text-${index}`}>{item}</span>
                               </li>
                             ))}
@@ -365,7 +365,7 @@ export const LoginPage: React.FC = () => {
                     <FormControl>
                       <Checkbox
                         checked={field.value}
-                        className={`h-4 w-4 border-white/20 data-[state=checked]:bg-[${brandPink}] data-[state=checked]:border-[${brandPink}]`}
+                        className="h-4 w-4 border-white/20 data-[state=checked]:bg-brand-pink data-[state=checked]:border-brand-pink"
                         onCheckedChange={field.onChange}
                       />
                     </FormControl>
@@ -377,7 +377,7 @@ export const LoginPage: React.FC = () => {
               />
 
               <Button
-                className={`w-full h-11 bg-[${brandPink}] hover:bg-[${brandPink}]/90 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98]`}
+                className="w-full h-11 bg-brand-pink hover:bg-brand-pink/90 text-white font-bold rounded-xl shadow-lg transition-all active:scale-[0.98]"
                 disabled={oauthLoading || rateLimitInfo.isBlocked}
                 id="admin-login-submit-button"
                 type="submit"

@@ -76,4 +76,14 @@ describe('LoginPage Layout', () => {
     
     expect(cardContainer).toHaveAttribute('data-animated', 'true');
   });
+
+  it('should use theme-compliant brand classes', () => {
+    const { container } = render(<LoginPage />);
+    const titleSpan = container.querySelector('#admin-login-title span');
+    const submitButton = container.querySelector('#admin-login-submit-button');
+    
+    // We want to move towards these classes instead of hardcoded hex
+    expect(titleSpan).toHaveClass('text-brand-pink');
+    expect(submitButton).toHaveClass('bg-brand-pink');
+  });
 });
