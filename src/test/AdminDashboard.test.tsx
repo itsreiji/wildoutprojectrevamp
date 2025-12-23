@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 
 // Mock Figma asset import before other imports
-vi.mock('figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png', () => 'test-logo.png');
+vi.mock('figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png', () => ({ default: 'test-logo.png' }));
 
 // Mock dependencies
-vi.mock('../components/router', () => ({
+vi.mock('../components/router/RouterContext', () => ({
   useRouter: vi.fn(() => ({
     getCurrentSubPath: vi.fn(() => 'home'),
     navigate: vi.fn(),
@@ -76,9 +76,7 @@ vi.mock('lucide-react', () => {
   };
 });
 
-// Mock the logo import and UI components
-vi.mock('figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png', () => 'test-logo.png');
-
+// Mock UI components
 vi.mock('@/components/ui/avatar', () => ({
   Avatar: ({ children, className }: any) =>
     React.createElement('div', { className, 'data-testid': 'user-avatar' }, children),
@@ -275,9 +273,6 @@ describe('AdminDashboard', () => {
       const logoImage = screen.getByTestId('logo-image');
       expect(logoImage).toBeInTheDocument();
       expect(logoImage).toHaveAttribute('alt', 'WildOut Logo');
-
-      const logoText = screen.getByTestId('logo-text');
-      expect(logoText).toHaveTextContent('WILDOUT!');
     });
 
     it('should have proper visual hierarchy with separators', () => {

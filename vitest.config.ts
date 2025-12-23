@@ -23,6 +23,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png': path.resolve(__dirname, './src/assets/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png'),
     },
   },
 })

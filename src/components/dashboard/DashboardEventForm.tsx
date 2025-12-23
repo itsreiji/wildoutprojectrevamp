@@ -129,6 +129,7 @@ export function DashboardEventForm({
   const [galleryImagesPreviews, setGalleryImagesPreviews] = useState<string[]>(
     []
   );
+  const [isInitialized, setIsInitialized] = useState(false);
   const formatDateForInput = (
     dateString: string | null | undefined
   ): string => {
@@ -194,8 +195,13 @@ export function DashboardEventForm({
 
   // Reset form when editing target changes to ensure fresh values
   useEffect(() => {
-    form.reset(getDefaultValues());
-  }, [defaultValues?.id, form, getDefaultValues]);
+    // Only reset if we haven't initialized yet, OR if the ID actually changed
+    // This prevents race conditions where defaultValues might be null initially
+    if (!isInitialized || (defaultValues?.id && form.getValues("title") === "")) {
+      form.reset(getDefaultValues());
+      setIsInitialized(true);
+    }
+  }, [defaultValues?.id, form, getDefaultValues, isInitialized]);
 
   // Transform form values to map empty strings to null for optional fields
   const handleFormSubmit = (values: EventFormValues) => {

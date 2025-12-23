@@ -13,37 +13,47 @@ import type { Feature } from '@/types/content';
 export const DashboardAbout = React.memo(() => {
   const { about, saveAboutContent, loading: contentLoading } = useEnhancedStaticContent();
   const [formData, setFormData] = useState({
-    title: about?.title || '',
-    subtitle: about?.subtitle || '',
-    founded_year: about?.founded_year || '',
-    story: Array.isArray(about?.story) ? about.story : [],
-    features: Array.isArray(about?.features) ? about.features : [],
-    created_at: about?.created_at || null,
-    updated_at: about?.updated_at || null,
-    updated_by: about?.updated_by || null,
-    id: about?.id || "00000000-0000-0000-0000-000000000002"
+    title: '',
+    subtitle: '',
+    founded_year: '',
+    story: [] as string[],
+    features: [] as Feature[],
+    created_at: null as string | null,
+    updated_at: null as string | null,
+    updated_by: null as string | null,
+    id: "00000000-0000-0000-0000-000000000002"
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Sync form data when about content loads
+  // Sync form data when about content loads - only once
   useEffect(() => {
-    if (about) {
+    if (about && !isInitialized) {
+      console.log('DashboardAbout: Initializing form with content', { id: about.id });
       setFormData({
         title: about.title || '',
         subtitle: about.subtitle || '',
         founded_year: about.founded_year || '',
-        story: Array.isArray(about.story) ? about.story : [],
-        features: Array.isArray(about.features) ? about.features : [],
+        story: Array.isArray(about.story) ? (about.story as string[]) : [],
+        features: Array.isArray(about.features) ? (about.features as any as Feature[]) : [],
         created_at: about.created_at || null,
         updated_at: about.updated_at || null,
         updated_by: about.updated_by || null,
         id: about.id || "00000000-0000-0000-0000-000000000002"
       });
+      setIsInitialized(true);
     }
-  }, [about]);
+  }, [about, isInitialized]);
 
   const handleSave = async () => {
-    if (isSaving) return;
+    if (isSaving || !isInitialized) return;
+
+    // Basic validation to prevent saving empty data if somehow initialized with nothing
+    if (!formData.title && (!formData.story || formData.story.length === 0)) {
+      toast.error('Cannot save empty about content');
+      return;
+    }
+
     setIsSaving(true);
     try {
       console.log('DashboardAbout: Attempting to save content', formData);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Save, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -6,28 +6,64 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-import { useContent } from '../../contexts/ContentContext';
+import { useEnhancedStaticContent } from '../../contexts/EnhancedStaticContentContext';
 import { toast } from 'sonner';
 
 export const DashboardHero = React.memo(() => {
-  const { hero, saveHeroContent } = useContent();
+  const { hero, saveHeroContent, loading: contentLoading } = useEnhancedStaticContent();
   const [formData, setFormData] = useState({
-    title: hero?.title || '',
-    subtitle: hero?.subtitle || '',
-    description: hero?.description || '',
-    stats: (hero?.stats as any) || { events: '500+', members: '50K+', partners: '100+' },
-    cta_text: hero?.cta_text || '',
-    cta_link: hero?.cta_link || '',
-    ...hero
+    title: '',
+    subtitle: '',
+    description: '',
+    stats: { events: '500+', members: '50K+', partners: '100+' },
+    cta_text: '',
+    cta_link: '',
+    id: "00000000-0000-0000-0000-000000000001",
+    created_at: null as string | null,
+    updated_at: null as string | null,
+    updated_by: null as string | null,
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Sync form data when hero content loads
+  useEffect(() => {
+    if (hero && !isInitialized) {
+      console.log('DashboardHero: Initializing form with content', { id: hero.id });
+      setFormData({
+        title: hero.title || '',
+        subtitle: hero.subtitle || '',
+        description: hero.description || '',
+        stats: (hero.stats as any) || { events: '500+', members: '50K+', partners: '100+' },
+        cta_text: hero.cta_text || '',
+        cta_link: hero.cta_link || '',
+        id: hero.id || "00000000-0000-0000-0000-000000000001",
+        created_at: hero.created_at || null,
+        updated_at: hero.updated_at || null,
+        updated_by: hero.updated_by || null,
+      });
+      setIsInitialized(true);
+    }
+  }, [hero, isInitialized]);
 
   const handleSave = async () => {
+    if (isSaving || !isInitialized) return;
+
+    // Validation
+    if (!formData.title) {
+      toast.error('Site Title is required');
+      return;
+    }
+
     setIsSaving(true);
     try {
+      console.log('DashboardHero: Attempting to save content', formData);
       await saveHeroContent({
         ...formData,
-        title: formData.title || 'WildOut!' // title is required
+        title: formData.title,
+        created_at: formData.created_at,
+        updated_at: formData.updated_at,
+        updated_by: formData.updated_by,
       });
       toast.success('Hero section updated successfully!');
     } catch (error) {
@@ -37,6 +73,14 @@ export const DashboardHero = React.memo(() => {
       setIsSaving(false);
     }
   };
+
+  if (contentLoading && !isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E93370]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6" id="admin-hero-container">

@@ -147,8 +147,14 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
   const [adminSectionsLoading, setAdminSectionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Track if fallback import has been attempted to prevent duplicates
+  const fallbackImportAttempted = React.useRef<Set<string>>(new Set());
+
+  // Track if content loading is in progress to prevent race conditions
+  const isLoadingContent = React.useRef(false);
+
   // Original fetch functions remain the same
-  const fetchHeroContent = async (): Promise<HeroContent | null> => {
+  const fetchHeroContent = useCallback(async (): Promise<HeroContent | null> => {
     try {
       if (useDummyData) {
         return MOCK_HERO;
@@ -156,9 +162,9 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
       const { data, error } = await supabaseClient.rpc("get_hero_content");
       if (error) {
         console.error("Error fetching hero content:", error);
-        return null;
+        return MOCK_HERO;
       }
-      const result = (data as any)?.[0] as
+      const result = (Array.isArray(data) ? data[0] : data) as
         | Database["public"]["Tables"]["hero_content"]["Row"]
         | undefined;
       if (result) {
@@ -179,14 +185,74 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
           updated_by: result.updated_by,
         };
       }
-      return null;
+      return MOCK_HERO;
     } catch (error) {
       console.error("Error in fetchHeroContent:", error);
-      return null;
+      return MOCK_HERO;
     }
-  };
+  }, []);
 
-  const fetchAboutContent = async (): Promise<AboutContent | null> => {
+  const importAboutContentFallback = useCallback(async (): Promise<{ success: boolean; data: AboutContent | null; error?: string }> => {
+    console.log('EnhancedStaticContentContext: Starting fallback import for about content');
+
+    try {
+      if (!user) {
+        console.warn('EnhancedStaticContentContext: User not authenticated yet, skipping database import and using mock data');
+        return { success: false, data: MOCK_ABOUT, error: "User not authenticated yet" };
+      }
+
+      if (role !== "admin") {
+        console.warn('EnhancedStaticContentContext: Insufficient permissions for fallback import, using mock data only');
+        return { success: false, data: MOCK_ABOUT, error: "Insufficient permissions" };
+      }
+
+      // Use mock data as the source for fallback import
+      const fallbackData = MOCK_ABOUT;
+
+      const saveData = {
+        id: "00000000-0000-0000-0000-000000000002",
+        title: fallbackData.title,
+        subtitle: fallbackData.subtitle,
+        founded_year: fallbackData.founded_year,
+        story: fallbackData.story,
+        features: fallbackData.features,
+        updated_at: new Date().toISOString(),
+        updated_by: user.id,
+        created_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabaseClient
+        .from("about_content")
+        .upsert(saveData);
+
+      if (error) {
+        console.error("EnhancedStaticContentContext: Database error during fallback import:", error);
+        return { success: false, data: null, error: error.message };
+      }
+
+      console.log('EnhancedStaticContentContext: Successfully imported fallback data to database');
+
+      return {
+        success: true,
+        data: {
+          ...fallbackData,
+          updated_at: saveData.updated_at,
+          updated_by: saveData.updated_by,
+          created_at: saveData.created_at
+        }
+      };
+
+    } catch (error) {
+      console.error("EnhancedStaticContentContext: Error during fallback import:", error);
+      return {
+        success: false,
+        data: MOCK_ABOUT,
+        error: error instanceof Error ? error.message : "Unknown error during import"
+      };
+    }
+  }, [user, role]);
+
+  const fetchAboutContent = useCallback(async (): Promise<AboutContent | null> => {
     try {
       if (useDummyData) {
         return MOCK_ABOUT;
@@ -194,9 +260,9 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
       const { data, error } = await supabaseClient.rpc("get_about_content");
       if (error) {
         console.error("Error fetching about content:", error);
-        return null;
+        return MOCK_ABOUT;
       }
-      const result = (data as any)?.[0] as
+      const result = (Array.isArray(data) ? data[0] : data) as
         | Database["public"]["Tables"]["about_content"]["Row"]
         | undefined;
       if (result) {
@@ -216,14 +282,27 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
           updated_by: result.updated_by,
         };
       }
-      return null;
+
+      // No data in database - fallback to mock data and import it
+      const fallbackKey = "about_content";
+      if (fallbackImportAttempted.current.has(fallbackKey)) {
+        return MOCK_ABOUT;
+      }
+
+      fallbackImportAttempted.current.add(fallbackKey);
+      const importResult = await importAboutContentFallback();
+      if (importResult.success) {
+        return importResult.data;
+      } else {
+        return MOCK_ABOUT;
+      }
     } catch (error) {
       console.error("Error in fetchAboutContent:", error);
-      return null;
+      return MOCK_ABOUT;
     }
-  };
+  }, [importAboutContentFallback]);
 
-  const fetchSiteSettings = async (): Promise<SiteSettings | null> => {
+  const fetchSiteSettings = useCallback(async (): Promise<SiteSettings | null> => {
     try {
       if (useDummyData) {
         return MOCK_SETTINGS;
@@ -231,9 +310,9 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
       const { data, error } = await supabaseClient.rpc("get_site_settings");
       if (error) {
         console.error("Error fetching site settings:", error);
-        return null;
+        return MOCK_SETTINGS;
       }
-      const result = (data as any)?.[0] as
+      const result = (Array.isArray(data) ? data[0] : data) as
         | Database["public"]["Tables"]["site_settings"]["Row"]
         | undefined;
       if (result) {
@@ -255,15 +334,15 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
           updated_by: result.updated_by,
         };
       }
-      return null;
+      return MOCK_SETTINGS;
     } catch (error) {
       console.error("Error in fetchSiteSettings:", error);
-      return null;
+      return MOCK_SETTINGS;
     }
-  };
+  }, []);
 
   // ENHANCED: Gallery fetch using new storage-aware function
-  const fetchGallery = async (): Promise<GalleryImage[]> => {
+  const fetchGallery = useCallback(async (): Promise<GalleryImage[]> => {
     try {
       if (useDummyData) {
         return MOCK_GALLERY;
@@ -316,10 +395,28 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
         return [];
       }
     }
-  };
+  }, []);
 
-  const loadStaticContent = useCallback(async () => {
+  const loadStaticContent = useCallback(async (forceRefresh = false) => {
+    // Prevent loading if authentication is still being determined
+    if (!useDummyData && authContext.loading) {
+      console.log("EnhancedStaticContentContext: Waiting for authentication to complete");
+      return;
+    }
+
+    // Prevent multiple simultaneous fetches
+    if (isLoadingContent.current) {
+      console.log("EnhancedStaticContentContext: Content loading already in progress, skipping");
+      return;
+    }
+
+    // Reset fallback flags if forcing refresh
+    if (forceRefresh) {
+      fallbackImportAttempted.current.clear();
+    }
+
     try {
+      isLoadingContent.current = true;
       setLoading(true);
       setError(null);
 
@@ -348,9 +445,10 @@ export const EnhancedStaticContentProvider: React.FC<{ children: ReactNode }> = 
       console.error("Error loading static content:", err);
       setError("Failed to load static content");
     } finally {
+      isLoadingContent.current = false;
       setLoading(false);
     }
-  }, []);
+  }, [fetchHeroContent, fetchAboutContent, fetchSiteSettings, fetchGallery, authContext.loading]);
 
   useEffect(() => {
     loadStaticContent();

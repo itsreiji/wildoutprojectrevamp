@@ -17,7 +17,7 @@ import { motion } from "motion/react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../../contexts/AuthContext";
-import { useStaticContent } from "../../contexts/StaticContentContext";
+import { useEnhancedStaticContent } from "../../contexts/EnhancedStaticContentContext";
 import { supabaseClient } from "../../supabase/client";
 import { Button } from "../ui/button";
 import {
@@ -51,25 +51,31 @@ interface UserProfile {
 }
 
 export const DashboardSettings = React.memo(() => {
-  const { settings, saveSiteSettings } = useStaticContent();
+  const { settings, saveSiteSettings, loading: contentLoading } = useEnhancedStaticContent();
   const { role: currentUserRole } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [formData, setFormData] = useState({
-    site_name: settings?.site_name || "",
-    site_description: settings?.site_description || "",
-    tagline: settings?.tagline || "",
-    email: settings?.email || "",
-    phone: settings?.phone || "",
-    address: settings?.address || "",
-    social_media: settings?.social_media || {},
+    site_name: "",
+    site_description: "",
+    tagline: "",
+    email: "",
+    phone: "",
+    address: "",
+    social_media: {} as Record<string, string | null>,
+    id: "00000000-0000-0000-0000-000000000003",
+    created_at: null as string | null,
+    updated_at: null as string | null,
+    updated_by: null as string | null,
   });
 
-  // Update formData when settings are loaded
+  // Update formData when settings are loaded - only once
   useEffect(() => {
-    if (settings) {
+    if (settings && !isInitialized) {
+      console.log('DashboardSettings: Initializing form with content', { id: settings.id });
       setFormData({
         site_name: settings.site_name || "",
         site_description: settings.site_description || "",
@@ -77,10 +83,15 @@ export const DashboardSettings = React.memo(() => {
         email: settings.email || "",
         phone: settings.phone || "",
         address: settings.address || "",
-        social_media: settings.social_media || {},
+        social_media: (settings.social_media as any) || {},
+        id: settings.id || "00000000-0000-0000-0000-000000000003",
+        created_at: settings.created_at || null,
+        updated_at: settings.updated_at || null,
+        updated_by: settings.updated_by || null,
       });
+      setIsInitialized(true);
     }
-  }, [settings]);
+  }, [settings, isInitialized]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -127,11 +138,19 @@ export const DashboardSettings = React.memo(() => {
   }, [currentUserRole]);
 
   const handleSave = async () => {
+    if (isSaving || !isInitialized) return;
+
+    // Validation
+    if (!formData.site_name) {
+      toast.error("Site Name is required");
+      return;
+    }
+
     setIsSaving(true);
     try {
+      console.log('DashboardSettings: Attempting to save content', formData);
       const updatedSettings: SiteSettings = {
-        ...settings,
-        id: settings?.id || "00000000-0000-0000-0000-000000000003",
+        id: formData.id || "00000000-0000-0000-0000-000000000003",
         site_name: formData.site_name,
         site_description: formData.site_description,
         tagline: formData.tagline,
@@ -139,9 +158,9 @@ export const DashboardSettings = React.memo(() => {
         phone: formData.phone,
         address: formData.address,
         social_media: formData.social_media as Json,
+        created_at: formData.created_at || new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        created_at: settings?.created_at || new Date().toISOString(),
-        updated_by: null,
+        updated_by: formData.updated_by,
       };
       await saveSiteSettings(updatedSettings);
       toast.success("Settings saved successfully!");
@@ -152,6 +171,14 @@ export const DashboardSettings = React.memo(() => {
       setIsSaving(false);
     }
   };
+
+  if (contentLoading && !isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E93370]"></div>
+      </div>
+    );
+  }
 
   const handleRoleUpdate = async (
     userId: string,

@@ -128,7 +128,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
         console.error("Error fetching hero content:", error);
         return null;
       }
-      const result = (data as any)?.[0] as
+      const result = (Array.isArray(data) ? data[0] : data) as
         | Database["public"]["Tables"]["hero_content"]["Row"]
         | undefined;
       if (result) {
@@ -250,7 +250,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
         return MOCK_ABOUT;
       }
 
-      const result = (data as any)?.[0] as
+      const result = (Array.isArray(data) ? data[0] : data) as
         | Database["public"]["Tables"]["about_content"]["Row"]
         | undefined;
 
@@ -309,7 +309,7 @@ export const StaticContentProvider: React.FC<{ children: ReactNode }> = ({
         console.error("Error fetching site settings:", error);
         return null;
       }
-      const result = (data as any)?.[0] as
+      const result = (Array.isArray(data) ? data[0] : data) as
         | Database["public"]["Tables"]["site_settings"]["Row"]
         | undefined;
       if (result) {

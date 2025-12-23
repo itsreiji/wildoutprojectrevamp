@@ -4,7 +4,7 @@
 - [x] Task: Audit existing RBAC implementation against Supabase profiles. [commit: 4535e42]
 - [x] Task: Write tests for section-level permission validation. [commit: bc0bde8]
 - [x] Task: Implement missing permission checks for sensitive delete/publish operations. [commit: 0162dcc]
-- [ ] Task: Conductor - User Manual Verification 'RBAC & Security Hardening' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'RBAC & Security Hardening' (Protocol in workflow.md)
 
 ## Phase 2: Synchronization & Data Integrity
 - [ ] Task: Enhance Supabase real-time subscription handling in Context providers.

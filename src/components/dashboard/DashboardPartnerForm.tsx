@@ -22,7 +22,7 @@
 
 import type { Partner } from "@/types/content";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../ui/button";
@@ -85,6 +85,7 @@ export function DashboardPartnerForm({
   defaultValues,
   onCancel,
 }: DashboardPartnerFormProps) {
+  const [isInitialized, setIsInitialized] = useState(false);
   const getDefaultValues = useCallback((): PartnerFormValues => {
     if (!defaultValues) {
       return {
@@ -120,8 +121,11 @@ export function DashboardPartnerForm({
 
   // Reset form when defaultValues changes (switching between create/edit modes)
   useEffect(() => {
-    form.reset(getDefaultValues());
-  }, [defaultValues?.id, form, getDefaultValues]);
+    if (!isInitialized || (defaultValues?.id && form.getValues("name") === "")) {
+      form.reset(getDefaultValues());
+      setIsInitialized(true);
+    }
+  }, [defaultValues?.id, form, getDefaultValues, isInitialized]);
 
   return (
     <Form {...form}>
