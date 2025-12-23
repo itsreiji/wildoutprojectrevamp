@@ -8,7 +8,6 @@ import { supabaseClient } from '@/supabase/client';
 
 export class GallerySetupWizard {
   private bucketName = 'wildout-images';
-  private momentsPath = 'moments';
 
   /**
    * Check if storage bucket exists and create if needed

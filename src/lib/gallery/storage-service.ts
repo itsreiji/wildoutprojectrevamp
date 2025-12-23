@@ -215,7 +215,7 @@ export class GalleryStorageService {
       let thumbnailUrl: string | undefined;
       if (options.generateThumbnail) {
         try {
-          thumbnailUrl = await this.generateThumbnail(uploadData.path, file);
+          thumbnailUrl = await this.generateThumbnail(uploadData.path);
         } catch (thumbError) {
           console.warn('Thumbnail generation failed:', thumbError);
         }

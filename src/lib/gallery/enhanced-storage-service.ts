@@ -1333,24 +1333,6 @@ export class EnhancedGalleryStorageService {
   // ==================== UTILITY METHODS ====================
 
   /**
-   * Get file metadata
-   */
-  private async getFileMetadata(path: string, file: File): Promise<StorageMetadata> {
-    // Create metadata object
-    const metadata: StorageMetadata = {
-      size: file.size,
-      width: 0, // Would need image processing library to get actual dimensions
-      height: 0,
-      mime_type: file.type,
-      format: file.name.split('.').pop() || 'unknown',
-      created_at: new Date().toISOString(),
-      uploaded_by: 'user' // Would get from auth context
-    };
-
-    return metadata;
-  }
-
-  /**
    * Extract storage path from URL
    */
   private extractPathFromUrl(url: string): string | null {
@@ -1550,7 +1532,7 @@ export const galleryGetEndpoint = async (request: Request): Promise<Response> =>
  * DELETE /api/gallery/items/:id
  * Delete gallery item
  */
-export const galleryDeleteEndpoint = async (request: Request, itemId: string): Promise<Response> => {
+export const galleryDeleteEndpoint = async (itemId: string): Promise<Response> => {
   try {
     await enhancedGalleryStorageService.deleteGalleryItem(itemId);
 
