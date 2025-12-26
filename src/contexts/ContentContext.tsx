@@ -49,7 +49,7 @@ export interface TeamMember {
   name: string;
   role: string;
   email: string;
-  phone?: string;
+  instagram?: string;
   bio: string;
   photoUrl?: string;
   status: 'active' | 'inactive';
@@ -82,7 +82,6 @@ export interface SiteSettings {
   siteDescription: string;
   tagline: string;
   email: string;
-  phone: string;
   address: string;
   socialMedia: {
     instagram: string;
@@ -246,10 +245,10 @@ const INITIAL_GALLERY: GalleryImage[] = [
 const INITIAL_TEAM: TeamMember[] = [
   {
     id: '1',
-    name: 'Sarah Chen',
+    name: 'Sarah Jenkins',
     role: 'CEO & Founder',
     email: 'sarah@wildoutproject.com',
-    phone: '+62 812 3456 7890',
+    instagram: '@sarahjenkins',
     bio: 'Visionary leader with 10+ years experience in nightlife and entertainment industry',
     photoUrl: 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400',
     status: 'active',
@@ -259,7 +258,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Michael Rodriguez',
     role: 'Creative Director',
     email: 'michael@wildoutproject.com',
-    phone: '+62 813 7654 3210',
+    instagram: '@mikerod',
     bio: 'Award-winning creative with passion for innovative event experiences',
     photoUrl: 'https://images.unsplash.com/photo-1599949287142-9a208b301ecd?w=400',
     status: 'active',
@@ -269,7 +268,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Aisha Patel',
     role: 'Marketing Director',
     email: 'aisha@wildoutproject.com',
-    phone: '+62 814 8765 4321',
+    instagram: '@aishapatel',
     bio: 'Digital marketing strategist specializing in community engagement',
     photoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400',
     status: 'active',
@@ -279,7 +278,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'David Kim',
     role: 'Operations Manager',
     email: 'david@wildoutproject.com',
-    phone: '+62 815 2468 1357',
+    instagram: '@davidkim',
     bio: 'Expert in logistics and operational excellence for large-scale events',
     photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
     status: 'active',
@@ -289,7 +288,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Priya Sharma',
     role: 'Event Coordinator',
     email: 'priya@wildoutproject.com',
-    phone: '+62 816 9753 8642',
+    instagram: '@priyasharma',
     bio: 'Meticulous planner ensuring flawless event execution',
     photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400',
     status: 'active',
@@ -299,7 +298,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'James Wilson',
     role: 'Technical Director',
     email: 'james@wildoutproject.com',
-    phone: '+62 817 3698 5274',
+    instagram: '@jameswilson',
     bio: 'Audio-visual expert with cutting-edge production knowledge',
     photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
     status: 'active',
@@ -309,7 +308,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Natasha Williams',
     role: 'Social Media Manager',
     email: 'natasha@wildoutproject.com',
-    phone: '+62 818 7531 9864',
+    instagram: '@natashaw',
     bio: 'Content creator building vibrant online communities',
     photoUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
     status: 'active',
@@ -319,7 +318,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Alex Zhang',
     role: 'Sponsorship Manager',
     email: 'alex@wildoutproject.com',
-    phone: '+62 819 8524 7136',
+    instagram: '@alexzhang',
     bio: 'Building strategic partnerships with leading brands',
     photoUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400',
     status: 'active',
@@ -329,7 +328,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Maria Santos',
     role: 'Artist Relations',
     email: 'maria@wildoutproject.com',
-    phone: '+62 820 1472 5836',
+    instagram: '@mariasantos',
     bio: 'Connecting top talent with incredible event opportunities',
     photoUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
     status: 'active',
@@ -339,7 +338,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Ryan Thompson',
     role: 'Design Lead',
     email: 'ryan@wildoutproject.com',
-    phone: '+62 821 9517 3648',
+    instagram: '@ryanthompson',
     bio: 'Creating stunning visual identities for memorable events',
     photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
     status: 'active',
@@ -349,7 +348,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Lily Anderson',
     role: 'Customer Experience',
     email: 'lily@wildoutproject.com',
-    phone: '+62 822 7539 5148',
+    instagram: '@lilyanderson',
     bio: 'Ensuring every guest has an unforgettable experience',
     photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
     status: 'active',
@@ -359,7 +358,7 @@ const INITIAL_TEAM: TeamMember[] = [
     name: 'Omar Hassan',
     role: 'Finance Manager',
     email: 'omar@wildoutproject.com',
-    phone: '+62 823 8642 9753',
+    instagram: '@omarhassan',
     bio: 'Managing financial strategy and sustainable growth',
     photoUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400',
     status: 'active',
@@ -411,7 +410,6 @@ const INITIAL_SETTINGS: SiteSettings = {
   siteDescription: 'Media Digital Nightlife & Event Multi-Platform',
   tagline: "Indonesia's premier creative community platform",
   email: 'contact@wildoutproject.com',
-  phone: '+62 21 1234 567',
   address: 'Jakarta, Indonesia',
   socialMedia: {
     instagram: 'https://instagram.com/wildoutproject.com',
@@ -637,7 +635,7 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
     try {
       const oldEvents = events;
       setEvents(eventsData);
-      
+
       // Update or create events
       for (const event of eventsData) {
         const oldEvent = oldEvents.find(e => e.id === event.id);
@@ -665,7 +663,7 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
     try {
       const oldGallery = gallery;
       setGallery(galleryData);
-      
+
       // Update or create images
       for (const image of galleryData) {
         const oldImage = oldGallery.find(img => img.id === image.id);

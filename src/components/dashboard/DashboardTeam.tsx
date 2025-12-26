@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Plus, Search, Edit, Trash2, Mail, Phone } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Mail, Instagram } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -20,7 +20,7 @@ export const DashboardTeam = React.memo(() => {
     name: '',
     role: '',
     email: '',
-    phone: '',
+    instagram: '',
     bio: '',
     photoUrl: '',
   });
@@ -34,7 +34,7 @@ export const DashboardTeam = React.memo(() => {
 
   const handleCreate = () => {
     setEditingMember(null);
-    setFormData({ name: '', role: '', email: '', phone: '', bio: '', photoUrl: '' });
+    setFormData({ name: '', role: '', email: '', instagram: '', bio: '', photoUrl: '' });
     setIsDialogOpen(true);
   };
 
@@ -44,7 +44,7 @@ export const DashboardTeam = React.memo(() => {
       name: member.name,
       role: member.role,
       email: member.email,
-      phone: member.phone || '',
+      instagram: member.instagram || '',
       bio: member.bio,
       photoUrl: member.photoUrl || '',
     });
@@ -170,11 +170,16 @@ export const DashboardTeam = React.memo(() => {
                   {member.email}
                 </a>
               </div>
-              {member.phone && (
+              {member.instagram && (
                 <div className="flex items-center space-x-2 text-sm text-white/70">
-                  <Phone className="h-4 w-4 text-[#E93370]" />
-                  <a href={`tel:${member.phone}`} className="hover:text-[#E93370] transition-colors">
-                    {member.phone}
+                  <Instagram className="h-4 w-4 text-[#E93370]" />
+                  <a
+                    href={member.instagram.startsWith('@') ? `https://instagram.com/${member.instagram.substring(1)}` : member.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#E93370] transition-colors"
+                  >
+                    {member.instagram}
                   </a>
                 </div>
               )}
@@ -267,12 +272,12 @@ export const DashboardTeam = React.memo(() => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone (Optional)</Label>
+                <Label htmlFor="instagram">Instagram (Optional)</Label>
                 <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+62 812 3456 7890"
+                  id="instagram"
+                  value={formData.instagram}
+                  onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                  placeholder="@username"
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>

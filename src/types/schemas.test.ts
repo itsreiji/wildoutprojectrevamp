@@ -8,7 +8,12 @@ describe('Schemas Validation', () => {
       const validHero = {
         title: 'Welcome',
         subtitle: 'To WildOut',
-        image_url: 'https://example.com/image.jpg',
+        description: 'The best platform',
+        stats: {
+          events: '10+',
+          members: '100+',
+          partners: '5+'
+        }
       };
       const result = HeroSchema.safeParse(validHero);
       expect(result.success).toBe(true);
@@ -26,54 +31,74 @@ describe('Schemas Validation', () => {
   describe('EventSchema', () => {
     it('should validate valid event data', () => {
       const validEvent = {
+        id: '1',
         title: 'Concert',
-        date: '2023-12-25T20:00:00Z',
+        description: 'Big concert',
+        date: '2023-12-25',
+        time: '20:00',
+        venue: 'Arena',
+        venueAddress: 'Street 1',
+        image: 'https://example.com/image.jpg',
+        category: 'Music',
         capacity: 100,
-        price: 50,
-        status: 'published',
+        attendees: 50,
+        price: 'IDR 100k',
+        artists: [],
+        gallery: [],
+        highlights: [],
+        status: 'upcoming',
       };
       const result = EventSchema.safeParse(validEvent);
       expect(result.success).toBe(true);
     });
 
-    it('should fail if capacity is negative', () => {
+    it('should fail if capacity is not a number', () => {
       const invalidEvent = {
+        id: '1',
         title: 'Concert',
-        capacity: -10,
+        description: 'Big concert',
+        date: '2023-12-25',
+        time: '20:00',
+        venue: 'Arena',
+        venueAddress: 'Street 1',
+        image: 'https://example.com/image.jpg',
+        category: 'Music',
+        capacity: 'not-a-number',
+        attendees: 50,
+        price: 'IDR 100k',
+        artists: [],
+        gallery: [],
+        highlights: [],
+        status: 'upcoming',
       };
       const result = EventSchema.safeParse(invalidEvent);
       expect(result.success).toBe(false);
-    });
-
-    it('should default status to published', () => {
-      const event = { title: 'New Event' };
-      const result = EventSchema.parse(event);
-      expect(result.status).toBe('published');
     });
   });
 
   describe('TeamMemberSchema', () => {
     it('should validate valid team member', () => {
       const validMember = {
+        id: '1',
         name: 'John Doe',
         role: 'CEO',
-        social_links: {
-          twitter: 'https://twitter.com/johndoe',
-        },
+        email: 'john@example.com',
+        instagram: '@johndoe',
+        bio: 'Legendary developer',
+        status: 'active'
       };
       const result = TeamMemberSchema.safeParse(validMember);
-      if (!result.success) {
-        console.log(JSON.stringify(result.error, null, 2));
-      }
       expect(result.success).toBe(true);
     });
 
-    it('should fail if social link is not a URL', () => {
+    it('should fail if email is invalid', () => {
       const invalidMember = {
+        id: '1',
         name: 'John Doe',
-        social_links: {
-          twitter: 'not-a-url',
-        },
+        role: 'CEO',
+        email: 'not-an-email',
+        bio: 'Legendary developer',
+        status: 'active'
       };
       const result = TeamMemberSchema.safeParse(invalidMember);
       expect(result.success).toBe(false);

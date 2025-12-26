@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Save, Globe, Mail, Phone, MapPin, Instagram, Twitter, Facebook, Youtube } from 'lucide-react';
+import { Save, Globe, Mail, MapPin, Instagram, Twitter, Facebook, Youtube } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -150,17 +150,18 @@ export const DashboardSettings = React.memo(() => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone" className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-[#E93370]" />
-                <span>Phone Number</span>
+              <Label htmlFor="instagram_contact" className="flex items-center space-x-2">
+                <Instagram className="h-4 w-4 text-[#E93370]" />
+                <span>Instagram Handle</span>
               </Label>
               <Input
-                id="phone"
-                value={formData.phone}
+                id="instagram_contact"
+                value={formData.socialMedia.instagram}
                 onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
+                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, instagram: e.target.value } })
                 }
                 className="bg-white/5 border-white/10 text-white"
+                placeholder="@wildoutproject"
               />
             </div>
 

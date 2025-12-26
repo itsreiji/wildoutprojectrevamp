@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Instagram, Twitter, Facebook, Youtube, Mail, MapPin, Phone } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Youtube, Mail, MapPin } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 import logo from '../assets/logo.png';
 
@@ -73,9 +73,18 @@ export const Footer = React.memo(() => {
                   </a>
                 </div>
                 <div className="flex items-center">
-                  <Phone className="h-4 w-4 mr-2 text-[#E93370]" />
-                  <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="hover:text-[#E93370] transition-colors">
-                    {settings.phone}
+                  <Instagram className="h-4 w-4 mr-2 text-[#E93370]" />
+                  <a
+                    href={settings.socialMedia.instagram.startsWith('http') ? settings.socialMedia.instagram : `https://instagram.com/${settings.socialMedia.instagram.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#E93370] transition-colors"
+                  >
+                    {settings.socialMedia.instagram.startsWith('@')
+                      ? settings.socialMedia.instagram
+                      : settings.socialMedia.instagram.includes('instagram.com/')
+                        ? `@${settings.socialMedia.instagram.split('instagram.com/')[1].replace(/\/$/, '')}`
+                        : settings.socialMedia.instagram}
                   </a>
                 </div>
                 <div className="flex items-start">

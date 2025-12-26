@@ -63,6 +63,7 @@
         "dev": "vite",
         "dev:smart": "node dev-server.js",
         "dev:check": "node test-dev-server.js",
-        "build": "vite build"
+        "build": "vite build",
+        "test": "vitest run"
     }
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ThemeProvider } from 'next-themes';
 import { ContentProvider } from './contexts/ContentContext';
 import { RouterProvider, useRouter } from './components/Router';
 import { LandingPage } from './components/LandingPage';
@@ -57,11 +58,13 @@ function AppContent() {
 
 function App() {
   return (
-    <ContentProvider>
-      <RouterProvider>
-        <AppContent />
-      </RouterProvider>
-    </ContentProvider>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+      <ContentProvider>
+        <RouterProvider>
+          <AppContent />
+        </RouterProvider>
+      </ContentProvider>
+    </ThemeProvider>
   );
 }
 

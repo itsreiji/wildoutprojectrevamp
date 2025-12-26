@@ -51,7 +51,7 @@ export const TeamMemberSchema = z.object({
   name: z.string().min(1, "Name is required"),
   role: z.string(),
   email: z.string().email(),
-  phone: z.string().optional(),
+  instagram: z.string().optional(),
   bio: z.string(),
   photoUrl: z.string().optional(),
   status: z.enum(["active", "inactive"]),
@@ -71,7 +71,6 @@ export const SettingsSchema = z.object({
   siteDescription: z.string(),
   tagline: z.string(),
   email: z.string().email(),
-  phone: z.string(),
   address: z.string(),
   socialMedia: z.object({
     instagram: z.string(),

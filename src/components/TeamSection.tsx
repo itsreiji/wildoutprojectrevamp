@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Mail, Phone, Linkedin, Twitter } from 'lucide-react';
+import { Mail, Instagram, Linkedin, Twitter } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useContent } from '../contexts/ContentContext';
 
@@ -71,13 +71,15 @@ export const TeamSection = React.memo(() => {
                         <span className="truncate">{member.email}</span>
                       </a>
                     )}
-                    {member.phone && (
+                    {member.instagram && (
                       <a
-                        href={`tel:${member.phone}`}
+                        href={member.instagram.startsWith('@') ? `https://instagram.com/${member.instagram.substring(1)}` : member.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors"
                       >
-                        <Phone className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span>{member.phone}</span>
+                        <Instagram className="h-4 w-4 mr-2 text-[#E93370]" />
+                        <span>{member.instagram}</span>
                       </a>
                     )}
                   </div>
