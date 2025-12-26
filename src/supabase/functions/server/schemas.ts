@@ -5,55 +5,88 @@ export const HeroSchema = z.object({
   title: z.string().min(1, "Title is required"),
   subtitle: z.string().optional(),
   description: z.string().optional(),
-  cta_text: z.string().optional(),
-  cta_link: z.string().optional(),
-  stats: z.record(z.string(), z.string()).optional(),
-  image_url: z.string().url().optional(),
+  stats: z.object({
+    events: z.string(),
+    members: z.string(),
+    partners: z.string(),
+  }),
 });
 
 export const AboutSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  content: z.string().optional(),
-  image_url: z.string().url().optional(),
-  features: z.array(z.string()).optional(),
+  subtitle: z.string(),
+  story: z.array(z.string()),
+  foundedYear: z.string(),
+  features: z.array(z.object({
+    title: z.string(),
+    description: z.string(),
+  })),
 });
 
 export const EventSchema = z.object({
-  id: z.string().optional(), // Generated on server if missing
+  id: z.string(),
   title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  date: z.string().datetime().optional(), // ISO string
-  location: z.string().optional(),
-  image_url: z.string().url().optional(),
-  category: z.string().optional(),
-  capacity: z.number().int().positive().optional(),
-  price: z.number().min(0).optional(),
-  status: z.enum(["draft", "published", "cancelled"]).default("published"),
+  description: z.string(),
+  date: z.string(),
+  time: z.string(),
+  venue: z.string(),
+  venueAddress: z.string(),
+  image: z.string(),
+  category: z.string(),
+  capacity: z.number(),
+  attendees: z.number(),
+  price: z.string(),
+  artists: z.array(z.object({
+    name: z.string(),
+    role: z.string(),
+    image: z.string(),
+  })),
+  gallery: z.array(z.string()),
+  highlights: z.array(z.string()),
+  status: z.enum(["upcoming", "ongoing", "completed"]),
 });
 
 export const TeamMemberSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   name: z.string().min(1, "Name is required"),
-  role: z.string().optional(),
-  bio: z.string().optional(),
-  image_url: z.string().url().optional(),
-  social_links: z.record(z.string(), z.string().url()).optional(),
+  role: z.string(),
+  email: z.string().email(),
+  phone: z.string().optional(),
+  bio: z.string(),
+  photoUrl: z.string().optional(),
+  status: z.enum(["active", "inactive"]),
 });
 
 export const PartnerSchema = z.object({
-  id: z.string().optional(),
+  id: z.string(),
   name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  logo_url: z.string().url().optional(),
-  website_url: z.string().url().optional(),
+  category: z.string(),
+  website: z.string(),
+  logoUrl: z.string().optional(),
+  status: z.enum(["active", "inactive"]),
 });
 
 export const SettingsSchema = z.object({
-  site_name: z.string().min(1),
-  contact_email: z.string().email().optional(),
-  social_links: z.record(z.string(), z.string().url()).optional(),
-  maintenance_mode: z.boolean().default(false),
+  siteName: z.string().min(1),
+  siteDescription: z.string(),
+  tagline: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  address: z.string(),
+  socialMedia: z.object({
+    instagram: z.string(),
+    twitter: z.string(),
+    facebook: z.string(),
+    youtube: z.string(),
+  }),
+});
+
+export const GalleryImageSchema = z.object({
+  id: z.string(),
+  url: z.string().url(),
+  caption: z.string(),
+  uploadDate: z.string(),
+  event: z.string().optional(),
 });
 
 export type Hero = z.infer<typeof HeroSchema>;
@@ -62,3 +95,4 @@ export type Event = z.infer<typeof EventSchema>;
 export type TeamMember = z.infer<typeof TeamMemberSchema>;
 export type Partner = z.infer<typeof PartnerSchema>;
 export type Settings = z.infer<typeof SettingsSchema>;
+export type GalleryImage = z.infer<typeof GalleryImageSchema>;

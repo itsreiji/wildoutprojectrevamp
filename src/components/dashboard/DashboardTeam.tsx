@@ -25,6 +25,8 @@ export const DashboardTeam = React.memo(() => {
     photoUrl: '',
   });
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const filteredTeam = team.filter((member) =>
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     member.role.toLowerCase().includes(searchQuery.toLowerCase())
@@ -49,31 +51,45 @@ export const DashboardTeam = React.memo(() => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to remove this team member?')) {
-      updateTeam(team.filter((m) => m.id !== id));
-      toast.success('Team member removed successfully!');
+      setIsProcessing(true);
+      try {
+        await updateTeam(team.filter((m) => m.id !== id));
+        toast.success('Team member removed successfully!');
+      } catch (error) {
+        toast.error('Failed to remove team member');
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
-  const handleSubmit = () => {
-    if (editingMember) {
-      updateTeam(
-        team.map((m) =>
-          m.id === editingMember.id ? { ...m, ...formData } : m
-        )
-      );
-      toast.success('Team member updated successfully!');
-    } else {
-      const newMember: TeamMember = {
-        id: Date.now().toString(),
-        ...formData,
-        status: 'active',
-      };
-      updateTeam([...team, newMember]);
-      toast.success('Team member added successfully!');
+  const handleSubmit = async () => {
+    setIsProcessing(true);
+    try {
+      if (editingMember) {
+        await updateTeam(
+          team.map((m) =>
+            m.id === editingMember.id ? { ...m, ...formData } : m
+          )
+        );
+        toast.success('Team member updated successfully!');
+      } else {
+        const newMember: TeamMember = {
+          id: Date.now().toString(),
+          ...formData,
+          status: 'active',
+        };
+        await updateTeam([...team, newMember]);
+        toast.success('Team member added successfully!');
+      }
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast.error('Failed to save team member');
+    } finally {
+      setIsProcessing(false);
     }
-    setIsDialogOpen(false);
   };
 
   return (
@@ -179,9 +195,18 @@ export const DashboardTeam = React.memo(() => {
                 size="sm"
                 variant="outline"
                 onClick={() => handleDelete(member.id)}
+                disabled={isProcessing}
                 className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
               >
-                <Trash2 className="h-4 w-4" />
+                {isProcessing ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="h-4 w-4 border-2 border-red-500/20 border-t-red-400 rounded-full"
+                  />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </motion.div>
@@ -290,12 +315,28 @@ export const DashboardTeam = React.memo(() => {
             <Button
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
-              className="border-white/10 text-white/70 hover:bg-white/5"
+              disabled={isProcessing}
+              className="border-white/10 text-white hover:bg-white/10"
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white">
-              {editingMember ? 'Update Member' : 'Add Member'}
+            <Button
+              onClick={handleSubmit}
+              disabled={isProcessing}
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
+            >
+              {isProcessing ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="mr-2 h-4 w-4 border-2 border-white/20 border-t-white rounded-full"
+                  />
+                  Saving...
+                </>
+              ) : (
+                editingMember ? 'Update Member' : 'Add Member'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

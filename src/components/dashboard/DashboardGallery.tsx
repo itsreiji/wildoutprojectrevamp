@@ -17,6 +17,7 @@ export const DashboardGallery = React.memo(() => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({ url: '', caption: '', event: '' });
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const filteredImages = gallery.filter(
     (image) =>
@@ -29,35 +30,57 @@ export const DashboardGallery = React.memo(() => {
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = () => {
-    const newImage: GalleryImage = {
-      id: Date.now().toString(),
-      ...formData,
-      uploadDate: new Date().toISOString().split('T')[0],
-    };
-    updateGallery([newImage, ...gallery]);
-    toast.success('Photo uploaded successfully!');
-    setIsDialogOpen(false);
-  };
-
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this image?')) {
-      updateGallery(gallery.filter((img) => img.id !== id));
-      setSelectedImages((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(id);
-        return newSet;
-      });
-      toast.success('Photo deleted successfully!');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    try {
+      const newImage: GalleryImage = {
+        id: Date.now().toString(),
+        ...formData,
+        uploadDate: new Date().toISOString().split('T')[0],
+      };
+      await updateGallery([newImage, ...gallery]);
+      toast.success('Photo uploaded successfully!');
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast.error('Failed to upload photo');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  const handleBulkDelete = () => {
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this image?')) {
+      setIsProcessing(true);
+      try {
+        await updateGallery(gallery.filter((img) => img.id !== id));
+        setSelectedImages((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(id);
+          return newSet;
+        });
+        toast.success('Photo deleted successfully!');
+      } catch (error) {
+        toast.error('Failed to delete photo');
+      } finally {
+        setIsProcessing(false);
+      }
+    }
+  };
+
+  const handleBulkDelete = async () => {
     if (selectedImages.size === 0) return;
     if (window.confirm(`Delete ${selectedImages.size} selected images?`)) {
-      updateGallery(gallery.filter((img) => !selectedImages.has(img.id)));
-      setSelectedImages(new Set());
-      toast.success(`${selectedImages.size} photos deleted successfully!`);
+      setIsProcessing(true);
+      try {
+        await updateGallery(gallery.filter((img) => !selectedImages.has(img.id)));
+        setSelectedImages(new Set());
+        toast.success(`${selectedImages.size} photos deleted successfully!`);
+      } catch (error) {
+        toast.error('Failed to delete photos');
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -200,67 +223,89 @@ export const DashboardGallery = React.memo(() => {
             <DialogTitle className="text-2xl">Upload New Photo</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="url">Image URL</Label>
-              <Input
-                id="url"
-                value={formData.url}
-                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                placeholder="https://example.com/image.jpg"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-              <p className="text-xs text-white/40">
-                Enter the URL of the image you want to add
-              </p>
-            </div>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="url">Image URL</Label>
+                <Input
+                  id="url"
+                  required
+                  value={formData.url}
+                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                  placeholder="https://example.com/image.jpg"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+                <p className="text-xs text-white/40">
+                  Enter the URL of the image you want to add
+                </p>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="caption">Caption</Label>
-              <Input
-                id="caption"
-                value={formData.caption}
-                onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
-                placeholder="Enter photo caption"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="event">Event (Optional)</Label>
-              <Input
-                id="event"
-                value={formData.event}
-                onChange={(e) => setFormData({ ...formData, event: e.target.value })}
-                placeholder="Event name"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            {formData.url && (
-              <div className="rounded-xl overflow-hidden border border-white/10">
-                <ImageWithFallback
-                  src={formData.url}
-                  alt="Preview"
-                  className="w-full h-48 object-cover"
+              <div className="space-y-2">
+                <Label htmlFor="caption">Caption</Label>
+                <Input
+                  id="caption"
+                  required
+                  value={formData.caption}
+                  onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+                  placeholder="Enter photo caption"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
-            )}
-          </div>
 
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-              className="border-white/10 text-white/70 hover:bg-white/5"
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white">
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Photo
-            </Button>
-          </DialogFooter>
+              <div className="space-y-2">
+                <Label htmlFor="event">Event (Optional)</Label>
+                <Input
+                  id="event"
+                  value={formData.event}
+                  onChange={(e) => setFormData({ ...formData, event: e.target.value })}
+                  placeholder="Event name"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+
+              {formData.url && (
+                <div className="rounded-xl overflow-hidden border border-white/10">
+                  <ImageWithFallback
+                    src={formData.url}
+                    alt="Preview"
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+                className="border-white/10 text-white/70 hover:bg-white/5"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isProcessing}
+                className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
+              >
+                {isProcessing ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="mr-2 h-4 w-4 border-2 border-white/20 border-t-white rounded-full"
+                    />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Photo
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

@@ -7,12 +7,14 @@ import {
   TeamMemberSchema,
   PartnerSchema,
   SettingsSchema,
+  GalleryImageSchema,
   Hero,
   About,
   Event,
   TeamMember,
   Partner,
   Settings,
+  GalleryImage,
 } from '../../types/schemas';
 import { z } from 'zod';
 
@@ -185,6 +187,20 @@ export class SupabaseKVClient {
 
   async deletePartner(id: string): Promise<void> {
     return this.request(`/make-server-41a567c3/partners/${id}`, 'DELETE');
+  }
+
+  // ========== GALLERY ==========
+
+  async getGallery(): Promise<GalleryImage[]> {
+    return this.request('/make-server-41a567c3/gallery', 'GET', z.array(GalleryImageSchema));
+  }
+
+  async createGalleryImage(data: GalleryImage): Promise<GalleryImage> {
+    return this.request('/make-server-41a567c3/gallery', 'POST', GalleryImageSchema, data);
+  }
+
+  async deleteGalleryImage(id: string): Promise<void> {
+    return this.request(`/make-server-41a567c3/gallery/${id}`, 'DELETE');
   }
 
   // ========== SETTINGS ==========

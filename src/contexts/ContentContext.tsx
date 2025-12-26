@@ -430,13 +430,13 @@ interface ContentContextType {
   hero: HeroContent;
   about: AboutContent;
   settings: SiteSettings;
-  updateEvents: (events: Event[]) => void;
-  updatePartners: (partners: Partner[]) => void;
-  updateGallery: (gallery: GalleryImage[]) => void;
-  updateTeam: (team: TeamMember[]) => void;
+  updateEvents: (events: Event[]) => Promise<void>;
+  updatePartners: (partners: Partner[]) => Promise<void>;
+  updateGallery: (gallery: GalleryImage[]) => Promise<void>;
+  updateTeam: (team: TeamMember[]) => Promise<void>;
   updateHero: (hero: HeroContent) => Promise<void>;
-  updateAbout: (about: AboutContent) => void;
-  updateSettings: (settings: SiteSettings) => void;
+  updateAbout: (about: AboutContent) => Promise<void>;
+  updateSettings: (settings: SiteSettings) => Promise<void>;
   loading: boolean;
   refresh: () => Promise<void>;
 }
@@ -471,29 +471,51 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
           apiClient.getEvents().catch((err) => {
             console.warn("Events API call failed:", err);
             return [];
+          }),
+          apiClient.getAbout().catch((err) => {
+            console.warn("About API call failed:", err);
+            return null;
+          }),
+          apiClient.getTeam().catch((err) => {
+            console.warn("Team API call failed:", err);
+            return [];
+          }),
+          apiClient.getPartners().catch((err) => {
+            console.warn("Partners API call failed:", err);
+            return [];
+          }),
+          apiClient.getSettings().catch((err) => {
+            console.warn("Settings API call failed:", err);
+            return null;
           })
         ]),
         timeoutPromise
-      ]) as [any, any];
+      ]) as [any, any, any, any, any, any];
 
-      const [fetchedHero, fetchedEvents] = raceResult;
+      const [fetchedHero, fetchedEvents, fetchedAbout, fetchedTeam, fetchedPartners, fetchedSettings] = raceResult;
 
       if (fetchedHero) {
-        setHero({
-          title: fetchedHero.title,
-          subtitle: fetchedHero.subtitle || '',
-          description: fetchedHero.description || '',
-          stats: {
-            events: fetchedHero.stats?.events || '0',
-            members: fetchedHero.stats?.members || '0',
-            partners: fetchedHero.stats?.partners || '0'
-          }
-        });
+        setHero(fetchedHero);
+      }
+
+      if (fetchedAbout) {
+        setAbout(fetchedAbout);
+      }
+
+      if (fetchedTeam && fetchedTeam.length > 0) {
+        setTeam(fetchedTeam);
       }
 
       if (fetchedEvents && fetchedEvents.length > 0) {
-        // Map API events to internal format if needed
-        // setEvents(mappedEvents);
+        setEvents(fetchedEvents);
+      }
+
+      if (fetchedPartners && fetchedPartners.length > 0) {
+        setPartners(fetchedPartners);
+      }
+
+      if (fetchedSettings) {
+        setSettings(fetchedSettings);
       }
 
     } catch (err) {
@@ -513,34 +535,159 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
       setHero(heroData);
       console.log("Local state updated");
 
-      // Save to Supabase in background
-      const apiData = {
-        title: heroData.title,
-        subtitle: heroData.subtitle,
-        description: heroData.description,
-        stats: {
-          events: heroData.stats.events,
-          members: heroData.stats.members,
-          partners: heroData.stats.partners
-        }
-      };
-
       console.log("Making API call to Supabase edge function...");
-
-      const result = await apiClient.updateHero(apiData);
+      const result = await apiClient.updateHero(heroData);
       console.log("Hero section saved to Supabase successfully:", result);
 
     } catch (err: any) {
       console.error("Failed to save hero section to Supabase:", err);
-      console.error("Error details:", {
-        message: err?.message,
-        url: "https://yanjivicgslwutjzhzdx.supabase.co/functions/v1"
-      });
       // Revert local changes if save fails
       await refresh();
       throw err;
     }
   }, [apiClient, refresh]);
+
+  // Update about function that saves to Supabase
+  const updateAboutContent = useCallback(async (aboutData: AboutContent) => {
+    try {
+      setAbout(aboutData);
+      await apiClient.updateAbout(aboutData);
+      console.log("About section saved to Supabase successfully");
+    } catch (err) {
+      console.error("Failed to save about section to Supabase:", err);
+      await refresh();
+      throw err;
+    }
+  }, [apiClient, refresh]);
+
+  // Update team function that saves to Supabase
+  // Note: This is a simplified implementation that replaces the whole team
+  // In a production app, you might want to handle individual member updates
+  const updateTeamContent = useCallback(async (teamData: TeamMember[]) => {
+    try {
+      const oldTeam = team;
+      setTeam(teamData);
+
+      // Find added/updated members
+      for (const member of teamData) {
+        const oldMember = oldTeam.find(m => m.id === member.id);
+        if (!oldMember || JSON.stringify(oldMember) !== JSON.stringify(member)) {
+          await apiClient.createTeamMember(member);
+        }
+      }
+
+      // Find deleted members
+      for (const oldMember of oldTeam) {
+        if (!teamData.find(m => m.id === oldMember.id)) {
+          await apiClient.deleteTeamMember(oldMember.id);
+        }
+      }
+
+      console.log("Team updated in Supabase successfully");
+    } catch (err) {
+      console.error("Failed to update team in Supabase:", err);
+      await refresh();
+      throw err;
+    }
+  }, [apiClient, refresh, team]);
+
+  // Update partners function that saves to Supabase
+  const updatePartnersContent = useCallback(async (partnersData: Partner[]) => {
+    try {
+      const oldPartners = partners;
+      setPartners(partnersData);
+
+      // Find added/updated partners
+      for (const partner of partnersData) {
+        const oldPartner = oldPartners.find(p => p.id === partner.id);
+        if (!oldPartner || JSON.stringify(oldPartner) !== JSON.stringify(partner)) {
+          await apiClient.createPartner(partner);
+        }
+      }
+
+      // Find deleted partners
+      for (const oldPartner of oldPartners) {
+        if (!partnersData.find(p => p.id === oldPartner.id)) {
+          await apiClient.deletePartner(oldPartner.id);
+        }
+      }
+
+      console.log("Partners updated in Supabase successfully");
+    } catch (err) {
+      console.error("Failed to update partners in Supabase:", err);
+      await refresh();
+      throw err;
+    }
+  }, [apiClient, refresh, partners]);
+
+  // Update settings function that saves to Supabase
+  const updateSettingsContent = useCallback(async (settingsData: SiteSettings) => {
+    try {
+      setSettings(settingsData);
+      await apiClient.updateSettings(settingsData);
+      console.log("Settings saved to Supabase successfully");
+    } catch (err) {
+      console.error("Failed to save settings to Supabase:", err);
+      await refresh();
+      throw err;
+    }
+  }, [apiClient, refresh]);
+
+  const updateEventsContent = useCallback(async (eventsData: Event[]) => {
+    try {
+      const oldEvents = events;
+      setEvents(eventsData);
+      
+      // Update or create events
+      for (const event of eventsData) {
+        const oldEvent = oldEvents.find(e => e.id === event.id);
+        if (!oldEvent || JSON.stringify(oldEvent) !== JSON.stringify(event)) {
+          await apiClient.updateEvent(event.id, event);
+        }
+      }
+
+      // Delete removed events
+      for (const oldEvent of oldEvents) {
+        if (!eventsData.find(e => e.id === oldEvent.id)) {
+          await apiClient.deleteEvent(oldEvent.id);
+        }
+      }
+
+      console.log("Events updated in Supabase successfully");
+    } catch (err) {
+      console.error("Failed to update events in Supabase:", err);
+      await refresh();
+      throw err;
+    }
+  }, [apiClient, refresh, events]);
+
+  const updateGalleryContent = useCallback(async (galleryData: GalleryImage[]) => {
+    try {
+      const oldGallery = gallery;
+      setGallery(galleryData);
+      
+      // Update or create images
+      for (const image of galleryData) {
+        const oldImage = oldGallery.find(img => img.id === image.id);
+        if (!oldImage) {
+          await apiClient.createGalleryImage(image);
+        }
+      }
+
+      // Delete removed images
+      for (const oldImage of oldGallery) {
+        if (!galleryData.find(img => img.id === oldImage.id)) {
+          await apiClient.deleteGalleryImage(oldImage.id);
+        }
+      }
+
+      console.log("Gallery updated in Supabase successfully");
+    } catch (err) {
+      console.error("Failed to update gallery in Supabase:", err);
+      await refresh();
+      throw err;
+    }
+  }, [apiClient, refresh, gallery]);
 
   useEffect(() => {
     refresh();
@@ -554,13 +701,13 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
     hero,
     about,
     settings,
-    updateEvents: setEvents,
-    updatePartners: setPartners,
-    updateGallery: setGallery,
-    updateTeam: setTeam,
+    updateEvents: updateEventsContent,
+    updatePartners: updatePartnersContent,
+    updateGallery: updateGalleryContent,
+    updateTeam: updateTeamContent,
     updateHero: updateHeroContent,
-    updateAbout: setAbout,
-    updateSettings: setSettings,
+    updateAbout: updateAboutContent,
+    updateSettings: updateSettingsContent,
     loading,
     refresh
   };

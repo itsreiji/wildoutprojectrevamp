@@ -30,56 +30,15 @@ import {
   TableRow,
 } from '../ui/table';
 import { Badge } from '../ui/badge';
-
-interface Event {
-  id: string;
-  title: string;
-  date: string;
-  venue: string;
-  category: string;
-  attendees: number;
-  capacity: number;
-  status: 'upcoming' | 'ongoing' | 'completed';
-}
-
-const INITIAL_EVENTS: Event[] = [
-  {
-    id: '1',
-    title: 'Neon Nights: Electronic Odyssey',
-    date: '2025-11-15',
-    venue: 'Jakarta Convention Center',
-    category: 'Music Festival',
-    attendees: 3200,
-    capacity: 5000,
-    status: 'upcoming',
-  },
-  {
-    id: '2',
-    title: 'Urban Art Exhibition',
-    date: '2025-11-20',
-    venue: 'Museum MACAN',
-    category: 'Art & Culture',
-    attendees: 450,
-    capacity: 800,
-    status: 'upcoming',
-  },
-  {
-    id: '3',
-    title: 'Sunset Sessions Vol. 12',
-    date: '2025-11-25',
-    venue: 'Cloud Lounge',
-    category: 'Live Music',
-    attendees: 285,
-    capacity: 300,
-    status: 'upcoming',
-  },
-];
+import { useContent, Event } from '../../contexts/ContentContext';
+import { toast } from 'sonner';
 
 export const DashboardEvents = React.memo(() => {
-  const [events, setEvents] = useState<Event[]>(INITIAL_EVENTS);
+  const { events, updateEvents } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     date: '',
@@ -116,44 +75,59 @@ export const DashboardEvents = React.memo(() => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this event?')) {
-      setEvents(events.filter((e) => e.id !== id));
+      setIsProcessing(true);
+      try {
+        await updateEvents(events.filter((e) => e.id !== id));
+        toast.success('Event deleted successfully!');
+      } catch (error) {
+        toast.error('Failed to delete event');
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
-  const handleSubmit = () => {
-    if (editingEvent) {
-      // Update existing event
-      setEvents(
-        events.map((e) =>
-          e.id === editingEvent.id
-            ? {
-                ...e,
-                title: formData.title,
-                date: formData.date,
-                venue: formData.venue,
-                category: formData.category,
-                capacity: parseInt(formData.capacity),
-              }
-            : e
-        )
-      );
-    } else {
-      // Create new event
-      const newEvent: Event = {
-        id: Date.now().toString(),
-        title: formData.title,
-        date: formData.date,
-        venue: formData.venue,
-        category: formData.category,
-        attendees: 0,
-        capacity: parseInt(formData.capacity),
-        status: 'upcoming',
-      };
-      setEvents([...events, newEvent]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+
+    try {
+      if (editingEvent) {
+        const updatedEvent: Event = {
+          ...editingEvent,
+          ...formData,
+          capacity: parseInt(formData.capacity) || 0,
+        };
+        await updateEvents(events.map((e) => (e.id === editingEvent.id ? updatedEvent : e)));
+        toast.success('Event updated successfully!');
+      } else {
+        const newEvent: Event = {
+          id: Date.now().toString(),
+          ...formData,
+          capacity: parseInt(formData.capacity) || 0,
+          attendees: 0,
+          status: 'upcoming',
+          description: formData.title + ' description', // Added default description
+          time: '19:00', // Added default time
+          venueAddress: 'Jakarta', // Added default address
+          image: 'https://images.unsplash.com/photo-1709131482554-53117b122a35?w=800', // Added default image
+          price: '0',
+          artists: [],
+          gallery: [],
+          highlights: [],
+        } as Event;
+        await updateEvents([newEvent, ...events]);
+        toast.success('Event created successfully!');
+      }
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast.error('Failed to save event. Please check required fields.');
+      console.error('Save error:', error);
+    } finally {
+      setIsProcessing(false);
     }
-    setIsDialogOpen(false);
   };
 
   const getStatusColor = (status: string) => {
@@ -296,91 +270,111 @@ export const DashboardEvents = React.memo(() => {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Event Title</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                placeholder="Enter event title"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="title">Event Title</Label>
                 <Input
-                  id="date"
-                  type="date"
-                  value={formData.date}
+                  id="title"
+                  required
+                  value={formData.title}
                   onChange={(e) =>
-                    setFormData({ ...formData, date: e.target.value })
+                    setFormData({ ...formData, title: e.target.value })
                   }
-                  className="bg-white/5 border-white/10 text-white"
+                  placeholder="Enter event title"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="date">Date</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    required
+                    value={formData.date}
+                    onChange={(e) =>
+                      setFormData({ ...formData, date: e.target.value })
+                    }
+                    className="bg-white/5 border-white/10 text-white"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="capacity">Capacity</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    required
+                    value={formData.capacity}
+                    onChange={(e) =>
+                      setFormData({ ...formData, capacity: e.target.value })
+                    }
+                    placeholder="e.g., 500"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="venue">Venue</Label>
+                <Input
+                  id="venue"
+                  required
+                  value={formData.venue}
+                  onChange={(e) =>
+                    setFormData({ ...formData, venue: e.target.value })
+                  }
+                  placeholder="Enter venue name"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="capacity">Capacity</Label>
+                <Label htmlFor="category">Category</Label>
                 <Input
-                  id="capacity"
-                  type="number"
-                  value={formData.capacity}
+                  id="category"
+                  required
+                  value={formData.category}
                   onChange={(e) =>
-                    setFormData({ ...formData, capacity: e.target.value })
+                    setFormData({ ...formData, category: e.target.value })
                   }
-                  placeholder="e.g., 500"
+                  placeholder="e.g., Music Festival, Art Exhibition"
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="venue">Venue</Label>
-              <Input
-                id="venue"
-                value={formData.venue}
-                onChange={(e) =>
-                  setFormData({ ...formData, venue: e.target.value })
-                }
-                placeholder="Enter venue name"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Input
-                id="category"
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                placeholder="e.g., Music Festival, Art Exhibition"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDialogOpen(false)}
-              className="border-white/10 text-white/70 hover:bg-white/5"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
-            >
-              {editingEvent ? 'Update Event' : 'Create Event'}
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+                className="border-white/10 text-white/70 hover:bg-white/5"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isProcessing}
+                className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl"
+              >
+                {isProcessing ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="mr-2 h-4 w-4 border-2 border-white/20 border-t-white rounded-full"
+                    />
+                    Saving...
+                  </>
+                ) : (
+                  editingEvent ? 'Update Event' : 'Create Event'
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

@@ -12,14 +12,18 @@ import { toast } from 'sonner';
 export const DashboardHero = React.memo(() => {
   const { hero, updateHero } = useContent();
   const [formData, setFormData] = useState(hero);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
       await updateHero(formData);
       toast.success('Hero section updated successfully!');
     } catch (err) {
       toast.error('Failed to save hero section. Please check your connection.');
       console.error('Save error:', err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -145,13 +149,29 @@ export const DashboardHero = React.memo(() => {
               </p>
             </div>
 
-            <Button
-              onClick={handleSave}
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              Save Hero Section
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 rounded-xl"
+              >
+                {isSaving ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="mr-2 h-4 w-4 border-2 border-white/20 border-t-white rounded-full"
+                    />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Hero Section
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </motion.div>

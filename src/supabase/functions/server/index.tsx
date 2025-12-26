@@ -11,6 +11,7 @@ import {
   TeamMemberSchema,
   PartnerSchema,
   SettingsSchema,
+  GalleryImageSchema,
 } from "./schemas.ts";
 
 const app = new Hono();
@@ -210,6 +211,28 @@ app.put("/make-server-41a567c3/settings", authMiddleware, async (c) => {
   if (validation instanceof Response) return validation;
   await kv.set("settings", validation);
   return c.json({ success: true, data: validation });
+});
+
+// Gallery
+app.get("/make-server-41a567c3/gallery", async (c) => {
+  c.header("Cache-Control", "public, max-age=60, s-maxage=60");
+  const data = await kv.getByPrefix("gallery:");
+  return c.json({ data });
+});
+
+app.post("/make-server-41a567c3/gallery", authMiddleware, async (c) => {
+  const validation = await validate(c, GalleryImageSchema);
+  if (validation instanceof Response) return validation;
+  const id = validation.id || crypto.randomUUID();
+  const image = { ...validation, id };
+  await kv.set(`gallery:${id}`, image);
+  return c.json({ success: true, data: image });
+});
+
+app.delete("/make-server-41a567c3/gallery/:id", authMiddleware, async (c) => {
+  const id = c.req.param("id");
+  await kv.del(`gallery:${id}`);
+  return c.json({ success: true });
 });
 
 Deno.serve(app.fetch);

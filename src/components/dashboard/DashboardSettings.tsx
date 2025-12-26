@@ -14,9 +14,18 @@ export const DashboardSettings = React.memo(() => {
   const { settings, updateSettings } = useContent();
   const [formData, setFormData] = useState(settings);
 
-  const handleSave = () => {
-    updateSettings(formData);
-    toast.success('Settings saved successfully!');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateSettings(formData);
+      toast.success('Settings saved successfully!');
+    } catch (error) {
+      toast.error('Failed to save settings');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -84,10 +93,24 @@ export const DashboardSettings = React.memo(() => {
 
             <Button
               onClick={handleSave}
+              disabled={isSaving}
               className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20"
             >
-              <Save className="mr-2 h-4 w-4" />
-              Save All Settings
+              {isSaving ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="mr-2 h-4 w-4 border-2 border-white/20 border-t-white rounded-full"
+                  />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save All Settings
+                </>
+              )}
             </Button>
           </CardContent>
         </Card>

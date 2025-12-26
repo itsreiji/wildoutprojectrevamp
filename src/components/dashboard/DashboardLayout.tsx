@@ -86,8 +86,8 @@ export const DashboardLayout = React.memo(
         >
           <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="p-6 border-b border-[#E93370]/20">
-              <div className="flex items-center justify-between">
+            <div className="h-20 px-6 flex items-center border-b border-[#E93370]/20">
+              <div className="flex items-center justify-between w-full">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -166,7 +166,7 @@ export const DashboardLayout = React.memo(
         <div className="lg:ml-80 min-h-screen">
           {/* Top Bar */}
           <header className="sticky top-0 z-30 bg-black/40 backdrop-blur-xl border-b border-white/10">
-            <div className="flex items-center justify-between px-4 lg:px-8 py-4">
+            <div className="h-20 flex items-center justify-between px-4 lg:px-8">
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setSidebarOpen(true)}

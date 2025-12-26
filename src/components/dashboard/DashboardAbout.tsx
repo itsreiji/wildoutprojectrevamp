@@ -13,9 +13,18 @@ export const DashboardAbout = React.memo(() => {
   const { about, updateAbout } = useContent();
   const [formData, setFormData] = useState(about);
 
-  const handleSave = () => {
-    updateAbout(formData);
-    toast.success('About section updated successfully!');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateAbout(formData);
+      toast.success('About section updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update About section');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAddStoryParagraph = () => {
@@ -242,10 +251,24 @@ export const DashboardAbout = React.memo(() => {
       <div className="flex justify-end">
         <Button
           onClick={handleSave}
+          disabled={isSaving}
           className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20"
         >
-          <Save className="mr-2 h-4 w-4" />
-          Save About Section
+          {isSaving ? (
+            <>
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="mr-2 h-4 w-4 border-2 border-white/20 border-t-white rounded-full"
+              />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" />
+              Save About Section
+            </>
+          )}
         </Button>
       </div>
     </div>

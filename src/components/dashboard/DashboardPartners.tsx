@@ -16,6 +16,8 @@ export const DashboardPartners = React.memo(() => {
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
   const [formData, setFormData] = useState({ name: '', category: '', website: '', logoUrl: '' });
 
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const filteredPartners = partners.filter((partner) =>
     partner.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -32,31 +34,45 @@ export const DashboardPartners = React.memo(() => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this partner?')) {
-      updatePartners(partners.filter((p) => p.id !== id));
-      toast.success('Partner deleted successfully!');
+      setIsProcessing(true);
+      try {
+        await updatePartners(partners.filter((p) => p.id !== id));
+        toast.success('Partner deleted successfully!');
+      } catch (error) {
+        toast.error('Failed to delete partner');
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
-  const handleSubmit = () => {
-    if (editingPartner) {
-      updatePartners(
-        partners.map((p) =>
-          p.id === editingPartner.id ? { ...p, ...formData } : p
-        )
-      );
-      toast.success('Partner updated successfully!');
-    } else {
-      const newPartner: Partner = {
-        id: Date.now().toString(),
-        ...formData,
-        status: 'active',
-      };
-      updatePartners([...partners, newPartner]);
-      toast.success('Partner added successfully!');
+  const handleSubmit = async () => {
+    setIsProcessing(true);
+    try {
+      if (editingPartner) {
+        await updatePartners(
+          partners.map((p) =>
+            p.id === editingPartner.id ? { ...p, ...formData } : p
+          )
+        );
+        toast.success('Partner updated successfully!');
+      } else {
+        const newPartner: Partner = {
+          id: Date.now().toString(),
+          ...formData,
+          status: 'active',
+        };
+        await updatePartners([...partners, newPartner]);
+        toast.success('Partner added successfully!');
+      }
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast.error('Failed to save partner');
+    } finally {
+      setIsProcessing(false);
     }
-    setIsDialogOpen(false);
   };
 
   return (
@@ -207,12 +223,28 @@ export const DashboardPartners = React.memo(() => {
             <Button
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
-              className="border-white/10 text-white/70 hover:bg-white/5"
+              disabled={isProcessing}
+              className="border-white/10 text-white hover:bg-white/10"
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white">
-              {editingPartner ? 'Update Partner' : 'Add Partner'}
+            <Button
+              onClick={handleSubmit}
+              disabled={isProcessing}
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white"
+            >
+              {isProcessing ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="mr-2 h-4 w-4 border-2 border-white/20 border-t-white rounded-full"
+                  />
+                  Saving...
+                </>
+              ) : (
+                editingPartner ? 'Update Partner' : 'Add Partner'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
