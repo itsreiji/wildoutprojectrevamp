@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from '../Router';
-import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import logo from '../../assets/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -46,14 +46,14 @@ export const DashboardLayout = React.memo(
       const checkMobile = () => {
         setIsMobile(window.innerWidth < 1024);
       };
-      
+
       checkMobile();
       window.addEventListener('resize', checkMobile);
       return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white">
+      <div className="dark min-h-screen bg-[#0a0a0a] text-white">
         {/* Mobile Sidebar Backdrop */}
         <AnimatePresence>
           {sidebarOpen && isMobile && (
@@ -116,10 +116,10 @@ export const DashboardLayout = React.memo(
             </nav>
 
             {/* Footer Actions */}
-            <div className="p-4 border-t border-white/10 space-y-2">
+            <div className="p-4 border-t border-[#E93370]/20 space-y-2">
               <Button
                 variant="outline"
-                className="w-full border-white/10 text-white/70 hover:bg-white/5 hover:text-white rounded-xl"
+                className="w-full bg-transparent border-[#E93370]/20 text-white/70 hover:bg-[#E93370]/10 hover:text-white rounded-xl"
                 onClick={() => navigateTo('landing')}
               >
                 <ChevronLeft className="mr-2 h-4 w-4" />
@@ -127,7 +127,7 @@ export const DashboardLayout = React.memo(
               </Button>
               <Button
                 variant="outline"
-                className="w-full border-[#E93370]/50 text-[#E93370] hover:bg-[#E93370]/10 rounded-xl"
+                className="w-full bg-transparent border-[#E93370]/20 text-[#E93370] hover:bg-[#E93370]/10 hover:text-[#E93370] hover:border-[#E93370]/50 rounded-xl"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
@@ -163,7 +163,7 @@ export const DashboardLayout = React.memo(
                   </div>
                   <div className="text-sm">
                     <div className="text-white">Admin User</div>
-                    <div className="text-white/60 text-xs">admin@wildout.id</div>
+                    <div className="text-white/60 text-xs">admin@wildoutproject.com</div>
                   </div>
                 </div>
               </div>

@@ -8,7 +8,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useContent, Event } from '../contexts/ContentContext';
 import { useRouter } from './Router';
-import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import logo from '../assets/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 export const AllEventsPage = React.memo(() => {
   const { navigateTo } = useRouter();
@@ -28,7 +28,7 @@ export const AllEventsPage = React.memo(() => {
 
   return (
     <>
-      <div className="min-h-screen bg-[#0a0a0a]">
+      <div className="dark min-h-screen bg-[#0a0a0a] text-white">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/10">
           <div className="container mx-auto max-w-7xl px-4 py-6">
@@ -36,8 +36,10 @@ export const AllEventsPage = React.memo(() => {
               <div className="flex items-center gap-4">
                 <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
                 <div>
-                  <h1 className="text-3xl md:text-4xl bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent mb-1">
-                    All Events
+                  <h1 className="text-3xl md:text-4xl mb-1">
+                    <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
+                      All Events
+                    </span>
                   </h1>
                   <p className="text-white/60">Browse our complete event catalog</p>
                 </div>
@@ -105,7 +107,7 @@ export const AllEventsPage = React.memo(() => {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-                    
+
                     {/* Category Badge */}
                     <div className="absolute top-4 left-4">
                       <Badge className="bg-[#E93370]/90 text-white border-0 backdrop-blur-sm">
@@ -130,7 +132,7 @@ export const AllEventsPage = React.memo(() => {
                     <h3 className="text-xl text-white mb-3 line-clamp-2 group-hover:text-[#E93370] transition-colors">
                       {event.title}
                     </h3>
-                    
+
                     <p className="text-white/60 text-sm mb-4 line-clamp-2 flex-1">
                       {event.description}
                     </p>

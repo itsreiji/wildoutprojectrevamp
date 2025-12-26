@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Calendar, MapPin, Clock, Users, Music, Ticket, ArrowRight } from 'lucide-react';
+import {
+  Calendar,
+  MapPin,
+  Clock,
+  Users,
+  Music,
+  Ticket,
+  ArrowRight
+} from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -34,7 +42,7 @@ export const EventsSection = React.memo(() => {
               Discover the hottest events in Indonesia's creative scene
             </p>
             <Button
-              onClick={() => setShowAllEvents(true)}
+              onClick={() => navigateTo('all-events')}
               className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20"
             >
               View All Events
@@ -62,7 +70,7 @@ export const EventsSection = React.memo(() => {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-                    
+
                     {/* Category Badge */}
                     <Badge className="absolute top-4 left-4 bg-[#E93370]/90 text-white border-0">
                       {event.category}

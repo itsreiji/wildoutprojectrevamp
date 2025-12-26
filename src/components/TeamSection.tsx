@@ -49,7 +49,7 @@ export const TeamSection = React.memo(() => {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
-                  
+
                   {/* Info Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     <h3 className="text-xl text-white mb-1">{member.name}</h3>
@@ -60,7 +60,7 @@ export const TeamSection = React.memo(() => {
                 {/* Bio & Contact */}
                 <div className="p-6 space-y-4">
                   <p className="text-sm text-white/70 line-clamp-2">{member.bio}</p>
-                  
+
                   <div className="space-y-2">
                     {member.email && (
                       <a
@@ -100,7 +100,7 @@ export const TeamSection = React.memo(() => {
         >
           <p className="text-white/60 mb-4">Want to join our amazing team?</p>
           <a
-            href="mailto:careers@wildout.id"
+            href="mailto:careers@wildoutproject.com"
             className="inline-flex items-center px-8 py-3 bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl transition-all duration-300 shadow-lg shadow-[#E93370]/20 hover:shadow-[#E93370]/40"
           >
             <Mail className="mr-2 h-5 w-5" />

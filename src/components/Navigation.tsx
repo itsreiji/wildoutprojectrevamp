@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
 import { useRouter } from './Router';
-import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import logo from '../assets/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: '#' },

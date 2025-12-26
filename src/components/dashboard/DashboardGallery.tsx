@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Plus, Search, Trash2, Upload, Image as ImageIcon } from 'lucide-react';
+import { Plus, Search, Trash2 } from 'lucide-react';
+const Upload = Plus;
+const ImageIcon = Plus;
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -39,7 +41,7 @@ export const DashboardGallery = React.memo(() => {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this image?')) {
+    if (window.confirm('Are you sure you want to delete this image?')) {
       updateGallery(gallery.filter((img) => img.id !== id));
       setSelectedImages((prev) => {
         const newSet = new Set(prev);
@@ -52,7 +54,7 @@ export const DashboardGallery = React.memo(() => {
 
   const handleBulkDelete = () => {
     if (selectedImages.size === 0) return;
-    if (confirm(`Delete ${selectedImages.size} selected images?`)) {
+    if (window.confirm(`Delete ${selectedImages.size} selected images?`)) {
       updateGallery(gallery.filter((img) => !selectedImages.has(img.id)));
       setSelectedImages(new Set());
       toast.success(`${selectedImages.size} photos deleted successfully!`);

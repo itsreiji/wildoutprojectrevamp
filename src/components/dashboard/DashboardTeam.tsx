@@ -236,7 +236,7 @@ export const DashboardTeam = React.memo(() => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="email@wildout.id"
+                  placeholder="email@wildoutproject.com"
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 />
               </div>

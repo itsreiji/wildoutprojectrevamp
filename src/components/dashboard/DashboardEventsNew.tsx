@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Plus, Search, Edit, Trash2, Calendar, MapPin, Users, Eye } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Calendar, MapPin, Users } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -13,8 +12,8 @@ import { toast } from 'sonner';
 
 export const DashboardEventsNew = React.memo(() => {
   const { events, updateEvents } = useContent();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [formData, setFormData] = useState<Partial<Event>>({
     title: '',
@@ -33,12 +32,12 @@ export const DashboardEventsNew = React.memo(() => {
     status: 'upcoming',
   });
 
-  const filteredEvents = events.filter((event) =>
-    event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    event.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredEvents = events.filter((event: Event) => {
+    return event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+           event.category.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
-  const handleCreate = () => {
+  const handleCreate = (): void => {
     setEditingEvent(null);
     setFormData({
       title: '',
@@ -59,23 +58,23 @@ export const DashboardEventsNew = React.memo(() => {
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (event: Event) => {
+  const handleEdit = (event: Event): void => {
     setEditingEvent(event);
     setFormData(event);
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this event?')) {
-      updateEvents(events.filter((e) => e.id !== id));
+  const handleDelete = (id: string): void => {
+    if (window.confirm('Are you sure you want to delete this event?')) {
+      updateEvents(events.filter((e: Event) => e.id !== id));
       toast.success('Event deleted successfully!');
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     if (editingEvent) {
       updateEvents(
-        events.map((e) =>
+        events.map((e: Event) =>
           e.id === editingEvent.id ? { ...e, ...formData } : e
         )
       );
@@ -92,7 +91,7 @@ export const DashboardEventsNew = React.memo(() => {
     setIsDialogOpen(false);
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): string => {
     switch (status) {
       case 'upcoming':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
@@ -337,7 +336,7 @@ export const DashboardEventsNew = React.memo(() => {
                   <select
                     id="status"
                     value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as 'upcoming' | 'ongoing' | 'completed' })}
                     className="w-full h-10 px-3 rounded-md bg-white/5 border border-white/10 text-white"
                   >
                     <option value="upcoming">Upcoming</option>
