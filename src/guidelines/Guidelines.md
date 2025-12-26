@@ -52,7 +52,7 @@ or initiating processes. They communicate interactivity and should have clear, a
   * Usage : One primary button per section to guide users toward the most important action
 * Secondary Button
   * Purpose : Used for alternative or supporting actions
-  * Visual Style : Outlined with the primary color, dark/black
+  * Visual Style : Outlined with the primary color, transparent background
   * Usage : Can appear alongside a primary button for less important actions
 * Tertiary Button
   * Purpose : Used for the least important actions

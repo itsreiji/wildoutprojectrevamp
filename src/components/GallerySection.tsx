@@ -13,8 +13,7 @@ const SPAN_PATTERNS = [
 ];
 
 export const GallerySection = React.memo(() => {
-  const { gallery, events } = useContent();
-
+  const { gallery } = useContent();
   const displayImages = gallery.slice(0, 6);
   return (
     <section id="gallery" className="relative py-20 px-4">
@@ -37,8 +36,6 @@ export const GallerySection = React.memo(() => {
           </p>
         </motion.div>
 
-
-
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
           {displayImages.map((image, index) => (
@@ -52,20 +49,16 @@ export const GallerySection = React.memo(() => {
             >
               <div className="relative w-full h-full">
                 <ImageWithFallback
-                  src={image.image_url}
-                  alt={image.title || image.description || ''}
+                  src={image.url}
+                  alt={image.caption}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-
+                
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-4 left-4 right-4">
-                    <p className="text-white text-sm">{image.title || image.description}</p>
-                    {image.event_id && (
-                      <p className="text-white/60 text-xs mt-1">
-                        {events.find(e => e.id === image.event_id)?.title}
-                      </p>
-                    )}
+                    <p className="text-white text-sm">{image.caption}</p>
+                    {image.event && <p className="text-white/60 text-xs mt-1">{image.event}</p>}
                   </div>
                 </div>
 

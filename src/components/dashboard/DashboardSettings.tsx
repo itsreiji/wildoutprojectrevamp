@@ -1,316 +1,93 @@
-import {
-  Facebook,
-  Globe,
-  Instagram,
-  Mail,
-  MapPin,
-  Phone,
-  Save,
-  Shield,
-  Twitter,
-  UserCheck,
-  Users,
-  UserX,
-  Youtube,
-} from "lucide-react";
-import { motion } from "motion/react";
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { useAuth } from "../../contexts/AuthContext";
-import { useEnhancedStaticContent } from "../../contexts/EnhancedStaticContentContext";
-import { supabaseClient } from "../../supabase/client";
-import { Button } from "../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { Separator } from "../ui/separator";
-import { Textarea } from "../ui/textarea";
-import type { SiteSettings } from "../../types/content";
-import type { Json } from "../../supabase/types";
-
-interface UserProfile {
-  id: string;
-  email: string | null;
-  username: string | null;
-  full_name: string | null;
-  role: "admin" | "editor" | "user";
-  created_at: string;
-}
+import React, { useState } from 'react';
+import { motion } from 'motion/react';
+import { Save, Globe, Mail, Phone, MapPin, Instagram, Twitter, Facebook, Youtube } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Textarea } from '../ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { Separator } from '../ui/separator';
+import { useContent } from '../../contexts/ContentContext';
+import { toast } from 'sonner';
 
 export const DashboardSettings = React.memo(() => {
-  const { settings, saveSiteSettings, loading: contentLoading } = useEnhancedStaticContent();
-  const { role: currentUserRole } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [usersLoading, setUsersLoading] = useState(false);
-  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [formData, setFormData] = useState({
-    site_name: "",
-    site_description: "",
-    tagline: "",
-    email: "",
-    phone: "",
-    address: "",
-    social_media: {} as Record<string, string | null>,
-    id: "00000000-0000-0000-0000-000000000003",
-    created_at: null as string | null,
-    updated_at: null as string | null,
-    updated_by: null as string | null,
-  });
+  const { settings, updateSettings } = useContent();
+  const [formData, setFormData] = useState(settings);
 
-  // Update formData when settings are loaded - only once
-  useEffect(() => {
-    if (settings && !isInitialized) {
-      console.log('DashboardSettings: Initializing form with content', { id: settings.id });
-      setFormData({
-        site_name: settings.site_name || "",
-        site_description: settings.site_description || "",
-        tagline: settings.tagline || "",
-        email: settings.email || "",
-        phone: settings.phone || "",
-        address: settings.address || "",
-        social_media: (settings.social_media as any) || {},
-        id: settings.id || "00000000-0000-0000-0000-000000000003",
-        created_at: settings.created_at || null,
-        updated_at: settings.updated_at || null,
-        updated_by: settings.updated_by || null,
-      });
-      setIsInitialized(true);
-    }
-  }, [settings, isInitialized]);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (currentUserRole !== "admin") return;
-
-      setUsersLoading(true);
-      try {
-        // Fetch profiles using RPC function to ensure RLS is properly handled
-        // The get_user_profile function respects the admin_full_access_profiles RLS policy
-        const { data: profilesData, error: profilesError } =
-          await supabaseClient.rpc("get_user_profile");
-
-        if (profilesError) {
-          console.error("Error fetching profiles:", profilesError);
-          toast.error("Failed to load users");
-          return;
-        }
-
-        // RPC function returns data with proper RLS handling
-        let usersWithEmail: UserProfile[] = [];
-
-        if (profilesData && profilesData.length > 0) {
-          // Map the RPC function response to UserProfile format
-          usersWithEmail = profilesData.map((user: any) => ({
-            id: user.id,
-            email: user.email || null,
-            username: user.username || null,
-            full_name: user.full_name || null,
-            role: user.role || "user",
-            created_at: user.created_at,
-          }));
-        }
-
-        setUsers(usersWithEmail);
-      } catch (err) {
-        console.error("Error in fetchUsers:", err);
-        toast.error("Failed to load users");
-      } finally {
-        setUsersLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, [currentUserRole]);
-
-  const handleSave = async () => {
-    if (isSaving || !isInitialized) return;
-
-    // Validation
-    if (!formData.site_name) {
-      toast.error("Site Name is required");
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      console.log('DashboardSettings: Attempting to save content', formData);
-      const updatedSettings: SiteSettings = {
-        id: formData.id || "00000000-0000-0000-0000-000000000003",
-        site_name: formData.site_name,
-        site_description: formData.site_description,
-        tagline: formData.tagline,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address,
-        social_media: formData.social_media as Json,
-        created_at: formData.created_at || new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        updated_by: formData.updated_by,
-      };
-      await saveSiteSettings(updatedSettings);
-      toast.success("Settings saved successfully!");
-    } catch (error) {
-      toast.error("Failed to save settings");
-      console.error("Save error:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  if (contentLoading && !isInitialized) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#E93370]"></div>
-      </div>
-    );
-  }
-
-  const handleRoleUpdate = async (
-    userId: string,
-    newRole: "admin" | "editor" | "user"
-  ) => {
-    setUpdatingUserId(userId);
-    try {
-      const { error } = await supabaseClient
-        .from("profiles")
-        .update({ role: newRole })
-        .eq("id", userId);
-
-      if (error) {
-        throw error;
-      }
-
-      // Update local state
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
-      );
-      toast.success("User role updated successfully!");
-    } catch (error) {
-      console.error("Error updating role:", error);
-      toast.error("Failed to update user role");
-    } finally {
-      setUpdatingUserId(null);
-    }
+  const handleSave = () => {
+    updateSettings(formData);
+    toast.success('Settings saved successfully!');
   };
 
   return (
-    <div className="space-y-6" id="admin-settings-container">
+    <div className="space-y-6">
       {/* Header */}
-      <div id="admin-settings-header">
-        <h2
-          className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent"
-          id="admin-settings-title"
-        >
+      <div>
+        <h2 className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
           Settings
         </h2>
-        <p className="text-white/60" id="admin-settings-subtitle">
-          Manage your site configuration - changes sync to landing page
-          instantly
-        </p>
+        <p className="text-white/60">Manage your site configuration - changes sync to landing page instantly</p>
       </div>
 
       {/* Site Settings */}
       <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        id="admin-settings-site-settings"
         initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card
-          className="bg-white/5 backdrop-blur-xl border-white/10"
-          id="admin-settings-site-card"
-        >
-          <CardHeader id="admin-settings-site-card-header">
-            <CardTitle
-              className="flex items-center space-x-2"
-              id="admin-settings-site-card-title"
-            >
-              <Globe
-                className="h-5 w-5 text-[#E93370]"
-                id="admin-settings-site-icon"
-              />
-              <span id="admin-settings-site-section-label">
-                Site Information
-              </span>
+        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Globe className="h-5 w-5 text-[#E93370]" />
+              <span>Site Information</span>
             </CardTitle>
-            <CardDescription
-              className="text-white/60"
-              id="admin-settings-site-card-description"
-            >
+            <CardDescription className="text-white/60">
               Update your site's basic information
             </CardDescription>
           </CardHeader>
-          <CardContent
-            className="space-y-4"
-            id="admin-settings-site-card-content"
-          >
+          <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="admin-settings-site-name-input">Site Name</Label>
+              <Label htmlFor="siteName">Site Name</Label>
               <Input
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
-                id="admin-settings-site-name-input"
-                value={formData.site_name}
+                id="siteName"
+                value={formData.siteName}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    site_name: e.target.value,
-                  })
+                  setFormData({ ...formData, siteName: e.target.value })
                 }
+                className="bg-white/5 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="admin-settings-site-description-input">
-                Site Description
-              </Label>
+              <Label htmlFor="siteDescription">Site Description</Label>
               <Input
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
-                id="admin-settings-site-description-input"
-                value={formData.site_description}
+                id="siteDescription"
+                value={formData.siteDescription}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    site_description: e.target.value,
-                  })
+                  setFormData({ ...formData, siteDescription: e.target.value })
                 }
+                className="bg-white/5 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="admin-settings-tagline-textarea">Tagline</Label>
+              <Label htmlFor="tagline">Tagline</Label>
               <Textarea
-                className="bg-white/5 border-white/10 text-white min-h-[80px] focus-visible:ring-[#E93370] transition-colors"
-                id="admin-settings-tagline-textarea"
-                value={formData.tagline || ""}
+                id="tagline"
+                value={formData.tagline}
                 onChange={(e) =>
                   setFormData({ ...formData, tagline: e.target.value })
                 }
+                className="bg-white/5 border-white/10 text-white min-h-[80px]"
               />
             </div>
 
             <Button
-              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20 disabled:opacity-50 transition-colors"
-              disabled={isSaving}
-              id="admin-settings-save-button"
               onClick={handleSave}
+              className="bg-[#E93370] hover:bg-[#E93370]/90 text-white shadow-lg shadow-[#E93370]/20"
             >
-              <Save className="mr-2 h-4 w-4" id="admin-settings-save-icon" />
-              {isSaving ? "Saving..." : "Save All Settings"}
+              <Save className="mr-2 h-4 w-4" />
+              Save All Settings
             </Button>
           </CardContent>
         </Card>
@@ -318,100 +95,64 @@ export const DashboardSettings = React.memo(() => {
 
       {/* Contact Settings */}
       <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        id="admin-settings-contact-settings"
         initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <Card
-          className="bg-white/5 backdrop-blur-xl border-white/10"
-          id="admin-settings-contact-card"
-        >
-          <CardHeader id="admin-settings-contact-card-header">
-            <CardTitle
-              className="flex items-center space-x-2"
-              id="admin-settings-contact-card-title"
-            >
-              <Mail
-                className="h-5 w-5 text-[#E93370]"
-                id="admin-settings-contact-icon"
-              />
-              <span id="admin-settings-contact-section-label">
-                Contact Information
-              </span>
+        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Mail className="h-5 w-5 text-[#E93370]" />
+              <span>Contact Information</span>
             </CardTitle>
-            <CardDescription
-              className="text-white/60"
-              id="admin-settings-contact-card-description"
-            >
+            <CardDescription className="text-white/60">
               Manage your contact details
             </CardDescription>
           </CardHeader>
-          <CardContent
-            className="space-y-4"
-            id="admin-settings-contact-card-content"
-          >
+          <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label
-                className="flex items-center space-x-2"
-                htmlFor="admin-settings-email-input"
-              >
-                <Mail
-                  className="h-4 w-4 text-[#E93370]"
-                  id="admin-settings-email-icon"
-                />
-                <span id="admin-settings-email-label">Email Address</span>
+              <Label htmlFor="email" className="flex items-center space-x-2">
+                <Mail className="h-4 w-4 text-[#E93370]" />
+                <span>Email Address</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
-                id="admin-settings-email-input"
+                id="email"
                 type="email"
-                value={formData.email || ""}
+                value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
+                className="bg-white/5 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                className="flex items-center space-x-2"
-                htmlFor="admin-settings-phone-input"
-              >
-                <Phone
-                  className="h-4 w-4 text-[#E93370]"
-                  id="admin-settings-phone-icon"
-                />
-                <span id="admin-settings-phone-label">Phone Number</span>
+              <Label htmlFor="phone" className="flex items-center space-x-2">
+                <Phone className="h-4 w-4 text-[#E93370]" />
+                <span>Phone Number</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
-                id="admin-settings-phone-input"
-                value={formData.phone || ""}
+                id="phone"
+                value={formData.phone}
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
+                className="bg-white/5 border-white/10 text-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                className="flex items-center space-x-2"
-                htmlFor="admin-settings-address-input"
-              >
-                <MapPin
-                  className="h-4 w-4 text-[#E93370]"
-                  id="admin-settings-address-icon"
-                />
-                <span id="admin-settings-address-label">Address</span>
+              <Label htmlFor="address" className="flex items-center space-x-2">
+                <MapPin className="h-4 w-4 text-[#E93370]" />
+                <span>Address</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370] transition-colors"
-                id="admin-settings-address-input"
-                value={formData.address || ""}
+                id="address"
+                value={formData.address}
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
+                className="bg-white/5 border-white/10 text-white"
               />
             </div>
           </CardContent>
@@ -420,200 +161,82 @@ export const DashboardSettings = React.memo(() => {
 
       {/* Social Media Settings */}
       <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        id="admin-settings-social-settings"
         initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <Card
-          className="bg-white/5 backdrop-blur-xl border-white/10"
-          id="admin-settings-social-card"
-        >
-          <CardHeader id="admin-settings-social-card-header">
-            <CardTitle
-              className="flex items-center space-x-2"
-              id="admin-settings-social-card-title"
-            >
-              <Instagram
-                className="h-5 w-5 text-[#E93370]"
-                id="admin-settings-social-icon"
-              />
-              <span id="admin-settings-social-section-label">
-                Social Media Links
-              </span>
+        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Instagram className="h-5 w-5 text-[#E93370]" />
+              <span>Social Media Links</span>
             </CardTitle>
-            <CardDescription
-              className="text-white/60"
-              id="admin-settings-social-card-description"
-            >
+            <CardDescription className="text-white/60">
               Update your social media profiles
             </CardDescription>
           </CardHeader>
-          <CardContent
-            className="space-y-4"
-            id="admin-settings-social-card-content"
-          >
+          <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label
-                className="flex items-center space-x-2"
-                htmlFor="admin-settings-instagram-input"
-              >
-                <Instagram
-                  className="h-4 w-4 text-[#E93370]"
-                  id="admin-settings-instagram-icon"
-                />
-                <span id="admin-settings-instagram-label">Instagram</span>
+              <Label htmlFor="instagram" className="flex items-center space-x-2">
+                <Instagram className="h-4 w-4 text-[#E93370]" />
+                <span>Instagram</span>
               </Label>
               <Input
+                id="instagram"
+                value={formData.socialMedia.instagram}
+                onChange={(e) =>
+                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, instagram: e.target.value } })
+                }
                 className="bg-white/5 border-white/10 text-white"
-                id="admin-settings-instagram-input"
                 placeholder="https://instagram.com/username"
-                value={
-                  typeof formData.social_media === "object" &&
-                  formData.social_media !== null &&
-                  !Array.isArray(formData.social_media) &&
-                  "instagram" in formData.social_media
-                    ? String(formData.social_media.instagram)
-                    : ""
-                }
-                onChange={(e) => {
-                  const currentSocialMedia =
-                    typeof formData.social_media === "object" &&
-                    formData.social_media !== null &&
-                    !Array.isArray(formData.social_media)
-                      ? formData.social_media
-                      : {};
-                  setFormData({
-                    ...formData,
-                    social_media: {
-                      ...currentSocialMedia,
-                      instagram: e.target.value,
-                    },
-                  });
-                }}
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                className="flex items-center space-x-2"
-                htmlFor="admin-settings-twitter-input"
-              >
-                <Twitter
-                  className="h-4 w-4 text-[#E93370]"
-                  id="admin-settings-twitter-icon"
-                />
-                <span id="admin-settings-twitter-label">Twitter</span>
+              <Label htmlFor="twitter" className="flex items-center space-x-2">
+                <Twitter className="h-4 w-4 text-[#E93370]" />
+                <span>Twitter</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white focus-visible:ring-[#E93370]"
-                id="admin-settings-twitter-input"
+                id="twitter"
+                value={formData.socialMedia.twitter}
+                onChange={(e) =>
+                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, twitter: e.target.value } })
+                }
+                className="bg-white/5 border-white/10 text-white"
                 placeholder="https://twitter.com/username"
-                value={
-                  typeof formData.social_media === "object" &&
-                  formData.social_media !== null &&
-                  !Array.isArray(formData.social_media) &&
-                  "twitter" in formData.social_media
-                    ? String(formData.social_media.twitter)
-                    : ""
-                }
-                onChange={(e) => {
-                  const currentSocialMedia =
-                    typeof formData.social_media === "object" &&
-                    formData.social_media !== null &&
-                    !Array.isArray(formData.social_media)
-                      ? formData.social_media
-                      : {};
-                  setFormData({
-                    ...formData,
-                    social_media: {
-                      ...currentSocialMedia,
-                      twitter: e.target.value,
-                    },
-                  });
-                }}
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                className="flex items-center space-x-2"
-                htmlFor="admin-settings-facebook-input"
-              >
-                <Facebook
-                  className="h-4 w-4 text-[#E93370]"
-                  id="admin-settings-facebook-icon"
-                />
-                <span id="admin-settings-facebook-label">Facebook</span>
+              <Label htmlFor="facebook" className="flex items-center space-x-2">
+                <Facebook className="h-4 w-4 text-[#E93370]" />
+                <span>Facebook</span>
               </Label>
               <Input
+                id="facebook"
+                value={formData.socialMedia.facebook}
+                onChange={(e) =>
+                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, facebook: e.target.value } })
+                }
                 className="bg-white/5 border-white/10 text-white"
-                id="admin-settings-facebook-input"
                 placeholder="https://facebook.com/page"
-                value={
-                  typeof formData.social_media === "object" &&
-                  formData.social_media !== null &&
-                  !Array.isArray(formData.social_media) &&
-                  "facebook" in formData.social_media
-                    ? String(formData.social_media.facebook)
-                    : ""
-                }
-                onChange={(e) => {
-                  const currentSocialMedia =
-                    typeof formData.social_media === "object" &&
-                    formData.social_media !== null &&
-                    !Array.isArray(formData.social_media)
-                      ? formData.social_media
-                      : {};
-                  setFormData({
-                    ...formData,
-                    social_media: {
-                      ...currentSocialMedia,
-                      facebook: e.target.value,
-                    },
-                  });
-                }}
               />
             </div>
 
             <div className="space-y-2">
-              <Label
-                className="flex items-center space-x-2"
-                htmlFor="admin-settings-youtube-input"
-              >
-                <Youtube
-                  className="h-4 w-4 text-[#E93370]"
-                  id="admin-settings-youtube-icon"
-                />
-                <span id="admin-settings-youtube-label">YouTube</span>
+              <Label htmlFor="youtube" className="flex items-center space-x-2">
+                <Youtube className="h-4 w-4 text-[#E93370]" />
+                <span>YouTube</span>
               </Label>
               <Input
-                className="bg-white/5 border-white/10 text-white"
-                id="admin-settings-youtube-input"
-                placeholder="https://youtube.com/@channel"
-                value={
-                  typeof formData.social_media === "object" &&
-                  formData.social_media !== null &&
-                  !Array.isArray(formData.social_media) &&
-                  "youtube" in formData.social_media
-                    ? String(formData.social_media.youtube)
-                    : ""
+                id="youtube"
+                value={formData.socialMedia.youtube}
+                onChange={(e) =>
+                  setFormData({ ...formData, socialMedia: { ...formData.socialMedia, youtube: e.target.value } })
                 }
-                onChange={(e) => {
-                  const currentSocialMedia =
-                    typeof formData.social_media === "object" &&
-                    formData.social_media !== null &&
-                    !Array.isArray(formData.social_media)
-                      ? formData.social_media
-                      : {};
-                  setFormData({
-                    ...formData,
-                    social_media: {
-                      ...currentSocialMedia,
-                      youtube: e.target.value,
-                    },
-                  });
-                }}
+                className="bg-white/5 border-white/10 text-white"
+                placeholder="https://youtube.com/@channel"
               />
             </div>
           </CardContent>
@@ -622,80 +245,37 @@ export const DashboardSettings = React.memo(() => {
 
       {/* Brand Colors */}
       <motion.div
-        animate={{ opacity: 1, y: 0 }}
-        id="admin-settings-brand-colors"
         initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.3 }}
       >
-        <Card
-          className="bg-white/5 backdrop-blur-xl border-white/10"
-          id="admin-settings-brand-colors-card"
-        >
-          <CardHeader id="admin-settings-brand-colors-card-header">
-            <CardTitle id="admin-settings-brand-colors-title">
-              Brand Colors
-            </CardTitle>
-            <CardDescription
-              className="text-white/60"
-              id="admin-settings-brand-colors-description"
-            >
+        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <CardHeader>
+            <CardTitle>Brand Colors</CardTitle>
+            <CardDescription className="text-white/60">
               Your brand color scheme
             </CardDescription>
           </CardHeader>
-          <CardContent id="admin-settings-brand-colors-card-content">
+          <CardContent>
             <div className="flex items-center space-x-4">
               <div className="flex-1">
-                <Label id="admin-settings-primary-color-label">
-                  Primary Color
-                </Label>
+                <Label>Primary Color</Label>
                 <div className="flex items-center space-x-3 mt-2">
-                  <div
-                    className="w-12 h-12 rounded-xl bg-[#E93370] border-2 border-white/10"
-                    id="admin-settings-primary-color-swatch"
-                  />
+                  <div className="w-12 h-12 rounded-xl bg-[#E93370] border-2 border-white/10" />
                   <div>
-                    <div
-                      className="text-white"
-                      id="admin-settings-primary-color-value"
-                    >
-                      #E93370
-                    </div>
-                    <div
-                      className="text-sm text-white/60"
-                      id="admin-settings-primary-color-name"
-                    >
-                      WildOut Pink
-                    </div>
+                    <div className="text-white">#E93370</div>
+                    <div className="text-sm text-white/60">WildOut Pink</div>
                   </div>
                 </div>
               </div>
-              <Separator
-                className="h-16"
-                id="admin-settings-brand-colors-separator"
-                orientation="vertical"
-              />
+              <Separator orientation="vertical" className="h-16" />
               <div className="flex-1">
-                <Label id="admin-settings-background-color-label">
-                  Background
-                </Label>
+                <Label>Background</Label>
                 <div className="flex items-center space-x-3 mt-2">
-                  <div
-                    className="w-12 h-12 rounded-xl bg-[#0a0a0a] border-2 border-white/10"
-                    id="admin-settings-background-color-swatch"
-                  />
+                  <div className="w-12 h-12 rounded-xl bg-[#0a0a0a] border-2 border-white/10" />
                   <div>
-                    <div
-                      className="text-white"
-                      id="admin-settings-background-color-value"
-                    >
-                      #0a0a0a
-                    </div>
-                    <div
-                      className="text-sm text-white/60"
-                      id="admin-settings-background-color-name"
-                    >
-                      Dark Background
-                    </div>
+                    <div className="text-white">#0a0a0a</div>
+                    <div className="text-sm text-white/60">Dark Background</div>
                   </div>
                 </div>
               </div>
@@ -703,162 +283,8 @@ export const DashboardSettings = React.memo(() => {
           </CardContent>
         </Card>
       </motion.div>
-
-      {/* User Management */}
-      {currentUserRole === "admin" && (
-        <motion.div
-          animate={{ opacity: 1, y: 0 }}
-          id="admin-settings-users"
-          initial={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.3, delay: 0.4 }}
-        >
-          <Card
-            className="bg-white/5 backdrop-blur-xl border-white/10"
-            id="admin-settings-users-card"
-          >
-            <CardHeader id="admin-settings-users-card-header">
-              <CardTitle
-                className="flex items-center space-x-2"
-                id="admin-settings-users-card-title"
-              >
-                <Users
-                  className="h-5 w-5 text-[#E93370]"
-                  id="admin-settings-users-icon"
-                />
-                <span id="admin-settings-users-section-label">
-                  User Management
-                </span>
-              </CardTitle>
-              <CardDescription
-                className="text-white/60"
-                id="admin-settings-users-card-description"
-              >
-                Manage user roles and permissions for your platform
-              </CardDescription>
-            </CardHeader>
-            <CardContent
-              className="space-y-4"
-              id="admin-settings-users-card-content"
-            >
-              {usersLoading ? (
-                <div
-                  className="text-center py-8 text-white/60"
-                  id="admin-settings-users-loading"
-                >
-                  Loading users...
-                </div>
-              ) : users.length === 0 ? (
-                <div
-                  className="text-sm text-white/60 p-4 bg-white/5 rounded-lg border border-white/10"
-                  id="admin-settings-users-empty"
-                >
-                  <p id="admin-settings-users-empty-text">No users found.</p>
-                </div>
-              ) : (
-                <div className="space-y-3" id="admin-settings-users-list">
-                  {users.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
-                      id={`admin-settings-user-${user.id}`}
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3">
-                          {user.role === "admin" ? (
-                            <Shield
-                              className="h-5 w-5 text-[#E93370]"
-                              id={`admin-settings-user-${user.id}-admin-icon`}
-                            />
-                          ) : user.role === "editor" ? (
-                            <UserCheck
-                              className="h-5 w-5 text-blue-400"
-                              id={`admin-settings-user-${user.id}-editor-icon`}
-                            />
-                          ) : (
-                            <UserX
-                              className="h-5 w-5 text-white/40"
-                              id={`admin-settings-user-${user.id}-user-icon`}
-                            />
-                          )}
-                          <div>
-                            <div
-                              className="font-medium text-white"
-                              id={`admin-settings-user-${user.id}-name`}
-                            >
-                              {user.full_name ||
-                                user.username ||
-                                "Unknown User"}
-                            </div>
-                            <div
-                              className="text-sm text-white/60"
-                              id={`admin-settings-user-${user.id}-email`}
-                            >
-                              {user.email || "No email"}
-                            </div>
-                            <div
-                              className="text-xs text-white/40 mt-1"
-                              id={`admin-settings-user-${user.id}-joined`}
-                            >
-                              Joined:{" "}
-                              {new Date(user.created_at).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <Select
-                          disabled={updatingUserId === user.id}
-                          value={user.role}
-                          onValueChange={(value: "admin" | "editor" | "user") =>
-                            handleRoleUpdate(user.id, value)
-                          }
-                        >
-                          <SelectTrigger
-                            className="w-32 bg-white/5 border-white/10 text-white"
-                            id={`admin-settings-user-${user.id}-role-select`}
-                          >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent position="popper">
-                            <SelectItem
-                              id={`admin-settings-user-${user.id}-role-select-user`}
-                              value="user"
-                            >
-                              User
-                            </SelectItem>
-                            <SelectItem
-                              id={`admin-settings-user-${user.id}-role-select-editor`}
-                              value="editor"
-                            >
-                              Editor
-                            </SelectItem>
-                            <SelectItem
-                              id={`admin-settings-user-${user.id}-role-select-admin`}
-                              value="admin"
-                            >
-                              Admin
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {updatingUserId === user.id && (
-                          <div
-                            className="text-xs text-white/60"
-                            id={`admin-settings-user-${user.id}-updating`}
-                          >
-                            Updating...
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
     </div>
   );
 });
 
-DashboardSettings.displayName = "DashboardSettings";
+DashboardSettings.displayName = 'DashboardSettings';

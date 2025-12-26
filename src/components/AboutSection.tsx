@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, Zap, Users, Sparkles } from 'lucide-react';
-import { useStaticContent } from '../contexts/StaticContentContext';
-import { Feature } from '@/types/content';
+import { useContent } from '../contexts/ContentContext';
 
 const ICON_MAP: Record<number, any> = {
   0: Heart,
@@ -12,51 +11,7 @@ const ICON_MAP: Record<number, any> = {
 };
 
 export const AboutSection = React.memo(() => {
-  const { about, loading, error } = useStaticContent();
-
-  // Log fetch operation
-  React.useEffect(() => {
-    console.log('AboutSection: Fetching about content...', {
-      loading,
-      hasData: !!about,
-      timestamp: new Date().toISOString()
-    });
-  }, [loading, about]);
-
-  if (loading) {
-    return (
-      <section id="about" className="relative py-20 px-4">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#E93370]"></div>
-            <p className="mt-4 text-white/60">Loading about content...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    console.error('AboutSection: Error loading content:', error);
-    return (
-      <section id="about" className="relative py-20 px-4">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center text-red-400">
-            <p>Unable to load about content: {error}</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!about) {
-    console.warn('AboutSection: No about content available');
-    return null;
-  }
-
-  const features = (about.features as unknown as Feature[]) || [];
-  const story = about.story || [];
-
+  const { about } = useContent();
   return (
     <section id="about" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -80,7 +35,7 @@ export const AboutSection = React.memo(() => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {features.map((feature, index) => {
+          {about.features.map((feature, index) => {
             const Icon = ICON_MAP[index % 4] || Heart;
             return (
               <motion.div
@@ -122,12 +77,16 @@ export const AboutSection = React.memo(() => {
           className="relative"
         >
           <div className="p-8 md:p-12 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+            {/* Background Decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#E93370]/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#E93370]/10 rounded-full blur-3xl" />
+
             <div className="relative z-10 max-w-4xl mx-auto">
               <h3 className="text-3xl md:text-4xl text-white mb-6">
                 Our Story
               </h3>
               <div className="space-y-4 text-white/70 leading-relaxed">
-                {story.map((paragraph, index) => (
+                {about.story.map((paragraph, index) => (
                   <p key={index}>{paragraph}</p>
                 ))}
               </div>
@@ -135,7 +94,7 @@ export const AboutSection = React.memo(() => {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
                 <div>
-                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{about.founded_year}</div>
+                  <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{about.foundedYear}</div>
                   <div className="text-sm text-white/60">Founded</div>
                 </div>
                 <div>

@@ -1,50 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, Crown } from 'lucide-react';
-import { Badge } from './ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
+import { Sparkles } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
 
 export const PartnersSection = React.memo(() => {
   const { partners } = useContent();
-  const [filterTier, setFilterTier] = useState<string>('all');
-
-  const tierOrder: Record<string, number> = {
-    platinum: 4,
-    gold: 3,
-    silver: 2,
-    bronze: 1,
-  };
-
-  const getBadgeVariant = (tier: string): 'default' | 'secondary' | 'outline' => {
-    switch (tier) {
-      case 'bronze': return 'secondary';
-      case 'silver': return 'default';
-      case 'gold': return 'outline';
-      case 'platinum': return 'default';
-      default: return 'secondary';
-    }
-  };
-
-  let filteredPartners = partners.filter(p => p.status === 'active');
-  if (filterTier !== 'all') {
-    filteredPartners = filteredPartners.filter(p => ((p as any).sponsorship_level ?? 'bronze') === filterTier);
-  }
-
-  // Sort by tier descending (platinum first)
-  filteredPartners.sort((a, b) => {
-    const tierA = tierOrder[(a as any).sponsorship_level ?? 'bronze'] ?? 0;
-    const tierB = tierOrder[(b as any).sponsorship_level ?? 'bronze'] ?? 0;
-    return tierB - tierA;
-  });
-
-  const activePartners = filteredPartners;
+  const activePartners = partners.filter(p => p.status === 'active');
   return (
     <section id="partners" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -70,22 +31,6 @@ export const PartnersSection = React.memo(() => {
           </p>
         </motion.div>
 
-        {/* Tier Filter */}
-        <div className="flex justify-center mb-8">
-          <Select value={filterTier} onValueChange={setFilterTier}>
-            <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white">
-              <SelectValue placeholder="All Tiers" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Tiers</SelectItem>
-              <SelectItem value="bronze">Bronze</SelectItem>
-              <SelectItem value="silver">Silver</SelectItem>
-              <SelectItem value="gold">Gold</SelectItem>
-              <SelectItem value="platinum">Platinum</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         {/* Partners Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {activePartners.map((partner, index) => (
@@ -104,21 +49,12 @@ export const PartnersSection = React.memo(() => {
                     {partner.name.charAt(0)}
                   </div>
                 </div>
-
+                
                 {/* Partner Info */}
                 <div className="text-center">
                   <div className="text-white group-hover:text-[#E93370] transition-colors duration-300">
                     {partner.name}
                   </div>
-                  {(partner as any).sponsorship_level && (
-                    <Badge
-                      variant={getBadgeVariant((partner as any).sponsorship_level)}
-                      className="mt-1 text-xs"
-                    >
-                      {(partner as any).sponsorship_level === 'platinum' && <Crown className="h-3 w-3 mr-1" />}
-                      {(partner as any).sponsorship_level.toUpperCase()}
-                    </Badge>
-                  )}
                   <div className="text-xs text-white/50 mt-1">
                     {partner.category}
                   </div>

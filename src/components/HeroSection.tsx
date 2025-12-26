@@ -5,11 +5,7 @@ import { Button } from './ui/button';
 import { useContent } from '../contexts/ContentContext';
 
 export const HeroSection = React.memo(() => {
-  const { hero } = useContent();
-
-  if (!hero) return null;
-
-  const stats = hero.stats as any;
+  const { hero, events, partners } = useContent();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
@@ -23,11 +19,11 @@ export const HeroSection = React.memo(() => {
             className="relative"
           >
             <motion.div
-              className="absolute -inset-4 blur-[100px] opacity-50 rounded-full"
+              className="absolute inset-0 blur-3xl opacity-50"
               style={{ background: '#E93370' }}
               animate={{
                 scale: [1, 1.2, 1],
-                opacity: [0.4, 0.6, 0.4],
+                opacity: [0.5, 0.7, 0.5],
               }}
               transition={{
                 duration: 3,
@@ -100,15 +96,15 @@ export const HeroSection = React.memo(() => {
             className="grid grid-cols-3 gap-8 pt-12 w-full max-w-3xl"
           >
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{stats?.events ?? '0'}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.events}</div>
               <div className="text-sm md:text-base text-white/60">Events</div>
             </div>
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{stats?.members ?? '0'}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.members}</div>
               <div className="text-sm md:text-base text-white/60">Members</div>
             </div>
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{stats?.partners ?? '0'}</div>
+              <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.partners}</div>
               <div className="text-sm md:text-base text-white/60">Partners</div>
             </div>
           </motion.div>

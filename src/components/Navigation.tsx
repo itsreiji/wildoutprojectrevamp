@@ -1,22 +1,21 @@
-import { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
-import { Link } from './router/Link';
-import { useRouter } from './router';
+import { useRouter } from './Router';
 import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
 
 const NAV_ITEMS = [
-  { id: 'home', label: 'Home', href: '/', hash: '#' },
-  { id: 'events', label: 'Events', href: '/events' },
-  { id: 'about', label: 'About', href: '/', hash: '#about' },
-  { id: 'team', label: 'Team', href: '/', hash: '#team' },
-  { id: 'gallery', label: 'Gallery', href: '/', hash: '#gallery' },
-  { id: 'partners', label: 'Partners', href: '/', hash: '#partners' },
+  { id: 'home', label: 'Home', href: '#' },
+  { id: 'events', label: 'Events', href: '#events' },
+  { id: 'about', label: 'About', href: '#about' },
+  { id: 'team', label: 'Team', href: '#team' },
+  { id: 'gallery', label: 'Gallery', href: '#gallery' },
+  { id: 'partners', label: 'Partners', href: '#partners' },
 ];
 
-const NavigationComponent = () => {
-  const { getAdminPath, currentPath, navigate } = useRouter();
+export const Navigation = React.memo(() => {
+  const { navigateTo } = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -29,29 +28,14 @@ const NavigationComponent = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
+  const scrollToSection = (href: string) => {
     setIsMobileMenuOpen(false);
-
-    // If has hash and on landing, do hash scroll; otherwise navigate to href
-    if (item.hash && currentPath === '/') {
-      if (item.hash === '#') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        const element = document.querySelector(item.hash);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
+    if (href === '#') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // Navigate to route, scroll to hash if on landing after nav
-      navigate(item.href);
-      if (item.href === '/' && item.hash && item.hash !== '#') {
-        setTimeout(() => {
-          const element = document.querySelector(item.hash);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 100);
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   };
@@ -71,34 +55,34 @@ const NavigationComponent = () => {
         <div className="container mx-auto max-w-7xl px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="cursor-pointer h-10 md:h-12"
-              >
-                <img src={logo} alt="WildOut!" className="h-full w-auto object-contain" />
-              </motion.div>
-            </Link>
+            <motion.button
+              onClick={() => scrollToSection('#')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="cursor-pointer h-10 md:h-12"
+            >
+              <img src={logo} alt="WildOut!" className="h-full w-auto object-contain" />
+            </motion.button>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-1">
               {NAV_ITEMS.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => handleNavClick(item)}
+                  onClick={() => scrollToSection(item.href)}
                   className="px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300"
                 >
                   {item.label}
                 </button>
               ))}
-              <Link
-                to={getAdminPath()}
-                className="group ml-3 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#E93370] border border-[#E93370]/30 bg-[#E93370]/5 hover:bg-[#E93370]/10 hover:border-[#E93370] hover:text-white rounded-lg transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black/80 active:scale-95"
+              <Button
+                onClick={() => navigateTo('admin')}
+                variant="outline"
+                className="ml-2 border-[#E93370]/50 text-[#E93370] hover:bg-[#E93370]/10 rounded-lg"
               >
-                <LayoutDashboard className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                <span>Admin</span>
-              </Link>
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                Admin
+              </Button>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -158,19 +142,25 @@ const NavigationComponent = () => {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        onClick={() => handleNavClick(item)}
+                        onClick={() => scrollToSection(item.href)}
                         className="w-full text-left px-4 py-3 text-lg text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300"
                       >
                         {item.label}
                       </motion.button>
                     ))}
-                    <Link
-                      to={getAdminPath()}
-                      className="group w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center gap-3 border border-[#E93370]/20 hover:border-[#E93370] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E93370]/50"
+                    <motion.button
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: NAV_ITEMS.length * 0.05 }}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        navigateTo('admin');
+                      }}
+                      className="w-full text-left px-4 py-3 text-lg text-[#E93370] hover:text-white hover:bg-[#E93370]/10 rounded-xl transition-all duration-300 flex items-center"
                     >
-                      <LayoutDashboard className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                      <span className="font-medium">Admin Dashboard</span>
-                    </Link>
+                      <LayoutDashboard className="mr-2 h-5 w-5" />
+                      Admin Dashboard
+                    </motion.button>
                   </div>
                 </nav>
 
@@ -187,7 +177,6 @@ const NavigationComponent = () => {
       </AnimatePresence>
     </>
   );
-};
+});
 
-export const Navigation = memo(NavigationComponent);
 Navigation.displayName = 'Navigation';

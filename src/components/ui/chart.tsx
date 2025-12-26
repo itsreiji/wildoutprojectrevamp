@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import * as RechartsPrimitive from "recharts";
+import * as RechartsPrimitive from "recharts@2.15.2";
 
 import { cn } from "./utils";
 
@@ -52,15 +52,15 @@ function ChartContainer({
   return (
     <ChartContext.Provider value={{ config }}>
       <div
+        data-slot="chart"
+        data-chart={chartId}
         className={cn(
           "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className,
         )}
-        data-chart={chartId}
-        data-slot="chart"
         {...props}
       >
-        <ChartStyle config={config} id={chartId} />
+        <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
           {children}
         </RechartsPrimitive.ResponsiveContainer>
@@ -106,13 +106,11 @@ const ChartTooltip = RechartsPrimitive.Tooltip;
 
 function ChartTooltipContent({
   active,
-  // @ts-expect-error - Recharts types conflict with Div props
   payload,
   className,
   indicator = "dot",
   hideLabel = false,
   hideIndicator = false,
-  // @ts-expect-error - Recharts types conflict with Div props
   label,
   labelFormatter,
   labelClassName,
@@ -120,8 +118,8 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<"div"> &
-  RechartsPrimitive.TooltipProps<any, any> & {
+}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
+  React.ComponentProps<"div"> & {
     hideLabel?: boolean;
     hideIndicator?: boolean;
     indicator?: "line" | "dot" | "dashed";
@@ -208,7 +206,7 @@ function ChartTooltipContent({
                           {
                             "h-2.5 w-2.5": indicator === "dot",
                             "w-1": indicator === "line",
-                            "w-0 border-[1.5px] border-dashed bg-black":
+                            "w-0 border-[1.5px] border-dashed bg-transparent":
                               indicator === "dashed",
                             "my-0.5": nestLabel && indicator === "dashed",
                           },
@@ -259,8 +257,7 @@ function ChartLegendContent({
   verticalAlign = "bottom",
   nameKey,
 }: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "verticalAlign"> & {
-    payload?: any[];
+  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
     hideIcon?: boolean;
     nameKey?: string;
   }) {

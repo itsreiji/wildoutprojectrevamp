@@ -1,53 +1,20 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { usePartners } from "@/contexts/PartnersContext";
-import { supabaseClient } from "@/supabase/client";
-import type { Partner } from "@/types/content";
-import { Edit, ExternalLink, Plus, Search, Trash2 } from "lucide-react";
-import { motion } from "motion/react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { ImageWithFallback } from "../figma/ImageWithFallback";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { StatusBadge } from "../ui/StatusBadge";
-import { H2, BodyText } from "../ui/typography";
-import {
-  DashboardPartnerForm,
-  type PartnerFormValues,
-} from "./DashboardPartnerForm";
+import React, { useState } from 'react';
+import { motion } from 'motion/react';
+import { Plus, Search, Edit, Trash2, ExternalLink } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
+import { Badge } from '../ui/badge';
+import { useContent, Partner } from '../../contexts/ContentContext';
+import { toast } from 'sonner';
 
-export const DashboardPartners = () => {
-  const {
-    partners = [],
-    addPartner,
-    updatePartner,
-    deletePartner,
-  } = usePartners();
-  const [searchQuery, setSearchQuery] = useState("");
+export const DashboardPartners = React.memo(() => {
+  const { partners, updatePartners } = useContent();
+  const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deletingPartnerId, setDeletingPartnerId] = useState<string | null>(
-    null
-  );
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [formData, setFormData] = useState({ name: '', category: '', website: '', logoUrl: '' });
 
   const filteredPartners = partners.filter((partner) =>
     partner.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -55,436 +22,203 @@ export const DashboardPartners = () => {
 
   const handleCreate = () => {
     setEditingPartner(null);
+    setFormData({ name: '', category: '', website: '', logoUrl: '' });
     setIsDialogOpen(true);
   };
 
   const handleEdit = (partner: Partner) => {
     setEditingPartner(partner);
+    setFormData({ name: partner.name, category: partner.category, website: partner.website, logoUrl: partner.logoUrl || '' });
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    setIsDeleting(true);
-    try {
-      await deletePartner(id);
-      toast.success("Partner deleted successfully!");
-      setIsDeleteDialogOpen(false);
-      setDeletingPartnerId(null);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to delete partner.";
-      toast.error(errorMessage);
-      console.error("Delete error:", error);
-    } finally {
-      setIsDeleting(false);
+  const handleDelete = (id: string) => {
+    if (confirm('Are you sure you want to delete this partner?')) {
+      updatePartners(partners.filter((p) => p.id !== id));
+      toast.success('Partner deleted successfully!');
     }
   };
 
-  // Validate file type and size
-  const validateFile = (file: File): { valid: boolean; message?: string } => {
-    const maxSizeMB = 10;
-    const maxSizeBytes = maxSizeMB * 1024 * 1024;
-
-    if (file.size > maxSizeBytes) {
-      return {
-        valid: false,
-        message: `File size exceeds ${maxSizeMB}MB limit`,
+  const handleSubmit = () => {
+    if (editingPartner) {
+      updatePartners(
+        partners.map((p) =>
+          p.id === editingPartner.id ? { ...p, ...formData } : p
+        )
+      );
+      toast.success('Partner updated successfully!');
+    } else {
+      const newPartner: Partner = {
+        id: Date.now().toString(),
+        ...formData,
+        status: 'active',
       };
+      updatePartners([...partners, newPartner]);
+      toast.success('Partner added successfully!');
     }
-
-    if (!file.type.startsWith("image/")) {
-      return { valid: false, message: "Only image files are allowed" };
-    }
-
-    const validImageTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-    ];
-    if (!validImageTypes.includes(file.type)) {
-      return {
-        valid: false,
-        message: "Only JPEG, PNG, WebP, and GIF formats are supported",
-      };
-    }
-
-    return { valid: true };
-  };
-
-  const handleSubmit = async (values: PartnerFormValues) => {
-    setIsSubmitting(true);
-    const newUploadedFiles: string[] = [];
-    // Use the URL from the form field if provided
-    let logoUrl: string | undefined = values.logo_url || undefined;
-    try {
-      // Handle logo upload (takes precedence over the URL field if a new file is uploaded)
-      if (values.logo_file) {
-        const file = values.logo_file as File;
-        const validation = validateFile(file);
-        if (!validation.valid) {
-          toast.error(`Logo: ${validation.message}`);
-          return;
-        }
-        // Upload logo
-        const uniqueName = `${Date.now()}-${Math.random()
-          .toString(36)
-          .substring(2)}-${file.name}`;
-        const { data, error } = await supabaseClient.storage
-          .from("event-media")
-          .upload(uniqueName, file);
-        if (error) throw error;
-        const {
-          data: { publicUrl },
-        } = supabaseClient.storage.from("event-media").getPublicUrl(data.path);
-        logoUrl = publicUrl;
-        newUploadedFiles.push(data.path);
-      }
-
-      // Prepare partner data
-      const partnerData = {
-        name: values.name,
-        website_url: values.website_url || null,
-        description: values.description || null,
-        contact_email: values.contact_email || null,
-        contact_phone: values.contact_phone || null,
-        featured: values.featured || false,
-        logo_url: logoUrl || null,
-        social_links: values.social_links || {},
-      };
-
-      // Update or create partner
-      if (editingPartner?.id) {
-        await updatePartner(
-          editingPartner.id,
-          partnerData,
-          editingPartner.logo_url
-        );
-        toast.success("Partner updated successfully!");
-      } else {
-        await addPartner({
-          ...partnerData,
-          status: "active",
-          category: "general",
-        });
-        toast.success("Partner added successfully!");
-      }
-      setIsDialogOpen(false);
-    } catch (error) {
-      // Cleanup uploaded files if mutation failed
-      if (newUploadedFiles.length > 0) {
-        try {
-          await supabaseClient.storage
-            .from("event-media")
-            .remove(newUploadedFiles);
-        } catch (cleanupError) {
-          console.error("Error cleaning up uploaded files:", cleanupError);
-        }
-      }
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to save partner";
-      toast.error(errorMessage);
-      console.error("Save error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsDialogOpen(false);
   };
 
   return (
-    <div className="space-y-6" id="dashboard-partners-container">
+    <div className="space-y-6">
       {/* Header */}
-      <div
-        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
-        id="dashboard-partners-header"
-      >
-        <div id="dashboard-partners-header-content">
-          <H2 gradient="from-white via-[#E93370] to-white" id="dashboard-partners-title">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
             Partner Management
-          </H2>
-          <BodyText className="text-white/60" id="dashboard-partners-subtitle">
-            Manage brand partnerships - changes sync to landing page instantly
-          </BodyText>
+          </h2>
+          <p className="text-white/60">Manage brand partnerships - changes sync to landing page instantly</p>
         </div>
-        <Button
-          className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl shadow-lg shadow-[#E93370]/20 h-12 px-6 font-bold transition-all"
-          id="dashboard-partners-create-button"
-          onClick={handleCreate}
-        >
-          <Plus className="mr-2 h-5 w-5" id="dashboard-partners-create-icon" />
+        <Button onClick={handleCreate} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl">
+          <Plus className="mr-2 h-4 w-4" />
           Add Partner
         </Button>
       </div>
 
       {/* Search Bar */}
-      <div className="relative" id="dashboard-partners-search-container">
-        <Search
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40"
-          id="dashboard-partners-search-icon"
-        />
+      <div className="relative">
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
         <Input
-          className="pl-12 pr-4 h-12 bg-white/5 border-white/10 focus-visible:ring-[#E93370] focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl text-base placeholder:text-white/30"
-          id="dashboard-partners-search-input"
-          placeholder="Search partners..."
           type="text"
+          placeholder="Search partners..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
         />
       </div>
 
       {/* Partners Grid */}
-      <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        id="dashboard-partners-grid"
-      >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredPartners.map((partner, index) => (
           <motion.div
             key={partner.id}
-            animate={{ opacity: 1, y: 0 }}
-            className="group flex flex-col h-full p-8 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 relative shadow-xl"
-            id={`dashboard-partner-card-${partner.id}`}
             initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
+            className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300"
           >
-            {/* Badges Row */}
-            <div className="flex items-start justify-between mb-6 gap-2">
-              <div id={`dashboard-partner-status-container-${partner.id}`}>
-                <StatusBadge status={partner.status || "active"} />
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-16 h-16 rounded-xl bg-[#E93370]/10 flex items-center justify-center">
+                <span className="text-2xl text-[#E93370]">{partner.name.charAt(0)}</span>
               </div>
-
-              {partner.featured && (
-                <div id={`dashboard-partner-featured-badge-container-${partner.id}`}>
-                  <StatusBadge
-                    status="upcoming"
-                    showDot={false}
-                    className="bg-amber-500/15 text-amber-400 border-amber-500/30 shadow-[0_0_8px_rgba(245,158,11,0.1)] text-[10px] px-3 py-1 font-bold tracking-wider uppercase"
-                    id={`dashboard-partner-featured-badge-${partner.id}`}
-                  >
-                    FEATURED
-                  </StatusBadge>
-                </div>
-              )}
+              <Badge className={partner.status === 'active' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-gray-500/20 text-gray-400 border-gray-500/30'}>
+                {partner.status}
+              </Badge>
             </div>
 
-            {/* Logo */}
-            {partner.logo_url ? (
-              <div
-                className="w-full h-40 rounded-2xl overflow-hidden border border-white/10 mb-6 bg-white/[0.03] group-hover:bg-white/[0.06] transition-colors flex items-center justify-center p-6"
-                id={`dashboard-partner-logo-container-${partner.id}`}
-              >
-                <ImageWithFallback
-                  alt={partner.name}
-                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                  id={`dashboard-partner-logo-${partner.id}`}
-                  src={partner.logo_url}
-                />
-              </div>
-            ) : (
-              <div
-                className="w-full h-40 rounded-2xl overflow-hidden border border-white/10 mb-6 bg-white/[0.03] flex items-center justify-center"
-                id={`dashboard-partner-logo-placeholder-${partner.id}`}
-              >
-                <span
-                  className="text-sm text-white/20 font-medium"
-                  id={`dashboard-partner-logo-placeholder-text-${partner.id}`}
-                >
-                  No logo provided
-                </span>
-              </div>
-            )}
+            <h3 className="text-xl text-white mb-2">{partner.name}</h3>
+            <p className="text-sm text-white/60 mb-4">{partner.category}</p>
 
-            {/* Info */}
-            <div className="mb-8">
-              <h3
-                className="text-xl font-bold text-white mb-2 group-hover:text-[#E93370] transition-colors leading-tight"
-                id={`dashboard-partner-name-${partner.id}`}
-              >
-                {partner.name}
-              </h3>
-              {partner.description ? (
-                <p
-                  className="text-sm text-white/60 line-clamp-2 leading-relaxed"
-                  id={`dashboard-partner-description-${partner.id}`}
-                >
-                  {partner.description}
-                </p>
-              ) : (
-                <p className="text-sm text-white/30 italic line-clamp-2 leading-relaxed">
-                  No description available
-                </p>
-              )}
-            </div>
+            <a
+              href={`https://${partner.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 text-sm text-[#E93370] hover:text-[#E93370]/80 mb-4"
+            >
+              <ExternalLink className="h-4 w-4" />
+              <span>{partner.website}</span>
+            </a>
 
-            {/* Contact & Actions Container - Pushed to bottom */}
-            <div className="mt-auto space-y-6">
-              {/* Contact Info */}
-              <div
-                className="space-y-3 pt-6 border-t border-white/5 text-sm"
-                id={`dashboard-partner-contact-container-${partner.id}`}
+            <div className="flex space-x-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleEdit(partner)}
+                className="flex-1 border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
               >
-                {partner.contact_email && (
-                  <div className="flex items-center gap-2 text-white/70" id={`dashboard-partner-email-container-${partner.id}`}>
-                    <span className="text-white/40 w-16" id={`dashboard-partner-email-label-${partner.id}`}>Email:</span>
-                    <a
-                      className="text-[#E93370] hover:text-[#E93370]/80 transition-colors truncate font-medium"
-                      href={`mailto:${partner.contact_email}`}
-                      id={`dashboard-partner-email-link-${partner.id}`}
-                    >
-                      {partner.contact_email}
-                    </a>
-                  </div>
-                )}
-                {partner.website_url && (
-                  <div className="flex items-center gap-2 text-white/70" id={`dashboard-partner-website-container-${partner.id}`}>
-                    <span className="text-white/40 w-16" id={`dashboard-partner-website-label-${partner.id}`}>Website:</span>
-                    <a
-                      className="text-[#E93370] hover:text-[#E93370]/80 inline-flex items-center gap-1 transition-colors font-medium"
-                      href={partner.website_url}
-                      id={`dashboard-partner-website-link-${partner.id}`}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      Visit site
-                      <ExternalLink
-                        className="h-3 w-3"
-                        id={`dashboard-partner-website-icon-${partner.id}`}
-                      />
-                    </a>
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div
-                className="flex space-x-3"
-                id={`dashboard-partner-actions-${partner.id}`}
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleDelete(partner.id)}
+                className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
               >
-                <Button
-                  className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white rounded-xl h-11 transition-all font-semibold"
-                  id={`dashboard-partner-edit-button-${partner.id}`}
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleEdit(partner)}
-                >
-                  <Edit
-                    className="mr-2 h-4 w-4"
-                    id={`dashboard-partner-edit-icon-${partner.id}`}
-                  />
-                  Edit
-                </Button>
-                <AlertDialog
-                  open={isDeleteDialogOpen && deletingPartnerId === partner.id}
-                  onOpenChange={(open) => {
-                    if (!open) setDeletingPartnerId(null);
-                    setIsDeleteDialogOpen(open);
-                  }}
-                >
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      className="bg-red-500/10 hover:bg-red-500 border-red-500/30 hover:border-red-500 text-red-400 hover:text-white rounded-xl h-11 w-11 p-0 transition-all"
-                      id={`dashboard-partner-delete-trigger-${partner.id}`}
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setDeletingPartnerId(partner.id)}
-                    >
-                      <Trash2
-                        className="h-4 w-4"
-                        id={`dashboard-partner-delete-icon-${partner.id}`}
-                      />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent
-                    className="bg-[#0a0a0a] border-white/10 text-white max-w-md rounded-3xl"
-                    id={`dashboard-partner-delete-dialog-content-${partner.id}`}
-                  >
-                    <AlertDialogHeader
-                      id={`dashboard-partner-delete-dialog-header-${partner.id}`}
-                    >
-                      <AlertDialogTitle
-                        className="text-2xl font-bold"
-                        id={`dashboard-partner-delete-dialog-title-${partner.id}`}
-                      >
-                        Remove Partner?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription
-                        className="text-white/60 text-base"
-                        id={`dashboard-partner-delete-dialog-description-${partner.id}`}
-                      >
-                        This action cannot be undone. This will permanently remove{" "}
-                        <span className="text-white font-semibold">
-                          {partner.name}
-                        </span>{" "}
-                        from the system.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter
-                      id={`dashboard-partner-delete-dialog-footer-${partner.id}`}
-                      className="mt-6"
-                    >
-                      <AlertDialogCancel
-                        className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white transition-colors rounded-xl px-6 h-11"
-                        id={`dashboard-partner-cancel-delete-button-${partner.id}`}
-                        onClick={() => setDeletingPartnerId(null)}
-                      >
-                        Cancel
-                      </AlertDialogCancel>
-                      <AlertDialogAction
-                        className="bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-lg shadow-red-600/20 rounded-xl px-6 h-11"
-                        id={`dashboard-partner-confirm-delete-button-${partner.id}`}
-                        onClick={() => handleDelete(partner.id)}
-                      >
-                        {isDeleting ? "Removing..." : "Remove Partner"}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           </motion.div>
         ))}
       </div>
 
       {filteredPartners.length === 0 && (
-        <div
-          className="text-center py-12 text-white/60"
-          id="dashboard-partners-empty-state"
-        >
-          <div className="flex flex-col items-center justify-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
-              <span className="text-2xl">🤝</span>
-            </div>
-            <p className="text-lg font-semibold text-white/80">No partners found</p>
-            <p className="text-sm text-white/50">Add your first partner to get started</p>
-          </div>
+        <div className="text-center py-12 text-white/60">
+          No partners found. Add your first partner!
         </div>
       )}
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent
-          className="sm:max-w-xl w-[95vw] !h-[800px] max-h-[90vh] bg-[#0a0a0a] border-white/10 text-white p-0 overflow-hidden shadow-2xl flex flex-col gap-0 rounded-2xl sm:rounded-[32px]"
-          id="dashboard-partners-create-edit-dialog"
-          aria-label={editingPartner ? `Edit Partner: ${editingPartner.name}` : "Add Partner"}
-          aria-labelledby="dashboard-partners-create-edit-dialog-title"
-        >
-          <DialogTitle
-            className="text-xl font-bold text-white flex items-center gap-2 px-8 py-6 border-b border-white/10"
-            id="dashboard-partners-create-edit-dialog-title"
-          >
-            <div className="w-2 h-2 rounded-full bg-[#E93370] animate-pulse"></div>
-            {editingPartner ? "Edit Partner" : "Add Partner"}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {editingPartner ? "Edit partner details" : "Add a new partner to the system"}
-          </DialogDescription>
+        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              {editingPartner ? 'Edit Partner' : 'Add New Partner'}
+            </DialogTitle>
+          </DialogHeader>
 
-          <DashboardPartnerForm
-            defaultValues={editingPartner || undefined}
-            isSubmitting={isSubmitting}
-            onCancel={() => setIsDialogOpen(false)}
-            onSubmit={handleSubmit}
-          />
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Partner Name</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter partner name"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="category">Category</Label>
+              <Input
+                id="category"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                placeholder="e.g., Music, Lifestyle, Technology"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                value={formData.website}
+                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                placeholder="example.com"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="logoUrl">Logo URL</Label>
+              <Input
+                id="logoUrl"
+                value={formData.logoUrl}
+                onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
+                placeholder="https://example.com/logo.png"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+              className="border-white/10 text-white/70 hover:bg-white/5"
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white">
+              {editingPartner ? 'Update Partner' : 'Add Partner'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
-};
+});
+
+DashboardPartners.displayName = 'DashboardPartners';
