@@ -7,6 +7,7 @@ import { Textarea } from '../ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
+import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useContent, Event } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 
@@ -157,8 +158,8 @@ export const DashboardEventsNew = React.memo(() => {
               >
                 <TableCell>
                   <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden">
-                      <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5">
+                      <ImageWithFallback src={event.image} alt={event.title} className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <div className="text-white">{event.title}</div>

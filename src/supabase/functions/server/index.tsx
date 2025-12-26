@@ -1,14 +1,31 @@
+
 import { Hono } from "npm:hono";
 import { cors } from "npm:hono/cors";
 import { logger } from "npm:hono/logger";
+import { createClient } from "jsr:@supabase/supabase-js@2.49.8";
 import * as kv from "./kv_store.tsx";
+import {
+  HeroSchema,
+  AboutSchema,
+  EventSchema,
+  TeamMemberSchema,
+  PartnerSchema,
+  SettingsSchema,
+} from "./schemas.ts";
 
 const app = new Hono();
 
-// Enable logger
-app.use('*', logger(console.log));
+// Initialize Supabase Client for Auth
+const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Enable CORS for all routes and methods
+// --- Middleware ---
+
+// Logger
+app.use("*", logger(console.log));
+
+// CORS
 app.use(
   "/*",
   cors({
@@ -17,273 +34,182 @@ app.use(
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,
-  }),
+  })
 );
 
-// Health check endpoint
-app.get("/make-server-41a567c3/health", (c) => {
-  return c.json({ status: "ok" });
-});
+// Auth Middleware
+const authMiddleware = async (c: any, next: any) => {
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader) {
+    return c.json({ error: "Unauthorized: Missing Authorization header" }, 401);
+  }
 
-// ========== CONTENT ENDPOINTS ==========
+  const token = authHeader.replace("Bearer ", "");
+  const { data: { user }, error } = await supabase.auth.getUser(token);
 
-// Hero Section
+  if (error || !user) {
+    return c.json({ error: "Unauthorized: Invalid token" }, 401);
+  }
+
+  c.set("user", user);
+  await next();
+};
+
+// --- Helpers ---
+
+const validate = async (c: any, schema: any) => {
+  try {
+    const body = await c.req.json();
+    return schema.parse(body);
+  } catch (error: any) {
+    return c.json({ error: "Validation Failed", details: error.errors }, 400);
+  }
+};
+
+// --- Routes ---
+
+// Health Check
+app.get("/make-server-41a567c3/health", (c) => c.json({ status: "ok" }));
+
+// Hero
 app.get("/make-server-41a567c3/hero", async (c) => {
-  try {
-    const hero = await kv.get("hero");
-    return c.json({ data: hero });
-  } catch (error) {
-    console.log("Error fetching hero:", error);
-    return c.json({ error: "Failed to fetch hero section" }, 500);
-  }
+  c.header("Cache-Control", "public, max-age=60, s-maxage=60");
+  const data = await kv.get("hero");
+  return c.json({ data });
 });
 
-app.put("/make-server-41a567c3/hero", async (c) => {
-  try {
-    const body = await c.req.json();
-    await kv.set("hero", body);
-    return c.json({ success: true, data: body });
-  } catch (error) {
-    console.log("Error updating hero:", error);
-    return c.json({ error: "Failed to update hero section" }, 500);
-  }
+app.put("/make-server-41a567c3/hero", authMiddleware, async (c) => {
+  const validation = await validate(c, HeroSchema);
+  if (validation instanceof Response) return validation;
+  await kv.set("hero", validation);
+  return c.json({ success: true, data: validation });
 });
 
-// About Section
+// About
 app.get("/make-server-41a567c3/about", async (c) => {
-  try {
-    const about = await kv.get("about");
-    return c.json({ data: about });
-  } catch (error) {
-    console.log("Error fetching about:", error);
-    return c.json({ error: "Failed to fetch about section" }, 500);
-  }
+  c.header("Cache-Control", "public, max-age=60, s-maxage=60");
+  const data = await kv.get("about");
+  return c.json({ data });
 });
 
-app.put("/make-server-41a567c3/about", async (c) => {
-  try {
-    const body = await c.req.json();
-    await kv.set("about", body);
-    return c.json({ success: true, data: body });
-  } catch (error) {
-    console.log("Error updating about:", error);
-    return c.json({ error: "Failed to update about section" }, 500);
-  }
+app.put("/make-server-41a567c3/about", authMiddleware, async (c) => {
+  const validation = await validate(c, AboutSchema);
+  if (validation instanceof Response) return validation;
+  await kv.set("about", validation);
+  return c.json({ success: true, data: validation });
 });
 
 // Events
 app.get("/make-server-41a567c3/events", async (c) => {
-  try {
-    const events = await kv.getByPrefix("event:");
-    return c.json({ data: events });
-  } catch (error) {
-    console.log("Error fetching events:", error);
-    return c.json({ error: "Failed to fetch events" }, 500);
-  }
+  c.header("Cache-Control", "public, max-age=60, s-maxage=60");
+  const data = await kv.getByPrefix("event:");
+  return c.json({ data });
 });
 
 app.get("/make-server-41a567c3/events/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    const event = await kv.get(`event:${id}`);
-    if (!event) {
-      return c.json({ error: "Event not found" }, 404);
-    }
-    return c.json({ data: event });
-  } catch (error) {
-    console.log("Error fetching event:", error);
-    return c.json({ error: "Failed to fetch event" }, 500);
-  }
+  const id = c.req.param("id");
+  const data = await kv.get(`event:${id}`);
+  if (!data) return c.json({ error: "Event not found" }, 404);
+  return c.json({ data });
 });
 
-app.post("/make-server-41a567c3/events", async (c) => {
-  try {
-    const body = await c.req.json();
-    const id = body.id || Date.now().toString();
-    const event = { ...body, id };
-    await kv.set(`event:${id}`, event);
-    return c.json({ success: true, data: event });
-  } catch (error) {
-    console.log("Error creating event:", error);
-    return c.json({ error: "Failed to create event" }, 500);
-  }
+app.post("/make-server-41a567c3/events", authMiddleware, async (c) => {
+  const validation = await validate(c, EventSchema);
+  if (validation instanceof Response) return validation;
+  const id = validation.id || crypto.randomUUID();
+  const event = { ...validation, id };
+  await kv.set(`event:${id}`, event);
+  return c.json({ success: true, data: event });
 });
 
-app.put("/make-server-41a567c3/events/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    const body = await c.req.json();
-    const event = { ...body, id };
-    await kv.set(`event:${id}`, event);
-    return c.json({ success: true, data: event });
-  } catch (error) {
-    console.log("Error updating event:", error);
-    return c.json({ error: "Failed to update event" }, 500);
-  }
+app.put("/make-server-41a567c3/events/:id", authMiddleware, async (c) => {
+  const id = c.req.param("id");
+  const validation = await validate(c, EventSchema);
+  if (validation instanceof Response) return validation;
+  const event = { ...validation, id };
+  await kv.set(`event:${id}`, event);
+  return c.json({ success: true, data: event });
 });
 
-app.delete("/make-server-41a567c3/events/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    await kv.del(`event:${id}`);
-    return c.json({ success: true });
-  } catch (error) {
-    console.log("Error deleting event:", error);
-    return c.json({ error: "Failed to delete event" }, 500);
-  }
+app.delete("/make-server-41a567c3/events/:id", authMiddleware, async (c) => {
+  const id = c.req.param("id");
+  await kv.del(`event:${id}`);
+  return c.json({ success: true });
 });
 
-// Team Members
+// Team
 app.get("/make-server-41a567c3/team", async (c) => {
-  try {
-    const team = await kv.getByPrefix("team:");
-    return c.json({ data: team });
-  } catch (error) {
-    console.log("Error fetching team:", error);
-    return c.json({ error: "Failed to fetch team" }, 500);
-  }
+  c.header("Cache-Control", "public, max-age=60, s-maxage=60");
+  const data = await kv.getByPrefix("team:");
+  return c.json({ data });
 });
 
-app.post("/make-server-41a567c3/team", async (c) => {
-  try {
-    const body = await c.req.json();
-    const id = body.id || Date.now().toString();
-    const member = { ...body, id };
-    await kv.set(`team:${id}`, member);
-    return c.json({ success: true, data: member });
-  } catch (error) {
-    console.log("Error creating team member:", error);
-    return c.json({ error: "Failed to create team member" }, 500);
-  }
+app.post("/make-server-41a567c3/team", authMiddleware, async (c) => {
+  const validation = await validate(c, TeamMemberSchema);
+  if (validation instanceof Response) return validation;
+  const id = validation.id || crypto.randomUUID();
+  const member = { ...validation, id };
+  await kv.set(`team:${id}`, member);
+  return c.json({ success: true, data: member });
 });
 
-app.put("/make-server-41a567c3/team/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    const body = await c.req.json();
-    const member = { ...body, id };
-    await kv.set(`team:${id}`, member);
-    return c.json({ success: true, data: member });
-  } catch (error) {
-    console.log("Error updating team member:", error);
-    return c.json({ error: "Failed to update team member" }, 500);
-  }
+app.put("/make-server-41a567c3/team/:id", authMiddleware, async (c) => {
+  const id = c.req.param("id");
+  const validation = await validate(c, TeamMemberSchema);
+  if (validation instanceof Response) return validation;
+  const member = { ...validation, id };
+  await kv.set(`team:${id}`, member);
+  return c.json({ success: true, data: member });
 });
 
-app.delete("/make-server-41a567c3/team/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    await kv.del(`team:${id}`);
-    return c.json({ success: true });
-  } catch (error) {
-    console.log("Error deleting team member:", error);
-    return c.json({ error: "Failed to delete team member" }, 500);
-  }
-});
-
-// Gallery
-app.get("/make-server-41a567c3/gallery", async (c) => {
-  try {
-    const gallery = await kv.getByPrefix("gallery:");
-    return c.json({ data: gallery });
-  } catch (error) {
-    console.log("Error fetching gallery:", error);
-    return c.json({ error: "Failed to fetch gallery" }, 500);
-  }
-});
-
-app.post("/make-server-41a567c3/gallery", async (c) => {
-  try {
-    const body = await c.req.json();
-    const id = body.id || Date.now().toString();
-    const image = { ...body, id };
-    await kv.set(`gallery:${id}`, image);
-    return c.json({ success: true, data: image });
-  } catch (error) {
-    console.log("Error creating gallery image:", error);
-    return c.json({ error: "Failed to create gallery image" }, 500);
-  }
-});
-
-app.delete("/make-server-41a567c3/gallery/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    await kv.del(`gallery:${id}`);
-    return c.json({ success: true });
-  } catch (error) {
-    console.log("Error deleting gallery image:", error);
-    return c.json({ error: "Failed to delete gallery image" }, 500);
-  }
+app.delete("/make-server-41a567c3/team/:id", authMiddleware, async (c) => {
+  const id = c.req.param("id");
+  await kv.del(`team:${id}`);
+  return c.json({ success: true });
 });
 
 // Partners
 app.get("/make-server-41a567c3/partners", async (c) => {
-  try {
-    const partners = await kv.getByPrefix("partner:");
-    return c.json({ data: partners });
-  } catch (error) {
-    console.log("Error fetching partners:", error);
-    return c.json({ error: "Failed to fetch partners" }, 500);
-  }
+  c.header("Cache-Control", "public, max-age=60, s-maxage=60");
+  const data = await kv.getByPrefix("partner:");
+  return c.json({ data });
 });
 
-app.post("/make-server-41a567c3/partners", async (c) => {
-  try {
-    const body = await c.req.json();
-    const id = body.id || Date.now().toString();
-    const partner = { ...body, id };
-    await kv.set(`partner:${id}`, partner);
-    return c.json({ success: true, data: partner });
-  } catch (error) {
-    console.log("Error creating partner:", error);
-    return c.json({ error: "Failed to create partner" }, 500);
-  }
+app.post("/make-server-41a567c3/partners", authMiddleware, async (c) => {
+  const validation = await validate(c, PartnerSchema);
+  if (validation instanceof Response) return validation;
+  const id = validation.id || crypto.randomUUID();
+  const partner = { ...validation, id };
+  await kv.set(`partner:${id}`, partner);
+  return c.json({ success: true, data: partner });
 });
 
-app.put("/make-server-41a567c3/partners/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    const body = await c.req.json();
-    const partner = { ...body, id };
-    await kv.set(`partner:${id}`, partner);
-    return c.json({ success: true, data: partner });
-  } catch (error) {
-    console.log("Error updating partner:", error);
-    return c.json({ error: "Failed to update partner" }, 500);
-  }
+app.put("/make-server-41a567c3/partners/:id", authMiddleware, async (c) => {
+  const id = c.req.param("id");
+  const validation = await validate(c, PartnerSchema);
+  if (validation instanceof Response) return validation;
+  const partner = { ...validation, id };
+  await kv.set(`partner:${id}`, partner);
+  return c.json({ success: true, data: partner });
 });
 
-app.delete("/make-server-41a567c3/partners/:id", async (c) => {
-  try {
-    const id = c.req.param("id");
-    await kv.del(`partner:${id}`);
-    return c.json({ success: true });
-  } catch (error) {
-    console.log("Error deleting partner:", error);
-    return c.json({ error: "Failed to delete partner" }, 500);
-  }
+app.delete("/make-server-41a567c3/partners/:id", authMiddleware, async (c) => {
+  const id = c.req.param("id");
+  await kv.del(`partner:${id}`);
+  return c.json({ success: true });
 });
 
 // Settings
 app.get("/make-server-41a567c3/settings", async (c) => {
-  try {
-    const settings = await kv.get("settings");
-    return c.json({ data: settings });
-  } catch (error) {
-    console.log("Error fetching settings:", error);
-    return c.json({ error: "Failed to fetch settings" }, 500);
-  }
+  const data = await kv.get("settings");
+  return c.json({ data });
 });
 
-app.put("/make-server-41a567c3/settings", async (c) => {
-  try {
-    const body = await c.req.json();
-    await kv.set("settings", body);
-    return c.json({ success: true, data: body });
-  } catch (error) {
-    console.log("Error updating settings:", error);
-    return c.json({ error: "Failed to update settings" }, 500);
-  }
+app.put("/make-server-41a567c3/settings", authMiddleware, async (c) => {
+  const validation = await validate(c, SettingsSchema);
+  if (validation instanceof Response) return validation;
+  await kv.set("settings", validation);
+  return c.json({ success: true, data: validation });
 });
 
 Deno.serve(app.fetch);

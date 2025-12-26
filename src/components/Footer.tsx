@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Instagram, Twitter, Facebook, Youtube, Mail, MapPin, Phone } from 'lucide-react';
 import { useContent } from '../contexts/ContentContext';
-import logo from 'figma:asset/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import logo from '../assets/logo.png';
 
 const FOOTER_LINKS = {
   company: [
@@ -33,7 +33,7 @@ const FOOTER_LINKS = {
 
 export const Footer = React.memo(() => {
   const { settings } = useContent();
-  
+
   const socialLinks = [
     { icon: Instagram, href: settings.socialMedia.instagram, label: 'Instagram' },
     { icon: Twitter, href: settings.socialMedia.twitter, label: 'Twitter' },
@@ -53,9 +53,13 @@ export const Footer = React.memo(() => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <div className="mb-4">
+              <motion.div
+                className="mb-4 inline-block cursor-pointer"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+              >
                 <img src={logo} alt={settings.siteName} className="h-12 w-auto object-contain" />
-              </div>
+              </motion.div>
               <p className="text-white/60 mb-6 leading-relaxed">
                 {settings.tagline}
               </p>

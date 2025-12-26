@@ -8,7 +8,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
 import { useContent, Event } from '../contexts/ContentContext';
 import { useRouter } from './Router';
-import logo from '../assets/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import logo from '../assets/logo.png';
 
 export const AllEventsPage = React.memo(() => {
   const { navigateTo } = useRouter();
@@ -34,7 +34,15 @@ export const AllEventsPage = React.memo(() => {
           <div className="container mx-auto max-w-7xl px-4 py-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">
-                <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="cursor-pointer"
+                  onClick={() => navigateTo('landing')}
+                >
+                  <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
+                </motion.div>
                 <div>
                   <h1 className="text-3xl md:text-4xl mb-1">
                     <span className="bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">

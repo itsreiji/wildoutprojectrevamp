@@ -74,7 +74,7 @@ export const DashboardHome = React.memo(() => {
   // Recent activity
   const recentActivity = useMemo(() => {
     const activities = [];
-    
+
     // Add recent events
     events.slice(0, 3).forEach((event) => {
       activities.push({
@@ -236,7 +236,7 @@ export const DashboardHome = React.memo(() => {
               <CardDescription className="text-white/60">Current state of all events</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[300px] min-h-[300px] w-full min-w-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -244,7 +244,7 @@ export const DashboardHome = React.memo(() => {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                       outerRadius={100}
                       fill="#8884d8"
                       dataKey="value"
@@ -280,7 +280,7 @@ export const DashboardHome = React.memo(() => {
               <CardDescription className="text-white/60">Distribution by event type</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[300px] min-h-[300px] w-full min-w-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={categoryData}>
                     <XAxis
@@ -317,7 +317,7 @@ export const DashboardHome = React.memo(() => {
               <CardDescription className="text-white/60">Monthly performance overview</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[300px] min-h-[300px] w-full min-w-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={monthlyTrendData}>
                     <defs>

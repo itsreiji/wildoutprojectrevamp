@@ -13,9 +13,14 @@ export const DashboardHero = React.memo(() => {
   const { hero, updateHero } = useContent();
   const [formData, setFormData] = useState(hero);
 
-  const handleSave = () => {
-    updateHero(formData);
-    toast.success('Hero section updated successfully!');
+  const handleSave = async () => {
+    try {
+      await updateHero(formData);
+      toast.success('Hero section updated successfully!');
+    } catch (err) {
+      toast.error('Failed to save hero section. Please check your connection.');
+      console.error('Save error:', err);
+    }
   };
 
   return (

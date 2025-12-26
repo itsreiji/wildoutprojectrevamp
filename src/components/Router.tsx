@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-type Page = 'landing' | 'admin' | 'all-events';
+type Page = 'landing' | 'admin' | 'all-events' | 'login';
 
 interface RouterContextValue {
   currentPage: Page;
@@ -25,6 +25,8 @@ export const RouterProvider = React.memo(({ children }: { children: React.ReactN
     const path = window.location.pathname;
     if (path === '/admin') {
       setCurrentPage('admin');
+    } else if (path === '/login') {
+      setCurrentPage('login');
     } else if (path === '/events') {
       setCurrentPage('all-events');
     } else {
@@ -36,6 +38,8 @@ export const RouterProvider = React.memo(({ children }: { children: React.ReactN
       const path = window.location.pathname;
       if (path === '/admin') {
         setCurrentPage('admin');
+      } else if (path === '/login') {
+        setCurrentPage('login');
       } else if (path === '/events') {
         setCurrentPage('all-events');
       } else {
@@ -49,16 +53,18 @@ export const RouterProvider = React.memo(({ children }: { children: React.ReactN
 
   const navigateTo = (page: Page) => {
     setCurrentPage(page);
-    
+
     // Update URL without reloading
     if (page === 'admin') {
       window.history.pushState({}, '', '/admin');
+    } else if (page === 'login') {
+      window.history.pushState({}, '', '/login');
     } else if (page === 'all-events') {
       window.history.pushState({}, '', '/events');
     } else {
       window.history.pushState({}, '', '/');
     }
-    
+
     // Scroll to top on navigation
     window.scrollTo(0, 0);
   };

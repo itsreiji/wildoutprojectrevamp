@@ -16,7 +16,9 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useRouter } from '../Router';
-import logo from '../../assets/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import { supabase } from '../../lib/supabase';
+import { toast } from 'sonner';
+import logo from '../../assets/logo.png';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -40,6 +42,13 @@ export const DashboardLayout = React.memo(
     const { navigateTo } = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [user, setUser] = useState<any>(null);
+
+    React.useEffect(() => {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        setUser(user);
+      });
+    }, []);
 
     // Detect screen size
     React.useEffect(() => {
@@ -79,7 +88,15 @@ export const DashboardLayout = React.memo(
             {/* Header */}
             <div className="p-6 border-b border-[#E93370]/20">
               <div className="flex items-center justify-between">
-                <img src={logo} alt="WildOut!" className="h-12 w-auto object-contain" />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.02 }}
+                  className="cursor-pointer"
+                  onClick={() => navigateTo('landing')}
+                >
+                  <img src={logo} alt="WildOut!" className="h-12 w-auto object-contain" />
+                </motion.div>
                 <button
                   onClick={() => setSidebarOpen(false)}
                   className="lg:hidden w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
@@ -128,6 +145,15 @@ export const DashboardLayout = React.memo(
               <Button
                 variant="outline"
                 className="w-full bg-transparent border-[#E93370]/20 text-[#E93370] hover:bg-[#E93370]/10 hover:text-[#E93370] hover:border-[#E93370]/50 rounded-xl"
+                onClick={async () => {
+                  const { error } = await supabase.auth.signOut();
+                  if (error) {
+                    toast.error('Failed to logout');
+                  } else {
+                    toast.success('Logged out successfully');
+                    navigateTo('landing');
+                  }
+                }}
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
@@ -159,11 +185,15 @@ export const DashboardLayout = React.memo(
               <div className="flex items-center space-x-3">
                 <div className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
                   <div className="w-8 h-8 rounded-full bg-[#E93370] flex items-center justify-center">
-                    <span className="text-sm">A</span>
+                    <span className="text-sm">
+                      {user?.email?.[0].toUpperCase() || 'A'}
+                    </span>
                   </div>
                   <div className="text-sm">
-                    <div className="text-white">Admin User</div>
-                    <div className="text-white/60 text-xs">admin@wildoutproject.com</div>
+                    <div className="text-white">
+                      {user?.user_metadata?.full_name || 'Admin User'}
+                    </div>
+                    <div className="text-white/60 text-xs">{user?.email || 'admin@wildoutproject.com'}</div>
                   </div>
                 </div>
               </div>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, LayoutDashboard } from 'lucide-react';
 import { Button } from './ui/button';
 import { useRouter } from './Router';
-import logo from '../assets/7f0e33eb82cb74c153a3d669c82ee10e38a7e638.png';
+import logo from '../assets/logo.png';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'Home', href: '#' },
@@ -54,12 +54,15 @@ export const Navigation = React.memo(() => {
       >
         <div className="container mx-auto max-w-7xl px-4">
           <div className="flex items-center justify-between h-20">
-            {/* Logo */}
             <motion.button
               onClick={() => scrollToSection('#')}
-              whileHover={{ scale: 1.05 }}
+              animate={{
+                scale: isScrolled ? 0.9 : 1,
+                opacity: 1
+              }}
+              whileHover={{ scale: isScrolled ? 0.95 : 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="cursor-pointer h-10 md:h-12"
+              className="cursor-pointer h-10 md:h-12 origin-left transition-all duration-300"
             >
               <img src={logo} alt="WildOut!" className="h-full w-auto object-contain" />
             </motion.button>
@@ -122,7 +125,13 @@ export const Navigation = React.memo(() => {
               <div className="flex flex-col h-full">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/10">
-                  <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
+                  </motion.div>
                   <Button
                     variant="outline"
                     size="icon"
