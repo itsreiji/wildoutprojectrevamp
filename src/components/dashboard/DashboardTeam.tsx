@@ -116,7 +116,7 @@ export const DashboardTeam = React.memo(() => {
           placeholder="Search team members..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
+          className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-xl"
         />
       </div>
 
@@ -128,7 +128,7 @@ export const DashboardTeam = React.memo(() => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300"
+            className="p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-300"
           >
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
@@ -191,7 +191,7 @@ export const DashboardTeam = React.memo(() => {
                 size="sm"
                 variant="outline"
                 onClick={() => handleEdit(member)}
-                className="flex-1 border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
+                className="flex-1 border-white/20 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
@@ -226,7 +226,7 @@ export const DashboardTeam = React.memo(() => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-2xl">
+        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/20 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl">
               {editingMember ? 'Edit Team Member' : 'Add Team Member'}
@@ -242,7 +242,7 @@ export const DashboardTeam = React.memo(() => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Enter full name"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
 
@@ -253,7 +253,7 @@ export const DashboardTeam = React.memo(() => {
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   placeholder="e.g., Event Manager"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
             </div>
@@ -267,7 +267,7 @@ export const DashboardTeam = React.memo(() => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="email@wildoutproject.com"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
 
@@ -278,7 +278,7 @@ export const DashboardTeam = React.memo(() => {
                   value={formData.instagram}
                   onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
                   placeholder="@username"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
             </div>
@@ -290,7 +290,7 @@ export const DashboardTeam = React.memo(() => {
                 value={formData.photoUrl}
                 onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
                 placeholder="https://example.com/photo.jpg"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
@@ -301,12 +301,12 @@ export const DashboardTeam = React.memo(() => {
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 placeholder="Enter team member bio"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 min-h-[100px]"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/40 min-h-[100px]"
               />
             </div>
 
             {formData.photoUrl && (
-              <div className="rounded-xl overflow-hidden border border-white/10">
+              <div className="rounded-xl overflow-hidden border border-white/20">
                 <ImageWithFallback
                   src={formData.photoUrl}
                   alt="Preview"
@@ -321,7 +321,7 @@ export const DashboardTeam = React.memo(() => {
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
               disabled={isProcessing}
-              className="border-white/10 text-white hover:bg-white/10"
+              className="border-white/20 text-white hover:bg-white/10"
             >
               Cancel
             </Button>

@@ -28,9 +28,9 @@ export const AllEventsPage = React.memo(() => {
 
   return (
     <>
-      <div className="dark min-h-screen bg-[#0a0a0a] text-white">
+      <div className="dark min-h-screen bg-black text-white">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/10">
+        <div className="sticky top-0 z-10 bg-black/90 backdrop-blur-xl border-b border-white/10">
           <div className="container mx-auto max-w-7xl px-4 py-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-4">

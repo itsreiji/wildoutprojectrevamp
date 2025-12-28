@@ -132,7 +132,7 @@ export const DashboardGallery = React.memo(() => {
           placeholder="Search by caption or event..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
+          className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-xl"
         />
       </div>
 
@@ -144,10 +144,10 @@ export const DashboardGallery = React.memo(() => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            className={`group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border transition-all duration-300 ${
+            className={`group relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-xl border transition-all duration-300 ${
               selectedImages.has(image.id)
                 ? 'border-[#E93370] shadow-lg shadow-[#E93370]/20'
-                : 'border-white/10 hover:border-[#E93370]/50'
+                : 'border-white/20 hover:border-[#E93370]/50'
             }`}
           >
             {/* Image */}
@@ -178,7 +178,7 @@ export const DashboardGallery = React.memo(() => {
               className={`absolute top-3 left-3 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 ${
                 selectedImages.has(image.id)
                   ? 'bg-[#E93370] border-[#E93370]'
-                  : 'bg-black/60 border-white/30 backdrop-blur-sm'
+                  : 'bg-black/60 border-white/20 backdrop-blur-sm'
               }`}
             >
               {selectedImages.has(image.id) && (
@@ -201,7 +201,7 @@ export const DashboardGallery = React.memo(() => {
             {/* Delete Button */}
             <button
               onClick={() => handleDelete(image.id)}
-              className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-red-400 hover:bg-red-500/20 hover:border-red-500/30 transition-all duration-200 opacity-0 group-hover:opacity-100"
+              className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-black/60 backdrop-blur-sm border border-white/20 flex items-center justify-center text-red-400 hover:bg-red-500/20 hover:border-red-500/30 transition-all duration-200 opacity-0 group-hover:opacity-100"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -218,7 +218,7 @@ export const DashboardGallery = React.memo(() => {
 
       {/* Upload Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white">
+        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/20 text-white">
           <DialogHeader>
             <DialogTitle className="text-2xl">Upload New Photo</DialogTitle>
           </DialogHeader>
@@ -233,7 +233,7 @@ export const DashboardGallery = React.memo(() => {
                   value={formData.url}
                   onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                   placeholder="https://example.com/image.jpg"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
                 <p className="text-xs text-white/40">
                   Enter the URL of the image you want to add
@@ -248,7 +248,7 @@ export const DashboardGallery = React.memo(() => {
                   value={formData.caption}
                   onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
                   placeholder="Enter photo caption"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
 
@@ -259,12 +259,12 @@ export const DashboardGallery = React.memo(() => {
                   value={formData.event}
                   onChange={(e) => setFormData({ ...formData, event: e.target.value })}
                   placeholder="Event name"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
 
               {formData.url && (
-                <div className="rounded-xl overflow-hidden border border-white/10">
+                <div className="rounded-xl overflow-hidden border border-white/20">
                   <ImageWithFallback
                     src={formData.url}
                     alt="Preview"
@@ -279,7 +279,7 @@ export const DashboardGallery = React.memo(() => {
                 type="button"
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
-                className="border-white/10 text-white/70 hover:bg-white/5"
+                className="border-white/20 text-white/70 hover:bg-white/10"
               >
                 Cancel
               </Button>

@@ -11,7 +11,7 @@ import { Footer } from './Footer';
 
 export const LandingPage = React.memo(() => {
   return (
-    <div className="dark relative min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <div className="dark relative min-h-screen bg-black text-white overflow-x-hidden">
       {/* 3D Animated Background */}
       <Background3D />
 

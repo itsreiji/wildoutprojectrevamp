@@ -46,7 +46,7 @@ export const AboutSection = React.memo(() => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="relative group"
               >
-                <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500 h-full">
+                <div className="p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-500 h-full">
                   {/* Icon */}
                   <div className="w-14 h-14 rounded-2xl bg-[#E93370]/10 flex items-center justify-center mb-4 group-hover:bg-[#E93370]/20 transition-colors duration-300">
                     <Icon className="h-7 w-7 text-[#E93370]" />

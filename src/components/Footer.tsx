@@ -131,7 +131,7 @@ export const Footer = React.memo(() => {
           transition={{ duration: 0.6 }}
           className="mb-12"
         >
-          <div className="p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+          <div className="p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20">
             <div className="max-w-2xl mx-auto text-center">
               <h4 className="text-2xl text-white mb-2">
                 Stay in the Loop

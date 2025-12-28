@@ -99,7 +99,7 @@ export const DashboardPartners = React.memo(() => {
           placeholder="Search partners..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
+          className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-xl"
         />
       </div>
 
@@ -111,7 +111,7 @@ export const DashboardPartners = React.memo(() => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300"
+            className="p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-300"
           >
             <div className="flex items-start justify-between mb-4">
               <div className="w-16 h-16 rounded-xl bg-[#E93370]/10 flex items-center justify-center">
@@ -140,7 +140,7 @@ export const DashboardPartners = React.memo(() => {
                 size="sm"
                 variant="outline"
                 onClick={() => handleEdit(partner)}
-                className="flex-1 border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
+                className="flex-1 border-white/20 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
@@ -166,7 +166,7 @@ export const DashboardPartners = React.memo(() => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white">
+        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/20 text-white">
           <DialogHeader>
             <DialogTitle className="text-2xl">
               {editingPartner ? 'Edit Partner' : 'Add New Partner'}
@@ -181,7 +181,7 @@ export const DashboardPartners = React.memo(() => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter partner name"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
@@ -192,7 +192,7 @@ export const DashboardPartners = React.memo(() => {
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 placeholder="e.g., Music, Lifestyle, Technology"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
@@ -203,7 +203,7 @@ export const DashboardPartners = React.memo(() => {
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                 placeholder="example.com"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
 
@@ -214,7 +214,7 @@ export const DashboardPartners = React.memo(() => {
                 value={formData.logoUrl}
                 onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
                 placeholder="https://example.com/logo.png"
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
             </div>
           </div>
@@ -224,7 +224,7 @@ export const DashboardPartners = React.memo(() => {
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
               disabled={isProcessing}
-              className="border-white/10 text-white hover:bg-white/10"
+              className="border-white/20 text-white hover:bg-white/10"
             >
               Cancel
             </Button>

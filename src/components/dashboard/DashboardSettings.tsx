@@ -44,7 +44,7 @@ export const DashboardSettings = React.memo(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Globe className="h-5 w-5 text-[#E93370]" />
@@ -63,7 +63,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, siteName: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
               />
             </div>
 
@@ -75,7 +75,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, siteDescription: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
               />
             </div>
 
@@ -87,7 +87,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, tagline: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white min-h-[80px]"
+                className="bg-white/10 border-white/20 text-white min-h-[80px]"
               />
             </div>
 
@@ -122,7 +122,7 @@ export const DashboardSettings = React.memo(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Mail className="h-5 w-5 text-[#E93370]" />
@@ -145,7 +145,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
               />
             </div>
 
@@ -160,7 +160,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, socialMedia: { ...formData.socialMedia, instagram: e.target.value } })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
                 placeholder="@wildoutproject"
               />
             </div>
@@ -176,7 +176,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
               />
             </div>
           </CardContent>
@@ -189,7 +189,7 @@ export const DashboardSettings = React.memo(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Instagram className="h-5 w-5 text-[#E93370]" />
@@ -211,7 +211,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, socialMedia: { ...formData.socialMedia, instagram: e.target.value } })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
                 placeholder="https://instagram.com/username"
               />
             </div>
@@ -227,7 +227,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, socialMedia: { ...formData.socialMedia, twitter: e.target.value } })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
                 placeholder="https://twitter.com/username"
               />
             </div>
@@ -243,7 +243,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, socialMedia: { ...formData.socialMedia, facebook: e.target.value } })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
                 placeholder="https://facebook.com/page"
               />
             </div>
@@ -259,7 +259,7 @@ export const DashboardSettings = React.memo(() => {
                 onChange={(e) =>
                   setFormData({ ...formData, socialMedia: { ...formData.socialMedia, youtube: e.target.value } })
                 }
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
                 placeholder="https://youtube.com/@channel"
               />
             </div>
@@ -273,7 +273,7 @@ export const DashboardSettings = React.memo(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.3 }}
       >
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
           <CardHeader>
             <CardTitle>Brand Colors</CardTitle>
             <CardDescription className="text-white/60">
@@ -285,7 +285,7 @@ export const DashboardSettings = React.memo(() => {
               <div className="flex-1">
                 <Label>Primary Color</Label>
                 <div className="flex items-center space-x-3 mt-2">
-                  <div className="w-12 h-12 rounded-xl bg-[#E93370] border-2 border-white/10" />
+                  <div className="w-12 h-12 rounded-xl bg-[#E93370] border-2 border-white/20" />
                   <div>
                     <div className="text-white">#E93370</div>
                     <div className="text-sm text-white/60">WildOut Pink</div>
@@ -296,7 +296,7 @@ export const DashboardSettings = React.memo(() => {
               <div className="flex-1">
                 <Label>Background</Label>
                 <div className="flex items-center space-x-3 mt-2">
-                  <div className="w-12 h-12 rounded-xl bg-[#0a0a0a] border-2 border-white/10" />
+                  <div className="w-12 h-12 rounded-xl bg-[#0a0a0a] border-2 border-white/20" />
                   <div>
                     <div className="text-white">#0a0a0a</div>
                     <div className="text-sm text-white/60">Dark Background</div>

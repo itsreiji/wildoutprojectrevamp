@@ -19,6 +19,7 @@ import { useRouter } from '../Router';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import logo from '../../assets/logo.png';
+import type { User } from '@supabase/auth-js';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -42,10 +43,10 @@ export const DashboardLayout = React.memo(
     const { navigateTo } = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     React.useEffect(() => {
-      supabase.auth.getUser().then(({ data: { user } }) => {
+      supabase.auth.getUser().then(({ data: { user } }: { data: { user: User | null } }) => {
         setUser(user);
       });
     }, []);
@@ -62,7 +63,7 @@ export const DashboardLayout = React.memo(
     }, []);
 
     return (
-      <div className="dark min-h-screen bg-[#0a0a0a] text-white">
+      <div className="dark min-h-screen bg-black text-white">
         {/* Mobile Sidebar Backdrop */}
         <AnimatePresence>
           {sidebarOpen && isMobile && (
@@ -82,7 +83,7 @@ export const DashboardLayout = React.memo(
           animate={{
             x: isMobile ? (sidebarOpen ? 0 : -320) : 0,
           }}
-          className="fixed top-0 left-0 h-full w-80 bg-gradient-to-b from-[#1a0a14] to-[#0a0a0a] backdrop-blur-xl border-r border-[#E93370]/20 z-50 lg:translate-x-0"
+          className="fixed top-0 left-0 h-full w-80 bg-gradient-to-b from-[#2a0a1a] to-black backdrop-blur-xl border-r border-[#E93370]/20 z-50 lg:translate-x-0"
         >
           <div className="flex flex-col h-full">
             {/* Header */}
@@ -99,7 +100,7 @@ export const DashboardLayout = React.memo(
                 </motion.div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="lg:hidden w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                  className="lg:hidden w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white transition-colors"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -122,7 +123,7 @@ export const DashboardLayout = React.memo(
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                       isActive
                         ? 'bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20'
-                        : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                        : 'bg-white/10 text-white/70 hover:bg-white/15 hover:text-white'
                     }`}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0" />
@@ -165,12 +166,12 @@ export const DashboardLayout = React.memo(
         {/* Main Content */}
         <div className="lg:ml-80 min-h-screen">
           {/* Top Bar */}
-          <header className="sticky top-0 z-30 bg-black/40 backdrop-blur-xl border-b border-white/10">
+          <header className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-white/20">
             <div className="h-20 flex items-center justify-between px-4 lg:px-8">
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/70 hover:text-white"
+                  className="lg:hidden w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white/70 hover:text-white"
                 >
                   <Menu className="h-5 w-5" />
                 </button>
@@ -183,7 +184,7 @@ export const DashboardLayout = React.memo(
               </div>
 
               <div className="flex items-center space-x-3">
-                <div className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+                <div className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20">
                   <div className="w-8 h-8 rounded-full bg-[#E93370] flex items-center justify-center">
                     <span className="text-sm">
                       {user?.email?.[0].toUpperCase() || 'A'}

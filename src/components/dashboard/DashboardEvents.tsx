@@ -168,15 +168,15 @@ export const DashboardEvents = React.memo(() => {
           placeholder="Search events..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl"
+          className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-xl"
         />
       </div>
 
       {/* Events Table */}
-      <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+      <div className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-white/10 hover:bg-white/5">
+            <TableRow className="border-white/20 hover:bg-white/10">
               <TableHead className="text-white/80">Event Name</TableHead>
               <TableHead className="text-white/80">Date</TableHead>
               <TableHead className="text-white/80">Venue</TableHead>
@@ -190,7 +190,7 @@ export const DashboardEvents = React.memo(() => {
             {filteredEvents.map((event) => (
               <TableRow
                 key={event.id}
-                className="border-white/10 hover:bg-white/5 transition-colors"
+                className="border-white/20 hover:bg-white/10 transition-colors"
               >
                 <TableCell className="text-white">{event.title}</TableCell>
                 <TableCell className="text-white/70">
@@ -235,7 +235,7 @@ export const DashboardEvents = React.memo(() => {
                       size="sm"
                       variant="outline"
                       onClick={() => handleEdit(event)}
-                      className="border-white/10 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
+                      className="border-white/20 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -263,7 +263,7 @@ export const DashboardEvents = React.memo(() => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white max-w-2xl">
+        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/20 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl">
               {editingEvent ? 'Edit Event' : 'Create New Event'}
@@ -282,7 +282,7 @@ export const DashboardEvents = React.memo(() => {
                     setFormData({ ...formData, title: e.target.value })
                   }
                   placeholder="Enter event title"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
 
@@ -297,7 +297,7 @@ export const DashboardEvents = React.memo(() => {
                     onChange={(e) =>
                       setFormData({ ...formData, date: e.target.value })
                     }
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white/10 border-white/20 text-white"
                   />
                 </div>
 
@@ -312,7 +312,7 @@ export const DashboardEvents = React.memo(() => {
                       setFormData({ ...formData, capacity: e.target.value })
                     }
                     placeholder="e.g., 500"
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                   />
                 </div>
               </div>
@@ -327,7 +327,7 @@ export const DashboardEvents = React.memo(() => {
                     setFormData({ ...formData, venue: e.target.value })
                   }
                   placeholder="Enter venue name"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
 
@@ -341,7 +341,7 @@ export const DashboardEvents = React.memo(() => {
                     setFormData({ ...formData, category: e.target.value })
                   }
                   placeholder="e.g., Music Festival, Art Exhibition"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 />
               </div>
             </div>
@@ -351,7 +351,7 @@ export const DashboardEvents = React.memo(() => {
                 type="button"
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
-                className="border-white/10 text-white/70 hover:bg-white/5"
+                className="border-white/20 text-white/70 hover:bg-white/10"
               >
                 Cancel
               </Button>

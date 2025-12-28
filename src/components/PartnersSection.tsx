@@ -42,7 +42,7 @@ export const PartnersSection = React.memo(() => {
               transition={{ duration: 0.5, delay: index * 0.05 }}
               className="group relative"
             >
-              <div className="aspect-square p-8 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-500 flex flex-col items-center justify-center">
+              <div className="aspect-square p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-500 flex flex-col items-center justify-center">
                 {/* Logo Placeholder */}
                 <div className="w-full h-full flex items-center justify-center mb-2">
                   <div className="text-3xl md:text-4xl text-white/80 group-hover:text-[#E93370] transition-colors duration-300">

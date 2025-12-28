@@ -95,7 +95,7 @@ export const HeroSection = React.memo(() => {
             transition={{ duration: 0.8, delay: 0.8 }}
             className="grid grid-cols-3 gap-8 pt-12 w-full max-w-3xl"
           >
-            <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+            <div className="flex flex-col items-center p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20">
               <div className="text-3xl md:text-4xl text-[#E93370] mb-2">{hero.stats.events}</div>
               <div className="text-sm md:text-base text-white/60">Events</div>
             </div>

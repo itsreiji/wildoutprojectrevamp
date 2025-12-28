@@ -45,7 +45,7 @@ export const Background3D = React.memo(() => {
     let animationFrameId: number;
 
     const animate = () => {
-      ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
+      ctx.fillStyle = 'rgba(10, 10, 10, 0.15)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Update and draw particles
@@ -117,8 +117,8 @@ export const Background3D = React.memo(() => {
 
       {/* Gradient Overlays */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1 }}>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/80" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(233,51,112,0.1),transparent_70%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/60 to-black/90" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(233,51,112,0.15),transparent_70%)]" />
       </div>
 
       {/* Floating 3D Shapes */}

@@ -2,7 +2,7 @@ import logo from '../assets/logo.png';
 import { LayoutDashboard, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { memo, useEffect, useState } from 'react';
-import { useRouter } from './router';
+import { useRouter } from './Router';
 import { Link } from './router/Link';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ui/theme-toggle';
@@ -70,8 +70,8 @@ const NavigationComponent = () => {
       <motion.header
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-          ? 'bg-black/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20'
-          : 'bg-transparent'
+          ? 'bg-black/90 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20'
+          : 'bg-black/70 backdrop-blur-lg border-b border-white/5'
           }`}
         initial={{ y: -100 }}
       >

@@ -130,7 +130,7 @@ export const DashboardHome = React.memo(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="bg-gradient-to-br from-[#E93370]/20 to-transparent backdrop-blur-xl border-[#E93370]/30 hover:border-[#E93370]/50 transition-all">
+          <Card className="bg-gradient-to-br from-[#E93370]/30 to-[#E93370]/10 backdrop-blur-xl border-[#E93370]/40 hover:border-[#E93370]/60 transition-all">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -230,7 +230,7 @@ export const DashboardHome = React.memo(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.4 }}
         >
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <Card className="bg-white/10 backdrop-blur-xl border-white/20">
             <CardHeader>
               <CardTitle className="text-white">Event Status Distribution</CardTitle>
               <CardDescription className="text-white/60">Current state of all events</CardDescription>
@@ -274,7 +274,7 @@ export const DashboardHome = React.memo(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.5 }}
         >
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <Card className="bg-white/10 backdrop-blur-xl border-white/20">
             <CardHeader>
               <CardTitle className="text-white">Event Categories</CardTitle>
               <CardDescription className="text-white/60">Distribution by event type</CardDescription>
@@ -311,7 +311,7 @@ export const DashboardHome = React.memo(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.6 }}
         >
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <Card className="bg-white/10 backdrop-blur-xl border-white/20">
             <CardHeader>
               <CardTitle className="text-white">Events Trend</CardTitle>
               <CardDescription className="text-white/60">Monthly performance overview</CardDescription>
@@ -360,7 +360,7 @@ export const DashboardHome = React.memo(() => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.7 }}
         >
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+          <Card className="bg-white/10 backdrop-blur-xl border-white/20">
             <CardHeader>
               <CardTitle className="text-white">Recent Activity</CardTitle>
               <CardDescription className="text-white/60">Latest platform updates</CardDescription>
@@ -372,7 +372,7 @@ export const DashboardHome = React.memo(() => {
                   return (
                     <div
                       key={index}
-                      className="flex items-start space-x-4 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                      className="flex items-start space-x-4 p-3 rounded-xl bg-white/10 hover:bg-white/15 transition-colors"
                     >
                       <div className="w-10 h-10 rounded-lg bg-[#E93370]/20 flex items-center justify-center flex-shrink-0">
                         <Icon className="h-5 w-5 text-[#E93370]" />
@@ -400,7 +400,7 @@ export const DashboardHome = React.memo(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.8 }}
       >
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
           <CardHeader>
             <CardTitle className="text-white">Attendance Overview</CardTitle>
             <CardDescription className="text-white/60">
@@ -419,7 +419,7 @@ export const DashboardHome = React.memo(() => {
                 {events.slice(0, 3).map((event) => {
                   const rate = (event.attendees / event.capacity) * 100;
                   return (
-                    <div key={event.id} className="p-4 rounded-xl bg-white/5 border border-white/10">
+                    <div key={event.id} className="p-4 rounded-xl bg-white/10 border border-white/20">
                       <p className="text-sm text-white/90 mb-2 truncate">{event.title}</p>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs text-white/60">
@@ -443,22 +443,22 @@ export const DashboardHome = React.memo(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.9 }}
       >
-        <Card className="bg-gradient-to-br from-[#E93370]/10 to-transparent backdrop-blur-xl border-[#E93370]/20">
+        <Card className="bg-gradient-to-br from-[#E93370]/20 to-[#E93370]/5 backdrop-blur-xl border-[#E93370]/30">
           <CardHeader>
             <CardTitle className="text-white">Site Performance</CardTitle>
             <CardDescription className="text-white/60">Key metrics from hero section</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-center">
+              <div className="p-6 rounded-xl bg-white/10 border border-white/20 text-center">
                 <div className="text-4xl text-[#E93370] mb-2">{hero.stats.events}</div>
                 <div className="text-sm text-white/60">Events Hosted</div>
               </div>
-              <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-center">
+              <div className="p-6 rounded-xl bg-white/10 border border-white/20 text-center">
                 <div className="text-4xl text-[#E93370] mb-2">{hero.stats.members}</div>
                 <div className="text-sm text-white/60">Community Members</div>
               </div>
-              <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-center">
+              <div className="p-6 rounded-xl bg-white/10 border border-white/20 text-center">
                 <div className="text-4xl text-[#E93370] mb-2">{hero.stats.partners}</div>
                 <div className="text-sm text-white/60">Brand Partners</div>
               </div>

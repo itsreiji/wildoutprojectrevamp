@@ -40,8 +40,8 @@ export const ImageUpload = React.memo(({
         {label} {required && <span className="text-[#E93370]">*</span>}
       </Label>
       
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'url' | 'upload')} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white/5">
+      <Tabs value={activeTab} onValueChange={(v: 'url' | 'upload') => setActiveTab(v)} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-white/10">
           <TabsTrigger value="url" className="data-[state=active]:bg-[#E93370]">
             <Link2 className="h-4 w-4 mr-2" />
             URL
@@ -58,7 +58,7 @@ export const ImageUpload = React.memo(({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+            className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
           />
           <p className="text-xs text-white/40">
             Enter the direct URL to your image
@@ -67,7 +67,7 @@ export const ImageUpload = React.memo(({
 
         <TabsContent value="upload" className="space-y-2 mt-2">
           <div className="flex items-center justify-center w-full">
-            <label htmlFor="file-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-white/10 border-dashed rounded-xl cursor-pointer bg-white/5 hover:bg-white/10 transition-colors">
+            <label htmlFor="file-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-white/20 border-dashed rounded-xl cursor-pointer bg-white/10 hover:bg-white/15 transition-colors">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Upload className="w-8 h-8 mb-3 text-white/40" />
                 <p className="mb-2 text-sm text-white/60">
@@ -92,7 +92,7 @@ export const ImageUpload = React.memo(({
 
       {/* Preview */}
       {value && (
-        <div className="mt-3 rounded-xl overflow-hidden border border-white/10">
+        <div className="mt-3 rounded-xl overflow-hidden border border-white/20">
           <ImageWithFallback
             src={value}
             alt="Preview"

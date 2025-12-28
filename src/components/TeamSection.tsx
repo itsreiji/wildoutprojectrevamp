@@ -40,7 +40,7 @@ export const TeamSection = React.memo(() => {
               transition={{ duration: 0.5, delay: index * 0.05 }}
               className="group"
             >
-              <div className="relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 transition-all duration-300 h-full">
+              <div className="relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-300 h-full">
                 {/* Photo */}
                 <div className="relative h-72 overflow-hidden">
                   <ImageWithFallback

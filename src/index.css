@@ -247,7 +247,6 @@
   }
 
   img, svg, video, canvas, audio, iframe, embed, object {
-    vertical-align: middle;
     display: block;
   }
 
@@ -764,6 +763,7 @@
     -webkit-box-orient: vertical;
     display: -webkit-box;
     overflow: hidden;
+    line-clamp: 1;
   }
 
   .line-clamp-2 {
@@ -771,6 +771,7 @@
     -webkit-box-orient: vertical;
     display: -webkit-box;
     overflow: hidden;
+    line-clamp: 2;
   }
 
   .block {
@@ -3335,7 +3336,7 @@
 }
 
 .dark {
-  --background: #0a0a0a;
+  --background: #000;
   --foreground: oklch(.985 0 0);
   --card: oklch(.145 0 0);
   --card-foreground: oklch(.985 0 0);

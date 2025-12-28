@@ -43,7 +43,7 @@ export const DashboardHero = React.memo(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Sparkles className="h-5 w-5 text-[#E93370]" />
@@ -60,7 +60,7 @@ export const DashboardHero = React.memo(() => {
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-white/5 border-white/10 text-white text-2xl"
+                className="bg-white/10 border-white/20 text-white text-2xl"
                 placeholder="WildOut!"
               />
               <p className="text-xs text-white/40">Main brand name displayed prominently</p>
@@ -72,7 +72,7 @@ export const DashboardHero = React.memo(() => {
                 id="subtitle"
                 value={formData.subtitle}
                 onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                className="bg-white/5 border-white/10 text-white"
+                className="bg-white/10 border-white/20 text-white"
                 placeholder="Media Digital Nightlife & Event Multi-Platform"
               />
               <p className="text-xs text-white/40">Short tagline that appears below the title</p>
@@ -84,7 +84,7 @@ export const DashboardHero = React.memo(() => {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="bg-white/5 border-white/10 text-white min-h-[100px]"
+                className="bg-white/10 border-white/20 text-white min-h-[100px]"
                 placeholder="Indonesia's premier creative community..."
               />
               <p className="text-xs text-white/40">
@@ -93,7 +93,7 @@ export const DashboardHero = React.memo(() => {
             </div>
 
             {/* Stats Section */}
-            <div className="pt-6 border-t border-white/10">
+            <div className="pt-6 border-t border-white/20">
               <h3 className="text-lg mb-4 text-white/90">Statistics Display</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
@@ -107,7 +107,7 @@ export const DashboardHero = React.memo(() => {
                         stats: { ...formData.stats, events: e.target.value },
                       })
                     }
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white/10 border-white/20 text-white"
                     placeholder="500+"
                   />
                 </div>
@@ -123,7 +123,7 @@ export const DashboardHero = React.memo(() => {
                         stats: { ...formData.stats, members: e.target.value },
                       })
                     }
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white/10 border-white/20 text-white"
                     placeholder="50K+"
                   />
                 </div>
@@ -139,7 +139,7 @@ export const DashboardHero = React.memo(() => {
                         stats: { ...formData.stats, partners: e.target.value },
                       })
                     }
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-white/10 border-white/20 text-white"
                     placeholder="100+"
                   />
                 </div>
@@ -182,7 +182,7 @@ export const DashboardHero = React.memo(() => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <Card className="bg-white/5 backdrop-blur-xl border-white/10">
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
           <CardHeader>
             <CardTitle>Live Preview</CardTitle>
             <CardDescription className="text-white/60">
@@ -190,7 +190,7 @@ export const DashboardHero = React.memo(() => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="p-8 rounded-xl bg-black/40 border border-white/10 text-center space-y-6">
+            <div className="p-8 rounded-xl bg-black/50 border border-white/20 text-center space-y-6">
               <h1 className="text-5xl tracking-tight bg-gradient-to-r from-white via-[#E93370] to-white bg-clip-text text-transparent">
                 {formData.title || 'Your Title'}
               </h1>
@@ -201,15 +201,15 @@ export const DashboardHero = React.memo(() => {
                 {formData.description || 'Your description will appear here'}
               </p>
               <div className="grid grid-cols-3 gap-4 pt-8 max-w-2xl mx-auto">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="p-4 rounded-xl bg-white/10 border border-white/20">
                   <div className="text-2xl text-[#E93370]">{formData.stats.events || '0'}</div>
                   <div className="text-sm text-white/60">Events</div>
                 </div>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="p-4 rounded-xl bg-white/10 border border-white/20">
                   <div className="text-2xl text-[#E93370]">{formData.stats.members || '0'}</div>
                   <div className="text-sm text-white/60">Members</div>
                 </div>
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="p-4 rounded-xl bg-white/10 border border-white/20">
                   <div className="text-2xl text-[#E93370]">{formData.stats.partners || '0'}</div>
                   <div className="text-sm text-white/60">Partners</div>
                 </div>

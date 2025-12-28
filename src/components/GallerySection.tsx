@@ -83,7 +83,7 @@ export const GallerySection = React.memo(() => {
           <div className="flex justify-center gap-4">
             <a
               href="#"
-              className="px-6 py-3 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-[#E93370]/50 text-white transition-all duration-300"
+              className="px-6 py-3 rounded-xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 text-white transition-all duration-300"
             >
               Instagram
             </a>
