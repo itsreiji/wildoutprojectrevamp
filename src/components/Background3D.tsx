@@ -45,7 +45,7 @@ export const Background3D = React.memo(() => {
     let animationFrameId: number;
 
     const animate = () => {
-      ctx.fillStyle = 'rgba(10, 10, 10, 0.15)';
+      ctx.fillStyle = 'rgba(10, 10, 10, 0.50)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Update and draw particles
