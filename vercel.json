@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "VITE_SUPABASE_URL": "@vercel-supabase-url",
+    "VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY": "@vercel-supabase-publishable-key",
+    "VITE_APP_ENV": "production",
+    "VITE_ADMIN_BASE_PATH": "/admin",
+    "VITE_USE_DUMMY_DATA": "false"
+  },
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm build",
+  "devCommand": "pnpm dev",
+  "outputDirectory": "build"
+}

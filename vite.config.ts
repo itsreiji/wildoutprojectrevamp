@@ -54,6 +54,20 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      sourcemap: false,
+      minify: 'esbuild', // Use esbuild instead of terser (comes with Vite)
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react/jsx-runtime'],
+            ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
+            motion: ['motion'],
+            charts: ['recharts'],
+            forms: ['react-hook-form', 'zod'],
+            supabase: ['@jsr/supabase__supabase-js'],
+          },
+        },
+      },
     },
     server: {
       port: 3000,
