@@ -4,8 +4,7 @@
     "private": true,
     "packageManager": "bun@1.3.5",
     "engines": {
-        "node": ">=18.0.0",
-        "pnpm": ">=8.0.0"
+        "node": ">=18.0.0"
     },
     "dependencies": {
         "@jsr/supabase__supabase-js": "^2.90.0",
@@ -73,6 +72,6 @@
         "build:clean": "rm -rf build && vite build",
         "preview": "vite preview --port 3000",
         "test": "vitest run",
-        "vercel-build": "pnpm build"
+        "vercel-build": "bun run build"
     }
 }
