@@ -13,6 +13,7 @@ interface ImageUploadProps {
   label: string;
   placeholder?: string;
   required?: boolean;
+  compact?: boolean;
 }
 
 export const ImageUpload = React.memo(({
@@ -21,6 +22,7 @@ export const ImageUpload = React.memo(({
   label,
   placeholder = 'https://example.com/image.jpg',
   required = false,
+  compact = false,
 }: ImageUploadProps) => {
   const [activeTab, setActiveTab] = useState<'url' | 'upload'>('url');
   const [isDragging, setIsDragging] = useState(false);
@@ -79,7 +81,7 @@ export const ImageUpload = React.memo(({
       </div>
       
       <Tabs value={activeTab} onValueChange={(v: string) => setActiveTab(v as 'url' | 'upload')} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-white/[0.03] border border-white/5 p-1.5 rounded-2xl mb-6 h-14">
+        <TabsList className={`grid w-full grid-cols-2 bg-white/[0.03] border border-white/5 p-1.5 rounded-2xl mb-6 ${compact ? 'h-10 mb-4' : 'h-14'}`}>
           <TabsTrigger 
             value="url" 
             className="rounded-xl data-[state=active]:bg-[#E93370] data-[state=active]:text-white text-white/40 data-[state=active]:shadow-[0_0_20px_-5px_#E93370] transition-all duration-500 font-bold tracking-widest text-[10px] uppercase"
@@ -107,7 +109,7 @@ export const ImageUpload = React.memo(({
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
-                    className="bg-white/[0.02] border-white/5 text-white placeholder:text-white/10 h-14 pl-14 focus:border-[#E93370]/30 focus:bg-white/[0.05] rounded-xl transition-all w-full font-mono text-xs"
+                    className={`bg-white/[0.02] border-white/5 text-white placeholder:text-white/10 pl-14 focus:border-[#E93370]/30 focus:bg-white/[0.05] rounded-xl transition-all w-full font-mono text-xs ${compact ? 'h-11' : 'h-14'}`}
                   />
                   <Link2 className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-[#E93370] transition-colors" />
                 </div>
@@ -120,7 +122,9 @@ export const ImageUpload = React.memo(({
 
           <TabsContent value="upload" className="m-0">
             <div 
-              className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-500 overflow-hidden ${
+              className={`relative flex flex-col items-center justify-center w-full border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-500 overflow-hidden ${
+                compact ? 'h-32' : 'h-48'
+              } ${
                 isDragging 
                   ? 'border-[#E93370] bg-[#E93370]/10 scale-[1.01]' 
                   : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/10'
@@ -138,11 +142,11 @@ export const ImageUpload = React.memo(({
                 onChange={handleFileUpload}
               />
               
-              <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4 pointer-events-none z-20">
-                <div className={`p-4 rounded-2xl mb-4 transition-all duration-500 ${isDragging ? 'bg-[#E93370] text-white shadow-[0_0_20px_#E93370]' : 'bg-white/5 text-white/20'}`}>
-                   <Upload className="w-6 h-6" />
+              <div className={`flex flex-col items-center justify-center text-center px-4 pointer-events-none z-20 ${compact ? 'pt-2 pb-3' : 'pt-5 pb-6'}`}>
+                <div className={`rounded-2xl transition-all duration-500 ${compact ? 'p-2 mb-2' : 'p-4 mb-4'} ${isDragging ? 'bg-[#E93370] text-white shadow-[0_0_20px_#E93370]' : 'bg-white/5 text-white/20'}`}>
+                   <Upload className={compact ? 'w-4 h-4' : 'w-6 h-6'} />
                 </div>
-                <p className="mb-2 text-sm text-white/60 font-bold tracking-tight">
+                <p className={`text-white/60 font-bold tracking-tight ${compact ? 'text-xs mb-1' : 'text-sm mb-2'}`}>
                   <span className="text-[#E93370]">DRAG & DROP</span> OR CLICK
                 </p>
                 <p className="text-[9px] text-white/20 font-mono tracking-widest uppercase">PNG, JPG, GIF // MAX 10MB</p>
@@ -174,18 +178,18 @@ export const ImageUpload = React.memo(({
               initial={{ opacity: 0, scale: 0.98, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 10 }}
-              className="mt-6 w-full rounded-2xl overflow-hidden border border-white/10 bg-[#0A0A0A] relative group shadow-2xl"
+              className={`${compact ? 'mt-4' : 'mt-6'} w-full rounded-2xl overflow-hidden border border-white/10 bg-[#0A0A0A] relative group shadow-2xl`}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity z-10" />
               
               <ImageWithFallback
                 src={value}
                 alt="Preview"
-                className="w-full h-72 object-cover transition-transform duration-1000 group-hover:scale-110"
+                className={`w-full object-cover transition-transform duration-1000 group-hover:scale-110 ${compact ? 'h-48' : 'h-72'}`}
               />
               
               {/* Overlay Content */}
-              <div className="absolute inset-0 z-20 p-6 flex flex-col justify-between">
+              <div className={`absolute inset-0 z-20 flex flex-col justify-between ${compact ? 'p-4' : 'p-6'}`}>
                 <div className="flex justify-end">
                   <div className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
                     <span className="text-[9px] font-black tracking-[0.2em] text-white/60">LIVE PREVIEW</span>
@@ -199,8 +203,8 @@ export const ImageUpload = React.memo(({
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-white/40 text-[9px] font-mono truncate max-w-[200px]">{value.substring(0, 40)}...</p>
-                    <div className="p-2 rounded-full bg-[#E93370] text-white shadow-[0_0_15px_-3px_#E93370] scale-0 group-hover:scale-100 transition-transform duration-500">
-                      <ImageIcon size={14} />
+                    <div className={`rounded-full bg-[#E93370] text-white shadow-[0_0_15px_-3px_#E93370] scale-0 group-hover:scale-100 transition-transform duration-500 ${compact ? 'p-1.5' : 'p-2'}`}>
+                      <ImageIcon size={compact ? 12 : 14} />
                     </div>
                   </div>
                 </div>

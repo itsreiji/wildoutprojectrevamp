@@ -209,7 +209,7 @@ export const DashboardTeam = React.memo(() => {
       {/* Edit/Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent
-          className="!bg-black border border-white/10 text-white max-w-4xl w-[95vw] max-h-[90vh] flex flex-col shadow-2xl p-0 overflow-hidden rounded-2xl"
+          className="!bg-black border border-white/10 text-white max-w-2xl w-[95vw] max-h-[90vh] flex flex-col shadow-2xl p-0 overflow-hidden rounded-2xl"
           style={{ backgroundColor: 'black', opacity: 1 }}
         >
           <DialogHeader className="px-6 py-5 border-b border-white/5 flex-shrink-0">
@@ -220,9 +220,9 @@ export const DashboardTeam = React.memo(() => {
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-6">
-              {/* Primary Info Column */}
-              <div className="lg:col-span-7 space-y-5">
+            <div className="space-y-6">
+              {/* Primary Info */}
+              <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[9px] uppercase text-[#E93370] font-black tracking-[0.4em] ml-1">Full Name</Label>
@@ -245,67 +245,62 @@ export const DashboardTeam = React.memo(() => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-[9px] uppercase text-white/40 font-bold tracking-[0.4em] ml-1">Contact Email</Label>
-                  <Input
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="bg-white/[0.03] border-white/5 text-white focus:border-[#E93370]/50 focus:bg-white/[0.07] h-11 text-sm px-4 rounded-lg transition-all"
-                    placeholder="email@wildoutproject.com"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-[9px] uppercase text-white/40 font-bold tracking-[0.4em] ml-1">Social Profile (Instagram)</Label>
-                  <div className="relative">
-                    <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={14} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[9px] uppercase text-white/40 font-bold tracking-[0.4em] ml-1">Contact Email</Label>
                     <Input
-                      value={formData.instagram}
-                      onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
-                      className="bg-white/[0.03] border-white/5 text-white focus:border-[#E93370]/50 focus:bg-white/[0.07] h-11 text-sm pl-10 pr-4 rounded-lg transition-all"
-                      placeholder="https://instagram.com/username"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="bg-white/[0.03] border-white/5 text-white focus:border-[#E93370]/50 focus:bg-white/[0.07] h-11 text-sm px-4 rounded-lg transition-all"
+                      placeholder="email@wildoutproject.com"
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[9px] uppercase text-white/40 font-bold tracking-[0.4em] ml-1">Social Profile (Instagram)</Label>
+                    <div className="relative">
+                      <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={14} />
+                      <Input
+                        value={formData.instagram}
+                        onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                        className="bg-white/[0.03] border-white/5 text-white focus:border-[#E93370]/50 focus:bg-white/[0.07] h-11 text-sm pl-10 pr-4 rounded-lg transition-all"
+                        placeholder="@username"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="space-y-2 pt-1">
+                <div className="space-y-2">
                   <Label className="text-[9px] uppercase text-white/40 font-bold tracking-[0.4em] ml-1">Professional Biography</Label>
                   <Textarea
                     value={formData.bio}
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                    className="bg-white/[0.03] border-white/5 text-white focus:border-[#E93370]/50 focus:bg-white/[0.07] min-h-[140px] max-h-[180px] resize-y leading-relaxed text-sm p-4 rounded-lg transition-all"
+                    className="bg-white/[0.03] border-white/5 text-white focus:border-[#E93370]/50 focus:bg-white/[0.07] min-h-[100px] max-h-[140px] resize-y leading-relaxed text-sm p-4 rounded-lg transition-all"
                     placeholder="Brief professional overview..."
                   />
                 </div>
               </div>
 
-              {/* Media Column */}
-              <div className="lg:col-span-5 space-y-5">
+              {/* Media Section */}
+              <div className="space-y-5">
                 <div className="p-4 bg-white/[0.02] border border-white/5 rounded-lg space-y-4">
-                  <div className="space-y-1.5">
-                    <h4 className="text-white font-bold tracking-tight text-xs">IDENTITY IMAGE</h4>
-                    <p className="text-white/20 text-[8px] font-mono tracking-widest uppercase">:: HIGH RESOLUTION RECOMMENDED ::</p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <ImageUpload
-                      label=""
-                      value={formData.photoUrl}
-                      onChange={(url) => setFormData({ ...formData, photoUrl: url })}
-                    />
-                  </div>
-                </div>
-
-                <div className="p-4 bg-[#E93370]/5 border border-[#E93370]/10 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <div className="p-1.5 bg-[#E93370]/20 rounded text-[#E93370] flex-shrink-0">
-                      <Shield size={14} />
-                    </div>
+                  <div className="space-y-1.5 flex items-center justify-between">
                     <div>
-                      <h4 className="text-white font-bold text-[10px] mb-1 uppercase tracking-wider">Access Level: Member</h4>
-                      <p className="text-white/40 text-[9px] leading-relaxed">This profile will be visible on the public team directory. Ensure all information is accurate and matches the brand voice.</p>
+                      <h4 className="text-white font-bold tracking-tight text-xs uppercase">Identity Image</h4>
+                      <p className="text-white/20 text-[8px] font-mono tracking-widest uppercase">:: High resolution recommended ::</p>
+                    </div>
+                    <div className="flex items-center gap-2 px-2 py-1 bg-[#E93370]/10 rounded border border-[#E93370]/20">
+                      <Shield size={10} className="text-[#E93370]" />
+                      <span className="text-white/40 text-[8px] font-mono uppercase">Access: Member</span>
                     </div>
                   </div>
+
+                  <ImageUpload
+                     label=""
+                     value={formData.photoUrl}
+                     onChange={(url) => setFormData({ ...formData, photoUrl: url })}
+                     compact
+                   />
                 </div>
               </div>
             </div>

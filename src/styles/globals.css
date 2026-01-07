@@ -191,16 +191,16 @@ html {
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #E93370;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
