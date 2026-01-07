@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Calendar, MapPin, Clock, Users, X, Search, Filter, ChevronLeft } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, X, Search, Filter, ChevronLeft, Zap } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
@@ -71,7 +71,7 @@ export const AllEventsPage = React.memo(() => {
                   placeholder="Search events..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-xl h-12"
+                  className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-full h-12"
                 />
               </div>
               <div className="flex gap-2 overflow-x-auto pb-2">

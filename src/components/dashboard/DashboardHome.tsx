@@ -3,28 +3,82 @@ import { motion } from 'motion/react';
 import {
   Calendar,
   Users,
-  Image,
+  Image as ImageIcon,
   Handshake,
   TrendingUp,
-  TrendingDown,
   Activity,
-  Eye,
+  Zap,
   Clock,
+  ArrowUpRight,
+  MoreHorizontal
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
 import { useContent } from '../../contexts/ContentContext';
-import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, Cell } from 'recharts';
+
+// --- Sub-Components ---
+
+const StatBlock = ({ label, value, subValue, icon: Icon, color, delay }: any) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay, duration: 0.5 }}
+    className="relative group overflow-hidden rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300"
+  >
+    <div className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+    <div className="p-6 relative z-10">
+      <div className="flex justify-between items-start mb-4">
+        <div className={`p-3 rounded-xl bg-white/5 group-hover:bg-white/10 transition-colors ${color.replace('from-', 'text-').split(' ')[0]}`}>
+          <Icon size={24} />
+        </div>
+        {subValue && (
+          <div className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-white/5 text-emerald-400">
+            <TrendingUp size={12} />
+            {subValue}
+          </div>
+        )}
+      </div>
+      <h3 className="text-3xl font-bold text-white mb-1 tracking-tight">{value}</h3>
+      <p className="text-white/40 text-sm font-medium uppercase tracking-wider">{label}</p>
+    </div>
+    <div className="absolute bottom-0 left-0 w-full h-1 bg-white/5">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: '100%' }}
+        transition={{ delay: delay + 0.3, duration: 1 }}
+        className={`h-full bg-gradient-to-r ${color}`}
+      />
+    </div>
+  </motion.div>
+);
+
+const ActivityItem = ({ icon: Icon, title, time, type }: any) => (
+  <div className="flex items-center gap-4 p-4 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer border border-transparent hover:border-white/5">
+    <div className={`w-10 h-10 rounded-full flex items-center justify-center bg-white/5 group-hover:scale-110 transition-transform ${
+      type === 'event' ? 'text-blue-400' : type === 'team' ? 'text-purple-400' : 'text-pink-400'
+    }`}>
+      <Icon size={18} />
+    </div>
+    <div className="flex-1 min-w-0">
+      <h4 className="text-sm font-medium text-white truncate group-hover:text-blue-400 transition-colors">{title}</h4>
+      <p className="text-xs text-white/40 flex items-center gap-2">
+        <Clock size={10} />
+        {time}
+      </p>
+    </div>
+    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+      <ArrowUpRight size={16} className="text-white/40" />
+    </div>
+  </div>
+);
+
+// --- Main Component ---
 
 export const DashboardHome = React.memo(() => {
-  const { events, team, gallery, partners, hero } = useContent();
+  const { events, team, gallery, partners } = useContent();
 
   // Calculate statistics
   const stats = useMemo(() => {
     const upcomingEvents = events.filter((e) => e.status === 'upcoming').length;
-    const ongoingEvents = events.filter((e) => e.status === 'ongoing').length;
-    const completedEvents = events.filter((e) => e.status === 'completed').length;
     const totalAttendees = events.reduce((sum, e) => sum + e.attendees, 0);
     const totalCapacity = events.reduce((sum, e) => sum + e.capacity, 0);
     const avgAttendanceRate = totalCapacity > 0 ? (totalAttendees / totalCapacity) * 100 : 0;
@@ -32,440 +86,219 @@ export const DashboardHome = React.memo(() => {
     return {
       totalEvents: events.length,
       upcomingEvents,
-      ongoingEvents,
-      completedEvents,
       totalTeamMembers: team.length,
-      activeTeamMembers: team.filter((m) => m.status === 'active').length,
       totalGalleryImages: gallery.length,
       totalPartners: partners.length,
-      activePartners: partners.filter((p) => p.status === 'active').length,
       totalAttendees,
       avgAttendanceRate: Math.round(avgAttendanceRate),
     };
   }, [events, team, gallery, partners]);
 
-  // Event status distribution data
-  const eventStatusData = [
-    { name: 'Upcoming', value: stats.upcomingEvents, color: '#3B82F6' },
-    { name: 'Ongoing', value: stats.ongoingEvents, color: '#10B981' },
-    { name: 'Completed', value: stats.completedEvents, color: '#6B7280' },
+  // Mock data for charts
+  const activityData = [
+    { name: 'Mon', value: 400 },
+    { name: 'Tue', value: 300 },
+    { name: 'Wed', value: 550 },
+    { name: 'Thu', value: 450 },
+    { name: 'Fri', value: 650 },
+    { name: 'Sat', value: 800 },
+    { name: 'Sun', value: 700 },
   ];
-
-  // Event category distribution
-  const categoryData = useMemo(() => {
-    const categories = events.reduce((acc, event) => {
-      acc[event.category] = (acc[event.category] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return Object.entries(categories).map(([name, value]) => ({ name, value }));
-  }, [events]);
-
-  // Monthly events trend (mock data - in production, would be based on actual dates)
-  const monthlyTrendData = [
-    { month: 'Jan', events: 12, attendees: 450 },
-    { month: 'Feb', events: 15, attendees: 580 },
-    { month: 'Mar', events: 18, attendees: 720 },
-    { month: 'Apr', events: 22, attendees: 890 },
-    { month: 'May', events: 25, attendees: 1050 },
-    { month: 'Jun', events: 20, attendees: 820 },
-  ];
-
-  // Recent activity
-  const recentActivity = useMemo(() => {
-    const activities = [];
-
-    // Add recent events
-    events.slice(0, 3).forEach((event) => {
-      activities.push({
-        type: 'event',
-        action: 'Event created',
-        title: event.title,
-        time: 'Recently',
-        icon: Calendar,
-      });
-    });
-
-    // Add team updates
-    if (team.length > 0) {
-      activities.push({
-        type: 'team',
-        action: 'Team member added',
-        title: team[team.length - 1]?.name,
-        time: 'Recently',
-        icon: Users,
-      });
-    }
-
-    // Add gallery updates
-    if (gallery.length > 0) {
-      activities.push({
-        type: 'gallery',
-        action: 'Photo uploaded',
-        title: gallery[0]?.caption || 'New photo',
-        time: 'Recently',
-        icon: Image,
-      });
-    }
-
-    return activities.slice(0, 5);
-  }, [events, team, gallery]);
-
-  const COLORS = ['#E93370', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
-          Dashboard Overview
-        </h2>
-        <p className="text-white/60">Welcome back! Here's what's happening with your platform</p>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <motion.h1 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-4xl md:text-5xl font-bold text-white tracking-tighter mb-2"
+          >
+            SYSTEM <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E93370] to-purple-500">OVERVIEW</span>
+          </motion.h1>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-white/40 font-mono text-sm"
+          >
+            :: REAL-TIME MONITORING ACTIVE ::
+          </motion.p>
+        </div>
+        
+        <motion.button
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-6 py-3 bg-[#E93370] hover:bg-[#D61E5C] text-white rounded-xl font-bold text-sm tracking-wide shadow-[0_0_20px_-5px_#E93370] transition-all flex items-center gap-2"
+        >
+          <Zap size={18} fill="currentColor" />
+          QUICK ACTION
+        </motion.button>
       </div>
 
-      {/* Key Stats Cards */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatBlock
+          label="Total Events"
+          value={stats.totalEvents}
+          subValue={`+${stats.upcomingEvents} Upcoming`}
+          icon={Calendar}
+          color="from-blue-500 to-cyan-500"
+          delay={0.1}
+        />
+        <StatBlock
+          label="Total Attendees"
+          value={stats.totalAttendees.toLocaleString()}
+          subValue={`${stats.avgAttendanceRate}% Cap.`}
+          icon={Users}
+          color="from-[#E93370] to-purple-500"
+          delay={0.2}
+        />
+        <StatBlock
+          label="Media Assets"
+          value={stats.totalGalleryImages}
+          icon={ImageIcon}
+          color="from-amber-400 to-orange-500"
+          delay={0.3}
+        />
+        <StatBlock
+          label="Active Partners"
+          value={stats.totalPartners}
+          icon={Handshake}
+          color="from-emerald-400 to-green-500"
+          delay={0.4}
+        />
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Activity Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ delay: 0.5 }}
+          className="lg:col-span-2 bg-white/5 border border-white/10 rounded-3xl p-6 relative overflow-hidden isolate"
         >
-          <Card className="bg-gradient-to-br from-[#E93370]/30 to-[#E93370]/10 backdrop-blur-xl border-[#E93370]/40 hover:border-[#E93370]/60 transition-all">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/60 mb-1">Total Events</p>
-                  <h3 className="text-3xl text-white">{stats.totalEvents}</h3>
-                  <div className="flex items-center mt-2 text-xs text-green-400">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    <span>{stats.upcomingEvents} upcoming</span>
-                  </div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-[#E93370]/20 flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-[#E93370]" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+            <Activity size={120} />
+          </div>
+          <div className="flex items-center justify-between mb-6 relative z-10">
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-1">Engagement Metrics</h2>
+              <p className="text-white/40 text-sm">Weekly attendee engagement overview</p>
+            </div>
+            <div className="flex gap-2">
+               {['D', 'W', 'M', 'Y'].map((period, i) => (
+                  <button 
+                     key={period} 
+                     className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors ${i === 1 ? 'bg-[#E93370] text-white' : 'bg-white/5 text-white/40 hover:bg-white/10'}`}
+                  >
+                     {period}
+                  </button>
+               ))}
+            </div>
+          </div>
+          
+          <div className="h-[300px] w-full relative z-10">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={activityData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#E93370" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#E93370" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                  itemStyle={{ color: '#fff' }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="#E93370" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorValue)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
 
+        {/* Recent Activity Feed */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ delay: 0.6 }}
+          className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col h-full"
         >
-          <Card className="bg-gradient-to-br from-blue-500/20 to-transparent backdrop-blur-xl border-blue-500/30 hover:border-blue-500/50 transition-all">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/60 mb-1">Team Members</p>
-                  <h3 className="text-3xl text-white">{stats.totalTeamMembers}</h3>
-                  <div className="flex items-center mt-2 text-xs text-blue-400">
-                    <Activity className="h-3 w-3 mr-1" />
-                    <span>{stats.activeTeamMembers} active</span>
-                  </div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-blue-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <Card className="bg-gradient-to-br from-purple-500/20 to-transparent backdrop-blur-xl border-purple-500/30 hover:border-purple-500/50 transition-all">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/60 mb-1">Gallery Photos</p>
-                  <h3 className="text-3xl text-white">{stats.totalGalleryImages}</h3>
-                  <div className="flex items-center mt-2 text-xs text-purple-400">
-                    <Eye className="h-3 w-3 mr-1" />
-                    <span>Public collection</span>
-                  </div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                  <Image className="h-6 w-6 text-purple-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-        >
-          <Card className="bg-gradient-to-br from-green-500/20 to-transparent backdrop-blur-xl border-green-500/30 hover:border-green-500/50 transition-all">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white/60 mb-1">Partners</p>
-                  <h3 className="text-3xl text-white">{stats.totalPartners}</h3>
-                  <div className="flex items-center mt-2 text-xs text-green-400">
-                    <TrendingUp className="h-3 w-3 mr-1" />
-                    <span>{stats.activePartners} active</span>
-                  </div>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-                  <Handshake className="h-6 w-6 text-green-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Zap size={20} className="text-yellow-400" />
+              Live Feed
+            </h2>
+            <button className="p-2 hover:bg-white/5 rounded-lg text-white/40 hover:text-white transition-colors">
+              <MoreHorizontal size={20} />
+            </button>
+          </div>
+          
+          <div className="space-y-2 overflow-y-auto custom-scrollbar flex-1 pr-2">
+            {events.slice(0, 3).map((event, i) => (
+              <ActivityItem
+                key={`event-${i}`}
+                icon={Calendar}
+                title={`New Event: ${event.title}`}
+                time="2 hours ago"
+                type="event"
+              />
+            ))}
+            {team.length > 0 && (
+               <ActivityItem
+                  icon={Users}
+                  title={`Welcome ${team[team.length - 1].name}`}
+                  time="5 hours ago"
+                  type="team"
+               />
+            )}
+            <ActivityItem
+               icon={ImageIcon}
+               title="Gallery updated with 12 new photos"
+               time="1 day ago"
+               type="gallery"
+            />
+             <ActivityItem
+               icon={Handshake}
+               title="New partnership inquiry"
+               time="2 days ago"
+               type="partner"
+            />
+          </div>
+          
+          <button className="w-full mt-6 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-white/60 hover:text-white text-sm font-medium transition-colors">
+            View All Activity
+          </button>
         </motion.div>
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Event Status Distribution */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.4 }}
-        >
-          <Card className="bg-white/10 backdrop-blur-xl border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Event Status Distribution</CardTitle>
-              <CardDescription className="text-white/60">Current state of all events</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] min-h-[300px] w-full min-w-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={eventStatusData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {eventStatusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        color: 'white',
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Event Categories */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.5 }}
-        >
-          <Card className="bg-white/10 backdrop-blur-xl border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Event Categories</CardTitle>
-              <CardDescription className="text-white/60">Distribution by event type</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] min-h-[300px] w-full min-w-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryData}>
-                    <XAxis
-                      dataKey="name"
-                      stroke="#ffffff40"
-                      tick={{ fill: '#ffffff80' }}
-                    />
-                    <YAxis stroke="#ffffff40" tick={{ fill: '#ffffff80' }} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        color: 'white',
-                      }}
-                    />
-                    <Bar dataKey="value" fill="#E93370" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Monthly Trend */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.6 }}
-        >
-          <Card className="bg-white/10 backdrop-blur-xl border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Events Trend</CardTitle>
-              <CardDescription className="text-white/60">Monthly performance overview</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] min-h-[300px] w-full min-w-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={monthlyTrendData}>
-                    <defs>
-                      <linearGradient id="colorEvents" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#E93370" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#E93370" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis
-                      dataKey="month"
-                      stroke="#ffffff40"
-                      tick={{ fill: '#ffffff80' }}
-                    />
-                    <YAxis stroke="#ffffff40" tick={{ fill: '#ffffff80' }} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        color: 'white',
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="events"
-                      stroke="#E93370"
-                      fillOpacity={1}
-                      fill="url(#colorEvents)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.7 }}
-        >
-          <Card className="bg-white/10 backdrop-blur-xl border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Recent Activity</CardTitle>
-              <CardDescription className="text-white/60">Latest platform updates</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentActivity.map((activity, index) => {
-                  const Icon = activity.icon;
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-start space-x-4 p-3 rounded-xl bg-white/10 hover:bg-white/15 transition-colors"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-[#E93370]/20 flex items-center justify-center flex-shrink-0">
-                        <Icon className="h-5 w-5 text-[#E93370]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white/90">{activity.action}</p>
-                        <p className="text-sm text-white/60 truncate">{activity.title}</p>
-                        <p className="text-xs text-white/40 mt-1 flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {activity.time}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {['Server Status: Online', 'Database: Healthy', 'API Latency: 24ms', 'Last Backup: 1h ago'].map((status, i) => (
+             <motion.div 
+               key={i}
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               transition={{ delay: 0.8 + (i * 0.1) }}
+               className="bg-white/5 border border-white/5 rounded-xl p-3 text-xs font-mono text-white/40 flex items-center justify-center gap-2"
+             >
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                {status}
+             </motion.div>
+          ))}
       </div>
-
-      {/* Attendance Overview */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.8 }}
-      >
-        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
-          <CardHeader>
-            <CardTitle className="text-white">Attendance Overview</CardTitle>
-            <CardDescription className="text-white/60">
-              Total attendees across all events: {stats.totalAttendees.toLocaleString()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-white/80">Average Attendance Rate</span>
-                <span className="text-sm text-[#E93370]">{stats.avgAttendanceRate}%</span>
-              </div>
-              <Progress value={stats.avgAttendanceRate} className="h-3" />
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                {events.slice(0, 3).map((event) => {
-                  const rate = (event.attendees / event.capacity) * 100;
-                  return (
-                    <div key={event.id} className="p-4 rounded-xl bg-white/10 border border-white/20">
-                      <p className="text-sm text-white/90 mb-2 truncate">{event.title}</p>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs text-white/60">
-                          {event.attendees}/{event.capacity}
-                        </span>
-                        <span className="text-xs text-[#E93370]">{Math.round(rate)}%</span>
-                      </div>
-                      <Progress value={rate} className="h-2" />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.9 }}
-      >
-        <Card className="bg-gradient-to-br from-[#E93370]/20 to-[#E93370]/5 backdrop-blur-xl border-[#E93370]/30">
-          <CardHeader>
-            <CardTitle className="text-white">Site Performance</CardTitle>
-            <CardDescription className="text-white/60">Key metrics from hero section</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-xl bg-white/10 border border-white/20 text-center">
-                <div className="text-4xl text-[#E93370] mb-2">{hero.stats.events}</div>
-                <div className="text-sm text-white/60">Events Hosted</div>
-              </div>
-              <div className="p-6 rounded-xl bg-white/10 border border-white/20 text-center">
-                <div className="text-4xl text-[#E93370] mb-2">{hero.stats.members}</div>
-                <div className="text-sm text-white/60">Community Members</div>
-              </div>
-              <div className="p-6 rounded-xl bg-white/10 border border-white/20 text-center">
-                <div className="text-4xl text-[#E93370] mb-2">{hero.stats.partners}</div>
-                <div className="text-sm text-white/60">Brand Partners</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
     </div>
   );
 });

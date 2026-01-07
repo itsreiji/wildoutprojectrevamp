@@ -7,6 +7,7 @@ import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { useContent, Partner } from '../../contexts/ContentContext';
+import { ImageUpload } from './ImageUpload';
 import { toast } from 'sonner';
 
 export const DashboardPartners = React.memo(() => {
@@ -76,31 +77,35 @@ export const DashboardPartners = React.memo(() => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl mb-1 bg-gradient-to-r from-white to-[#E93370] bg-clip-text text-transparent">
-            Partner Management
-          </h2>
-          <p className="text-white/60">Manage brand partnerships - changes sync to landing page instantly</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">ALLIANCE NETWORK</h1>
+          <p className="text-white/40 font-mono text-sm">:: STRATEGIC PARTNERSHIPS & SPONSORS ::</p>
         </div>
-        <Button onClick={handleCreate} className="bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl">
+        <Button 
+          onClick={handleCreate} 
+          className="bg-[#E93370] hover:bg-[#E93370]/80 text-white rounded-xl shadow-[0_0_20px_rgba(233,51,112,0.3)] hover:shadow-[0_0_30px_rgba(233,51,112,0.5)] transition-all duration-300 border border-white/10"
+        >
           <Plus className="mr-2 h-4 w-4" />
-          Add Partner
+          NEW PARTNER
         </Button>
       </div>
 
       {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
-        <Input
-          type="text"
-          placeholder="Search partners..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 bg-white/10 border-white/20 text-white placeholder:text-white/40 rounded-xl"
-        />
+      <div className="relative group">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#E93370]/20 to-blue-600/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40 group-focus-within:text-[#E93370] transition-colors duration-300" />
+          <Input
+            type="text"
+            placeholder="SEARCH NETWORK..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-12 h-12 bg-black/40 border-white/10 text-white placeholder:text-white/20 rounded-full focus:border-[#E93370]/50 focus:ring-[#E93370]/20 transition-all duration-300"
+          />
+        </div>
       </div>
 
       {/* Partners Grid */}
@@ -111,45 +116,47 @@ export const DashboardPartners = React.memo(() => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
-            className="p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-300"
+            className="group relative p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#E93370]/50 hover:bg-white/[0.07] transition-all duration-300"
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-16 h-16 rounded-xl bg-[#E93370]/10 flex items-center justify-center">
-                <span className="text-2xl text-[#E93370]">{partner.name.charAt(0)}</span>
+            <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <ExternalLink className="h-4 w-4 text-white/40" />
+            </div>
+
+            <div className="flex items-start justify-between mb-6">
+              <div className="w-16 h-16 rounded-xl bg-[#E93370]/10 border border-[#E93370]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                {partner.logoUrl ? (
+                  <img src={partner.logoUrl} alt={partner.name} className="w-10 h-10 object-contain opacity-80 group-hover:opacity-100" />
+                ) : (
+                  <span className="text-2xl font-bold text-[#E93370]">{partner.name.charAt(0)}</span>
+                )}
               </div>
-              <Badge className={partner.status === 'active' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-gray-500/20 text-gray-400 border-gray-500/30'}>
-                {partner.status}
+              <Badge className={`border ${partner.status === 'active' 
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                : 'bg-white/5 text-white/40 border-white/10'
+              }`}>
+                {partner.status.toUpperCase()}
               </Badge>
             </div>
 
-            <h3 className="text-xl text-white mb-2">{partner.name}</h3>
-            <p className="text-sm text-white/60 mb-4">{partner.category}</p>
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-white mb-1 group-hover:text-[#E93370] transition-colors">{partner.name}</h3>
+              <p className="text-sm text-white/40 font-mono uppercase">{partner.category}</p>
+            </div>
 
-            <a
-              href={`https://${partner.website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-sm text-[#E93370] hover:text-[#E93370]/80 mb-4"
-            >
-              <ExternalLink className="h-4 w-4" />
-              <span>{partner.website}</span>
-            </a>
-
-            <div className="flex space-x-2">
+            <div className="flex items-center gap-3 mt-auto">
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => handleEdit(partner)}
-                className="flex-1 border-white/20 text-white/70 hover:bg-white/10 hover:text-white rounded-lg"
+                className="flex-1 border-white/10 text-white/60 hover:bg-white/5 hover:text-white rounded-lg h-10"
               >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
+                EDIT DETAILS
               </Button>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => handleDelete(partner.id)}
-                className="border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-lg"
+                className="w-10 h-10 border-red-500/20 text-red-400/60 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/40 rounded-lg p-0"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -159,74 +166,84 @@ export const DashboardPartners = React.memo(() => {
       </div>
 
       {filteredPartners.length === 0 && (
-        <div className="text-center py-12 text-white/60">
-          No partners found. Add your first partner!
-        </div>
+        <div className="flex flex-col items-center justify-center py-24 border border-white/5 rounded-3xl bg-white/[0.02]">
+           <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 animate-pulse">
+             <Search className="h-10 w-10 text-white/20" />
+           </div>
+           <p className="text-white/40 font-mono text-sm">:: NO PARTNERS FOUND ::</p>
+           <Button 
+             variant="link" 
+             onClick={handleCreate}
+             className="text-[#E93370] hover:text-[#E93370]/80 mt-2"
+           >
+             ESTABLISH NEW PARTNERSHIP
+           </Button>
+         </div>
       )}
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 backdrop-blur-xl border-white/20 text-white">
+        <DialogContent className="bg-[#0a0a0a] border-white/10 text-white sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl">
-              {editingPartner ? 'Edit Partner' : 'Add New Partner'}
+            <DialogTitle className="text-2xl font-bold tracking-tight">
+              {editingPartner ? 'EDIT PARTNERSHIP' : 'NEW ALLIANCE'}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-6 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Partner Name</Label>
+              <Label htmlFor="name" className="text-[10px] uppercase text-white/40 font-bold tracking-widest">Partner Entity Name</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter partner name"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                placeholder="Enter organization name..."
+                className="bg-[#0A0A0A] border-white/10 text-white placeholder:text-white/20 focus:border-[#E93370]/50"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category" className="text-[10px] uppercase text-white/40 font-bold tracking-widest">Industry / Category</Label>
               <Input
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="e.g., Music, Lifestyle, Technology"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                placeholder="e.g., TECH, AUDIO, LIFESTYLE"
+                className="bg-[#0A0A0A] border-white/10 text-white placeholder:text-white/20 focus:border-[#E93370]/50"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="website">Website</Label>
+              <Label htmlFor="website" className="text-[10px] uppercase text-white/40 font-bold tracking-widest">Digital Presence</Label>
               <Input
                 id="website"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                placeholder="example.com"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                placeholder="domain.com"
+                className="bg-[#0A0A0A] border-white/10 text-white placeholder:text-white/20 focus:border-[#E93370]/50"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="logoUrl">Logo URL</Label>
+              <Label htmlFor="logoUrl" className="text-[10px] uppercase text-white/40 font-bold tracking-widest">Brand Asset URL</Label>
               <Input
                 id="logoUrl"
                 value={formData.logoUrl}
                 onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
-                placeholder="https://example.com/logo.png"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                placeholder="https://..."
+                className="bg-[#0A0A0A] border-white/10 text-white placeholder:text-white/20 focus:border-[#E93370]/50"
               />
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
               disabled={isProcessing}
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-white/10 text-white/60 hover:bg-white/5 hover:text-white"
             >
-              Cancel
+              CANCEL
             </Button>
             <Button
               onClick={handleSubmit}
@@ -240,10 +257,10 @@ export const DashboardPartners = React.memo(() => {
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     className="mr-2 h-4 w-4 border-2 border-white/20 border-t-white rounded-full"
                   />
-                  Saving...
+                  PROCESSING...
                 </>
               ) : (
-                editingPartner ? 'Update Partner' : 'Add Partner'
+                editingPartner ? 'UPDATE RECORDS' : 'INITIATE PARTNERSHIP'
               )}
             </Button>
           </DialogFooter>

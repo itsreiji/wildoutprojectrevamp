@@ -15,7 +15,7 @@ import {
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Event } from "./EventsSection";
+import { Event } from "../contexts/ContentContext";
 
 interface EventDetailModalProps {
   event: Event | null;

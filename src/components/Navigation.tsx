@@ -1,5 +1,5 @@
 import logo from '../assets/logo.png';
-import { LayoutDashboard, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Menu, X, Zap } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { memo, useEffect, useState } from 'react';
 import { useRouter } from './Router';
@@ -84,7 +84,7 @@ const NavigationComponent = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <img alt="WildOut!" className="h-full w-auto object-contain" src={logo} />
+                <img src={logo} alt="WildOut!" className="h-full w-auto object-contain" />
               </motion.div>
             </Link>
 

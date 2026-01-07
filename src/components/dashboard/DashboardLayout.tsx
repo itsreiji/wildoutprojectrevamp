@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard,
@@ -10,16 +10,15 @@ import {
   Menu,
   X,
   LogOut,
-  ChevronLeft,
   Sparkles,
   Info,
+  Zap,
 } from 'lucide-react';
-import { Button } from '../ui/button';
 import { useRouter } from '../Router';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import logo from '../../assets/logo.png';
 import type { User } from '@supabase/auth-js';
+import logo from '../../assets/logo.png';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -45,14 +44,13 @@ export const DashboardLayout = React.memo(
     const [isMobile, setIsMobile] = useState(false);
     const [user, setUser] = useState<User | null>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
       supabase.auth.getUser().then(({ data: { user } }: { data: { user: User | null } }) => {
         setUser(user);
       });
     }, []);
 
-    // Detect screen size
-    React.useEffect(() => {
+    useEffect(() => {
       const checkMobile = () => {
         setIsMobile(window.innerWidth < 1024);
       };
@@ -62,8 +60,25 @@ export const DashboardLayout = React.memo(
       return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    const handleLogout = async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast.error('Error signing out');
+      } else {
+        toast.success('Signed out successfully');
+        navigateTo('login');
+      }
+    };
+
     return (
-      <div className="dark min-h-screen bg-black text-white">
+      <div className="dark min-h-screen bg-[#050505] text-white selection:bg-[#E93370] selection:text-white overflow-hidden font-sans">
+        {/* Ambient Background Noise/Gradient */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
+          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-[#E93370]/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]" />
+        </div>
+
         {/* Mobile Sidebar Backdrop */}
         <AnimatePresence>
           {sidebarOpen && isMobile && (
@@ -71,7 +86,7 @@ export const DashboardLayout = React.memo(
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:hidden"
               onClick={() => setSidebarOpen(false)}
             />
           )}
@@ -83,127 +98,122 @@ export const DashboardLayout = React.memo(
           animate={{
             x: isMobile ? (sidebarOpen ? 0 : -320) : 0,
           }}
-          className="fixed top-0 left-0 h-full w-80 bg-gradient-to-b from-[#2a0a1a] to-black backdrop-blur-xl border-r border-[#E93370]/20 z-50 lg:translate-x-0"
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className="fixed top-0 left-0 h-full w-72 bg-black/40 backdrop-blur-2xl border-r border-white/5 z-50 lg:translate-x-0 flex flex-col"
         >
-          <div className="flex flex-col h-full">
-            {/* Header */}
-            <div className="h-20 px-6 flex items-center border-b border-[#E93370]/20">
-              <div className="flex items-center justify-between w-full">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  whileHover={{ scale: 1.02 }}
-                  className="cursor-pointer"
-                  onClick={() => navigateTo('landing')}
-                >
-                  <img src={logo} alt="WildOut!" className="h-12 w-auto object-contain" />
-                </motion.div>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="lg:hidden w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white/60 hover:text-white transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
+          {/* Header */}
+          <div className="h-24 px-8 flex items-center justify-between border-b border-white/5">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="cursor-pointer flex items-center gap-3"
+              onClick={() => navigateTo('landing')}
+            >
+              <img src={logo} alt="WildOut!" className="h-10 w-auto object-contain" />
+            </motion.div>
+            {isMobile && (
+               <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-white/50 hover:text-white">
+                  <X size={24} />
+               </button>
+            )}
+          </div>
 
-            {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-              {NAVIGATION_ITEMS.map((item) => {
-                const Icon = item.icon;
-                const isActive = currentPage === item.id;
-
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      onNavigate(item.id);
-                      setSidebarOpen(false);
-                    }}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                      isActive
-                        ? 'bg-[#E93370] text-white shadow-lg shadow-[#E93370]/20'
-                        : 'bg-white/10 text-white/70 hover:bg-white/15 hover:text-white'
+          {/* Navigation */}
+          <nav className="flex-1 px-4 py-8 space-y-2 overflow-y-auto custom-scrollbar">
+            {NAVIGATION_ITEMS.map((item) => {
+              const isActive = currentPage === item.id;
+              return (
+                <motion.button
+                  key={item.id}
+                  onClick={() => {
+                    onNavigate(item.id);
+                    if (isMobile) setSidebarOpen(false);
+                  }}
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 group relative overflow-hidden ${
+                    isActive
+                      ? 'bg-white/10 text-white shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)]'
+                      : 'text-white/40 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute inset-0 bg-gradient-to-r from-[#E93370]/20 to-transparent opacity-50"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    />
+                  )}
+                  <item.icon
+                    size={20}
+                    className={`relative z-10 transition-colors duration-300 ${
+                      isActive ? 'text-[#E93370]' : 'text-current group-hover:text-[#E93370]'
                     }`}
-                  >
-                    <Icon className="h-5 w-5 flex-shrink-0" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+                  />
+                  <span className="font-medium tracking-wide relative z-10">{item.label}</span>
+                  
+                  {isActive && (
+                     <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-[#E93370] shadow-[0_0_10px_#E93370]" />
+                  )}
+                </motion.button>
+              );
+            })}
+          </nav>
 
-            {/* Footer Actions */}
-            <div className="p-4 border-t border-[#E93370]/20 space-y-2">
-              <Button
-                variant="outline"
-                className="w-full bg-transparent border-[#E93370]/20 text-white/70 hover:bg-[#E93370]/10 hover:text-white rounded-xl"
-                onClick={() => navigateTo('landing')}
-              >
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Back to Site
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full bg-transparent border-[#E93370]/20 text-[#E93370] hover:bg-[#E93370]/10 hover:text-[#E93370] hover:border-[#E93370]/50 rounded-xl"
-                onClick={async () => {
-                  const { error } = await supabase.auth.signOut();
-                  if (error) {
-                    toast.error('Failed to logout');
-                  } else {
-                    toast.success('Logged out successfully');
-                    navigateTo('landing');
-                  }
-                }}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
+          {/* User Profile / Logout */}
+          <div className="p-8 border-t border-white/5 bg-black/20">
+            <div className="flex items-center gap-4 mb-4">
+               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#E93370] to-purple-600 flex items-center justify-center text-sm font-bold shadow-lg">
+                  {user?.email?.[0].toUpperCase() || 'A'}
+               </div>
+               <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate text-white">{user?.email}</p>
+                  <p className="text-xs text-white/40">Administrator</p>
+               </div>
             </div>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 border border-red-500/20 hover:border-red-500"
+            >
+              <LogOut size={18} />
+              <span className="font-medium text-sm">Sign Out</span>
+            </motion.button>
           </div>
         </motion.aside>
 
         {/* Main Content */}
-        <div className="lg:ml-80 min-h-screen">
-          {/* Top Bar */}
-          <header className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-white/20">
-            <div className="h-20 flex items-center justify-between px-4 lg:px-8">
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white/70 hover:text-white"
-                >
-                  <Menu className="h-5 w-5" />
-                </button>
-                <div>
-                  <h2 className="text-xl">
-                    {NAVIGATION_ITEMS.find((item) => item.id === currentPage)?.label}
-                  </h2>
-                  <p className="text-sm text-white/60">Manage your content</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <div className="hidden md:flex items-center space-x-2 px-4 py-2 rounded-xl bg-white/10 border border-white/20">
-                  <div className="w-8 h-8 rounded-full bg-[#E93370] flex items-center justify-center">
-                    <span className="text-sm">
-                      {user?.email?.[0].toUpperCase() || 'A'}
-                    </span>
-                  </div>
-                  <div className="text-sm">
-                    <div className="text-white">
-                      {user?.user_metadata?.full_name || 'Admin User'}
-                    </div>
-                    <div className="text-white/60 text-xs">{user?.email || 'admin@wildoutproject.com'}</div>
-                  </div>
-                </div>
-              </div>
+        <main
+          className={`relative min-h-screen transition-all duration-300 lg:ml-72 flex flex-col z-10`}
+        >
+          {/* Mobile Header */}
+          <div className="lg:hidden h-20 px-8 flex items-center justify-between border-b border-white/10 bg-black/40 backdrop-blur-xl sticky top-0 z-30">
+            <div className="flex items-center gap-3">
+               <img src={logo} alt="WildOut!" className="h-8 w-auto object-contain" />
             </div>
-          </header>
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 text-white/70 hover:text-white bg-white/5 rounded-lg"
+            >
+              <Menu size={24} />
+            </button>
+          </div>
 
-          {/* Page Content */}
-          <main className="p-4 lg:p-8">{children}</main>
-        </div>
+          <div className="flex-1 p-6 lg:p-10 overflow-x-hidden">
+            <motion.div
+               key={currentPage}
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.4, ease: "easeOut" }}
+               className="max-w-7xl mx-auto"
+            >
+               {children}
+            </motion.div>
+          </div>
+        </main>
       </div>
     );
   }

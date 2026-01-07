@@ -569,8 +569,12 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
       // Find added/updated members
       for (const member of teamData) {
         const oldMember = oldTeam.find(m => m.id === member.id);
-        if (!oldMember || JSON.stringify(oldMember) !== JSON.stringify(member)) {
+        if (!oldMember) {
+          // New member
           await apiClient.createTeamMember(member);
+        } else if (JSON.stringify(oldMember) !== JSON.stringify(member)) {
+          // Updated member
+          await apiClient.updateTeamMember(member.id, member);
         }
       }
 
