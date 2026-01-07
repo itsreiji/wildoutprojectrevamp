@@ -6,7 +6,8 @@ import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
-import { useContent, Event } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContextCore';
+import { Event } from '../types/content';
 import { useRouter } from './Router';
 import logo from '../assets/logo.png';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Instagram, Twitter, Facebook, Youtube, Mail, MapPin, Zap } from 'lucide-react';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContextCore';
 import logo from '../assets/logo.png';
 
 const FOOTER_LINKS = {

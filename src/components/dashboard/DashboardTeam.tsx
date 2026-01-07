@@ -7,7 +7,8 @@ import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Textarea } from '../ui/textarea';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
-import { useContent, TeamMember } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContextCore';
+import { TeamMember } from '../../types/content';
 import { toast } from 'sonner';
 import { ImageUpload } from './ImageUpload';
 

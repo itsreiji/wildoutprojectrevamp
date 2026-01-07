@@ -13,7 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { ImageUpload } from './ImageUpload';
-import { useContent, Event } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContextCore';
+import { Event } from '../../types/content';
 import { toast } from 'sonner';
 
 export const DashboardEventsNew = React.memo(() => {

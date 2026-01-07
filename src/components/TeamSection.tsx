@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Mail, Instagram, Linkedin, Twitter } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContextCore';
 
 export const TeamSection = React.memo(() => {
   const { team } = useContent();

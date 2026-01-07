@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Heart, Zap, Users, Sparkles } from 'lucide-react';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContextCore';
 
 const ICON_MAP: Record<number, any> = {
   0: Heart,

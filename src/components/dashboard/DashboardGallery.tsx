@@ -9,7 +9,8 @@ import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { ImageUpload } from './ImageUpload';
-import { useContent, GalleryImage } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContextCore';
+import { GalleryImage } from '../../types/content';
 import { toast } from 'sonner';
 
 export const DashboardGallery = React.memo(() => {

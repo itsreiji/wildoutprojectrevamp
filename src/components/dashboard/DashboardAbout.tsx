@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
-import { useContent } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContextCore';
 import { toast } from 'sonner';
 
 export const DashboardAbout = React.memo(() => {

@@ -13,7 +13,8 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { EventDetailModal } from './EventDetailModal';
-import { useContent, Event } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContextCore';
+import { Event } from '../types/content';
 import { useRouter } from './Router';
 
 export const EventsSection = React.memo(() => {

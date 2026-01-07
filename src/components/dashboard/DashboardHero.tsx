@@ -6,7 +6,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-import { useContent } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContextCore';
 import { toast } from 'sonner';
 
 export const DashboardHero = React.memo(() => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Sparkles } from 'lucide-react';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContextCore';
 
 export const PartnersSection = React.memo(() => {
   const { partners } = useContent();

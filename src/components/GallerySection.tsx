@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../contexts/ContentContextCore';
 
 const SPAN_PATTERNS = [
   'col-span-2 row-span-2',

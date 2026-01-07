@@ -6,8 +6,8 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { Badge } from '../ui/badge';
-import { useContent, Partner } from '../../contexts/ContentContext';
-import { ImageUpload } from './ImageUpload';
+import { useContent } from '../../contexts/ContentContextCore';
+import { Partner } from '../../types/content';
 import { toast } from 'sonner';
 
 export const DashboardPartners = React.memo(() => {
@@ -97,7 +97,6 @@ export const DashboardPartners = React.memo(() => {
         toast.success('Partner updated successfully!');
       } else {
         const newPartner: Partner = {
-          id: formData.id,
           ...formData,
           status: 'active',
         };

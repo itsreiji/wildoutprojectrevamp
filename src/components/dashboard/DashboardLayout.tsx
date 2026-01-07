@@ -20,7 +20,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import type { User } from '@supabase/auth-js';
 import logo from '../../assets/logo.png';
-import { useContent } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContextCore';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

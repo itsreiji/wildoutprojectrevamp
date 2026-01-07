@@ -12,7 +12,7 @@ import {
   ArrowUpRight,
   MoreHorizontal
 } from 'lucide-react';
-import { useContent } from '../../contexts/ContentContext';
+import { useContent } from '../../contexts/ContentContextCore';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, BarChart, Bar, Cell } from 'recharts';
 
 // --- Sub-Components ---
