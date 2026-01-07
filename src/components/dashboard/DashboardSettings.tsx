@@ -31,10 +31,37 @@ export const DashboardSettings = React.memo(() => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await updateSettings(formData);
+      // Validate required fields before sending
+      if (!formData.siteName || formData.siteName.trim().length === 0) {
+        toast.error('Site name is required');
+        setIsSaving(false);
+        return;
+      }
+
+      if (!formData.email || !formData.email.includes('@')) {
+        toast.error('Valid email is required');
+        setIsSaving(false);
+        return;
+      }
+
+      // Ensure socialMedia object has all required fields
+      const cleanData = {
+        ...formData,
+        socialMedia: {
+          instagram: formData.socialMedia?.instagram || '',
+          twitter: formData.socialMedia?.twitter || '',
+          facebook: formData.socialMedia?.facebook || '',
+          youtube: formData.socialMedia?.youtube || '',
+        }
+      };
+
+      console.log("📤 Sending clean data:", cleanData);
+      await updateSettings(cleanData);
       toast.success('System configuration updated successfully!');
-    } catch (error) {
-      toast.error('Failed to update system configuration');
+    } catch (error: any) {
+      console.error("❌ Save failed:", error);
+      const errorMsg = error.message || 'Failed to update system configuration';
+      toast.error(errorMsg);
     } finally {
       setIsSaving(false);
     }

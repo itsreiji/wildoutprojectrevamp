@@ -155,6 +155,7 @@ try {
 - Framework: Vitest
 - Schema tests: `*.test.ts` alongside schemas
 - Run single test: `pnpm test -- -t "test name"`
+- All schema tests should pass before deploying Edge Functions
 
 ### Important Notes
 
@@ -201,3 +202,10 @@ try {
 - Call `refresh()` from `useContent()`
 - Check browser console for API errors
 - Verify Edge Function deployment
+
+**Validation Failed (400)**: Settings save fails with "Validation Failed":
+- **Cause**: Edge Function on Supabase has outdated schemas/validation
+- **Solution**: Deploy updated Edge Function: `supabase functions deploy make-server-41a567c3`
+- **Debug**: Check browser console for detailed error info
+- **Verify**: Client-side validation runs first in `apiClient.updateSettings()` with detailed logging
+- **Common issues**: Missing socialMedia fields, invalid email format, empty siteName

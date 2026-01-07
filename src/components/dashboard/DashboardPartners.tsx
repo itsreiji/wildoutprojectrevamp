@@ -11,13 +11,14 @@ import { ImageUpload } from './ImageUpload';
 import { toast } from 'sonner';
 
 export const DashboardPartners = React.memo(() => {
-  const { partners, updatePartners } = useContent();
+  const { partners, updatePartners, refresh } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
-  const [formData, setFormData] = useState({ name: '', category: '', website: '', logoUrl: '' });
+  const [formData, setFormData] = useState({ id: '', name: '', category: '', website: '', logoUrl: '' });
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const filteredPartners = partners.filter((partner) =>
     partner.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -25,24 +26,38 @@ export const DashboardPartners = React.memo(() => {
 
   const handleCreate = () => {
     setEditingPartner(null);
-    setFormData({ name: '', category: '', website: '', logoUrl: '' });
+    setFormData({ id: '', name: '', category: '', website: '', logoUrl: '' });
     setIsDialogOpen(true);
   };
 
   const handleEdit = (partner: Partner) => {
     setEditingPartner(partner);
-    setFormData({ name: partner.name, category: partner.category, website: partner.website, logoUrl: partner.logoUrl || '' });
+    setFormData({ id: partner.id, name: partner.name, category: partner.category, website: partner.website, logoUrl: partner.logoUrl || '' });
     setIsDialogOpen(true);
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refresh();
+      toast.success('Data refreshed from server');
+    } catch (error: any) {
+      toast.error('Failed to refresh data: ' + error.message);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this partner?')) {
       setIsProcessing(true);
       try {
-        await updatePartners(partners.filter((p) => p.id !== id));
+        const updatedPartners = partners.filter((p) => p.id !== id);
+        await updatePartners(updatedPartners);
         toast.success('Partner deleted successfully!');
-      } catch (error) {
-        toast.error('Failed to delete partner');
+      } catch (error: any) {
+        console.error('Delete error:', error);
+        toast.error('Failed to delete partner: ' + error.message);
       } finally {
         setIsProcessing(false);
       }
@@ -50,27 +65,52 @@ export const DashboardPartners = React.memo(() => {
   };
 
   const handleSubmit = async () => {
+    if (!formData.id.trim()) {
+      toast.error('ID is required for organization');
+      return;
+    }
+    if (!formData.name.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+    if (!formData.website.trim()) {
+      toast.error('Website is required');
+      return;
+    }
+
+    // Check for duplicate ID when creating
+    if (!editingPartner) {
+      const duplicateId = partners.find(p => p.id === formData.id);
+      if (duplicateId) {
+        toast.error('ID already exists. Please use a unique ID.');
+        return;
+      }
+    }
+
     setIsProcessing(true);
     try {
       if (editingPartner) {
-        await updatePartners(
-          partners.map((p) =>
-            p.id === editingPartner.id ? { ...p, ...formData } : p
-          )
+        const updatedPartners = partners.map((p) =>
+          p.id === editingPartner.id ? { ...p, ...formData } : p
         );
+        await updatePartners(updatedPartners);
         toast.success('Partner updated successfully!');
       } else {
         const newPartner: Partner = {
-          id: Date.now().toString(),
+          id: formData.id,
           ...formData,
           status: 'active',
         };
-        await updatePartners([...partners, newPartner]);
+        const updatedPartners = [...partners, newPartner];
+        await updatePartners(updatedPartners);
         toast.success('Partner added successfully!');
       }
       setIsDialogOpen(false);
-    } catch (error) {
-      toast.error('Failed to save partner');
+      setFormData({ id: '', name: '', category: '', website: '', logoUrl: '' });
+      setEditingPartner(null);
+    } catch (error: any) {
+      console.error('Error saving partner:', error);
+      toast.error('Failed to save: ' + error.message);
     } finally {
       setIsProcessing(false);
     }
@@ -83,14 +123,30 @@ export const DashboardPartners = React.memo(() => {
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight mb-2">ALLIANCE NETWORK</h1>
           <p className="text-white/40 font-mono text-sm">:: STRATEGIC PARTNERSHIPS & SPONSORS ::</p>
+          <p className="text-[#E93370]/60 font-mono text-[10px] mt-1">
+            {partners.length} partners • Local changes stay until synced
+          </p>
         </div>
-        <Button 
-          onClick={handleCreate} 
-          className="bg-[#E93370] hover:bg-[#E93370]/80 text-white rounded-xl shadow-[0_0_20px_rgba(233,51,112,0.3)] hover:shadow-[0_0_30px_rgba(233,51,112,0.5)] transition-all duration-300 border border-white/10"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          NEW PARTNER
-        </Button>
+        <div className="flex items-center gap-3">
+          <button
+             onClick={handleRefresh}
+             disabled={isRefreshing}
+             className="px-3 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-sm tracking-wide transition-all flex items-center gap-2 border border-white/10"
+             title="Refresh data from server"
+          >
+            <svg className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {isRefreshing ? 'SYNCING' : 'SYNC'}
+          </button>
+          <Button
+             onClick={handleCreate}
+             className="bg-[#E93370] hover:bg-[#E93370]/80 text-white rounded-xl shadow-[0_0_20px_rgba(233,51,112,0.3)] hover:shadow-[0_0_30px_rgba(233,51,112,0.5)] transition-all duration-300 border border-white/10"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            NEW PARTNER
+          </Button>
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -130,8 +186,8 @@ export const DashboardPartners = React.memo(() => {
                   <span className="text-2xl font-bold text-[#E93370]">{partner.name.charAt(0)}</span>
                 )}
               </div>
-              <Badge className={`border ${partner.status === 'active' 
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+              <Badge className={`border ${partner.status === 'active'
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                 : 'bg-white/5 text-white/40 border-white/10'
               }`}>
                 {partner.status.toUpperCase()}
@@ -141,6 +197,9 @@ export const DashboardPartners = React.memo(() => {
             <div className="mb-6">
               <h3 className="text-xl font-bold text-white mb-1 group-hover:text-[#E93370] transition-colors">{partner.name}</h3>
               <p className="text-sm text-white/40 font-mono uppercase">{partner.category}</p>
+              <p className="text-[10px] text-white/30 font-mono tracking-widest mt-2">
+                ID: {partner.id}
+              </p>
             </div>
 
             <div className="flex items-center gap-3 mt-auto">
@@ -171,8 +230,8 @@ export const DashboardPartners = React.memo(() => {
              <Search className="h-10 w-10 text-white/20" />
            </div>
            <p className="text-white/40 font-mono text-sm">:: NO PARTNERS FOUND ::</p>
-           <Button 
-             variant="link" 
+           <Button
+             variant="link"
              onClick={handleCreate}
              className="text-[#E93370] hover:text-[#E93370]/80 mt-2"
            >
@@ -191,6 +250,21 @@ export const DashboardPartners = React.memo(() => {
           </DialogHeader>
 
           <div className="space-y-6 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="id" className="text-[10px] uppercase text-[#E93370] font-black tracking-[0.4em] ml-1">Partner ID (Unique)</Label>
+              <Input
+                id="id"
+                value={formData.id}
+                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                placeholder="e.g., partner-001"
+                className="bg-[#0A0A0A] border-white/10 text-white placeholder:text-white/20 focus:border-[#E93370]/50 font-mono"
+                disabled={!!editingPartner}
+              />
+              {editingPartner && (
+                <p className="text-[10px] text-white/40 font-mono mt-1">ID cannot be changed after creation</p>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="name" className="text-[10px] uppercase text-white/40 font-bold tracking-widest">Partner Entity Name</Label>
               <Input

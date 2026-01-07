@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, Search, Edit, Trash2, Mail, Instagram, Shield, Users } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -10,13 +10,15 @@ import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useContent, TeamMember } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import { ImageUpload } from './ImageUpload';
+import { apiClient } from '../../supabase/api/client';
 
 export const DashboardTeam = React.memo(() => {
-  const { team, updateTeam } = useContent();
+  const { team, updateTeam, refresh, loading } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [formData, setFormData] = useState({
+    id: '',
     name: '',
     role: '',
     email: '',
@@ -26,6 +28,21 @@ export const DashboardTeam = React.memo(() => {
   });
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Auto-refresh data when component mounts
+  useEffect(() => {
+    console.log("🔄 DashboardTeam mounted, triggering refresh...");
+    // Just call refresh directly, let the toast be handled by the context
+    refresh().then(() => {
+      console.log("✅ DashboardTeam auto-refresh completed");
+    }).catch((err) => {
+      console.error("❌ DashboardTeam auto-refresh failed:", err);
+    });
+  }, [refresh]);
+
+  // Log team changes from context
+  console.log("📊 DashboardTeam rendered with team:", team.length, "members");
 
   const filteredTeam = team.filter((member) =>
     member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -34,13 +51,14 @@ export const DashboardTeam = React.memo(() => {
 
   const handleCreate = () => {
     setEditingMember(null);
-    setFormData({ name: '', role: '', email: '', instagram: '', bio: '', photoUrl: '' });
+    setFormData({ id: '', name: '', role: '', email: '', instagram: '', bio: '', photoUrl: '' });
     setIsDialogOpen(true);
   };
 
   const handleEdit = (member: TeamMember) => {
     setEditingMember(member);
     setFormData({
+      id: member.id,
       name: member.name,
       role: member.role,
       email: member.email,
@@ -51,14 +69,32 @@ export const DashboardTeam = React.memo(() => {
     setIsDialogOpen(true);
   };
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    console.log("🔄 SYNC button clicked - calling refresh()");
+    try {
+      await refresh();
+      toast.success('Data refreshed from server');
+      console.log("✅ refresh() completed successfully");
+    } catch (error: any) {
+      console.error("❌ refresh() failed:", error);
+      toast.error('Failed to refresh data: ' + error.message);
+    } finally {
+      setIsRefreshing(false);
+      console.log("🔄 SYNC operation finished");
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to remove this team member?')) {
       setIsProcessing(true);
       try {
-        await updateTeam(team.filter((m) => m.id !== id));
+        const updatedTeam = team.filter((m) => m.id !== id);
+        await updateTeam(updatedTeam);
         toast.success('Team member removed successfully!');
-      } catch (error) {
-        toast.error('Failed to remove team member');
+      } catch (error: any) {
+        console.error('Delete error:', error);
+        toast.error('Failed to remove team member: ' + error.message);
       } finally {
         setIsProcessing(false);
       }
@@ -67,6 +103,10 @@ export const DashboardTeam = React.memo(() => {
 
   const handleSubmit = async () => {
     // Basic validation
+    if (!formData.id.trim()) {
+      toast.error('ID is required for organization');
+      return;
+    }
     if (!formData.name.trim()) {
       toast.error('Name is required');
       return;
@@ -85,28 +125,53 @@ export const DashboardTeam = React.memo(() => {
       return;
     }
 
+    // Check for duplicate ID when creating
+    if (!editingMember) {
+      const duplicateId = team.find(m => m.id === formData.id);
+      if (duplicateId) {
+        toast.error('ID already exists. Please use a unique ID.');
+        return;
+      }
+    }
+
+    console.log("📝 Submitting team change:", editingMember ? "UPDATE" : "CREATE", formData.name, "(ID:", formData.id + ")");
     setIsProcessing(true);
+
     try {
       if (editingMember) {
-        await updateTeam(
-          team.map((m) =>
-            m.id === editingMember.id ? { ...m, ...formData } : m
-          )
+        // Update existing member
+        const updatedTeam = team.map((m) =>
+          m.id === editingMember.id ? { ...m, ...formData } : m
         );
+        console.log("📝 Local team before update:", team.length, "members");
+        console.log("📝 Updated team will have:", updatedTeam.length, "members");
+        await updateTeam(updatedTeam);
+        console.log("✅ updateTeam() completed successfully");
         toast.success('Team member updated successfully!');
       } else {
+        // Add new member with custom ID
         const newMember: TeamMember = {
-          id: Date.now().toString(),
+          id: formData.id,
           ...formData,
           status: 'active',
         };
-        await updateTeam([...team, newMember]);
+        const updatedTeam = [...team, newMember];
+        console.log("📝 Local team before add:", team.length, "members");
+        console.log("📝 New team will have:", updatedTeam.length, "members");
+        await updateTeam(updatedTeam);
+        console.log("✅ updateTeam() completed successfully");
         toast.success('Team member added successfully!');
       }
+
+      // Show current team state after update
+      console.log("📊 Team state after update:", team.length, "members");
+
       setIsDialogOpen(false);
+      setFormData({ id: '', name: '', role: '', email: '', instagram: '', bio: '', photoUrl: '' });
+      setEditingMember(null);
     } catch (error: any) {
-      console.error('Error saving team member:', error);
-      toast.error(error.message || 'Failed to save team member');
+      console.error('❌ Error saving team member:', error);
+      toast.error('Failed to save: ' + error.message);
     } finally {
       setIsProcessing(false);
     }
@@ -119,6 +184,9 @@ export const DashboardTeam = React.memo(() => {
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight mb-2">TEAM MANAGEMENT</h1>
           <p className="text-white/40 font-mono text-sm">:: MANAGE PERSONNEL & ROLES ::</p>
+          <p className="text-[#E93370]/60 font-mono text-[10px] mt-1">
+            {team.length} members • Local changes stay until synced
+          </p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -132,7 +200,18 @@ export const DashboardTeam = React.memo(() => {
               className="pl-12 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-full text-white placeholder:text-white/20 focus:outline-none focus:border-[#E93370]/50 focus:bg-white/10 transition-all w-64"
             />
           </div>
-          <button 
+          <button
+             onClick={handleRefresh}
+             disabled={isRefreshing}
+             className="px-3 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-sm tracking-wide transition-all flex items-center gap-2 border border-white/10"
+             title="Refresh data from server"
+          >
+            <svg className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {isRefreshing ? 'SYNCING' : 'SYNC'}
+          </button>
+          <button
              onClick={handleCreate}
              className="px-4 py-2.5 bg-[#E93370] hover:bg-[#D61E5C] text-white rounded-xl font-bold text-sm tracking-wide shadow-[0_0_20px_-5px_#E93370] transition-all flex items-center gap-2"
           >
@@ -179,10 +258,13 @@ export const DashboardTeam = React.memo(() => {
                   </div>
                   
                   <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
-                  <div className="flex items-center gap-2 text-[#E93370] text-sm font-medium mb-4">
+                  <div className="flex items-center gap-2 text-[#E93370] text-sm font-medium mb-2">
                      <Shield size={14} />
                      {member.role}
                   </div>
+                  <p className="text-[10px] text-white/30 font-mono tracking-widest mb-4">
+                     ID: {member.id}
+                  </p>
 
                   <p className="text-white/60 text-sm line-clamp-2 mb-6 h-10">
                      {member.bio || 'No bio available'}
@@ -247,6 +329,20 @@ export const DashboardTeam = React.memo(() => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
+                    <Label className="text-[9px] uppercase text-[#E93370] font-black tracking-[0.4em] ml-1">ID (Unique)</Label>
+                    <Input
+                      value={formData.id}
+                      onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                      className="bg-white/[0.03] border-white/5 text-white focus:border-[#E93370]/50 focus:bg-white/[0.07] h-11 text-sm px-4 rounded-lg transition-all font-mono"
+                      placeholder="e.g. team-001"
+                      disabled={!!editingMember}
+                    />
+                    {editingMember && (
+                      <p className="text-[10px] text-white/40 font-mono mt-1">ID cannot be changed after creation</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
                     <Label className="text-[9px] uppercase text-white/40 font-bold tracking-[0.4em] ml-1">Contact Email</Label>
                     <Input
                       value={formData.email}
@@ -255,7 +351,9 @@ export const DashboardTeam = React.memo(() => {
                       placeholder="email@wildoutproject.com"
                     />
                   </div>
+                </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[9px] uppercase text-white/40 font-bold tracking-[0.4em] ml-1">Social Profile (Instagram)</Label>
                     <div className="relative">

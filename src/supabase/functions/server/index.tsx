@@ -59,11 +59,33 @@ const authMiddleware = async (c: any, next: any) => {
 // --- Helpers ---
 
 const validate = async (c: any, schema: any) => {
+  let body: any;
   try {
-    const body = await c.req.json();
-    return schema.parse(body);
+    body = await c.req.json();
+    console.log("🔍 Server received body:", JSON.stringify(body, null, 2));
+    console.log("📋 Body keys:", Object.keys(body));
+    if (body.socialMedia) {
+      console.log("📱 Social media keys:", Object.keys(body.socialMedia));
+    }
+    const result = schema.parse(body);
+    console.log("✅ Validation passed");
+    return result;
   } catch (error: any) {
-    return c.json({ error: "Validation Failed", details: error.errors }, 400);
+    console.log("❌ Validation failed:", error.message);
+    console.log("❌ Full error object:", error);
+    console.log("❌ Error errors property:", error.errors);
+    console.log("❌ Error issues property:", error.issues);
+
+    // Handle both ZodError and other error types
+    // Zod errors are in error.issues, not error.errors
+    const errorDetails = error.issues || error.errors || [{ message: error.message }];
+    const response = {
+      error: "Validation Failed",
+      details: errorDetails,
+      receivedBody: body || "Unable to parse body"
+    };
+    console.log("❌ Sending error response:", JSON.stringify(response, null, 2));
+    return c.json(response, 400);
   }
 };
 

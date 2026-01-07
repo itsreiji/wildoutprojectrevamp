@@ -13,12 +13,14 @@ import {
   Sparkles,
   Info,
   Zap,
+  RefreshCw,
 } from 'lucide-react';
 import { useRouter } from '../Router';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import type { User } from '@supabase/auth-js';
 import logo from '../../assets/logo.png';
+import { useContent } from '../../contexts/ContentContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -40,9 +42,11 @@ const NAVIGATION_ITEMS = [
 export const DashboardLayout = React.memo(
   ({ children, currentPage, onNavigate }: DashboardLayoutProps) => {
     const { navigateTo } = useRouter();
+    const { refresh } = useContent();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [user, setUser] = useState<User | null>(null);
+    const [isSyncing, setIsSyncing] = useState(false);
 
     useEffect(() => {
       supabase.auth.getUser().then(({ data: { user } }: { data: { user: User | null } }) => {
@@ -67,6 +71,18 @@ export const DashboardLayout = React.memo(
       } else {
         toast.success('Signed out successfully');
         navigateTo('login');
+      }
+    };
+
+    const handleSync = async () => {
+      setIsSyncing(true);
+      try {
+        await refresh();
+        toast.success('✅ All data synced with server');
+      } catch (error: any) {
+        toast.error('❌ Sync failed: ' + error.message);
+      } finally {
+        setIsSyncing(false);
       }
     };
 
@@ -173,15 +189,27 @@ export const DashboardLayout = React.memo(
                   <p className="text-xs text-white/40">Administrator</p>
                </div>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 border border-red-500/20 hover:border-red-500"
-            >
-              <LogOut size={18} />
-              <span className="font-medium text-sm">Sign Out</span>
-            </motion.button>
+            <div className="space-y-2">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSync}
+                disabled={isSyncing}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-white/5 text-white hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20"
+              >
+                <RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
+                <span className="font-medium text-sm">{isSyncing ? 'Syncing...' : 'Sync All Data'}</span>
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 border border-red-500/20 hover:border-red-500"
+              >
+                <LogOut size={18} />
+                <span className="font-medium text-sm">Sign Out</span>
+              </motion.button>
+            </div>
           </div>
         </motion.aside>
 
