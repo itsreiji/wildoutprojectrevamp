@@ -22,8 +22,8 @@
     "VITE_ADMIN_BASE_PATH": "/admin",
     "VITE_USE_DUMMY_DATA": "false"
   },
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm build",
-  "devCommand": "pnpm dev",
+  "installCommand": "bun install",
+  "buildCommand": "bun run build",
+  "devCommand": "bun run dev",
   "outputDirectory": "build"
 }
