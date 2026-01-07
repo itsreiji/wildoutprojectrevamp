@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, Search, Edit, Trash2, Mail, Instagram, Shield, Users } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Mail, Instagram as LucideInstagram, Shield } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -10,10 +10,9 @@ import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useContent, TeamMember } from '../../contexts/ContentContext';
 import { toast } from 'sonner';
 import { ImageUpload } from './ImageUpload';
-import { apiClient } from '../../supabase/api/client';
 
 export const DashboardTeam = React.memo(() => {
-  const { team, updateTeam, refresh, loading } = useContent();
+  const { team, updateTeam, refresh } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
@@ -151,7 +150,6 @@ export const DashboardTeam = React.memo(() => {
       } else {
         // Add new member with custom ID
         const newMember: TeamMember = {
-          id: formData.id,
           ...formData,
           status: 'active',
         };
@@ -278,7 +276,7 @@ export const DashboardTeam = React.memo(() => {
                      )}
                      {member.instagram && (
                         <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-full">
-                           <Instagram size={18} />
+                           <LucideInstagram size={18} />
                         </a>
                      )}
                   </div>
@@ -357,7 +355,7 @@ export const DashboardTeam = React.memo(() => {
                   <div className="space-y-2">
                     <Label className="text-[9px] uppercase text-white/40 font-bold tracking-[0.4em] ml-1">Social Profile (Instagram)</Label>
                     <div className="relative">
-                      <Instagram className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={14} />
+                      <LucideInstagram className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={14} />
                       <Input
                         value={formData.instagram}
                         onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}

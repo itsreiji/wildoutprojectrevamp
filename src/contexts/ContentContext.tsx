@@ -1,7 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect, useRef } from 'react';
 import { apiClient } from '../supabase/api/client';
-import { Hero, About, Event as APIEvent, TeamMember as APITeamMember, Partner as APIPartner, Settings } from '../types/schemas';
 
 // --- Internal UI Types (Legacy) ---
 export interface Event {
@@ -495,7 +494,7 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     try {
       // Individual timeouts for each API call to prevent complete hang
-      const fetchWithTimeout = async <T>(promise: Promise<T>, name: string, timeoutMs: number = 5000): Promise<T | null> => {
+      const fetchWithTimeout = async <T,>(promise: Promise<T>, name: string, timeoutMs: number = 5000): Promise<T | null> => {
         let completed = false;
         const timeoutPromise = new Promise<null>((resolve) =>
           setTimeout(() => {
@@ -530,7 +529,12 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
 
       if (fetchedHero) {
         console.log("✅ Hero data received");
-        setHero(fetchedHero);
+        setHero({
+          ...fetchedHero,
+          subtitle: fetchedHero.subtitle ?? "",
+          description: fetchedHero.description ?? "",
+          stats: (fetchedHero.stats as any) || INITIAL_HERO.stats
+        });
       }
 
       if (fetchedAbout) {
@@ -660,8 +664,6 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
 
       console.log("✅ ALL API CALLS SUCCESSFUL");
       console.log("=== 🔄 TEAM UPDATE FLOW COMPLETE ===");
-
-      return true;
     } catch (err) {
       console.error("❌ FAILURE - Reverting:", err);
       // Revert to old state
@@ -715,7 +717,6 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
 
       console.log("✅ Partners successfully synchronized with Supabase");
-      return true;
     } catch (err) {
       console.error("❌ Failed to update partners in Supabase, reverting:", err);
       setPartners(oldPartners);
@@ -780,7 +781,6 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
 
       console.log("✅ Events successfully synchronized with Supabase");
-      return true;
     } catch (err) {
       console.error("❌ Failed to update events in Supabase, reverting:", err);
       setEvents(oldEvents);
@@ -828,7 +828,6 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
 
       console.log("✅ Gallery successfully synchronized with Supabase");
-      return true;
     } catch (err) {
       console.error("❌ Failed to update gallery in Supabase, reverting:", err);
       setGallery(oldGallery);
