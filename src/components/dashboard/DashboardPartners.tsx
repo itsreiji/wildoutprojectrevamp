@@ -178,9 +178,9 @@ export const DashboardPartners = React.memo(() => {
             </div>
 
             <div className="flex items-start justify-between mb-6">
-              <div className="w-16 h-16 rounded-xl bg-[#E93370]/10 border border-[#E93370]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-[#E93370]/10 border border-[#E93370]/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 {partner.logoUrl ? (
-                  <img src={partner.logoUrl} alt={partner.name} className="w-10 h-10 object-contain opacity-80 group-hover:opacity-100" />
+                  <img src={partner.logoUrl} alt={partner.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100" />
                 ) : (
                   <span className="text-2xl font-bold text-[#E93370]">{partner.name.charAt(0)}</span>
                 )}

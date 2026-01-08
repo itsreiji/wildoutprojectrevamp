@@ -12,13 +12,12 @@ import type {
   ContentContextType
 } from '../types/content';
 
-import { 
-  INITIAL_EVENTS, 
-  INITIAL_PARTNERS, 
-  INITIAL_GALLERY, 
-  INITIAL_TEAM, 
-  INITIAL_HERO, 
-  INITIAL_ABOUT, 
+import {
+  INITIAL_EVENTS,
+  INITIAL_PARTNERS,
+  INITIAL_GALLERY,
+  INITIAL_HERO,
+  INITIAL_ABOUT,
   INITIAL_SETTINGS
 } from './ContentData';
 import { ContentContext } from './ContentContextCore';
@@ -27,7 +26,7 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [events, setEvents] = useState<Event[]>(INITIAL_EVENTS);
   const [partners, setPartners] = useState<Partner[]>(INITIAL_PARTNERS);
   const [gallery, setGallery] = useState<GalleryImage[]>(INITIAL_GALLERY);
-  const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
+  const [team, setTeam] = useState<TeamMember[]>([]);
   const [hero, setHero] = useState<HeroContent>(INITIAL_HERO);
   const [about, setAbout] = useState<AboutContent>(INITIAL_ABOUT);
   const [settings, setSettings] = useState<SiteSettings>(INITIAL_SETTINGS);
@@ -35,7 +34,7 @@ export const ContentProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [loading, setLoading] = useState(false);
 
   // Refs to store current state for use in callbacks without stale closures
-  const teamRef = useRef<TeamMember[]>(INITIAL_TEAM);
+  const teamRef = useRef<TeamMember[]>([]);
   const eventsRef = useRef<Event[]>(INITIAL_EVENTS);
   const partnersRef = useRef<Partner[]>(INITIAL_PARTNERS);
   const galleryRef = useRef<GalleryImage[]>(INITIAL_GALLERY);

@@ -3,15 +3,16 @@ import { motion } from 'motion/react';
 import { Mail, Instagram, Linkedin, Twitter } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useContent } from '../contexts/ContentContextCore';
+import { TeamSkeleton } from './TeamSkeleton';
 
 export const TeamSection = React.memo(() => {
-  const { team } = useContent();
+  const { team, loading } = useContent();
   const activeTeam = team.filter(member => member.status === 'active');
 
   return (
     <section id="team" className="relative py-20 px-4">
       <div className="container mx-auto max-w-7xl">
-        {/* Section Header */}
+        {/* Section Header - Shown first (progressive loading) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -29,87 +30,132 @@ export const TeamSection = React.memo(() => {
           </p>
         </motion.div>
 
-        {/* Team Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {activeTeam.map((member, index) => (
+        {/* Skeleton Loading State - Shows after header */}
+        {loading ? (
+          <>
+            <TeamSkeleton count={8} variant="landing" />
+            {/* CTA placeholder during loading */}
             <motion.div
-              key={member.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
-              className="group"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-center mt-16"
             >
-              <div className="relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-300 h-full">
-                {/* Photo */}
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <ImageWithFallback
-                    src={member.photoUrl || 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400'}
-                    alt={member.name}
-                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60" />
-                </div>
-
-                {/* Bio & Contact */}
-                <div className="p-6 space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
-                    <p className="text-sm font-medium text-[#E93370]">{member.role}</p>
-                  </div>
-                  
-                  <p className="text-white/60 text-sm leading-relaxed">
-                    {member.bio}
-                  </p>
-
-                  <div className="space-y-2">
-                    {member.email && (
-                      <a
-                        href={`mailto:${member.email}`}
-                        className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors group"
-                      >
-                        <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span className="truncate">{member.email}</span>
-                      </a>
-                    )}
-                    {member.instagram && (
-                      <a
-                        href={member.instagram.startsWith('@') ? `https://instagram.com/${member.instagram.substring(1)}` : member.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors"
-                      >
-                        <Instagram className="h-4 w-4 mr-2 text-[#E93370]" />
-                        <span>{member.instagram}</span>
-                      </a>
-                    )}
-                  </div>
-                </div>
-
-                {/* Hover Effect */}
-                <div className="absolute inset-0 border-2 border-[#E93370] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none" />
+              <p className="text-white/60 mb-4">Want to join our amazing team?</p>
+              <div className="inline-flex items-center px-8 py-3 bg-white/10 text-transparent rounded-xl">
+                Get in Touch
               </div>
             </motion.div>
-          ))}
-        </div>
+          </>
+        ) : activeTeam.length === 0 ? (
+          <>
+            {/* Empty state if no team data */}
+            <div className="text-center text-white/40 py-12">
+              No team members yet. Check back soon!
+            </div>
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-center mt-16"
+            >
+              <p className="text-white/60 mb-4">Want to join our amazing team?</p>
+              <a
+                href="mailto:careers@wildoutproject.com"
+                className="inline-flex items-center px-8 py-3 bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl transition-all duration-300 shadow-lg shadow-[#E93370]/20 hover:shadow-[#E93370]/40"
+              >
+                <Mail className="mr-2 h-5 w-5" />
+                Get in Touch
+              </a>
+            </motion.div>
+          </>
+        ) : (
+          <>
+            {/* Team Grid - Actual content */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {activeTeam.map((member, index) => (
+                <motion.div
+                  key={member.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  className="group"
+                >
+                  <div className="relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-300 h-full">
+                    {/* Photo */}
+                    <div className="relative aspect-[3/4] overflow-hidden">
+                      <ImageWithFallback
+                        src={member.photoUrl || 'https://images.unsplash.com/photo-1676277757211-ebd7fdeb3d5b?w=400'}
+                        alt={member.name}
+                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60" />
+                    </div>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center mt-16"
-        >
-          <p className="text-white/60 mb-4">Want to join our amazing team?</p>
-          <a
-            href="mailto:careers@wildoutproject.com"
-            className="inline-flex items-center px-8 py-3 bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl transition-all duration-300 shadow-lg shadow-[#E93370]/20 hover:shadow-[#E93370]/40"
-          >
-            <Mail className="mr-2 h-5 w-5" />
-            Get in Touch
-          </a>
-        </motion.div>
+                    {/* Bio & Contact */}
+                    <div className="p-6 space-y-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
+                        <p className="text-sm font-medium text-[#E93370]">{member.role}</p>
+                      </div>
+
+                      <p className="text-white/60 text-sm leading-relaxed">
+                        {member.bio}
+                      </p>
+
+                      <div className="space-y-2">
+                        {member.email && (
+                          <a
+                            href={`mailto:${member.email}`}
+                            className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors group"
+                          >
+                            <Mail className="h-4 w-4 mr-2 text-[#E93370]" />
+                            <span className="truncate">{member.email}</span>
+                          </a>
+                        )}
+                        {member.instagram && (
+                          <a
+                            href={member.instagram.startsWith('@') ? `https://instagram.com/${member.instagram.substring(1)}` : member.instagram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-sm text-white/60 hover:text-[#E93370] transition-colors"
+                          >
+                            <Instagram className="h-4 w-4 mr-2 text-[#E93370]" />
+                            <span>{member.instagram}</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Hover Effect */}
+                    <div className="absolute inset-0 border-2 border-[#E93370] rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none" />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-center mt-16"
+            >
+              <p className="text-white/60 mb-4">Want to join our amazing team?</p>
+              <a
+                href="mailto:careers@wildoutproject.com"
+                className="inline-flex items-center px-8 py-3 bg-[#E93370] hover:bg-[#E93370]/90 text-white rounded-xl transition-all duration-300 shadow-lg shadow-[#E93370]/20 hover:shadow-[#E93370]/40"
+              >
+                <Mail className="mr-2 h-5 w-5" />
+                Get in Touch
+              </a>
+            </motion.div>
+          </>
+        )}
       </div>
     </section>
   );

@@ -11,9 +11,10 @@ import { useContent } from '../../contexts/ContentContextCore';
 import { TeamMember } from '../../types/content';
 import { toast } from 'sonner';
 import { ImageUpload } from './ImageUpload';
+import { TeamSkeleton } from '../TeamSkeleton';
 
 export const DashboardTeam = React.memo(() => {
-  const { team, updateTeam, refresh } = useContent();
+  const { team, updateTeam, refresh, loading } = useContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
@@ -187,7 +188,7 @@ export const DashboardTeam = React.memo(() => {
             {team.length} members • Local changes stay until synced
           </p>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-hover:text-white transition-colors" size={18} />
@@ -220,10 +221,15 @@ export const DashboardTeam = React.memo(() => {
         </div>
       </div>
 
-      {/* Team Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <AnimatePresence>
-          {filteredTeam.map((member, index) => (
+      {/* Skeleton Loading State */}
+      {loading ? (
+        <TeamSkeleton count={6} variant="dashboard" />
+      ) : (
+        <>
+          {/* Team Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence>
+              {filteredTeam.map((member, index) => (
             <motion.div
               key={member.id}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -286,6 +292,13 @@ export const DashboardTeam = React.memo(() => {
           ))}
         </AnimatePresence>
       </div>
+
+      {/* Empty State */}
+      {filteredTeam.length === 0 && (
+        <div className="text-center text-white/40 py-12">
+          {searchQuery ? 'No team members match your search.' : 'No team members yet. Add your first member to get started!'}
+        </div>
+      )}
 
       {/* Edit/Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -426,6 +439,8 @@ export const DashboardTeam = React.memo(() => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+        </>
+      )}
     </div>
   );
 });

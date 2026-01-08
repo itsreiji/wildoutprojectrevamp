@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Sparkles } from 'lucide-react';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useContent } from '../contexts/ContentContextCore';
 
 export const PartnersSection = React.memo(() => {
@@ -43,10 +44,20 @@ export const PartnersSection = React.memo(() => {
               className="group relative"
             >
               <div className="aspect-square p-8 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 hover:border-[#E93370]/50 transition-all duration-500 flex flex-col items-center justify-center">
-                {/* Logo Placeholder */}
-                <div className="w-full h-full flex items-center justify-center mb-2">
-                  <div className="text-3xl md:text-4xl text-white/80 group-hover:text-[#E93370] transition-colors duration-300">
-                    {partner.name.charAt(0)}
+                {/* Logo */}
+                <div className="flex-1 flex items-center justify-center mb-4 w-full">
+                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#E93370]/30 transition-all duration-500">
+                    {partner.logoUrl ? (
+                      <ImageWithFallback
+                        src={partner.logoUrl}
+                        alt={partner.name}
+                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
+                      />
+                    ) : (
+                      <div className="text-3xl md:text-4xl text-white/80 group-hover:text-[#E93370] transition-colors duration-300">
+                        {partner.name.charAt(0)}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
