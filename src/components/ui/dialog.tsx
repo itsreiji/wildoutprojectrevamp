@@ -46,27 +46,64 @@ function DialogOverlay({
   );
 }
 
+interface DialogContentProps extends React.ComponentProps<typeof DialogPrimitive.Content> {
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
+}
+
 function DialogContent({
   className,
   children,
+  size = 'medium',
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+}: DialogContentProps) {
+  const sizeClasses = {
+    small: 'sm:max-w-[500px]',
+    medium: 'sm:max-w-[640px]',
+    large: 'sm:max-w-[800px]',
+    xlarge: 'sm:max-w-[1024px]',
+  };
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg",
+          // Dark theme background
+          "bg-[#0A0A0A] text-white",
+          // Center positioning (standard dialog behavior)
+          "fixed top-[50%] left-[50%] z-50 translate-x-[-50%] translate-y-[-50%]",
+          // Size constraints - NOT full screen
+          "w-full max-w-[calc(100%-2rem)]",
+          sizeClasses[size],
+          // Height limit - prevents covering entire screen
+          "max-h-[90vh]",
+          // Layout
+          "flex flex-col",
+          // Visual styling
+          "rounded-2xl border border-white/10 shadow-2xl",
+          // Animations
+          "data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+          "duration-200",
+          // Overflow handling
+          "overflow-hidden",
           className,
         )}
         {...props}
+        onClick={(e) => e.stopPropagation()} // Prevent backdrop click from closing
       >
-        {children}
-        <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
-          <XIcon />
+        {/* Close button - positioned absolutely */}
+        <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 z-20 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <XIcon className="text-white/70 hover:text-white" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
+
+        {/* Scrollable content wrapper */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {children}
+        </div>
       </DialogPrimitive.Content>
     </DialogPortal>
   );
@@ -133,3 +170,4 @@ export {
   DialogTitle,
   DialogTrigger,
 };
+export type { DialogContentProps };

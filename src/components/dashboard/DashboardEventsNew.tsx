@@ -279,15 +279,15 @@ export const DashboardEventsNew = React.memo(() => {
 
       {/* Edit/Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-[#0A0A0A]/95 backdrop-blur-xl border border-white/10 text-white sm:max-w-[800px] p-0 overflow-hidden">
+        <DialogContent size="large">
           <DialogHeader className="px-6 py-4 border-b border-white/10 bg-white/5">
             <DialogTitle className="text-xl font-bold tracking-tight flex items-center gap-2">
               {editingEvent ? <Edit className="w-5 h-5 text-[#E93370]" /> : <Plus className="w-5 h-5 text-[#E93370]" />}
               {editingEvent ? 'EDIT EVENT' : 'CREATE NEW EVENT'}
             </DialogTitle>
           </DialogHeader>
-          
-          <div className="p-6">
+
+          <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="flex w-full bg-black/40 p-1 rounded-xl mb-6 h-auto border border-white/10">
                 <TabsTrigger value="details" className="flex-1 data-[state=active]:bg-[#E93370] data-[state=active]:text-white rounded-lg text-xs uppercase font-bold tracking-wider py-2">Details</TabsTrigger>
@@ -296,8 +296,6 @@ export const DashboardEventsNew = React.memo(() => {
                 <TabsTrigger value="lineup" className="flex-1 data-[state=active]:bg-[#E93370] data-[state=active]:text-white rounded-lg text-xs uppercase font-bold tracking-wider py-2">Lineup</TabsTrigger>
                 <TabsTrigger value="extras" className="flex-1 data-[state=active]:bg-[#E93370] data-[state=active]:text-white rounded-lg text-xs uppercase font-bold tracking-wider py-2">Extras</TabsTrigger>
               </TabsList>
-
-              <div className="max-h-[50vh] overflow-y-auto custom-scrollbar pr-2">
                 {/* DETAILS TAB */}
                 <TabsContent value="details" className="space-y-4 mt-0">
                   <div className="grid grid-cols-2 gap-4">
@@ -603,7 +601,6 @@ export const DashboardEventsNew = React.memo(() => {
                   </div>
                 </TabsContent>
 
-              </div>
             </Tabs>
           </div>
 

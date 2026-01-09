@@ -302,10 +302,7 @@ export const DashboardTeam = React.memo(() => {
 
       {/* Edit/Create Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent
-          className="!bg-black border border-white/10 text-white max-w-2xl w-[95vw] max-h-[90vh] flex flex-col shadow-2xl p-0 overflow-hidden rounded-2xl"
-          style={{ backgroundColor: 'black', opacity: 1 }}
-        >
+        <DialogContent size="large">
           <DialogHeader className="px-6 py-5 border-b border-white/5 flex-shrink-0">
             <DialogTitle className="text-xl font-bold tracking-tighter uppercase italic">
               {editingMember ? ':: EDIT PERSONNEL ::' : ':: ADD PERSONNEL ::'}

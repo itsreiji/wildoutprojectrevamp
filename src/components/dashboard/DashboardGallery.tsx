@@ -227,7 +227,7 @@ export const DashboardGallery = React.memo(() => {
 
       {/* Upload Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-[#0a0a0a] border-white/10 text-white sm:max-w-[500px]">
+        <DialogContent size="small">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold tracking-tight">UPLOAD ASSET</DialogTitle>
           </DialogHeader>
